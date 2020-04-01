@@ -9,6 +9,6 @@ output$text_interventions_total_death <- renderText({
         div(class = "n_box_interventions",
             div(class = "icon_box", h3(paste0("(", format(reduction, big.mark = ","), ")"))),
             h3(paste0(format(n, big.mark = ","))),
-            span(h4("Deaths"), "during the epidemic. (Interventions)")
+            span(h4("Deaths"), "during the epidemic.")
         ))))
 })

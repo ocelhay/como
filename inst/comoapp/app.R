@@ -9,155 +9,168 @@ source("./www/prepare_data.R")
 # Define UI ----
 ui <- function(request) {
   fluidPage(
-    theme = shinytheme("simplex"),
+    theme = shinytheme("flatly"),
     includeCSS("./www/styles.css"),
+    pushbar_deps(),
     chooseSliderSkin('HTML5'),
-    title = "COVID-19 App",
-    br(),
-    div(class = "box_outputs",
-        h4("About COVID-19 App v9.20")
+    title = "CoMo COVID-19 App",
+    div(id = "float_feedback_process",
+        htmlOutput("feedback_process"),
+        
+        conditionalPanel("output.show_results_interventions && input.tabs == 'tab_modelpredictions'",
+                         downloadButton("export", label = "Download Results (.csv)", class="btn btn-primary")
+        ),
     ),
-    h4("Important Disclaimer:"),
-    includeMarkdown("./www/markdown/disclaimer.md"),
-    
-    fluidRow(
-      column(3, 
-             br(),
-             tabsetPanel(id = "left_panel",
-                         # UI Tab Baseline ----
-                         tabPanel(value = 'baseline', title = h5("Baseline"), 
-                                  conditionalPanel("! output.interventions_okay",
-                                                   br(),
-                                                   bsButton("open2", label = "Country/Area Data", icon = icon('cog'), style = "default", type = "action", value = FALSE, 
-                                                            block = TRUE), br(),
-                                                   bsButton("open", label = "Virus Parameters", icon = icon('cog'), style = "default", type = "action", value = FALSE, 
-                                                            block = TRUE), br(), 
-                                                   # Modal dialogs for parameters ----
-                                                   source("./www/modal_parameters_virus.R", local = TRUE)$value,
-                                                   source("./www/modal_parameters_country.R", local = TRUE)$value,
-                                                   
-                                                   sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
-                                                               value = 0.035, ticks = FALSE),
-                                                   div(id = "margin_month_slider",
-                                                       sliderTextInput("phi", label = "Month of peak infectivity of the virus:", 
-                                                                       choices = month.name, selected = month.name[1])
-                                                   ),
-                                                   bsPopover("phi", title = "Recommendation", content = "Select the month of peak humidity",
-                                                             "right", options = list(container = "body")),
-                                                   
-                                                   sliderInput("report", label = "Percentage of all infections that are reported:", min = 0, max = 100, step = 0.1,
-                                                               value = 12.5, post = "%", ticks = FALSE),
-                                                   
-                                                   dateRangeInput("date_range", label = "Range of dates", start = "2020-01-31", end = "2020-12-31"),
-                                                   br(), 
-                                                   htmlOutput("feedback_choices"),
-                                                   div(class = "floating-button",
-                                                       actionButton("run_baseline", "Run Baseline", class="btn btn-success")
-                                                   ),
-                                                   hr()
-                                                   
-                                  ),
-                                  
-                                  conditionalPanel("output.interventions_okay", 
-                                                   br(),
-                                                   p("Since interventions are already built, to change parameters here, you will need to reset the baseline and start again."),
-                                                   bsButton("reset_baseline", label = "Reset the Baseline", icon = icon('cog'), style = "default", type = "action", value = FALSE, 
-                                                            block = TRUE), 
-                                  )
-                         ),
-                         # UI Tab Interventions ----
-                         tabPanel(value = 'interventions', title = h5("Interventions"), 
-                                  br(), 
-                                  # prettyRadioButtons("package_interventions", label = "Package of Interventions:", 
-                                  #                    choices = c("Low", "Medium", "High"), 
-                                  #                    selected = NULL, inline = TRUE),
-                                  # prettyCheckbox("custom_interventions", label = "Customise Package", value = FALSE),
-                                  # 
-                                  # conditionalPanel("input.custom_interventions", 
-                                  
-                                  h4("Interventions available:"),
-                                  # Self Isolation ----
-                                  source("./www/interventions/selfisolation.R", local = TRUE)$value,
-                                  bsPopover("interventions_selfis", title='Self-isolation', "<p>Coverages gives the proportion of people whom self-isolate after testing positive for coronavirus. The efficacy indicates how many less infectious contacts isolating people have (across all contact matrices).</p>", 
-                                            "top", trigger='hover', options = list(container = "body")),
-                                  # Social Distancing ----
-                                  source("./www/interventions/socialdistancing.R", local = TRUE)$value,
-                                  bsPopover("interventions_dist", title='Social distancing', "<p>Coverage reflects the proportion of people that reduce their societal contacts (excluding those at home, work and school). Efficacy changes the percent reduction in those contacts.</p>", 
-                                            "top", trigger='hover', options = list(container = "body")),
-                                  # Handwashing ----
-                                  source("./www/interventions/handwashing.R", local = TRUE)$value,
-                                  bsPopover("interventions_hand", title='Hand washing', "<p>This indicates improvements in personal hygiene and reduction in risk behaviours (touching face, nose, mouth). It reduces the risk of infection by efficacy for the duration of the intervention.</p>", 
-                                            "top", trigger='hover', options = list(container = "body")),
-                                  # Working from Home ----
-                                  source("./www/interventions/work.R", local = TRUE)$value,
-                                  bsPopover("interventions_work", title='Working at home', "<p>Sets the proportion of workers working from home. Those who don’t, have a reduction in contacts at work defined by efficacy. Those who work at home have increased contacts at home defined by w2h.</p>", 
-                                            "top", trigger='hover', options = list(container = "body")),
-                                  # School Closure ----
-                                  source("./www/interventions/school.R", local = TRUE)$value,
-                                  bsPopover("interventions_school", title='School closure', "<p>We assume all schools close at the same time. Efficacy defines the reduction of contacts between school children when school is closed. Children at home have increased home contacts given by s2h.</p>", 
-                                            "top", trigger='hover', options = list(container = "body")),
-                                  # Cocooning the elderly ----
-                                  source("./www/interventions/cocoon.R", local = TRUE)$value,
-                                  bsPopover("interventions_cocoon", title='Cocooning the elderly', "<p>Defining an age cut-off, this intervention is designed to isolate a proportion (coverage) of the elderly population and reduce their overall contacts by efficacy.</p>", 
-                                            "top", trigger='hover', options = list(container = "body")),
-                                  # Travel Ban ----
-                                  source("./www/interventions/travel.R", local = TRUE)$value,
-                                  bsPopover("interventions_travelban", title='Travel ban', "<p>Reduced the number of imported cases per day by a percentage given by efficacy.</p>", 
-                                            "bottom", trigger='hover', options = list(container = "body")),
-                                  # Quarantine ----
-                                  source("./www/interventions/quarantine.R", local = TRUE)$value,
-                                  bsPopover("interventions_quarantine", title='Quarantine', "<p>This indicates how many people will self-isolate for X days if a person they live with tests positive. As such, coverage depends on the number of people isolating and the number of persons per household. During their isolation period, these people will have increased contacts at home and reduced societal contacts.</p>", 
-                                            "bottom", trigger='hover', options = list(container = "body")),
-                                  # Vaccination ----
-                                  h4("Interventions not yet available:"),
-                                  source("./www/interventions/vaccination.R", local = TRUE)$value,
-                                  br(),
-                                  # ),
-                                  div(class = "floating-button",
-                                      actionButton("run_interventions", "Run Interventions", class="btn btn-success")
-                                  ),
-                                  hr()
-                         )
-             )
-      ),
-      # UI Outputs ----
-      column(9, 
-             br(), br(), 
-             div(class = "box_outputs", h4("Timeline")),
-             timevisOutput("timeline"),
-             br(), 
-             conditionalPanel("output.show_results",
-                              div(class = "box_outputs", h4("Predictions")),
-                              fluidRow(
-                                column(9,
-                                       prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
-                                                          selected = "Predicted Reported + Unreported", inline = TRUE)
-                                ),
-                                column(3, downloadButton("export", label = "Download Results (.csv)"))
-                              ),
-                              fluidRow(
-                                column(6,
-                                       highchartOutput("highchart_confirmed", height = "350px"), br(),
-                                       highchartOutput("highchart_mortality", height = "350px")
-                                ),
-                                column(6,
-                                       highchartOutput("highchart_ICU", height = "350px"), br(),
-                                       htmlOutput("text_doubling_time"), br(),
-                                       fluidRow(
-                                         column(6,
-                                                htmlOutput("text_baseline_pct_pop"), br(),
-                                                htmlOutput("text_baseline_total_death")
-                                         ),
-                                         column(6, 
-                                                htmlOutput("text_interventions_pct_pop"), br(),
-                                                htmlOutput("text_interventions_total_death")
-                                         )
-                                       )
-                                )
-                              ),
-                              br()
-             )
-      )
+    navbarPage(NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
+               tabPanel("Welcome", value = "tab_welcome",
+                        h3("CoMo COVID-19 App"),
+                        h4("v9.21"),
+                        br(),
+                        fluidRow(
+                          column(5, 
+                                 div(class = "box_outputs",
+                                     h4("Important Disclaimer:")
+                                 ),
+                                 includeMarkdown("./www/markdown/disclaimer.md")
+                          ),
+                          column(5, offset = 2,
+                                 div(class = "box_outputs",
+                                     h4("Sources of Data:")
+                                 ),
+                                 includeMarkdown("./www/markdown/about_country_data.md"),
+                                 includeMarkdown("./www/markdown/about_data.md"),
+                          )
+                        )
+               ),
+               tabPanel("Visual Fit", value = "tab_visualfit",
+                        fluidRow(
+                          column(4, 
+                                 conditionalPanel("! output.show_results_interventions",
+                                                  div(class = "baseline_left",
+                                                      br(),
+                                                      bsButton("open_country_param", label = "Country/Area Data", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                               block = TRUE), br(),
+                                                      bsButton("open_virus_param", label = "Virus Parameters", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                               block = TRUE), br(), 
+                                                      sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
+                                                                  value = 0.035, ticks = FALSE),
+                                                      div(id = "margin_month_slider",
+                                                          sliderTextInput("phi", label = "Month of peak infectivity of the virus:", 
+                                                                          choices = month.name, selected = month.name[1])
+                                                      ),
+                                                      bsPopover("phi", title = "Recommendation", content = "Select the month of peak humidity",
+                                                                "right", options = list(container = "body")),
+                                                      
+                                                      sliderInput("report", label = "Percentage of all infections that are reported:", min = 0, max = 100, step = 0.1,
+                                                                  value = 12.5, post = "%", ticks = FALSE),
+                                                      
+                                                      dateRangeInput("date_range", label = "Range of dates", start = "2020-01-31", end = "2020-12-31"),
+                                                      br(), 
+                                                      htmlOutput("feedback_choices"),
+                                                      div(class = "floating-button",
+                                                          actionButton("run_baseline", "Run Baseline", class="btn btn-success")
+                                                      ),
+                                                      hr()
+                                                  )
+                                 ),
+                                 source("./www/pushbar_parameters_country.R", local = TRUE)[1],
+                                 source("./www/pushbar_parameters_virus.R", local = TRUE)[1],
+                                 
+                                 conditionalPanel("output.show_results_interventions", 
+                                                  br(),
+                                                  bsButton("reset_baseline", label = "Reset the Baseline", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                           block = TRUE), 
+                                 )
+                          ),
+                          column(8,
+                                 conditionalPanel("output.show_results_baseline",
+                                                  br(), br(),
+                                                  fluidRow(
+                                                    column(8, br(), prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
+                                                                                       selected = "Observed", inline = TRUE)),
+                                                    column(3, offset = 1, htmlOutput("text_doubling_time"))
+                                                  ),
+                                                  highchartOutput("highchart_confirmed", height = "300px"), 
+                                                  highchartOutput("highchart_mortality", height = "300px")
+                                 )
+                          )
+                        )
+               ),
+               tabPanel("Model Predictions", value = "tab_modelpredictions",
+                        fluidRow(
+                          column(4, 
+                                 div(class = "interventions_left",
+                                     h4("Interventions available:"),
+                                     # Self Isolation ----
+                                     source("./www/interventions/selfisolation.R", local = TRUE)$value,
+                                     bsPopover("interventions_selfis", title='Self-isolation', "<p>Coverages gives the proportion of people whom self-isolate after testing positive for coronavirus. The efficacy indicates how many less infectious contacts isolating people have (across all contact matrices).</p>", 
+                                               "top", trigger='hover', options = list(container = "body")),
+                                     # Social Distancing ----
+                                     source("./www/interventions/socialdistancing.R", local = TRUE)$value,
+                                     bsPopover("interventions_dist", title='Social distancing', "<p>Coverage reflects the proportion of people that reduce their societal contacts (excluding those at home, work and school). Efficacy changes the percent reduction in those contacts.</p>", 
+                                               "top", trigger='hover', options = list(container = "body")),
+                                     # Handwashing ----
+                                     source("./www/interventions/handwashing.R", local = TRUE)$value,
+                                     bsPopover("interventions_hand", title='Hand washing', "<p>This indicates improvements in personal hygiene and reduction in risk behaviours (touching face, nose, mouth). It reduces the risk of infection by efficacy for the duration of the intervention.</p>", 
+                                               "top", trigger='hover', options = list(container = "body")),
+                                     # Working from Home ----
+                                     source("./www/interventions/work.R", local = TRUE)$value,
+                                     bsPopover("interventions_work", title='Working at home', "<p>Sets the proportion of workers working from home. Those who don’t, have a reduction in contacts at work defined by efficacy. Those who work at home have increased contacts at home defined by w2h.</p>", 
+                                               "top", trigger='hover', options = list(container = "body")),
+                                     # School Closure ----
+                                     source("./www/interventions/school.R", local = TRUE)$value,
+                                     bsPopover("interventions_school", title='School closure', "<p>We assume all schools close at the same time. Efficacy defines the reduction of contacts between school children when school is closed. Children at home have increased home contacts given by s2h.</p>", 
+                                               "top", trigger='hover', options = list(container = "body")),
+                                     # Cocooning the elderly ----
+                                     source("./www/interventions/cocoon.R", local = TRUE)$value,
+                                     bsPopover("interventions_cocoon", title='Cocooning the elderly', "<p>Defining an age cut-off, this intervention is designed to isolate a proportion (coverage) of the elderly population and reduce their overall contacts by efficacy.</p>", 
+                                               "top", trigger='hover', options = list(container = "body")),
+                                     # Travel Ban ----
+                                     source("./www/interventions/travel.R", local = TRUE)$value,
+                                     bsPopover("interventions_travelban", title='Travel ban', "<p>Reduced the number of imported cases per day by a percentage given by efficacy.</p>", 
+                                               "bottom", trigger='hover', options = list(container = "body")),
+                                     # Quarantine ----
+                                     source("./www/interventions/quarantine.R", local = TRUE)$value,
+                                     bsPopover("interventions_quarantine", title='Quarantine', "<p>This indicates how many people will self-isolate for X days if a person they live with tests positive. As such, coverage depends on the number of people isolating and the number of persons per household. During their isolation period, these people will have increased contacts at home and reduced societal contacts.</p>", 
+                                               "bottom", trigger='hover', options = list(container = "body")),
+                                     # Vaccination ----
+                                     h4("Interventions not yet available:"),
+                                     source("./www/interventions/vaccination.R", local = TRUE)$value,
+                                     br(),
+                                     # ),
+                                     div(class = "floating-button",
+                                         actionButton("run_interventions", "Run Interventions", class="btn btn-success")
+                                     ),
+                                     hr()
+                                 )
+                          ),
+                          column(8,
+                                 br(), br(),
+                                 div(class = "box_outputs", h4("Timeline")),
+                                 timevisOutput("timeline"),
+                                 conditionalPanel("output.show_results_interventions",
+                                                  fluidRow(
+                                                    column(6, 
+                                                           div(class = "box_outputs", h4("Baseline")),
+                                                           htmlOutput("text_baseline_pct_pop"), br(),
+                                                           htmlOutput("text_baseline_total_death"),
+                                                    ),
+                                                    column(6, 
+                                                           div(class = "box_outputs", h4("Interventions")),
+                                                           htmlOutput("text_interventions_pct_pop"), br(),
+                                                           htmlOutput("text_interventions_total_death")
+                                                    ),
+                                                  ),
+                                                  br(),
+                                                  prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
+                                                                     selected = "Predicted Reported + Unreported", inline = TRUE),
+                                                  highchartOutput("highchart_confirmed_dup", height = "300px"), 
+                                                  highchartOutput("highchart_mortality_dup", height = "300px"),
+                                                  highchartOutput("highchart_ICU", height = "300px"), br()
+                                 )
+                          )
+                        )
+               )
     )
   )
 }
@@ -166,20 +179,19 @@ ui <- function(request) {
 server <- function(input, output, session) {
   # On deployment only:
   # Stop the shiny app when the browser window is closed
-  # session$onSessionEnded(function() {
-  #   stopApp()
-  # })
-  
-  # Show disclaimer on startup
-  # observe({
-  #   showNotification(id = "disclaimer", ui = div(includeMarkdown("./www/markdown/disclaimer.md")),
-  #                    duration = NULL, closeButton = FALSE, type = "message",
-  #                    action = actionButton("understand", "I understand and wish to continue."))
-  # })
-  # observeEvent(input$understand, removeNotification("disclaimer"))
+  session$onSessionEnded(function() {
+    stopApp()
+  })
   
   # Hide tabs on app launch ----
-  hideTab(inputId = "left_panel", target = "interventions")
+  hideTab(inputId = "tabs", target = "tab_modelpredictions")
+  
+  # Pushbar for parameters ----
+  setup_pushbar(overlay = TRUE, blur = TRUE)
+  observeEvent(input$open_country_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_country"))  
+  observeEvent(input$close_country_param, pushbar_close())
+  observeEvent(input$open_virus_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_virus"))  
+  observeEvent(input$close_virus_param, pushbar_close())
   
   # # Provide default values for package of interventions
   # observeEvent(input$package_interventions, {
@@ -259,17 +271,16 @@ server <- function(input, output, session) {
   file_list <- list.files(path = "./www/outputs", pattern = "*.R")
   for (file in file_list) source(paste0("./www/outputs/", file), local = TRUE)$value
   
-  # To show/hide baseline reset ----
-  output$interventions_okay <- reactive({
+  # To show/hide results ----
+  output$show_results_baseline <- reactive({
+    return(simul_baseline$baseline_available & !simul_interventions$interventions_available)
+  })
+  outputOptions(output, "show_results_baseline", suspendWhenHidden = FALSE)
+  
+  output$show_results_interventions <- reactive({
     return(simul_interventions$interventions_available)
   })
-  outputOptions(output, "interventions_okay", suspendWhenHidden = FALSE)
-  
-  # To show/hide results ----
-  output$show_results <- reactive({
-    return(simul_baseline$baseline_available)
-  })
-  outputOptions(output, "show_results", suspendWhenHidden = FALSE)
+  outputOptions(output, "show_results_interventions", suspendWhenHidden = FALSE)
   
   # Process on uploading a file of severity/mortality
   observeEvent(input$severity_mortality_file, {
@@ -333,7 +344,7 @@ server <- function(input, output, session) {
     updateMaterialSwitch(session, "screen_switch", value = FALSE)
     updateMaterialSwitch(session, "vaccination_switch", value = FALSE)
     updateMaterialSwitch(session, "quarantine_switch", value = FALSE)
-    hideTab(inputId = "left_panel", target = "interventions")
+    hideTab(inputId = "tabs", target = "tab_modelpredictions")
   })
   
   # Process on "run_baseline" ----
@@ -376,7 +387,7 @@ server <- function(input, output, session) {
     
     removeNotification(id = "model_run_notif", session = session)
     
-    showTab(inputId = "left_panel", target = "interventions")
+    showTab(inputId = "tabs", target = "tab_modelpredictions")
   })
   
   # Process on "run_interventions" ----

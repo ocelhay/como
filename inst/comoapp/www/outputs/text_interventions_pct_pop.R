@@ -9,6 +9,6 @@ output$text_interventions_pct_pop <- renderText({
         div(class = "n_box_interventions",
             div(class = "icon_box", h3(paste0("(", reduction, "%)"))),
             h3(paste0(n, "%")),
-            p("of the population will be infected during the epidemic. (Interventions)")
+            p("of the population will be infected during the epidemic.")
         ))))
 })
