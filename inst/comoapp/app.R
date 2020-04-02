@@ -24,7 +24,7 @@ ui <- function(request) {
     navbarPage(NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
                tabPanel("Welcome", value = "tab_welcome",
                         h3("CoMo COVID-19 App"),
-                        h4("v9.22"),
+                        h4("v9.23"),
                         br(),
                         fluidRow(
                           column(5, 
@@ -300,12 +300,9 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$cases_file, {
-    cases_file_upload <- read_csv(input$cases_file$datapath, col_names = TRUE,
-                                  col_types = "cnnn") %>%
+    cases_rv$data <- read_csv(input$cases_file$datapath, col_names = TRUE,
+                              col_types = "cnnn") %>%
       mutate(date = ymd(date))
-    
-    cases_rv$data <- cases_file_upload
-    cases_rv$data <- cases %>% filter(country == input$country_cases)
   })
   
   # Manage population reactive values
