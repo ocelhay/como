@@ -45,34 +45,41 @@ ui <- function(request) {
                tabPanel("Visual Fit", value = "tab_visualfit",
                         fluidRow(
                           column(4, 
-                                 conditionalPanel("! output.show_results_interventions",
-                                                  div(class = "baseline_left",
-                                                      br(), 
-                                                      bsButton("open_country_param", label = "Country/Area Data", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                               block = TRUE), br(),
-                                                      bsButton("open_virus_param", label = "Virus Parameters", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                               block = TRUE), br(), 
-                                                      sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
-                                                                  value = 0.035, ticks = FALSE),
-                                                      sliderInput("report", label = "Percentage of all infections that are reported:", min = 0, max = 100, step = 0.1,
-                                                                  value = 12.5, post = "%", ticks = FALSE),
-                                                      
-                                                      dateRangeInput("date_range", label = "Range of dates", start = "2020-01-31", end = "2020-12-31"),
-                                                      br(), 
-                                                      htmlOutput("feedback_choices"),
-                                                      div(class = "floating-button",
-                                                          actionButton("run_baseline", "Run Baseline", class="btn btn-success")
-                                                      ),
-                                                      hr()
-                                                  )
-                                 ),
-                                 source("./www/pushbar_parameters_country.R", local = TRUE)[1],
-                                 source("./www/pushbar_parameters_virus.R", local = TRUE)[1],
-                                 
-                                 conditionalPanel("output.show_results_interventions", 
-                                                  br(),
-                                                  bsButton("reset_baseline", label = "Reset the Baseline", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                           block = TRUE), 
+                                 tabsetPanel(type = "tabs",
+                                             tabPanel("Parameters",
+                                                       conditionalPanel("! output.show_results_interventions",
+                                                                        div(class = "baseline_left",
+                                                                            br(), 
+                                                                            bsButton("open_country_param", label = "Country/Area Data", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                                     block = TRUE), br(),
+                                                                            bsButton("open_virus_param", label = "Virus Parameters", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                                     block = TRUE), br(), 
+                                                                            sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
+                                                                                        value = 0.035, ticks = FALSE),
+                                                                            sliderInput("report", label = "Percentage of all infections that are reported:", min = 0, max = 100, step = 0.1,
+                                                                                        value = 12.5, post = "%", ticks = FALSE),
+                                                                            
+                                                                            dateRangeInput("date_range", label = "Range of dates", start = "2020-01-31", end = "2020-12-31"),
+                                                                            br(), 
+                                                                            htmlOutput("feedback_choices"),
+                                                                            div(class = "floating-button",
+                                                                                actionButton("run_baseline", "Run Baseline", class="btn btn-success")
+                                                                            ),
+                                                                            hr()
+                                                                        ),
+                                                                        source("./www/pushbar_parameters_country.R", local = TRUE)[1],
+                                                                        source("./www/pushbar_parameters_virus.R", local = TRUE)[1]
+                                                       ),
+                                                       conditionalPanel("output.show_results_interventions", 
+                                                                        br(),
+                                                                        bsButton("reset_baseline", label = "Reset the Baseline", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                                 block = TRUE)
+                                                       )
+                                             ),
+                                             tabPanel("Past/Current Interventions",
+                                                       HTML("TBC")
+                                             )
+                                             
                                  )
                           ),
                           column(8,
