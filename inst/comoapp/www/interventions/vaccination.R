@@ -10,13 +10,13 @@ div(class = "interventions", id = 'interventions_vaccine',
                                              width = "400px", tooltip = FALSE, right = FALSE, up = TRUE,
                                              fluidRow(
                                                column(12,
-                                                      dateInput("date_vaccine_on", label = "Start Date", value = "2020-04-14"),
-                                                      sliderInput("vaccine_eff", label = "Efficacy of vaccine:", value = 0, min = 0, max = 100,
-                                                                  step = 1, post = "%", ticks = FALSE),
+                                                      dateInput("date_vaccine_on", label = "Start Date", value = "2021-06-01"),
+                                                      sliderInput("vac_campaign", label = "Time to reach target coverage:", value = 4, min = 1, max = 8,
+                                                                  step = 1, post = " weeks", ticks = FALSE),
                                                       sliderInput("vaccine_cov", label = "Coverage of vaccine:", value = 90, min = 0, max = 100,
                                                                   step = 1, post = "%", ticks = FALSE),
-                                                      sliderInput("vac_campaign", label = "Duration of vaccination campaign:", value = 4, min = 1, max = 8,
-                                                                  step = 1, post = " weeks", ticks = FALSE)
+                                                      sliderInput("vaccine_eff", label = "Efficacy of vaccine:", value = 0, min = 0, max = 100,
+                                                                  step = 1, post = "%", ticks = FALSE)
                                                )
                                              )
                               )

@@ -7,14 +7,14 @@ div(class = "interventions", id = 'interventions_school',
       column(width = 3,
              conditionalPanel("input.school_switch",
                               dropdownButton(label = "", circle = FALSE, status = "default", size = 'sm', icon = icon("gear"), 
-                                             width = "400px", tooltip = FALSE, right = FALSE,
+                                             width = "400px", tooltip = FALSE, right = FALSE, up = TRUE,
                                              fluidRow(
                                                column(12,
                                                       dateInput("date_school_on", label = "Start Date:", value = "2020-03-23"),
                                                       sliderInput("school_dur", label = "Duration:", value = 16, min = 1, max = 52, step = 1, post = " weeks", ticks = FALSE),
                                                       sliderInput("school_eff", label = "Efficacy of school closure:", value = 85, min = 0, max = 100,
                                                                   step = 1, post = "%", ticks = FALSE),
-                                                      sliderInput("s2h", label = "School contacts that get attibuted to home when school closes:", value = 20, min = 0, max = 100,
+                                                      sliderInput("s2h", label = "Home contacts inflation due to school closure:", value = 20, min = 0, max = 100,
                                                                   step = 1, post = "%", ticks = FALSE)
                                                       
                                                )

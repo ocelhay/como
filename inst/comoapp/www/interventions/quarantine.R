@@ -11,17 +11,18 @@ div(class = "interventions", id = 'interventions_quarantine',
                                              fluidRow(
                                                column(6,
                                                       dateInput("date_quarantine_on", label = "Start Date:", value = "2020-03-25"),
-                                                      sliderInput("quarantine_cov", label = "Coverage of quarantine:", value = 70, min = 0, max = 100,
-                                                                  step = 1, post = "%", ticks = FALSE),
                                                       sliderInput("quarantine_dur", label = "Duration of quarantine:", value = 24, min = 1, max = 52,
                                                                   step = 1, post = " weeks", ticks = FALSE),
                                                       sliderInput("quarantine_days", label = "Days in isolation for average person:", value = 14, min = 1, max = 21,
-                                                                  step = 1, post = " days", ticks = FALSE)
+                                                                  step = 1, post = " days", ticks = FALSE),
+                                                      sliderInput("quarantine_cov", label = "Coverage of quarantine:", value = 70, min = 0, max = 100,
+                                                                  step = 1, post = "%", ticks = FALSE)
+                                                      
                                                ),
                                                column(6,
-                                                      sliderInput("quarantine_eff_home", label = "Increase in the number of contacts at home when quarantined", value = 100, 
-                                                                  min = 0, max = 100, step = 5, post = "%", ticks = FALSE),
                                                       sliderInput("quarantine_eff_other", label = "Decrease in the number of other contacts when quarantined:", value = 20, 
+                                                                  min = 0, max = 100, step = 5, post = "%", ticks = FALSE),
+                                                      sliderInput("quarantine_eff_home", label = "Increase in the number of contacts at home when quarantined", value = 100, 
                                                                   min = 0, max = 100, step = 5, post = "%", ticks = FALSE)
                                                )
                                              )

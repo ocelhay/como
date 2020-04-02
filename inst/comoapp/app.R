@@ -24,7 +24,7 @@ ui <- function(request) {
     navbarPage(NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
                tabPanel("Welcome", value = "tab_welcome",
                         h3("CoMo COVID-19 App"),
-                        h4("v9.21"),
+                        h4("v9.22"),
                         br(),
                         fluidRow(
                           column(5, 
@@ -47,20 +47,13 @@ ui <- function(request) {
                           column(4, 
                                  conditionalPanel("! output.show_results_interventions",
                                                   div(class = "baseline_left",
-                                                      br(),
+                                                      br(), 
                                                       bsButton("open_country_param", label = "Country/Area Data", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                                block = TRUE), br(),
                                                       bsButton("open_virus_param", label = "Virus Parameters", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                                block = TRUE), br(), 
                                                       sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
                                                                   value = 0.035, ticks = FALSE),
-                                                      div(id = "margin_month_slider",
-                                                          sliderTextInput("phi", label = "Month of peak infectivity of the virus:", 
-                                                                          choices = month.name, selected = month.name[1])
-                                                      ),
-                                                      bsPopover("phi", title = "Recommendation", content = "Select the month of peak humidity",
-                                                                "right", options = list(container = "body")),
-                                                      
                                                       sliderInput("report", label = "Percentage of all infections that are reported:", min = 0, max = 100, step = 0.1,
                                                                   value = 12.5, post = "%", ticks = FALSE),
                                                       
@@ -84,7 +77,7 @@ ui <- function(request) {
                           ),
                           column(8,
                                  conditionalPanel("output.show_results_baseline",
-                                                  br(), br(),
+                                                  br(), br(), br(), br(),
                                                   fluidRow(
                                                     column(8, br(), prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
                                                                                        selected = "Observed", inline = TRUE)),

@@ -7,7 +7,7 @@ div(class = "interventions", id = 'interventions_work',
       column(width = 3,
              conditionalPanel("input.work_switch",
                               dropdownButton(label = "", circle = FALSE, status = "default", size = 'sm', icon = icon("gear"), 
-                                             width = "400px", tooltip = FALSE, right = FALSE,
+                                             width = "400px", tooltip = FALSE, right = FALSE, up = TRUE,
                                              fluidRow(
                                                column(12,
                                                       dateInput("date_work_on", label = "Start Date:", value = "2020-03-19"),
@@ -16,7 +16,7 @@ div(class = "interventions", id = 'interventions_work',
                                                                   step = 1, post = "%", ticks = FALSE),
                                                       sliderInput("work_eff", label = "Efficacy of working from home:", value = 85, min = 0, max = 100,
                                                                   step = 1, post = "%", ticks = FALSE),
-                                                      sliderInput("w2h", label = "Work contacts that get attibuted to home when working from home:", value = 10, min = 0, max = 100,
+                                                      sliderInput("w2h", label = "Home contacts inflation due to working from home:", value = 10, min = 0, max = 100,
                                                                   step = 1, post = "%", ticks = FALSE)
                                                       
                                                )

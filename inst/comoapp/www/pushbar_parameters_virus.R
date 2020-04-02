@@ -10,7 +10,12 @@ list(
                    sliderInput("nui", label = "Average duration of symptomatic infection period:", post = " days", ticks = FALSE,
                                value = 5.5, min = 1, max = 7, step = 0.5),
                    sliderInput("nus", label = "Average duration of non-fatal severe infection:", post = " days", ticks = FALSE,
-                               value = 7, min = 1, max = 21, step = 0.5)
+                               value = 7, min = 1, max = 21, step = 0.5),
+                   div(id = "margin_month_slider",
+                       sliderTextInput("phi", label = "Month of peak infectivity of the virus:", 
+                                       choices = month.name, selected = month.name[1]),
+                       p("Recommendation: select the month of peak humidity")
+                   )
             ),
             column(6,  
                    sliderInput("ratem", label = "Average time to death for fatal infection:", post = " days", ticks = FALSE,

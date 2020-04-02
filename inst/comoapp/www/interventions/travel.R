@@ -11,10 +11,10 @@ div(class = "interventions", id = 'interventions_travelban',
                                              fluidRow(
                                                column(12,
                                                       dateInput("date_travelban_on", label = "Start Date:", value = "2020-03-25"),
-                                                      sliderInput("travelban_eff", label = "Efficacy of travel ban:", value = 50, min = 0, max = 100,
-                                                                  step = 1, post = "%", ticks = FALSE),
                                                       sliderInput("travelban_dur", label = "Duration of travel ban:", value = 16, min = 0, max = 52,
-                                                                  step = 1, post = " weeks", ticks = FALSE)
+                                                                  step = 1, post = " weeks", ticks = FALSE),
+                                                      sliderInput("travelban_eff", label = "Efficacy of travel ban:", value = 50, min = 0, max = 100,
+                                                                  step = 1, post = "%", ticks = FALSE)
                                                )
                                              )
                               )

@@ -1,7 +1,7 @@
 
 **Cases/Deaths Data**
 
-- Source: https://www.ecdc.europa.eu/ <span style="color:red;">Last updated: 2020-04-01 at 8pm, GMT</span>
+- Source: https://www.ecdc.europa.eu/ <span style="color:red;">updated 2020-04-02 at 6pm, GMT</span>
 - The App allows to upload data.
 
 
