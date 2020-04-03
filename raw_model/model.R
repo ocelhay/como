@@ -1,30 +1,36 @@
-# v9
+# v11.3
 ###########################################################################
 ## AGE-DEPENDANT SEIRS MODEL WITH 5-YEAR AGE CLASSES USING UN DEMOG DATA ##
 ###########################################################################
 
-
 require("deSolve")
-setwd("C:/Users/ricardo/Dropbox/covid19/covid_age")
+library("ggplot2")
+library("dplyr")
+library("reshape2")
+require(gridExtra)
+library(ggpubr)
+
+
+setwd("/Users/olivier/Documents/CoMo/v11data")
 
 #########  INCIDENCE DATA
-incdata_X<-read.csv("UKcovidcases1.csv")
+incdata_X<-read.csv("NYCcovidcases3.csv")
 
 #########  DEMOGRAPHIC DATA
 # population structure in 2020
-popstruc <- read.csv("pop_structure_X.csv",header=TRUE)
+popstruc <- read.csv("pop_structure_NYC.csv",header=TRUE)
 # convert from 1000s to total numbers
 popstruc[,2]<-popstruc[,2]*1000
 
 A<-length(popstruc[,2])
 
 # births by age of mother
-popbirth <- read.csv("pop_birth_X.csv",header=TRUE)
+popbirth <- read.csv("pop_birth_NY.csv",header=TRUE)
 # convert from 1000s per 5 year period to per person per day
 popbirth[,2]<-1000*popbirth[,2]/(5*popstruc[,2]*365.25)
 
 #natural mortality per person per year
-popmort<-read.csv("pop_mort_X.csv",header=TRUE)
+popmort<-read.csv("pop_mort_NY.csv",header=TRUE)
 # convert from 1000s per 5 year period to per person per day
 popmort[,2]<-1000*popmort[,2]/(5*popstruc[,2]*365.25)
 mort<- popmort[,2]
@@ -32,8 +38,8 @@ mort<- popmort[,2]
 
 ##########   CONTACT DATA
 c_home <- as.matrix(read.csv("contact_home_X.csv",header=FALSE))
-c_school <- as.matrix(read.csv("contact_school_X.csv",header=FALSE))
-c_work <- as.matrix(read.csv("contact_work_X.csv",header=FALSE))
+c_school <- as.matrix(read.csv("contact_school_NY.csv",header=FALSE))
+c_work <- as.matrix(read.csv("contact_work_NY.csv",header=FALSE))
 c_other <- as.matrix(read.csv("contact_other_X.csv",header=FALSE))
 
 nce <-A-length(c_home[1,])
@@ -83,13 +89,14 @@ c<-sum((contact_home+contact_other+contact_school+contact_work)%*%(popstruc[,2]/
 
 #########    SEVERITY AND MORTALITY
 # age dependent hosp and mort
-csr <- read.csv("covidagesevere_X.csv",header=TRUE) # of confirmed cases requiring ICU
-cfr <- read.csv("covidagemort_X.csv",header=TRUE) # of confirmed cases who die
-# Olivier: csr-cfr >= 0 for all age classes - if not model won't work
-# do somthing here cfr[i]=min(csr[i],cfr[i])
+ihr <- read.csv("covidagehosp_X.csv",header=TRUE) # of confirmed cases who die
+ifr <- read.csv("covidagefrpi_X.csv",header=TRUE) # of confirmed cases who die
+ihr<-4*ihr/100   # csv data is in percentages
+ifr_original<-ifr/100   # csv data is in percentages
 for (i in 1:A){
-  cfr[i,2]=min(csr[i,2],cfr[i,2])
+  ifr[i,2]=ifr[i,2]/max(ifr[,2])
 }
+
 
 #########    POP AGEING
 # per year ageing matrix
@@ -99,39 +106,51 @@ ageing<-cbind(ageing,0*seq(1:A)) # no ageing from last compartment
 
 
 #########   INITIALISE SIMULATION/INTERVENTION START TIMES
-startdate<-as.Date("2020-01-31") 
+startdate<-as.Date("2020-02-10") 
 # stopdate<-Sys.Date() # today
-stopdate<-as.Date("2020-12-31")
+stopdate<-as.Date("2020-09-01")
 # stopdate<-as.Date("2020-03-18")
 day_start <- as.numeric(startdate-startdate)
 day_stop <- as.numeric(stopdate-startdate)
 times <- seq(day_start, day_stop)
 
 tin<-as.numeric(startdate-as.Date("2020-01-01"))/365.25
-initP<-sum(popstruc[,2]) # population size 
-ageindcase<-20 # age of index case (years)
+initP<-sum(popstruc[,2])       # population size 
+ageindcase<-20                 # age of index case (years)
 aci <- floor((ageindcase/5)+1) # age class of index case
 
 # date to start the self isolation intervention
-date_selfis_on<-as.Date("2020-03-10")
+date_selfis_on<-as.Date("2020-03-15")
 # date to start the social distancing intervention
-date_dist_on<-as.Date("2020-03-17")
+#date_dist_on<-as.Date("2020-03-17")
+date_dist_on<-as.Date("2020-04-15")
 # date to start the handwashing intervention
-date_hand_on<-as.Date("2020-02-01")
+# date_hand_on<-as.Date("2020-02-01")
+date_hand_on<-as.Date("2020-12-31")
 # date to start the working from home
-date_work_on<-as.Date("2020-03-19")
+#date_work_on<-as.Date("2020-03-19")
+date_work_on<-as.Date("2020-04-15")
 # date to start the school closure
-date_school_on<-as.Date("2020-03-23")
+#date_school_on<-as.Date("2020-03-23")
+date_school_on<-as.Date("2020-04-15")
 # date to start cocooning the elderly
 date_cocoon_on<-as.Date("2020-03-14")
 # date to start vaccinating
-date_vaccine_on<-as.Date("2020-08-14")
+date_vaccine_on<-as.Date("2020-12-31")
 # date to start international travel ban
-date_travelban_on<-as.Date("2020-08-25")
+date_travelban_on<-as.Date("2020-12-31")
 # date to start screening
-date_screen_on<-as.Date("2020-08-25")
+date_screen_on<-as.Date("2020-12-31")
 # date to start voluntary quarantine
-date_quarantine_on<-as.Date("2020-03-25")
+#date_quarantine_on<-as.Date("2020-03-15")
+date_quarantine_on<-as.Date("2020-04-15")
+# date to start lockdown low 
+date_lockdown_low_on<-as.Date("2020-12-31")
+# date to start lockdown mid 
+# date_lockdown_mid_on<-as.Date("2020-03-23")
+date_lockdown_mid_on<-as.Date("2020-12-18")
+# date to start lockdown high 
+date_lockdown_high_on<-as.Date("2020-03-20")
 
 ###########################################################################
 # include scaleup time to intervention coverage about 2 weeks
@@ -141,23 +160,41 @@ date_quarantine_on<-as.Date("2020-03-25")
 #############   DEFINE PARAMETERS
 parameters <- c(
   # Transmission instrinsic
-  p=0.053,        # probabilty of infection given a contact 
+  p=0.0495,        # probabilty of infection given a contact 
   rho = 12.5,     # relative infectiousness of incubation phase (%) min 0 max 100 step 0.5 
-  omega=100,      # average duration of immunity (years) min 0.5 max 100 step 0.5 
-  gamma=4.5,      # average incubation period (days) min 1 max 7 step 0.5 
-  nui=5.5,        # average duration of symptomatic infection period (days) min 1 max 7 step 0.5
-  report=12.5,    # percentage of all infections that are reported (%) min 0 max 100 step 1
-  ratem=7,        # time to death for fatal infection (days) min 1 max 20 step 0.5
-  nus = 7,        # duration of non-fatal severe infection (days) min 1 max 20 step 0.5
-  rhos= 10,       # relative level of conatcts from severely ill patients (%) min 0 max 100 step 1
-  amp=50,         # relative amplitude of seasonal forcing (%) min 0 max 100 step 1
-  phi=1,          # month of peak in seasonal forcing
+  omega=200,      # average duration of immunity (years) min 0.5 max 100 step 0.5 
+  gamma=3.5,      # average incubation period (days) min 1 max 7 step 0.5 
+  nui=4.5,        # average duration of symptomatic infection period (days) min 1 max 7 step 0.5
+  report=2.5,    # percentage of all asymptomatic infections that are reported (%) min 0 max 100 step 1
+  reportc=5,     # percentage of all symptomatic infections that are reported (%) min 0 max 100 step 1
+  beds_available = sum(popstruc[,2])*2.54/1000,#80000, # maximum number of hospital beds - numeric 
+  icu_beds_available = sum(popstruc[,2])*6.6/10000,#8000, # maximum number of hospital beds - numeric 
+  ventilators_available = 6000, # maximum number of ventilators - numeric
+  give = 65 ,       # system capacity stressor  
+  pdeath_h = 35,     # probability of dying when hospitalised 
+  pdeath_hc = 45,    # probability of dying when denied hospitalisation 
+  pdeath_icu = 55,  # probability of dying when admitted to ICU 
+  pdeath_icuc = 80,  # probability of dying when admission to ICU denied 
+  pdeath_vent = 80, # probability of dying when ventilated 
+  pdeath_ventc = 95,# probability of dying when ventilator denied 
+  nus = 24,          # duration of non-fatal hospitalised infection (days) min 1 max 20 step 0.5
+  nusc = 24,        # duration of non-fatal denied hospitalisation infection (days) min 1 max 20 step 0.5
+  nu_icu = 24,      # duration of non-fatal icu infection (days) min 1 max 20 step 0.5
+  nu_icuc = 24,     # duration of non-fatal denied icu infection (days) min 1 max 20 step 0.5
+  nu_vent = 25,     # duration of non-fatal ventilated infection (days) min 1 max 20 step 0.5
+  nu_ventc = 24,    # duration of non-fatal denied ventilation infection (days) min 1 max 20 step 0.5
+  rhos= 15,         # relative level of contacts from severely ill patients (%) min 0 max 100 step 1
+  amp=50,           # relative amplitude of seasonal forcing (%) min 0 max 100 step 1
+  phi=1,            # month of peak in seasonal forcing
+  pclin=55,         # probability upon infection of developing clinical symptoms
+  prob_icu = 50,    # probability upon hospitalisation of requiring icu admission   
+  prob_vent = 75,   # probability upon admission to the UCI of requiring a ventilator
   # INTERVENTIONS
   # self isolation
   selfis_on=as.numeric(date_selfis_on-startdate),
   selfis_dur=36,  # duration of self-isolation protocol (weeks) min 1 max 52 step 1
   selfis_cov=50,  # coverage of self isolation (%) min 0 max 100 step 1
-  selfis_eff=65,  # adherence to self isolation (%) min 0 max 100 step 1
+  selfis_eff=50,  # adherence to self isolation (%) min 0 max 100 step 1
   # social distancing
   dist_on=as.numeric(date_dist_on-startdate),
   dist_dur=26,    # duration of social distancing protocol (weeks) min 1 max 52 step 1
@@ -200,15 +237,22 @@ parameters <- c(
   screen_cov = 90,    # intensified screening coverage (%) - min 0 max 100 step 1
   # quarantine - This is the bi-product of increasing testing of suspected cases with a certain false positivity rate and voluntary home quarantining of people sharing a house with an infectious case
   quarantine_on = as.numeric(date_quarantine_on-startdate),
-  quarantine_cov = 70,          # coverage of quarantine (%)- min 0 max 100 step 1
-  quarantine_dur = 24,          # duration of quarantine (weeks) - min 1 max 52 step 1
-  quarantine_days = 14,         # days in isolation for average person (days)  - min 5 max 21 step 1
-  quarantine_eff_home = -100,   # reduction in the number of contacts at home when quarantined (%) - min 0 max 100 step 52
-  quarantine_eff_other = 20,    # reduction in the number of other contacts when quarantined (%) - min 0 max 100 step 52
+  quarantine_cov = 70,        # coverage of quarantine (%)- min 0 max 100 step 1
+  quarantine_dur = 24,        # duration of quarantine (weeks) - min 1 max 52 step 1
+  quarantine_days = 14,       # days in isolation for average person (days)  - min 5 max 21 step 1
+  quarantine_eff_home = 100,  # reduction in the number of contacts at home when quarantined (%) - min 0 max 100 step 52
+  quarantine_eff_other = 20,  # reduction in the number of other contacts when quarantined (%) - min 0 max 100 step 52
+  # lockdown
+  lockdown_low_on=as.numeric(date_lockdown_low_on-startdate),
+  lockdown_low_dur = 3,
+  lockdown_mid_on=as.numeric(date_lockdown_mid_on-startdate),
+  lockdown_mid_dur = 3,
+  lockdown_high_on=as.numeric(date_lockdown_high_on-startdate),
+  lockdown_high_dur = 3,
   # mean household size
-  household_size = 2            # mean household size (number) - min 1 max 10 step 1 
-  
+  household_size = 2          # mean household size (number) - min 1 max 10 step 1 
 )
+
 
 # Scale parameters to percentages/ rates
 parameters["rho"]<-parameters["rho"]/100
@@ -216,7 +260,7 @@ parameters["omega"]<-(1/(parameters["omega"]*365))
 parameters["gamma"]<-1/parameters["gamma"]
 parameters["nui"]<-1/parameters["nui"]
 parameters["report"]<-parameters["report"]/100
-parameters["ratem"]<-1/parameters["ratem"]
+parameters["reportc"]<-parameters["reportc"]/100
 parameters["nus"]<-1/parameters["nus"]
 parameters["rhos"]<-parameters["rhos"]/100
 parameters["amp"]<-parameters["amp"]/100
@@ -250,8 +294,26 @@ parameters["screen_cov"]<-parameters["screen_cov"]/100
 parameters["quarantine_cov"]<-parameters["quarantine_cov"]/100
 parameters["quarantine_dur"]<-parameters["quarantine_dur"]*7
 parameters["quarantine_days"]<-parameters["quarantine_days"]
-parameters["quarantine_eff_home"]<-parameters["quarantine_eff_home"]/100
+parameters["quarantine_eff_home"]<-parameters["quarantine_eff_home"]/-100
 parameters["quarantine_eff_other"]<-parameters["quarantine_eff_other"]/100
+parameters["give"]<-parameters["give"]/100
+parameters["pdeath_h"]<-parameters["pdeath_h"]/100
+parameters["pdeath_hc"]<-parameters["pdeath_hc"]/100
+parameters["pdeath_icu"]<-parameters["pdeath_icu"]/100
+parameters["pdeath_icuc"]<-parameters["pdeath_icuc"]/100
+parameters["pdeath_vent"]<-parameters["pdeath_vent"]/100
+parameters["pdeath_ventc"]<-parameters["pdeath_ventc"]/100
+parameters["nusc"]<-1/parameters["nusc"]
+parameters["nu_icu"]<-1/parameters["nu_icu"]
+parameters["nu_icuc"]<-1/parameters["nu_icuc"]
+parameters["nu_vent"]<-1/parameters["nu_vent"]
+parameters["nu_ventc"]<-1/parameters["nu_ventc"]
+parameters["pclin"]<-parameters["pclin"]/100
+parameters["prob_icu"]<-parameters["prob_icu"]/100
+parameters["prob_vent"]<-parameters["prob_vent"]/100
+parameters["lockdow_low_dur"]<-parameters["lockdow_low_dur"]*7
+parameters["lockdown_mid_dur"]<-parameters["lockdown_mid_dur"]*7
+parameters["lockdown_high_dur"]<-parameters["lockdown_high_dur"]*7
 
 beds <- 2.54 # beds per 1000 population
 
@@ -263,7 +325,7 @@ Iindex<-(2*A+1):(3*A)
 Rindex<-(3*A+1):(4*A)
 Xindex<-(4*A+1):(5*A)
 Hindex<-(5*A+1):(6*A)
-Mindex<-(6*A+1):(7*A)
+HCindex<-(6*A+1):(7*A)
 Cindex<-(7*A+1):(8*A)
 CMindex<-(8*A+1):(9*A)
 Vindex<-(9*A+1):(10*A)
@@ -271,6 +333,13 @@ QSindex<-(10*A+1):(11*A)
 QEindex<-(11*A+1):(12*A)
 QIindex<-(12*A+1):(13*A)
 QRindex<-(13*A+1):(14*A)
+CLindex<-(14*A+1):(15*A)
+QCindex<-(15*A+1):(16*A)
+ICUindex<-(16*A+1):(17*A)
+ICUCindex<-(17*A+1):(18*A)
+Ventindex<-(18*A+1):(19*A)
+VentCindex<-(19*A+1):(20*A)
+CMCindex<-(20*A+1):(21*A)
 
 ###########################################################################
 # MODEL INITIAL CONDITIONS
@@ -285,11 +354,18 @@ initQE<-0*popstruc[,2] # quarantined E
 initQI<-0*popstruc[,2] # quarantined I  
 initQR<-0*popstruc[,2] # quarantined R  
 initH<-0*popstruc[,2]  # hospitalised 
-initM<-0*popstruc[,2]  # died 
+initHC<-0*popstruc[,2] # hospital critical 
 initC<-0*popstruc[,2]  # Cumulative cases (true)
 initCM<-0*popstruc[,2] # Cumulative deaths (true)
+initCL<-0*popstruc[,2] # symptomatic cases
+initQC<-0*popstruc[,2] # quarantined C 
+initICU<-0*popstruc[,2] # icu
+initICUC<-0*popstruc[,2] # icu critical
+initVent<-0*popstruc[,2] # icu vent
+initVentC<-0*popstruc[,2] # icu vent crit
+initCMC<-0*popstruc[,2] # Cumulative deaths (true)
 
-initS<-popstruc[,2]-initE-initI-initR-initX-initV-initH-initM-initQS-initQE-initQI-initQR  # Susceptible (non-immune)
+initS<-popstruc[,2]-initE-initI-initR-initX-initV-initH-initHC-initQS-initQE-initQI-initQR-initCL-initQC-initICU-initICUC-initVent-initVentC  # Susceptible (non-immune)
 
 
 # set up a function to solve the equations
@@ -303,7 +379,7 @@ covid<-function(t, Y, parameters)
          R <- Y[Rindex]
          X <- Y[Xindex]
          H <- Y[Hindex]
-         M <- Y[Mindex]
+         HC <- Y[HCindex]
          C <- Y[Cindex]
          CM <- Y[CMindex]
          V <- Y[Vindex]
@@ -311,7 +387,32 @@ covid<-function(t, Y, parameters)
          QE <- Y[QEindex]
          QI <- Y[QIindex]
          QR <- Y[QRindex]
-         P <- (S+E+I+R+X+V+H+M+QS+QE+QI+QR)
+         CL <- Y[CLindex]
+         QC <- Y[QCindex]
+         ICU <- Y[ICUindex]
+         ICUC <- Y[ICUCindex]
+         Vent <- Y[Ventindex]
+         VentC <- Y[VentCindex]
+         CMC <- Y[CMCindex]
+         
+         P <- (S+E+I+R+X+V+H+HC+QS+QE+QI+QR+CL+QC+ICU+ICUC+Vent+VentC)
+         # print(sum(P))
+         
+         # health system performance
+         f <- c(1,(1+give)/2,(1-give)/2,0) 
+         KH<-beds_available
+         KICU<- icu_beds_available
+         Kvent<- ventilators_available
+         x.H <- c(0,(1+give)*KH/2,(3-give)*KH/2,2*KH) 
+         x.ICU <- c(0,(1+give)*KICU/2,(3-give)*KICU/2,2*KICU) 
+         x.Vent <- c(0,(1+give)*Kvent/2,(3-give)*Kvent/2,2*Kvent) 
+         fH <- splinefun(x.H, f, method = "hyman") 
+         fICU <- splinefun(x.ICU, f, method = "hyman") 
+         fVent<- splinefun(x.Vent, f, method = "hyman") 
+         critH<-1-fH(sum(H))
+         crit<-1-fICU(sum(ICU))
+         critV<-1-fVent(sum(Vent))
+         
          
          # interventions
          isolation<-(t>=selfis_on)*(t<=selfis_on+selfis_dur)
@@ -324,34 +425,74 @@ covid<-function(t, Y, parameters)
          travelban<-(t>=travelban_on)*(t<=(travelban_on+travelban_dur))
          screen<-(t>=screen_on)*(t<=(screen_on+screen_dur))
          quarantine<-(t>=quarantine_on)*(t<=(quarantine_on+quarantine_dur))
+         lockdown_low<-(t>=lockdown_low_on)*(t<=(lockdown_low_on+lockdown_low_dur))
+         lockdown_mid<-(t>=lockdown_mid_on)*(t<=(lockdown_mid_on+lockdown_mid_dur))
+         lockdown_high<-(t>=lockdown_high_on)*(t<=(lockdown_high_on+lockdown_high_dur))   
          
-         if (workhome){
-           work<-work_cov*work_eff
-         }else{work<-1}
-         if (isolation){
-           if(screen){selfis<-min(selfis_cov/screen_cov,1)}
-           else{selfis<-selfis_cov}
-         }else{selfis<-0}
-         if (schoolclose){
-           school<-school_eff
-         }else{school<-1}
-         if(distancing){
-           dist<-dist_cov*dist_eff
-         }else{dist<-1}
-         if(handwash){
-           hand<-hand_eff
-         }else{hand<-0}
-         if(vaccine){
-           vac_rate <- (-log(1-vaccine_cov)/vac_campaign)
-           vaccinate <- vac_rate
-         }else{vaccinate<-0}
-         if(travelban){
-           trvban_eff<-travelban_eff
-         }else{trvban_eff<-0}
-         if(quarantine){
-           quarantine_rate<-(I*household_size/P)*quarantine_cov
-         }else{quarantine_rate<-0}
          
+         if (lockdown_low || lockdown_mid || lockdown_high){
+           if(lockdown_low){
+             selfis<-0.5
+             dist<-0.25
+             school<-0
+             trvban_eff<-0
+             quarantine_rate<-0
+             work<-0
+             cocoon<-0.95
+             hand<-0.075
+             vaccinate<-0
+           }
+           if(lockdown_mid){
+             selfis<-0.75
+             dist<-0.75
+             school<-0.85
+             trvban_eff<-0
+             quarantine_rate<-0.25
+             work<-0.5
+             cocoon<-0.95
+             hand<-0.075
+             vaccinate<-0
+           }
+           if(lockdown_high){
+             selfis<-0.95
+             dist<-0.95
+             school<-0.85
+             trvban_eff<-0.95
+             quarantine_rate<-0.9
+             work<-0.75
+             cocoon<-0.95
+             hand<-0.075
+             vaccinate<-0
+           }
+         }
+         else{
+           if (workhome){
+             work<-work_cov*work_eff
+           }else{work<-1}
+           if (isolation){
+             if(screen){selfis<-min(selfis_cov/(1-screen_cov),1)}
+             else{selfis<-selfis_cov}
+           }else{selfis<-0}
+           if (schoolclose){
+             school<-school_eff
+           }else{school<-1}
+           if(distancing){
+             dist<-dist_cov*dist_eff
+           }else{dist<-1}
+           if(handwash){
+             hand<-hand_eff
+           }else{hand<-0}
+           if(vaccine){
+             vac_rate <- (-log(1-vaccine_cov)/vac_campaign)
+             vaccinate <- vac_rate
+           }else{vaccinate<-0}
+           if(travelban){
+             trvban_eff<-travelban_eff
+           }else{trvban_eff<-0}
+           if(quarantine){
+             quarantine_rate<-(I*household_size/P)*quarantine_cov
+           }else{quarantine_rate<-0}
+         }
          # cocooning the elderly
          cocoon_mat<-matrix(1,nrow = length(popstruc$pop),ncol = length(popstruc$pop))
          cocoon_mat[(age_cocoon-1):length(popstruc$pop),(age_cocoon-1):length(popstruc$pop)]<-(1-cocoon_eff)
@@ -370,54 +511,117 @@ covid<-function(t, Y, parameters)
          contacts <- (1-cocoon)*cts+cocoon*cts*cocoon_mat+cocoon*(1+school*(1-school_eff)+work*(1-work_eff))*contact_home*(1-cocoon_mat)
          seas <- 1+amp*cos(2*pi*(t+tin-(phi*365.25/12))/365.25)
          importation <- mean_imports*(1-trvban_eff)
-         lam <- (1-hand)*p*seas*(contacts%*%((rho*E+(I+importation)+(1-selfis_eff)*X+rhos*(H+M))/P))
+         HH<-H+ICU+Vent+HC+ICUC+VentC
+         lam <- (1-hand)*p*seas*(contacts%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*X+rhos*(HH))/P))
          # contacts under home quarantine
-         lamq<-(1-hand)*p*seas*(contact_home%*%(((1-selfis_eff)*X)/P))+(1-hand)*p*seas*(1-quarantine_eff_other)*(contact_other%*%((rho*E+(I+importation)+(1-selfis_eff)*X+rhos*(H+M))/P))
+         lamq<-(1-hand)*p*seas*((1-quarantine_eff_home)*contact_home%*%(((1-selfis_eff)*X)/P))+(1-hand)*p*seas*(1-quarantine_eff_other)*(contact_other%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*X+rhos*(HH))/P))
          
          # birth/death
          b1<-sum(popbirth[,2]*popstruc[,2])
          birth<-0*popbirth[,2]
          birth[1]<-b1
          
+         npdeath_hc<-pdeath_hc*(1-prob_icu)+prob_icu*(1-prob_vent)*pdeath_icuc+prob_icu*prob_vent*pdeath_ventc
+         npdeath_icuc<-pdeath_icuc*(1-prob_vent)+prob_vent*pdeath_ventc
+         
          # ODE system
          dSdt <- -S*lam-S*vaccinate+omega*R+ageing%*%S-mort*S+birth-quarantine_rate*S +(1/quarantine_days)*QS
          dEdt <- S*lam-gamma*E+ageing%*%E-mort*E + (1-vaccine_eff)*lam*V-quarantine_rate*E+(1/quarantine_days)*QE
-         dIdt <- gamma*(1-selfis)*(1-csr[,2])*E-nui*I+ageing%*%I-mort*I + (1/quarantine_days)*QI
-         dRdt <- nui*I-omega*R+nui*X+ageing%*%R-mort*R+nus*H + (1/quarantine_days)*QR
-         dXdt <- gamma*selfis*(1-csr[,2])*E-nui*X+ageing%*%X-mort*X 
+         dIdt <- gamma*(1-pclin)*(1-ihr[,2])*E-nui*I+ageing%*%I-mort*I + (1/quarantine_days)*QI - quarantine_rate*I
+         dCLdt<- gamma*pclin*(1-selfis)*(1-ihr[,2])*E-nui*CL+ageing%*%CL-mort*CL + (1/quarantine_days)*QC
+         dRdt <- nui*I-omega*R+nui*X+nui*CL+ageing%*%R-mort*R + (1/quarantine_days)*QR + nus*(1-pdeath_h*ifr[,2])*H + (1-pdeath_icu*ifr[,2])*nu_icu*ICU + (1-npdeath_icuc*ifr[,2])*nu_icuc*ICUC + (1-npdeath_hc*ifr[,2])*nusc*HC + (1-pdeath_vent*ifr[,2])*nu_vent*Vent+ (1-pdeath_ventc*ifr[,2])*nu_ventc*VentC
+         dXdt <- gamma*selfis*pclin*(1-ihr[,2])*E-nui*X+ageing%*%X-mort*X 
          dVdt <- vaccinate*S -(1-vaccine_eff)*lam*V +ageing%*%V - mort*V
+         
          dQSdt <- quarantine_rate*S+ageing%*%QS-mort*QS - (1/quarantine_days)*QS - lamq*QS
-         dQEdt <- quarantine_rate*E- gamma*QE +ageing%*%QE-mort*QE - (1/quarantine_days)*QE +lamq*QS 
-         dQIdt <- gamma*(1-csr[,2])*QE-nui*QI+ageing%*%QI-mort*QI - (1/quarantine_days)*QI
+         dQEdt <- quarantine_rate*E - gamma*QE +ageing%*%QE-mort*QE - (1/quarantine_days)*QE +lamq*QS 
+         dQIdt <- quarantine_rate*I + gamma*(1-ihr[,2])*(1-pclin)*QE-nui*QI+ageing%*%QI-mort*QI - (1/quarantine_days)*QI
+         dQCdt <- gamma*(1-ihr[,2])*pclin*QE-nui*QC+ageing%*%QC-mort*QC - (1/quarantine_days)*QC
          dQRdt <- nui*QI+ageing%*%QR-mort*QR - (1/quarantine_days)*QR
          
-         dHdt <- ageing%*%H-mort*H +gamma*(csr[,2]-cfr[,2])*E-nus*H + gamma*(csr[,2]-cfr[,2])*QE
-         dMdt <- ageing%*%M+gamma*cfr[,2]*E-ratem*M-mort*M +gamma*cfr[,2]*QE
+         dHdt <- gamma*ihr[,2]*(1-prob_icu)*(1-critH)*E + gamma*ihr[,2]*(1-prob_icu)*(1-critH)*QE - nus*H + ageing%*%H-mort*H  # all pdeath have to be lower than
+         dHCdt <- gamma*ihr[,2]*(1-prob_icu)*critH*E + gamma*ihr[,2]*(1-prob_icu)*critH*QE - nusc*HC + ageing%*%HC-mort*HC 
+         dICUdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critH)*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*(1-critH)*(1-crit)*(1-prob_vent)*QE - nu_icu*ICU +ageing%*%ICU - mort*ICU 
+         dICUCdt <- gamma*ihr[,2]*prob_icu*crit*(1-critH)*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*(1-critH)*crit*(1-prob_vent)*QE - nu_icuc*ICUC +ageing%*%ICUC - mort*ICUC 
+         dVentdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*(1-critH)*prob_vent*E + gamma*ihr[,2]*prob_icu*(1-critH)*(1-crit)*prob_vent*QE - nu_vent*Vent +ageing%*%Vent - mort*Vent 
+         dVentCdt <- gamma*ihr[,2]*prob_icu*critV*(1-crit)*(1-critH)*prob_vent*E + gamma*ihr[,2]*prob_icu*(1-critH)*crit*prob_vent*QE - nu_ventc*VentC +ageing%*%VentC - mort*VentC 
          
-         dCdt <- report*gamma*(E+QE)
-         dCMdt <- ratem*M+mort*M
+         dCdt <- report*gamma*(1-pclin)*(E+QE)+reportc*gamma*pclin*(E+QE)+ gamma*ihr[,2]*(E+QE)
+         dCMdt<- nus*pdeath_h*ifr[,2]*H + nusc*npdeath_hc*ifr[,2]*HC + nu_icu*pdeath_icu*ifr[,2]*ICU + nu_icuc*npdeath_icuc*ifr[,2]*ICUC +  nu_vent*pdeath_vent*ifr[,2]*Vent + nu_ventc*pdeath_ventc*ifr[,2]*VentC + 
+           mort*H + mort*HC + mort*ICU + mort*ICUC + mort*Vent + mort*VentC + mort*I + mort*X
+         dCMCdt <- nusc*npdeath_hc*ifr[,2]*HC +  nu_icuc*npdeath_icuc*ifr[,2]*ICUC + nu_ventc*pdeath_ventc*ifr[,2]*VentC + 
+           mort*HC + mort*ICUC + mort*VentC
+         
          
          # return the rate of change
-         list(c(dSdt,dEdt,dIdt,dRdt,dXdt,dHdt,dMdt,dCdt,dCMdt,dVdt,dQSdt,dQEdt,dQIdt,dQRdt))
+         list(c(dSdt,dEdt,dIdt,dRdt,dXdt,dHdt,dHCdt,dCdt,dCMdt,dVdt,dQSdt,dQEdt,dQIdt,dQRdt,dCLdt,dQCdt,dICUdt,dICUCdt,dVentdt,dVentCdt,dCMCdt))
        }
   ) 
 }
 
 
 #########    RUN MODEL WITH INTERVENTION
-Y<-c(initS,initI,initE,initR,initX,initV,initH,initM,initC,initCM, initQS, initQR, initQI, initQE) # initial conditions for the main solution vector
+Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, initICUC, initVent, initVentC, initCMC) # initial conditions for the main solution vector
 out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
 
+############     CALCULATE HOSPITAL STRESS
+f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0) 
+KH<-parameters["beds_available"]
+KICU<- parameters["icu_beds_available"]
+Kvent<- parameters["ventilators_available"]
+x.H <- c(0,(1+parameters["give"])*KH/2,(3-parameters["give"])*KH/2,2*KH) 
+x.ICU <- c(0,(1+parameters["give"])*KICU/2,(3-parameters["give"])*KICU/2,2*KICU) 
+x.Vent <- c(0,(1+parameters["give"])*Kvent/2,(3-parameters["give"])*Kvent/2,2*Kvent) 
+fH <- splinefun(x.H, f, method = "hyman") 
+fICU <- splinefun(x.ICU, f, method = "hyman") 
+fVent<- splinefun(x.Vent, f, method = "hyman") 
+critH<-1-fH((rowSums(out[,(Hindex+1)])))
+crit<-1-fICU((rowSums(out[,(ICUindex+1)])))
+critV<-1-fVent((rowSums(out[,(Ventindex+1)])))
+
 # total population
-pop1<-out[,(Sindex+1)]+out[,(Eindex+1)]+out[,(Iindex+1)]+out[,(Rindex+1)]+out[,(Xindex+1)]+out[,(Vindex+1)]+
-  out[,(QSindex+1)]+out[,(QEindex+1)]+out[,(QIindex+1)]+out[,(QRindex+1)]
+pop1<-out[,(Sindex+1)]+out[,(Eindex+1)]+out[,(Iindex+1)]+out[,(CLindex+1)]+out[,(Rindex+1)]+out[,(Xindex+1)]+out[,(Vindex+1)]+
+  out[,(QSindex+1)]+out[,(QEindex+1)]+out[,(QIindex+1)]+out[,(QCindex+1)]+out[,(QRindex+1)]+
+  out[,(Hindex+1)]+out[,(HCindex+1)]+out[,(ICUindex+1)]+out[,(ICUCindex+1)]+out[,(Ventindex+1)]+out[,(VentCindex+1)] 
 tpop1<-rowSums(pop1)
 time<-as.Date(out[,1]+startdate)
 # daily incidence
-inc1 <- parameters["report"]*parameters["gamma"]*out[,(Eindex+1)]+parameters["report"]*parameters["gamma"]*out[,(QEindex+1)]
-dailyinc1<-rowSums(inc1)
-previcureq1<-rowSums(out[,(Hindex+1)]) # requirement for ICU
-cmortality1<-rowSums(out[,(CMindex+1)]) # cumulative mortality
+inc1 <- parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out[,(Eindex+1)]+
+  parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out[,(Eindex+1)]+
+  parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out[,(QEindex+1)]+
+  parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out[,(QEindex+1)]
+inc1h<- parameters["gamma"]*out[,(Eindex+1)]+(parameters["gamma"]*out[,(QEindex+1)])
+for (i in 1:length(time)){
+  inc1h[i,]<-inc1h[i,]*ihr[,2]
+  inc1[i,]<-inc1[i,]*(1-ihr[,2])
+}
+
+dailyinc1<-rowSums(inc1)+rowSums(inc1h)      # daily incidence
+cuminc1<-colSums(inc1)+colSums(inc1h)        # cumulative incidence
+previcureq1<-rowSums(out[,(Hindex+1)])       # requirement for beds
+previcureq21<-rowSums(out[,(ICUindex+1)])    # requirement for icu
+previcureq31<-rowSums(out[,(Ventindex+1)])    # requirement for icu
+cmortality1<-rowSums(out[,(CMindex+1)])      # cumulative mortality
+overloadH1<-rowSums(out[,(HCindex+1)])       # requirement for beds
+overloadICU1<-rowSums(out[,(ICUCindex+1)])   # requirement for beds
+overloadVent1<-rowSums(out[,(VentCindex+1)]) # requirement for beds
+ccases1<-rowSums(out[,(Cindex+1)])           # cumulative cases
+
+inc_overloadH1<-((parameters["gamma"]*(1-parameters["prob_icu"])*out[,(Eindex+1)]))
+inc_overloadICU1<-((parameters["gamma"]*parameters["prob_icu"]*(1-parameters["prob_vent"])*out[,(Eindex+1)]))
+for (i in 1:length(time)) {
+  inc_overloadH1[i,]<-inc_overloadH1[i,]*critH[i]*ihr[,2]
+  inc_overloadICU1[i,]<-inc_overloadICU1[i,]*crit[i]*ihr[,2]
+}
+inc_overloadH1<-cumsum(rowSums(inc_overloadH1))
+inc_overloadICU1<-cumsum(rowSums(inc_overloadICU1))
+
+
+MORTDF<-as.data.frame(cbind(out[30,CMindex+1]/out[30,Cindex+1],out[60,CMindex+1]/out[60,Cindex+1],out[90,CMindex+1]/out[90,Cindex+1],out[120,CMindex+1]/out[120,Cindex+1]))
+MORTDF<-cbind(popstruc$agefloor,MORTDF)
+colnames(MORTDF)<-c("Age","day30","day60","day90","day120")
+MORT1<-melt(MORTDF, id.vars="Age",measure.vars = c("day30","day60","day90","day120"))
+
 
 
 ###########    RUN BASELINE MODEL - start time for interventions is set to day 1e5, i.e. interventions are always off
@@ -431,47 +635,220 @@ parameters["vaccine_on"]<-10e5
 parameters["travelban_on"]<-10e5
 parameters["screen_on"]<-10e5
 parameters["quarantine_on"]<-10e5
+parameters["lockdown_low_on"]<-10e5
+parameters["lockdown_mid_on"]<-10e5
+parameters["lockdown_high_on"]<-10e5
 
-Y<-c(initS,initI,initE,initR,initX,initV,initH,initM,initC,initCM, initQS, initQR, initQI, initQE) # initial conditions for the main solution vector
-out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
+Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, initICUC, initVent, initVentC, initCMC) # initial conditions for the main solution vector
+out0 <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
 # total population
-pop0<-out[,(Sindex+1)]+out[,(Eindex+1)]+out[,(Iindex+1)]+out[,(Rindex+1)]+out[,(Xindex+1)]+out[,(Vindex+1)]+
-  out[,(QSindex+1)]+out[,(QEindex+1)]+out[,(QIindex+1)]+out[,(QRindex+1)]
+pop0<-out[,(Sindex+1)]+out0[,(Eindex+1)]+out0[,(Iindex+1)]+out0[,(CLindex+1)]+out0[,(Rindex+1)]+out0[,(Xindex+1)]+out0[,(Vindex+1)]+
+  out0[,(QSindex+1)]+out0[,(QEindex+1)]+out0[,(QIindex+1)]+out0[,(QCindex+1)]+out0[,(QRindex+1)]+
+  out0[,(Hindex+1)]+out0[,(HCindex+1)]+out0[,(ICUindex+1)]+out0[,(ICUCindex+1)]+out0[,(Ventindex+1)]+out0[,(VentCindex+1)]
 tpop0<-rowSums(pop0)
-time<-as.Date(out[,1]+startdate)
+time<-as.Date(out0[,1]+startdate)
 # daily incidence
-inc0 <- parameters["report"]*parameters["gamma"]*out[,(Eindex+1)]+parameters["report"]*parameters["gamma"]*out[,(QEindex+1)]
-dailyinc0<-rowSums(inc0)
-previcureq0<-rowSums(out[,(Hindex+1)]) # requirement for ICU
-cmortality0<-rowSums(out[,(CMindex+1)]) # cumulative mortality
+inc0 <- parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out0[,(Eindex+1)]+
+  parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out0[,(Eindex+1)]+
+  parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out0[,(QEindex+1)]+
+  parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out0[,(QEindex+1)]
+
+inc0h<- parameters["gamma"]*out0[,(Eindex+1)]+(parameters["gamma"]*out0[,(QEindex+1)])
+for (i in 1:length(time)) {
+  inc0h[i,]<-inc0h[i,]*ihr[,2]
+  inc0[i,]<-inc0[i,]*(1-ihr[,2])
+}
+dailyinc0<-rowSums(inc0)+rowSums(inc0h)
+previcureq0<-rowSums(out0[,(Hindex+1)])     # requirement for beds
+previcureq20<-rowSums(out0[,(ICUindex+1)])  # requirement for icu
+previcureq30<-rowSums(out0[,(Ventindex+1)]) # requirement for vent
+cmortality0<-rowSums(out0[,(CMindex+1)])    # cumulative mortality
+overloadH0<-rowSums(out0[,(HCindex+1)])     # requirement for beds
+overloadICU0<-rowSums(out0[,(ICUCindex+1)]) # requirement for beds
+overloadVent0<-rowSums(out0[,(VentCindex+1)]) # requirement for beds
+
+
+##########################    CALCULATE MORTALITY 
+pdeath_hc<-parameters["pdeath_hc"]
+prob_icu<-parameters["prob_icu"]
+prob_vent<-parameters["prob_vent"]
+pdeath_icuc<-parameters["pdeath_icuc"]
+pdeath_ventc<-parameters["pdeath_ventc"]
+
+npdeath_hc<-pdeath_hc*(1-prob_icu)+prob_icu*(1-prob_vent)*pdeath_icuc+prob_icu*prob_vent*pdeath_ventc
+npdeath_icuc<-pdeath_icuc*(1-prob_vent)+prob_vent*pdeath_ventc
+
+for (i in 1:length(time)){
+  inc1h[i,]<-inc1h[i,]*ihr[,2]
+  inc1[i,]<-inc1[i,]*(1-ihr[,2])
+}
+cinc_mort_H1 <- cumsum(rowSums(parameters["nus"]*parameters["pdeath_h"]*(out[,(Hindex+1)]%*%ifr[,2])+ out[,(Hindex+1)]%*%mort))
+cinc_mort_HC1 <- cumsum(rowSums(parameters["nusc"]*npdeath_hc*(out[,(HCindex+1)]%*%ifr[,2]) + out[,(HCindex+1)]%*%mort))
+cinc_mort_ICU1 <- cumsum(rowSums(parameters["nu_icu"]*parameters["pdeath_icu"]*out[,(ICUindex+1)]%*%ifr[,2] + out[,(ICUindex+1)]%*%mort))
+cinc_mort_ICUC1 <- cumsum(rowSums(parameters["nu_icuc"]*npdeath_icuc*out[,(ICUCindex+1)]%*%ifr[,2] + out[,(ICUCindex+1)]%*%mort))
+cinc_mort_Vent1 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*out[,(Ventindex+1)]%*%ifr[,2] + out[,(Ventindex+1)]%*%mort))
+cinc_mort_VentC1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out[,(VentCindex+1)]%*%ifr[,2] + out[,(VentCindex+1)]%*%mort))
+
+cinc_mort_H0  <- cumsum(rowSums(parameters["nus"]*parameters["pdeath_h"]*(out0[,(Hindex+1)]%*%ifr[,2])+ out0[,(Hindex+1)]%*%mort))
+cinc_mort_HC0 <- cumsum(rowSums(parameters["nusc"]*npdeath_hc*(out0[,(HCindex+1)]%*%ifr[,2]) + out0[,(HCindex+1)]%*%mort))
+cinc_mort_ICU0 <- cumsum(rowSums(parameters["nu_icu"]*parameters["pdeath_icu"]*out0[,(ICUindex+1)]%*%ifr[,2] + out0[,(ICUindex+1)]%*%mort))
+cinc_mort_ICUC0 <- cumsum(rowSums(parameters["nu_icuc"]*npdeath_icuc*out0[,(ICUCindex+1)]%*%ifr[,2] + out0[,(ICUCindex+1)]%*%mort))
+cinc_mort_Vent0 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*out0[,(Ventindex+1)]%*%ifr[,2] + out0[,(Ventindex+1)]%*%mort))
+cinc_mort_VentC0 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out0[,(VentCindex+1)]%*%ifr[,2] + out0[,(VentCindex+1)]%*%mort))
+
+
+MORTDF<-as.data.frame(cbind(out0[30,CMindex+1]/out0[30,Cindex+1],out0[60,CMindex+1]/out0[60,Cindex+1],out0[90,CMindex+1]/out0[90,Cindex+1],out0[120,CMindex+1]/out0[120,Cindex+1]))
+MORTDF<-cbind(popstruc$agefloor,MORTDF)
+colnames(MORTDF)<-c("Age","day30","day60","day90","day120")
+MORT0<-melt(MORTDF, id.vars="Age",measure.vars = c("day30","day60","day90","day120"))
+
+
+##########################   CALCULATE Rt  
+Rt0<-c()
+Rt1<-c()
+for (i in (1/parameters["nui"]+1):length(time)){
+  Rt0[i]<-cumsum(sum(parameters["gamma"]*out0[i,(Eindex+1)]))/cumsum(sum(parameters["gamma"]*out0[(i-1/parameters["nui"]),(Eindex+1)]))
+  Rt1[i]<-cumsum(sum(parameters["gamma"]*out[i,(Eindex+1)]))/cumsum(sum(parameters["gamma"]*out[(i-1/parameters["nui"]),(Eindex+1)]))
+}
+
 
 
 #############    PLOTTING
-time<-as.Date(out[,"time"]+startdate)
-plot(time,cmortality0,type='l',lwd=3,col='grey',
-     main="Predicted Cumulative Mortality", xlab="Date", ylab="Deaths")
-lines(time,cmortality1,type='l',lwd=3)
-legend(as.Date(stopdate-0.35*day_stop), 0.3*max(cmortality0), legend=c("Baseline", "Intervention"),
-       col=c("grey", "black"), lwd=c(3,3))
 
-par(mfrow=c(1,1))
-time<-as.Date(out[,"time"]+startdate)
-plot(time,previcureq0,type='l',lwd=3,col='grey',
-     main="Predicted ICU requirement", xlab="Date", ylab="Beds")
-lines(time,previcureq1,type='l',lwd=3)
-lines(time,tpop0*2.54/1000,lwd=3,col='pink')
-lines(time,tpop1*2.54/1000,lwd=3,col='red')
-legend(as.Date(stopdate-0.35*day_stop), 0.9*max(previcureq0), legend=c("Baseline", "Intervention"),
-       col=c("grey", "black"), lwd=c(3,3))
+# Fitting tab
+# fitting the intervention lines to the data to account for any historical interventions
+par(mfrow=c(1,2))
+# set up the axis limits
+xmin<-min(as.Date(incdata_X[,1]))
+xmax<-max(as.Date(incdata_X[,1]))
+ymax<-max(incdata_X[,2])
+xtick<-seq(xmin, xmax, by=7)
+plot(time,dailyinc1,type='l',lwd=3,
+     main="New Reported Cases", xlab="Date", ylab="Cases per day",
+     xlim=c(xmin,xmax),  ylim=c(0,ymax), col='blue',xaxt="n")
+axis(side=1, labels = FALSE)
+text(x=xtick,  y=-250, labels = format(xtick,"%b-%d"), srt = 0, xpd = TRUE)
+points(as.Date(incdata_X[,1]),incdata_X[,2],pch=19,col='red')
 
-par(mfrow=c(1,1))
+# reset the maximum to the cumulative mortality 
+ymax<-max(incdata_X[,3])
+plot(time,cmortality1,type='l',lwd=3,
+     main="Cumulative Mortality", xlab="Date", ylab="Total deaths",
+     xlim=c(xmin,xmax), ylim=c(0,ymax), col='blue',xaxt="n")
+text(x=xtick,  y=-100, labels = format(xtick,"%b-%d"), srt = 0, xpd = TRUE)
+points(as.Date(incdata_X[,1]),incdata_X[,3],pch=19,col='red')
+
+
+# Predictions tab
+par(mfrow=c(1,2))
+# Cases at baseline and intervention
+ymax<-max(c(incdata_X[,2],dailyinc0,dailyinc1))
+plot(time,dailyinc0,type='l',lwd=3,col='blue',
+     main="Baseline", xlab="Date", ylab="New cases per day",ylim=c(0,ymax))
+points(as.Date(incdata_X[,1]),incdata_X[,2],pch=19,col='red')
+plot(time,dailyinc1,type='l',lwd=3,col='blue',
+     main="Intervention", xlab="Date", ylab="New cases per day",ylim=c(0,ymax))
+points(as.Date(incdata_X[,1]),incdata_X[,2],pch=19,col='red')
+# Olivier to include Numerical outputs in boxes: % attack rate compare baseline with intervention
+
+
+
+# Hospital prevalences stratified by H,ICU and Vent
+# Olivier to make them sit side by side and to have the same y axis limit for easy comparison
+ymax<-max(c((previcureq0+previcureq20+previcureq30),(previcureq1+previcureq21+previcureq31)))
 time<-as.Date(out[,"time"]+startdate)
-plot(time,dailyinc0,type='l',lwd=3,col='grey',
-     main="Predicted Confirmed Cases", xlab="Date", ylab="Cases",ylim=c(0,max(dailyinc0)))
-lines(time,dailyinc1,type='l',lwd=3)
-points(as.Date(incdata_X[,1]),incdata_X[,2],pch=19,col='blue')
-legend(as.Date(stopdate-0.35*day_stop), 0.9*max(dailyinc0), legend=c("Baseline", "Intervention"),
-       col=c("grey", "black"), lwd=c(3,3))
+coul=c("#047883", "#24A9E2","#051A46")
+DM<-as.data.frame(cbind(time,previcureq0,previcureq20,previcureq30))
+colnames(DM)<-c("Time","Hospital surge beds","ICU beds","Ventilators")
+DM$Time<-as.Date(DM$Time,origin = "1970-01-01")
+DMF<-melt(DM, id.vars="Time",measure.vars = c("Hospital surge beds","ICU beds","Ventilators"))
+d0<-ggplot(DMF, aes(x = Time, y = value,fill=variable)) +
+  geom_area()+
+  scale_fill_manual(values=coul)
+
+
+DM<-as.data.frame(cbind(time,previcureq1,previcureq21,previcureq31))
+colnames(DM)<-c("Time","Hospital surge beds","ICU beds","Ventilators")
+DM$Time<-as.Date(DM$Time, origin = "1970-01-01")
+DMF<-melt(DM, id.vars="Time",measure.vars = c("Hospital surge beds","ICU beds","Ventilators"))
+d1<-ggplot(DMF, aes(x = Time, y = value,fill=variable)) +
+  geom_area()+
+  scale_fill_manual(values=coul)
+
+grid.arrange(d0+ylab("Number of Patients")+
+               ggtitle("Baseline")+
+               ylim(0, ymax)+
+               geom_hline(yintercept=(parameters["beds_available"]+parameters["icu_beds_available"]+parameters["ventilators_available"]), linetype="dashed", color = "#047883")+
+               geom_hline(yintercept=(parameters["icu_beds_available"]+parameters["ventilators_available"]), linetype="dashed", color = "#24A9E2")+
+               geom_hline(yintercept=parameters["ventilators_available"], linetype="dashed", color = "#051A46")+
+               theme_bw(),
+             d1+ylab("Number of Patients")+
+               ggtitle("Intervention")+
+               ylim(0, ymax)+
+               geom_hline(yintercept=(parameters["beds_available"]+parameters["icu_beds_available"]+parameters["ventilators_available"]), linetype="dashed", color = "#047883")+
+               geom_hline(yintercept=(parameters["icu_beds_available"]+parameters["ventilators_available"]), linetype="dashed", color = "#24A9E2")+
+               geom_hline(yintercept=parameters["ventilators_available"], linetype="dashed", color = "#051A46")+
+               theme_bw(),
+             nrow = 1)
+
+# Olivier to include Numerical outputs in boxes: cumulative patients without treatment compare baseline with intervention
+
+
+
+# Cumulative mortality at baseline and intervention stratified by hospital status
+
+ymax<-max(c((cinc_mort_H0+cinc_mort_ICU0+cinc_mort_Vent0+cinc_mort_HC0+cinc_mort_ICUC0+cinc_mort_VentC0),(cinc_mort_H1+cinc_mort_ICU1+cinc_mort_Vent1+cinc_mort_HC1+cinc_mort_ICUC1+cinc_mort_VentC1)))
+time<-as.Date(out[,"time"]+startdate)
+coul=c("#047883", "#24A9E2","#051A46","#E68029", "#D63304","#D1D604")
+DM<-as.data.frame(cbind(time,cinc_mort_H0,cinc_mort_ICU0,cinc_mort_Vent0,cinc_mort_HC0,cinc_mort_ICUC0,cinc_mort_VentC0))
+colnames(DM)<-c("Time","Treated: Hospital","Treated: ICU","Treated: Ventilator","Untreated: Hospital","Untreated: ICU","Untreated: Ventilator")
+DM$Time<-as.Date(DM$Time, origin = "1970-01-01")
+DMF<-melt(DM, id.vars="Time",measure.vars = c("Treated: Hospital","Treated: ICU","Treated: Ventilator","Untreated: Hospital","Untreated: ICU","Untreated: Ventilator"))
+m0<-ggplot(DMF, aes(x = Time, y = value,fill=variable)) +
+  geom_area()+
+  scale_fill_manual(values=coul)
+
+DM<-as.data.frame(cbind(time,cinc_mort_H1,cinc_mort_ICU1,cinc_mort_Vent1,cinc_mort_HC1,cinc_mort_ICUC1,cinc_mort_VentC1))
+colnames(DM)<-c("Time","Treated: Hospital","Treated: ICU","Treated: Ventilator","Untreated: Hospital","Untreated: ICU","Untreated: Ventilator")
+DM$Time<-as.Date(DM$Time, origin = "1970-01-01")
+DMF<-melt(DM, id.vars="Time",measure.vars = c("Treated: Hospital","Treated: ICU","Treated: Ventilator","Untreated: Hospital","Untreated: ICU","Untreated: Ventilator"))
+m1<-ggplot(DMF, aes(x = Time, y = value,fill=variable)) +
+  geom_area()+
+  scale_fill_manual(values=coul)
+
+
+grid.arrange(m0+ylab("Cumulatice mortality")+
+               ggtitle("Baseline")+
+               ylim(0, ymax),
+             m1+ylab("Cumulatice mortality")+
+               ggtitle("Baseline")+
+               ylim(0, ymax),
+             nrow = 1)
+
+# Oliver to include Numerical outputs: cumulative mortality compare baseline with intervention
+
+
+# Estimated basic reproduction number, R_t
+par(mfrow=c(1,2))
+ymax<-max(c(Rt0[!is.na(Rt0)],Rt1[!is.na(Rt1)]))
+plot(time[2:length(time)],Rt0,type='l',lwd=3,col='black',
+     main="Baseline", xlab="Date", ylab="Reproduction number",ylim=c(0,ymax))
+lines(time[2:length(time)],Rt0/Rt0,lwd=2,col='grey')
+plot(time[2:length(time)],Rt1,type='l',lwd=3,col='black',
+     main="Intervention", xlab="Date", ylab="Reproduction number",ylim=c(0,ymax))
+lines(time[2:length(time)],Rt1/Rt1,lwd=2,col='grey')
+
+
+# Predicted ifr 
+gm<-ggplot(data=MORT1,aes(x=Age,y=value,fill=variable))+
+  geom_line(data=MORT1,aes(x=Age,y=value,colour=variable),lwd=1.5)+ylab("Mortality")
+gm0<-ggplot(data=MORT0,aes(x=Age,y=value,fill=variable))+
+  geom_line(data=MORT0,aes(x=Age,y=value,colour=variable),lwd=1.5)+ylab("Mortality")
+
+grid.arrange(gm+theme_classic(),
+             gm0+theme_classic(),
+             nrow=1)
+
 
 # output doubling time over time first 7 days
 dd<-7
@@ -479,4 +856,3 @@ doub0<-log(2)*dd/(log(dailyinc0[2+dd]/dailyinc0[2]))
 doub0
 
 
-# write.csv(cbind(dailyinc0,dailyinc1),file = "baseline_intervention_UK.csv")

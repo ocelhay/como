@@ -20,12 +20,6 @@ list(
                                                      p("(5) upload your own dataset of demographic data"), 
                                                      fileInput("population_file", label = NULL, accept = ".csv", multiple = FALSE)
                                     )
-                   ),
-                   pickerInput("country_beds", label = "Hospital Beds per 1,000:", choices = c("-- Own Value ---", countries_beds),
-                               options = pickerOptions(liveSearch = TRUE), selected = "Afghanistan"),
-                   p("To provide your own values, select '--Own Value--' in the list"),
-                   conditionalPanel("input.country_beds == '-- Own Value ---'",
-                                    numericInput("beds", label = "Beds per 1,000 population", value = 2.54, min = 0, width = "50%"),
                    )
             ),
             column(4,
@@ -60,6 +54,6 @@ list(
                    fileInput("severity_mortality_file", label = NULL, accept = ".csv", multiple = FALSE)
             )
           ),
-          div(id = "closebutton", bsButton("close_country_param", "Close", icon("times"), style = "danger", size = "small"))
+          div(class = "closebutton", bsButton("close_country_param", "Close", icon("times"), style = "danger", size = "small"))
   )
 )

@@ -24,7 +24,7 @@ ui <- function(request) {
     navbarPage(NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
                tabPanel("Welcome", value = "tab_welcome",
                         h3("CoMo COVID-19 App"),
-                        h4("v9.22"),
+                        h4("v11.3"),
                         br(),
                         fluidRow(
                           column(5, 
@@ -54,12 +54,16 @@ ui <- function(request) {
                                                                                      block = TRUE), br(),
                                                                             bsButton("open_virus_param", label = "Virus Parameters", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                                                      block = TRUE), br(), 
+                                                                            bsButton("open_hospitalisation_param", label = "Hospitalisation Parameters", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                                     block = TRUE), br(), 
                                                                             sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
-                                                                                        value = 0.035, ticks = FALSE),
-                                                                            sliderInput("report", label = "Percentage of all infections that are reported:", min = 0, max = 100, step = 0.1,
-                                                                                        value = 12.5, post = "%", ticks = FALSE),
+                                                                                        value = 0.049, ticks = FALSE),
+                                                                            sliderInput("report", label = span("Percentage of all", strong(" asymptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
+                                                                                        value = 2.5, post = "%", ticks = FALSE),
+                                                                            sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
+                                                                                        value = 5, post = "%", ticks = FALSE),
                                                                             
-                                                                            dateRangeInput("date_range", label = "Range of dates", start = "2020-01-31", end = "2020-12-31"),
+                                                                            dateRangeInput("date_range", label = "Range of dates", start = "2020-02-10", end = "2020-09-01"),
                                                                             br(), 
                                                                             htmlOutput("feedback_choices"),
                                                                             div(class = "floating-button",
@@ -68,7 +72,8 @@ ui <- function(request) {
                                                                             hr()
                                                                         ),
                                                                         source("./www/pushbar_parameters_country.R", local = TRUE)[1],
-                                                                        source("./www/pushbar_parameters_virus.R", local = TRUE)[1]
+                                                                        source("./www/pushbar_parameters_virus.R", local = TRUE)[1],
+                                                                        source("./www/pushbar_parameters_hospitalisation.R", local = TRUE)[1]
                                                        ),
                                                        conditionalPanel("output.show_results_interventions", 
                                                                         br(),
@@ -100,6 +105,8 @@ ui <- function(request) {
                         fluidRow(
                           column(4, 
                                  div(class = "interventions_left",
+                                     h4("Lockdown:"),
+                                     source("./www/interventions/lockdown.R", local = TRUE)$value,
                                      h4("Interventions available:"),
                                      # Self Isolation ----
                                      source("./www/interventions/selfisolation.R", local = TRUE)$value,
@@ -192,72 +199,8 @@ server <- function(input, output, session) {
   observeEvent(input$close_country_param, pushbar_close())
   observeEvent(input$open_virus_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_virus"))  
   observeEvent(input$close_virus_param, pushbar_close())
-  
-  # # Provide default values for package of interventions
-  # observeEvent(input$package_interventions, {
-  #   if(input$package_interventions == "Low"){
-  #     updateMaterialSwitch(session, "selfis_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "dist_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "hand_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "work_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "school_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "cocoon_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "travelban_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "screen_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "quarantine_switch", value = TRUE)
-  #     updateSliderInput(session, "selfis_cov", value = 50)
-  #     updateSliderInput(session, "dist_cov", value = 25)
-  #     updateSliderInput(session, "hand_eff", value = 5)
-  #     updateSliderInput(session, "work_cov", value = 25)
-  #     updateSliderInput(session, "school_eff", value = 0)
-  #     updateSliderInput(session, "cocoon_cov", value = 90)
-  #     updateSliderInput(session, "travelban_eff", value = 0)
-  #     updateSliderInput(session, "quarantine_cov", value = 0)
-  #   }
-  #   if(input$package_interventions == "Medium"){
-  #     updateMaterialSwitch(session, "selfis_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "dist_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "hand_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "work_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "school_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "cocoon_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "travelban_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "screen_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "quarantine_switch", value = TRUE)
-  #     updateSliderInput(session, "selfis_cov", value = 75)
-  #     updateSliderInput(session, "dist_cov", value = 75)
-  #     updateSliderInput(session, "hand_eff", value = 5)
-  #     updateSliderInput(session, "work_cov", value = 50)
-  #     updateSliderInput(session, "school_eff", value = 85)
-  #     updateSliderInput(session, "cocoon_cov", value = 90)
-  #     updateSliderInput(session, "travelban_eff", value = 0)
-  #     updateSliderInput(session, "quarantine_cov", value = 25)
-  #   }
-  #   if(input$package_interventions == "High"){
-  #     updateMaterialSwitch(session, "selfis_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "dist_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "hand_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "work_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "school_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "cocoon_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "travelban_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "screen_switch", value = TRUE)
-  #     updateMaterialSwitch(session, "quarantine_switch", value = TRUE)
-  #     updateSliderInput(session, "selfis_cov", value = 95)
-  #     updateSliderInput(session, "dist_cov", value = 95)
-  #     updateSliderInput(session, "hand_eff", value = 5)
-  #     updateSliderInput(session, "work_cov", value = 75)
-  #     updateSliderInput(session, "school_eff", value = 85)
-  #     updateSliderInput(session, "cocoon_cov", value = 90)
-  #     updateSliderInput(session, "travelban_eff", value = 100)
-  #     updateSliderInput(session, "quarantine_cov", value = 90)
-  #   }
-  # }, ignoreNULL = FALSE, ignoreInit = TRUE)
-  # 
-  # observeEvent(input$left_panel, {
-  #   print(input$left_panel)
-  #   if(input$left_panel == "interventions") updatePrettyRadioButtons(session, "package_interventions", selected = "Medium")
-  # })
+  observeEvent(input$open_hospitalisation_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_hospitalisation"))  
+  observeEvent(input$close_hospitalisation_param, pushbar_close())
   
   # Reactive elements
   population_rv <- reactiveValues(data = NULL)
@@ -284,12 +227,9 @@ server <- function(input, output, session) {
   
   # Process on uploading a file of severity/mortality
   observeEvent(input$severity_mortality_file, {
-    mort_sever_upload <- read.csv(input$severity_mortality_file$datapath, header = TRUE)
-    
-    if (any(mort_sever_upload$mortality > mort_sever_upload$severity)) {
-      warning("CFR > CSR for at least one age class!")
-      mort_sever_upload %>% mutate(severity = max(mortality, severity))
-    }
+    mort_sever_upload <- read.csv(input$severity_mortality_file$datapath, header = TRUE) %>%
+      mutate(ihr = 4*ihr/100) %>%
+      mutate(ifr = ifr/max(ifr))
     
     mort_sever$data <- mort_sever_upload
   })
@@ -300,12 +240,9 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$cases_file, {
-    cases_file_upload <- read_csv(input$cases_file$datapath, col_names = TRUE,
+    cases_rv$data <- read_csv(input$cases_file$datapath, col_names = TRUE,
                                   col_types = "cnnn") %>%
       mutate(date = ymd(date))
-    
-    cases_rv$data <- cases_file_upload
-    cases_rv$data <- cases %>% filter(country == input$country_cases)
   })
   
   # Manage population reactive values
@@ -365,6 +302,9 @@ server <- function(input, output, session) {
     updateMaterialSwitch(session, "screen_switch", value = FALSE)
     updateMaterialSwitch(session, "vaccination_switch", value = FALSE)
     updateMaterialSwitch(session, "quarantine_switch", value = FALSE)
+    updateMaterialSwitch(session, "lockdown_low_switch", value = FALSE)
+    updateMaterialSwitch(session, "lockdown_mid_switch", value = FALSE)
+    updateMaterialSwitch(session, "lockdown_high_switch", value = FALSE)
     
     source("./www/model.R", local = TRUE)
     
@@ -379,6 +319,9 @@ server <- function(input, output, session) {
     parameters["screen_on"]<-10e5
     parameters["vaccine_on"]<-10e5
     parameters["quarantine_on"]<-10e5
+    parameters["lockdown_low_on"]<-10e5
+    parameters["lockdown_mid_on"]<-10e5
+    parameters["lockdown_high_on"]<-10e5
     
     
     out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
@@ -406,6 +349,9 @@ server <- function(input, output, session) {
     if(! input$screen_switch) parameters["screen_on"] <- 10e5
     if(! input$vaccination_switch) parameters["vaccine_on"] <- 10e5
     if(! input$quarantine_switch) parameters["quarantine_on"] <- 10e5
+    parameters["lockdown_low_on"]<-10e5
+    parameters["lockdown_mid_on"]<-10e5
+    parameters["lockdown_high_on"]<-10e5
     
     out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
     simul_interventions$results <- process_ode_outcome(out)

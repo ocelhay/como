@@ -4,7 +4,7 @@
 	z-index: 99999;
 }
 
-#closebutton{
+.closebutton{
   top: calc(5%);;
   right: calc(5%);;
   position: fixed;

@@ -10,7 +10,7 @@ div(class = "interventions", id = 'interventions_work',
                                              width = "400px", tooltip = FALSE, right = FALSE, up = TRUE,
                                              fluidRow(
                                                column(12,
-                                                      dateInput("date_work_on", label = "Start Date:", value = "2020-03-19"),
+                                                      dateInput("date_work_on", label = "Start Date:", value = "2020-04-15"),
                                                       sliderInput("work_dur", label = "Duration:", value = 12 , min = 1, max = 52, step = 1, post = " weeks", ticks = FALSE),
                                                       sliderInput("work_cov", label = "Coverage of working from home:", value = 50, min = 0, max = 100,
                                                                   step = 1, post = "%", ticks = FALSE),

@@ -9,7 +9,7 @@ div(class = "interventions", id = 'interventions_dist',
                                              width = "400px", tooltip = FALSE, right = FALSE,
                                              fluidRow(
                                                column(12,
-                                                      dateInput("date_dist_on", label = "Start Date:", value = "2020-03-17"),
+                                                      dateInput("date_dist_on", label = "Start Date:", value = "2020-04-15"),
                                                       sliderInput("dist_dur", label = "Duration:", value = 26, min = 1, max = 52, step = 1, post = " weeks", ticks = FALSE),
                                                       sliderInput("dist_cov", label = "Coverage of social distancing:", value = 50, min = 0, max = 100,
                                                                   step = 1, post = "%", ticks = FALSE),
