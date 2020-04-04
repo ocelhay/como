@@ -1,7 +1,8 @@
 output$text_baseline_pct_pop <- renderText({
   req(simul_baseline$baseline_available)
   
-  n <- round(last(simul_baseline$results$pct_total_pop_infected), 1)
+  n <- simul_baseline$results$pct_total_pop_infected
+  
   return(
     paste0(
       as.character(

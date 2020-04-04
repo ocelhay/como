@@ -277,7 +277,6 @@ parameters["work_cov"]<-parameters["work_cov"]/100
 parameters["work_eff"]<-parameters["work_eff"]/100
 parameters["w2h"]<-parameters["w2h"]/100
 parameters["school_dur"]<-parameters["school_dur"]*7
-parameters["schoolcov"]<-parameters["schoolcov"]/100
 parameters["school_eff"]<-parameters["school_eff"]/100
 parameters["s2h"]<-parameters["s2h"]/100
 parameters["cocoon_dur"]<-parameters["cocoon_dur"]*7
@@ -311,7 +310,7 @@ parameters["nu_ventc"]<-1/parameters["nu_ventc"]
 parameters["pclin"]<-parameters["pclin"]/100
 parameters["prob_icu"]<-parameters["prob_icu"]/100
 parameters["prob_vent"]<-parameters["prob_vent"]/100
-parameters["lockdow_low_dur"]<-parameters["lockdow_low_dur"]*7
+parameters["lockdown_low_dur"]<-parameters["lockdown_low_dur"]*7
 parameters["lockdown_mid_dur"]<-parameters["lockdown_mid_dur"]*7
 parameters["lockdown_high_dur"]<-parameters["lockdown_high_dur"]*7
 

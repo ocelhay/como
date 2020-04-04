@@ -4,7 +4,7 @@ output$highchart_confirmed <- renderHighchart({
   # Baseline only ----
   if(!simul_interventions$interventions_available){
 
-    dta <- left_join(tibble(dailyinc = simul_baseline$results$dailyinc0,
+    dta <- left_join(tibble(dailyinc = simul_baseline$results$daily_incidence,
                             daily_total_cases = simul_baseline$results$daily_total_cases,
                             time = simul_baseline$results$time), 
                      cases_rv$data, 
@@ -48,10 +48,10 @@ output$highchart_confirmed <- renderHighchart({
   # Baseline & Interventions
   if(simul_interventions$interventions_available){
     dta <- left_join(
-      tibble(dailyinc_bas = simul_baseline$results$dailyinc0,
+      tibble(dailyinc_bas = simul_baseline$results$daily_incidence,
              daily_total_cases_bas = simul_baseline$results$daily_total_cases,
              time = simul_baseline$results$time),
-      tibble(dailyinc_int = simul_interventions$results$dailyinc0,
+      tibble(dailyinc_int = simul_interventions$results$daily_incidence,
              daily_total_cases_int = simul_interventions$results$daily_total_cases,
              time = simul_interventions$results$time),
       by = "time")

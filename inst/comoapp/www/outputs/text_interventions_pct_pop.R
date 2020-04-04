@@ -1,8 +1,9 @@
 output$text_interventions_pct_pop <- renderText({
   req(simul_interventions$interventions_available)
   
-  n <- round(last(simul_interventions$results$pct_total_pop_infected), 1)
-  reduction <- round(last(simul_interventions$results$pct_total_pop_infected - simul_baseline$results$pct_total_pop_infected), 1)
+  n <- simul_interventions$results$pct_total_pop_infected
+  reduction <- round((n - simul_baseline$results$pct_total_pop_infected), 1)
+  
   return(
     paste0(
       as.character(

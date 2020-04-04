@@ -1,8 +1,9 @@
 output$text_interventions_total_death <- renderText({
   req(simul_interventions$interventions_available)
   
-  n <- round(last(simul_interventions$results$cmortality0))
-  reduction <- round(last(simul_interventions$results$cmortality0) - last(simul_baseline$results$cmortality0))
+  n <- simul_interventions$results$total_deaths
+  reduction <- n - simul_baseline$results$total_deaths
+  
   return(
     paste0(
       as.character(

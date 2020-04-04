@@ -2,8 +2,8 @@ output$highchart_ICU <- renderHighchart({
   
   # Baseline only
   if(simul_baseline$baseline_available & !simul_interventions$interventions_available){
-    dta <- tibble(previcureq = round(simul_baseline$results$previcureq0, 0),
-                  saturation = round(simul_baseline$results$saturation[1], 0),
+    dta <- tibble(previcureq = round(simul_baseline$results$required_beds, 0),
+                  saturation = round(simul_baseline$results$saturation, 0),
                   time = simul_baseline$results$time)
     
     tt <- tooltip_table(c("Baseline, Required Beds: ", "Saturation: "), 
@@ -22,10 +22,10 @@ output$highchart_ICU <- renderHighchart({
   # Basline & Interventions
   if(simul_interventions$interventions_available){
     dta <- left_join(
-      tibble(previcureq_bas = round(simul_baseline$results$previcureq0, 0),
-             saturation = round(simul_baseline$results$saturation[1], 0),
+      tibble(previcureq_bas = round(simul_baseline$results$required_beds, 0),
+             saturation = round(simul_baseline$results$saturation, 0),
              time = simul_baseline$results$time),
-      tibble(previcureq_int = round(simul_interventions$results$previcureq0, 0),
+      tibble(previcureq_int = round(simul_interventions$results$required_beds, 0),
              time = simul_interventions$results$time),
       by = "time")
     

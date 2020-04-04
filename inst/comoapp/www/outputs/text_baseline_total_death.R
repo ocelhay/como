@@ -1,7 +1,8 @@
 output$text_baseline_total_death <- renderText({
   req(simul_baseline$baseline_available)
   
-  n <- round(last(simul_baseline$results$cmortality0))
+  n <- simul_baseline$results$total_deaths
+  
   return(
     paste0(
       as.character(

@@ -1,7 +1,6 @@
 **Demographic Data**
 
 - Source: [UN 2019 Revision of World Population Prospects](https://population.un.org/wpp/Download/Standard/Population/)
-- The App allows to upload data.
 
 **Social Contacts Data**
 
