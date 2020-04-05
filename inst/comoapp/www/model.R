@@ -239,8 +239,8 @@ shiny_parameters <<- parameters
 popstruc <- population_rv$data %>% select(age_category, pop) %>% rename(agefloor = age_category) %>% as.data.frame()
 popbirth <- population_rv$data %>% select(age_category, birth) %>% as.data.frame()
 mort <- population_rv$data %>% pull(death)
-ihr <- mort_sever$data %>% select(age_category, ihr) %>% as.data.frame()
-ifr <- mort_sever$data %>% select(age_category, ifr) %>% as.data.frame()
+ihr <- mort_sever_rv$data %>% select(age_category, ihr) %>% as.data.frame()
+ifr <- mort_sever_rv$data %>% select(age_category, ifr) %>% as.data.frame()
 
 
 # START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----

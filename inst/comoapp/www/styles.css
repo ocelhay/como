@@ -17,12 +17,12 @@
 /* Floating feedback */
 #float_feedback_process {
   top: calc(1%);;
-  right: calc(2%);;
+  left: calc(2%);;
   z-index: 9999;
   position: fixed;
   padding: 10px 10px 5px 5px;
   border-radius: 5px;
-  max-width: 500px;
+  max-width: 400px;
   color: white;
   text-align: center;
   background-color: #18bc9c;
@@ -37,6 +37,7 @@
   width: 80%;
 }
 
+/*
 .interventions_left{
   bottom: calc(2%);;
   left: calc(2%);;
@@ -44,6 +45,7 @@
   z-index: 999;
   position: fixed;
 }
+*/
 
 
 #margin_month_slider {
@@ -117,6 +119,6 @@ h4 {
 }
 
 
-.floating-button{
+.marginleft{
   margin-left: 60%;
 }
