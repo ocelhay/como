@@ -7,6 +7,20 @@ output$timeline <- renderTimevis({
   max_x <- cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))]
   dta <- bind_rows(dta, tibble(id = 11, content = "Observed Cases/Deaths", start = min_x, end = max_x, type = "range", group = 1,
                                style = "border-color: #F991A3; background-color: pink; color: red;"))
+  if(input$lockdown_low_switch) {
+    dta <- bind_rows(dta, tibble(id = 12, content = "Low Lockdown", start = input$date_lockdown_low_on, 
+                                 end = as.Date(input$date_lockdown_low_on + 7*input$lockdown_low_dur), type = "range", group = 3))
+  }
+  
+  if(input$lockdown_mid_switch) {
+    dta <- bind_rows(dta, tibble(id = 12, content = "Mid Lockdown", start = input$date_lockdown_mid_on, 
+                                 end = as.Date(input$date_lockdown_mid_on + 7*input$lockdown_mid_dur), type = "range", group = 3))
+  }
+  
+  if(input$lockdown_high_switch) {
+    dta <- bind_rows(dta, tibble(id = 12, content = "High Lockdown", start = input$date_lockdown_high_on, 
+                                 end = as.Date(input$date_lockdown_high_on + 7*input$lockdown_high_dur), type = "range", group = 3))
+  }
   
   if(input$selfis_switch) {
     dta <- bind_rows(dta, tibble(id = 1, content = "Self Isolation if Symptomatic", start = input$date_selfis_on, 

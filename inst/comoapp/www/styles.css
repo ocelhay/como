@@ -1,11 +1,15 @@
+.importanttext {
+  color: red;
+}
+
 /* Pushbar */
 .pushbar.from_right {
 	width: 75%; !important;
 	z-index: 99999;
 }
 
-#closebutton{
-  top: calc(5%);;
+.closebutton{
+  top: calc(3%);;
   right: calc(5%);;
   position: fixed;
 }
@@ -13,17 +17,26 @@
 /* Floating feedback */
 #float_feedback_process {
   top: calc(1%);;
-  right: calc(2%);;
+  left: calc(2%);;
   z-index: 9999;
   position: fixed;
   padding: 10px 10px 5px 5px;
   border-radius: 5px;
-  max-width: 500px;
+  max-width: 400px;
   color: white;
   text-align: center;
   background-color: #18bc9c;
   border-color: red;
   border-width: 5px;
+}
+
+#css_feedback_process {
+  padding: 10px 10px 5px 5px;
+  margin: 5px 5px 5px 5px;
+  border-radius: 5px;
+  color: white;
+  text-align: center;
+  background-color: #18bc9c;
 }
 
 
@@ -33,10 +46,14 @@
   width: 80%;
 }
 
-.interventions_left{
+.float_buttons{
   bottom: calc(2%);;
   left: calc(2%);;
-  width: 25%;
+  border-radius: 5px;
+  padding: 8px;
+  border: 3px solid #18bc9c;
+  background-color: white;
+  width: 30%;
   z-index: 999;
   position: fixed;
 }
@@ -110,9 +127,4 @@ h4 {
   float: right;
   font-size: 30px;
   margin-right: 5px;
-}
-
-
-.floating-button{
-  margin-left: 60%;
 }

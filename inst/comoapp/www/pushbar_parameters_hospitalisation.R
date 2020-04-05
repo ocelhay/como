@@ -1,0 +1,31 @@
+list(
+  pushbar(id = "pushbar_parameters_hospitalisation", from = "right", class = "pushbarcomp",
+          br(), br(), br(), br(), 
+          fluidRow(
+            column(4, 
+                   numericInput("beds_available", label = "Maximum number of hospital beds:", value = 80000, min = 1),
+                   numericInput("icu_beds_available", label = "Maximum number of ICU beds:", value = 8000, min = 1),
+                   numericInput("ventilators_available", label = "Maximum number of ventilators:", value = 6000, min = 1),
+                   sliderInput("rhos", label = "Relative level of contacts from severely ill patients:", post = "%", ticks = FALSE,
+                               value = 15, min = 0, max = 100, step = 1)
+            ),
+            column(4,
+                   sliderInput("pdeath_h", label = "Probability of dying when hospitalised:", value = 35, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("pdeath_hc", label = "Probability of dying when denied hospitalisation:", value = 45, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("pdeath_icu", label = "Probability of dying when admitted to ICU:", value = 55, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("pdeath_icuc", label = "Probability of dying when admission to ICU denied:", value = 80, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("pdeath_vent", label = "Probability of dying when ventilated:", value = 80, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("pdeath_ventc", label = "Probability of dying when ventilator denied:", value = 95, min = 0, max = 100, step = 1, post = "%", ticks = FALSE)
+            ),
+            column(4,
+                   sliderInput("nus", label = "Duration of non-fatal hospitalised infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
+                   sliderInput("nusc", label = "Duration of non-fatal denied hospitalisation infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
+                   sliderInput("nu_icu", label = "Duration of non-fatal ICU infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
+                   sliderInput("nu_icuc", label = "Duration of non-fatal denied ICU infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
+                   sliderInput("nu_vent", label = "Duration of non-fatal ventilated infection:", value = 25, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
+                   sliderInput("nu_ventc", label = "Duration of non-fatal denied ventilation infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
+            )
+          ),
+          div(class = "closebutton", bsButton("close_hospitalisation_param", "Close", icon("times"), style = "danger", size = "small"))
+  )
+)

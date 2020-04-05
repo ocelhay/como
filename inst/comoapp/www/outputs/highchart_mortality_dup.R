@@ -4,7 +4,7 @@ output$highchart_mortality_dup <- renderHighchart({
   # Baseline only ----
   if(!simul_interventions$interventions_available){
 
-    dta <- left_join(tibble(cmortality = simul_baseline$results$cmortality0,
+    dta <- left_join(tibble(cmortality = simul_baseline$results$cum_mortality,
                             time = simul_baseline$results$time), 
                      cases_rv$data, 
                      by = c("time" = "date"))
@@ -46,9 +46,9 @@ output$highchart_mortality_dup <- renderHighchart({
   # Baseline & Interventions
   if(simul_interventions$interventions_available){
     dta <- left_join(
-      tibble(cmortality_bas = simul_baseline$results$cmortality0,
+      tibble(cmortality_bas = simul_baseline$results$cum_mortality,
              time = simul_baseline$results$time),
-      tibble(cmortality_int = simul_interventions$results$cmortality0,
+      tibble(cmortality_int = simul_interventions$results$cum_mortality,
              time = simul_interventions$results$time),
       by = "time")
     
@@ -72,8 +72,8 @@ output$highchart_mortality_dup <- renderHighchart({
     
     dta2 <- dta %>%
       transmute(Date = time, 
-                CDB= round(cmortality_bas),
-                CDI= round(cmortality_int),
+                CDB = round(cmortality_bas),
+                CDI = round(cmortality_int),
                 D = cumulative_death) %>%
       filter(Date <= max_x)
     

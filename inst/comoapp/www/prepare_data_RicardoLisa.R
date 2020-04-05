@@ -1,3 +1,5 @@
+# Original
+setwd("/Users/olivier/Documents/CoMo/como/inst/comoapp")
 # Cases data ----
 load(file = "./www/data/cases.RData")
 countries_cases <- c("-- Own Value ---", cases %>% pull(country) %>% unique() %>% sort())
@@ -19,3 +21,6 @@ countries_contact <- names(contact_home)
 mort_sever_default <- read.csv("./www/data/COVID_severe_mortality_age.csv", header = TRUE) %>%
   mutate(ihr = 4*ihr/100) %>%
   mutate(ifr = ifr/max(ifr))
+
+# Modified
+
