@@ -17,7 +17,7 @@ list(
             ),
             column(4,  
                    sliderInput("amp", label = "Annual variation in infectivity of the virus:", post = "%", ticks = FALSE,
-                               value = 50, min = 0, max = 100, step = 1),
+                               value = 0, min = 0, max = 100, step = 1),
                    sliderInput("omega", label = "Average duration of immunity:", post = " years", ticks = FALSE,
                                value = 150, min = 0.5, max = 150, step = 0.5)
                    
@@ -25,9 +25,9 @@ list(
             column(4,  
                    sliderInput("pclin", label = "Probability upon infection of developing clinical symptoms:", post = "%", ticks = FALSE,
                                value = 55, min = 0, max = 100, step = 1),
-                   sliderInput("prob_icu", label = "Probability upon hospitalisation of requiring icu admission:", post = "%", ticks = FALSE,
+                   sliderInput("prob_icu", label = "Probability upon hospitalisation of requiring ICU admission:", post = "%", ticks = FALSE,
                                value = 50, min = 0, max = 100, step = 1),
-                   sliderInput("prob_vent", label = "Probability upon admission to the UCI of requiring a ventilator:", post = "%", ticks = FALSE,
+                   sliderInput("prob_vent", label = "Probability upon admission to the ICU of requiring a ventilator:", post = "%", ticks = FALSE,
                                value = 75, min = 0, max = 100, step = 1)
             )
           ),

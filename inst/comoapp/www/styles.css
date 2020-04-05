@@ -1,3 +1,7 @@
+.importanttext {
+  color: red;
+}
+
 /* Pushbar */
 .pushbar.from_right {
 	width: 75%; !important;
@@ -5,7 +9,7 @@
 }
 
 .closebutton{
-  top: calc(5%);;
+  top: calc(3%);;
   right: calc(5%);;
   position: fixed;
 }

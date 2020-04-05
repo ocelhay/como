@@ -3,9 +3,9 @@ output$feedback_choices <- renderText({
     paste0(
       strong("Selected Inputs:"),
       tags$ul(
-        tags$li("Cases/Deaths: ", input$country_cases),
-        tags$li("Demographics: ", input$country),
-        tags$li("Social Contacts: ", input$country_contact)
+        tags$li("Cases/Deaths:", span(class = "importanttext", input$country_cases)),
+        tags$li("Demographics: ", span(class = "importanttext", input$country)),
+        tags$li("Social Contacts: ", span(class = "importanttext", input$country_contact))
       )
     )
   )

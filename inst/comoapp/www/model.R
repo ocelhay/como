@@ -53,7 +53,7 @@ times <- seq(0, as.numeric(stopdate - startdate))
 tin <- as.numeric(startdate - as.Date("2020-01-01")) / 365.25
 ageindcase <- 20 # age of index case (years)
 aci <- floor((ageindcase / 5) + 2) # age class of index case
-
+give <- 65
 
 
 
@@ -69,7 +69,7 @@ parameters <- c(
   beds_available = input$beds_available,
   icu_beds_available = input$icu_beds_available,
   ventilators_available = input$ventilators_available,
-  give = 65,
+  give = give,
   pdeath_h = input$pdeath_h,
   pdeath_hc = input$pdeath_hc,
   pdeath_icu = input$pdeath_icu,
@@ -558,9 +558,7 @@ process_ode_outcome <- function(out){
   results$time <- time  # dates
   results$cum_mortality <- round(cmortality1)  # cumulative mortality
   results$total_deaths <- round(last(cmortality1))  # total deaths at the end of the simulation
-  results$total_infected <- round(last(ccases1))  # total population that has been infected at the end of the simulation
-  # results$pct_total_pop_infected <- round(100*last(ccases1) / last(tpop1), 1) # proportion of the  population that has been infected at the end of the simulation
-  results$pct_total_pop_infected <- NA
+  results$pct_total_pop_infected <- round(100 * tail(cumsum(rowSums(parameters["gamma"]*out[,(Eindex+1)])),1)/sum(popstruc[,2]), 1)  # proportion of the  population that has been infected at the end of the simulation
   results$doubling_time <- round(log(2)*7 / (log(dailyinc1[2+7] / dailyinc1[2])), 2)  # (Baseline only) to double the number of infections at inception
   results$required_beds <- round(previcureq1)  # required beds
   results$saturation <- parameters["beds_available"]  # saturation
@@ -570,4 +568,3 @@ process_ode_outcome <- function(out){
   shiny_results <<- results
   return(results)
 }
-

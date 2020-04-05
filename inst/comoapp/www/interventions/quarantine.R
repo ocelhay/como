@@ -22,7 +22,7 @@ div(class = "interventions", id = 'interventions_quarantine',
                                                column(6,
                                                       sliderInput("quarantine_eff_other", label = "Decrease in the number of other contacts when quarantined:", value = 20, 
                                                                   min = 0, max = 100, step = 5, post = "%", ticks = FALSE),
-                                                      sliderInput("quarantine_eff_home", label = "Increase in the number of contacts at home when quarantined", value = 100, 
+                                                      sliderInput("quarantine_eff_home", label = "Increase in the number of contacts at home when quarantined:", value = 100, 
                                                                   min = 0, max = 100, step = 5, post = "%", ticks = FALSE)
                                                )
                                              )

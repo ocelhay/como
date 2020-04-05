@@ -42,53 +42,52 @@ ui <- function(request) {
                           )
                         )
                ),
-               tabPanel("Visual Fit", value = "tab_visualfit",
+               tabPanel("Visual Calibration", value = "tab_visualfit",
                         fluidRow(
                           column(4, 
-                                 tabsetPanel(type = "tabs",
-                                             tabPanel("Parameters",
-                                                      conditionalPanel("! output.show_results_interventions",
-                                                                       div(class = "baseline_left",
-                                                                           br(), 
-                                                                           p("Use customised data/ update default parameters:", a("download the template", href = "https://www.dropbox.com/s/eslw1x267iq6p5p/Template_data_comomodel.xlsx?dl=1", target = "_blank"), 
-                                                                             ", edit it and upload below. (Any subsequent input in the App will overseed provided input value)."),
-                                                                           fileInput("own_data", label = NULL, accept = ".xlsx", multiple = FALSE),
-                                                                           bsButton("open_country_param", label = "Country/Area Data", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                                    block = TRUE), br(),
-                                                                           bsButton("open_virus_param", label = "Virus Parameters", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                                    block = TRUE), br(), 
-                                                                           bsButton("open_hospitalisation_param", label = "Hospitalisation Parameters", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                                    block = TRUE), br(), 
-                                                                           sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
-                                                                                       value = 0.049, ticks = FALSE),
-                                                                           sliderInput("report", label = span("Percentage of all", strong(" asymptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
-                                                                                       value = 2.5, post = "%", ticks = FALSE),
-                                                                           sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
-                                                                                       value = 5, post = "%", ticks = FALSE),
-                                                                           
-                                                                           dateRangeInput("date_range", label = "Range of dates", start = "2020-02-10", end = "2020-09-01"),
-                                                                           br(), 
-                                                                           htmlOutput("feedback_choices"),
-                                                                           div(class = "floating-button",
-                                                                               actionButton("run_baseline", "Run Baseline", class="btn btn-success")
-                                                                           ),
-                                                                           hr()
-                                                                       ),
-                                                                       source("./www/pushbar_parameters_country.R", local = TRUE)[1],
-                                                                       source("./www/pushbar_parameters_virus.R", local = TRUE)[1],
-                                                                       source("./www/pushbar_parameters_hospitalisation.R", local = TRUE)[1]
-                                                      ),
-                                                      conditionalPanel("output.show_results_interventions", 
-                                                                       br(),
-                                                                       bsButton("reset_baseline", label = "Reset the Baseline", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                                block = TRUE)
-                                                      )
-                                             ),
-                                             tabPanel("Past/Current Interventions",
-                                                      HTML("TBC")
-                                             )
-                                             
+                                 tabsetPanel(
+                                   tabPanel("Baseline",
+                                            conditionalPanel("! output.show_results_interventions",
+                                                             div(class = "baseline_left",
+                                                                 br(), 
+                                                                 p("Use customised data/ update default parameters:", a("download the template", href = "https://www.dropbox.com/s/eslw1x267iq6p5p/Template_data_comomodel.xlsx?dl=1", target = "_blank"), 
+                                                                   ", edit it and upload below. (Any subsequent input in the App will overseed provided input value)."),
+                                                                 fileInput("own_data", label = NULL, accept = ".xlsx", multiple = FALSE),
+                                                                 bsButton("open_country_param", label = "Country/Area Data", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                          block = TRUE), br(),
+                                                                 bsButton("open_virus_param", label = "Virus Parameters", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                          block = TRUE), br(), 
+                                                                 bsButton("open_hospitalisation_param", label = "Hospitalisation Parameters", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                          block = TRUE), br(), 
+                                                                 sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
+                                                                             value = 0.049, ticks = FALSE),
+                                                                 sliderInput("report", label = span("Percentage of all", strong(" asymptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
+                                                                             value = 2.5, post = "%", ticks = FALSE),
+                                                                 sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
+                                                                             value = 5, post = "%", ticks = FALSE),
+                                                                 
+                                                                 dateRangeInput("date_range", label = "Range of dates", start = "2020-02-10", end = "2020-09-01"),
+                                                                 br()
+                                                             ),
+                                                             source("./www/pushbar_parameters_country.R", local = TRUE)[1],
+                                                             source("./www/pushbar_parameters_virus.R", local = TRUE)[1],
+                                                             source("./www/pushbar_parameters_hospitalisation.R", local = TRUE)[1]
+                                            ),
+                                            conditionalPanel("output.show_results_interventions", 
+                                                             br(),
+                                                             bsButton("reset_baseline", label = "Reset the Baseline", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                      block = TRUE)
+                                            )
+                                   ),
+                                   tabPanel("Interventions",
+                                   )
+                                 ),
+                                 hr(),
+                                 htmlOutput("feedback_choices"),
+                                 div(class = "floating-button",
+                                     actionButton("run_baseline", "Run Baseline", class="btn btn-success")
                                  )
+                                 
                           ),
                           column(8,
                                  conditionalPanel("output.show_results_baseline",
@@ -214,16 +213,16 @@ server <- function(input, output, session) {
   
   # Manage cases data reactive values
   observeEvent(input$country, if(input$country != "-- Own Value ---"){
-               population_rv$data <- population %>% filter(country == input$country)
-               
-               shiny_population_rv_data_1 <<- population_rv$data
+    population_rv$data <- population %>% filter(country == input$country)
+    
+    shiny_population_rv_data_1 <<- population_rv$data
   })
   
   observeEvent(input$country_cases, if(input$country != "-- Own Value ---"){
-               cases_rv$data <- cases %>% filter(country == input$country_cases) %>%
-                 select(-country)
-               
-               shiny_cases_rv_data_1 <<- cases_rv$data
+    cases_rv$data <- cases %>% filter(country == input$country_cases) %>%
+      select(-country)
+    
+    shiny_cases_rv_data_1 <<- cases_rv$data
   })
   
   
@@ -255,41 +254,61 @@ server <- function(input, output, session) {
       mutate(date = as.Date(date), cumulative_death = cumsum(deaths)) %>%
       as.data.frame()
     
-    shiny_cases_rv_data <<- cases_rv$data
-    
     updatePickerInput(session, inputId = "country_cases", selected = "-- Own Value ---")
-
+    
     
     # Severity/Mortality
-    mort_sever$data <- read_excel(file_path, sheet = "Severity-Mortality") %>%
-      rename(ihr = severity, ifr = mortality) %>%
+    dta <- read_excel(file_path, sheet = "Severity-Mortality") 
+    names(dta) <- c("age_category",	"ifr",	"ihr")
+    
+    mort_sever$data <- dta %>%
       mutate(ihr = 4*ihr) %>%
       mutate(ifr = ifr/max(ifr))
     
     # Population
-    population_rv$data <- read_excel(file_path, sheet = "Population") %>%
+    dta <- read_excel(file_path, sheet = "Population")
+    names(dta) <- c("age_category",	"pop",	"birth",	"death")
+    
+    population_rv$data <- dta %>%
       transmute(country = NA, age_category, pop, birth, death)
     
-    shiny_population_rv_data <<- population_rv$data
     updatePickerInput(session, inputId = "country", selected = "-- Own Value ---")
     
     # Parameters
     param <- bind_rows(read_excel(file_path, sheet = "Country Area Parameters"),
-                            read_excel(file_path, sheet = "Virus Parameters"),
-                            read_excel(file_path, sheet = "Hospitalisation Parameters"))
-
-    shiny_param <<- param
-
-    # Update all sliders with one value
+                       read_excel(file_path, sheet = "Virus Parameters"),
+                       read_excel(file_path, sheet = "Hospitalisation Parameters"),
+                       read_excel(file_path, sheet = "Interventions")) %>%
+      mutate(Value_Date = as.Date(Value_Date))
+    
+    
+    # Update all sliders
     if(!is_empty(param$Parameter[param$Type == 'slider'])) {
       for (input_excel in param$Parameter[param$Type == 'slider']){
         updateSliderInput(session = session, inputId = input_excel, value = param$Value[param$Parameter == input_excel])
       }}
-
+    
     # Update all numeric values
     if(!is_empty(param$Parameter[param$Type == 'numeric'])) {
       for (input_excel in param$Parameter[param$Type == 'numeric']){
         updateNumericInput(session = session, inputId = input_excel, value = param$Value[param$Parameter == input_excel])
+      }}
+    
+    # Update month text slider
+    if(!is_empty(param$Parameter[param$Type == 'slider_text'])) {
+      updateSliderTextInput(session = session, inputId = "phi", selected = month.name[param$Value[param$Parameter == input_excel]])
+    }
+    
+    # Update switch
+    if(!is_empty(param$Parameter[param$Type == 'switch'])) {
+      for (input_excel in param$Parameter[param$Type == 'switch']){
+        updateMaterialSwitch(session = session, inputId = input_excel, value = param$Value_Logical[param$Parameter == input_excel])
+      }}
+    
+    # Update dates
+    if(!is_empty(param$Parameter[param$Type == 'date'])) {
+      for (input_excel in param$Parameter[param$Type == 'date']){
+        updateDateInput(session = session, inputId = input_excel, value = param$Value_Date[param$Parameter == input_excel])
       }}
   })
   
@@ -299,16 +318,16 @@ server <- function(input, output, session) {
     simul_baseline$baseline_available <- FALSE
     simul_interventions$results <- NULL
     simul_interventions$interventions_available <- FALSE
-    updateMaterialSwitch(session, "selfis_switch", value = FALSE)
-    updateMaterialSwitch(session, "dist_switch", value = FALSE)
-    updateMaterialSwitch(session, "hand_switch", value = FALSE)
-    updateMaterialSwitch(session, "work_switch", value = FALSE)
-    updateMaterialSwitch(session, "school_switch", value = FALSE)
-    updateMaterialSwitch(session, "cocoon_switch", value = FALSE)
-    updateMaterialSwitch(session, "travelban_switch", value = FALSE)
-    updateMaterialSwitch(session, "screen_switch", value = FALSE)
-    updateMaterialSwitch(session, "vaccination_switch", value = FALSE)
-    updateMaterialSwitch(session, "quarantine_switch", value = FALSE)
+    # updateMaterialSwitch(session, "selfis_switch", value = FALSE)
+    # updateMaterialSwitch(session, "dist_switch", value = FALSE)
+    # updateMaterialSwitch(session, "hand_switch", value = FALSE)
+    # updateMaterialSwitch(session, "work_switch", value = FALSE)
+    # updateMaterialSwitch(session, "school_switch", value = FALSE)
+    # updateMaterialSwitch(session, "cocoon_switch", value = FALSE)
+    # updateMaterialSwitch(session, "travelban_switch", value = FALSE)
+    # updateMaterialSwitch(session, "screen_switch", value = FALSE)
+    # updateMaterialSwitch(session, "vaccination_switch", value = FALSE)
+    # updateMaterialSwitch(session, "quarantine_switch", value = FALSE)
     hideTab(inputId = "tabs", target = "tab_modelpredictions")
   })
   
@@ -320,36 +339,36 @@ server <- function(input, output, session) {
     # Reset simul_interventions and elements of the UI
     simul_interventions$results <- NULL
     simul_interventions$interventions_available <- FALSE
-    updateMaterialSwitch(session, "selfis_switch", value = FALSE)
-    updateMaterialSwitch(session, "dist_switch", value = FALSE)
-    updateMaterialSwitch(session, "hand_switch", value = FALSE)
-    updateMaterialSwitch(session, "work_switch", value = FALSE)
-    updateMaterialSwitch(session, "school_switch", value = FALSE)
-    updateMaterialSwitch(session, "cocoon_switch", value = FALSE)
-    updateMaterialSwitch(session, "travelban_switch", value = FALSE)
-    updateMaterialSwitch(session, "screen_switch", value = FALSE)
-    updateMaterialSwitch(session, "vaccination_switch", value = FALSE)
-    updateMaterialSwitch(session, "quarantine_switch", value = FALSE)
-    updateMaterialSwitch(session, "lockdown_low_switch", value = FALSE)
-    updateMaterialSwitch(session, "lockdown_mid_switch", value = FALSE)
-    updateMaterialSwitch(session, "lockdown_high_switch", value = FALSE)
+    # updateMaterialSwitch(session, "selfis_switch", value = FALSE)
+    # updateMaterialSwitch(session, "dist_switch", value = FALSE)
+    # updateMaterialSwitch(session, "hand_switch", value = FALSE)
+    # updateMaterialSwitch(session, "work_switch", value = FALSE)
+    # updateMaterialSwitch(session, "school_switch", value = FALSE)
+    # updateMaterialSwitch(session, "cocoon_switch", value = FALSE)
+    # updateMaterialSwitch(session, "travelban_switch", value = FALSE)
+    # updateMaterialSwitch(session, "screen_switch", value = FALSE)
+    # updateMaterialSwitch(session, "vaccination_switch", value = FALSE)
+    # updateMaterialSwitch(session, "quarantine_switch", value = FALSE)
+    # updateMaterialSwitch(session, "lockdown_low_switch", value = FALSE)
+    # updateMaterialSwitch(session, "lockdown_mid_switch", value = FALSE)
+    # updateMaterialSwitch(session, "lockdown_high_switch", value = FALSE)
     
     source("./www/model.R", local = TRUE)
     
     # Make sure that interventions are not used
-    parameters["selfis_on"]<-10e5
-    parameters["dist_on"]<-10e5
-    parameters["hand_on"]<-10e5
-    parameters["work_on"]<-10e5
-    parameters["school_on"]<-10e5
-    parameters["cocoon_on"]<-10e5
-    parameters["travelban_on"]<-10e5
-    parameters["screen_on"]<-10e5
-    parameters["vaccine_on"]<-10e5
-    parameters["quarantine_on"]<-10e5
-    parameters["lockdown_low_on"]<-10e5
-    parameters["lockdown_mid_on"]<-10e5
-    parameters["lockdown_high_on"]<-10e5
+    # parameters["selfis_on"]<-10e5
+    # parameters["dist_on"]<-10e5
+    # parameters["hand_on"]<-10e5
+    # parameters["work_on"]<-10e5
+    # parameters["school_on"]<-10e5
+    # parameters["cocoon_on"]<-10e5
+    # parameters["travelban_on"]<-10e5
+    # parameters["screen_on"]<-10e5
+    # parameters["vaccine_on"]<-10e5
+    # parameters["quarantine_on"]<-10e5
+    # parameters["lockdown_low_on"]<-10e5
+    # parameters["lockdown_mid_on"]<-10e5
+    # parameters["lockdown_high_on"]<-10e5
     
     
     out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
@@ -393,15 +412,13 @@ server <- function(input, output, session) {
   results_aggregated <- reactive({
     dta <- tibble(
       date = simul_baseline$results$time,
-      baseline_daily_incidence = round(simul_baseline$results$dailyinc0),
-      baseline_cumulative_total_cases = round(simul_baseline$results$daily_total_cases),
-      baseline_bed_requirement = round(simul_baseline$results$previcureq0),
-      baseline_saturation_bed = round(simul_baseline$results$saturation),
-      baseline_cumulative_death = round(simul_baseline$results$cmortality0))
+      baseline_daily_incidence = simul_baseline$results$daily_incidence,
+      baseline_daily_total_cases = simul_baseline$results$daily_total_cases,
+      baseline_required_beds = simul_baseline$results$required_beds,
+      baseline_cum_mortality = simul_baseline$results$cum_mortality)
     
     dta <- left_join(dta, 
-                     cases_rv$data %>% rename(input_country = country,
-                                              input_cases = cases,
+                     cases_rv$data %>% rename(input_cases = cases,
                                               input_deaths = deaths,
                                               input_cumulative_death = cumulative_death), by = "date")
     
@@ -409,11 +426,10 @@ server <- function(input, output, session) {
       
       dta_inter <- tibble(
         date = simul_interventions$results$time,
-        interventions_daily_incidence = round(simul_interventions$results$dailyinc0),
-        interventions_cumulative_total_cases = round(simul_interventions$results$daily_total_cases),
-        interventions_bed_requirement = round(simul_interventions$results$previcureq0),
-        interventions_saturation_bed = round(simul_interventions$results$saturation),
-        interventions_cumulative_death = round(simul_interventions$results$cmortality0))
+        predictions_daily_incidence = simul_interventions$results$daily_incidence,
+        predictions_daily_total_cases = simul_interventions$results$daily_total_cases,
+        predictions_required_beds = simul_interventions$results$required_beds,
+        predictions_cum_mortality = simul_interventions$results$cum_mortality)
       
       dta <- left_join(dta, dta_inter, by = "date") }
     
