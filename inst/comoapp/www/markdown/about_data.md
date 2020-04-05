@@ -1,7 +1,7 @@
 
 **Cases/Deaths Data**
 
-- Source: https://www.ecdc.europa.eu/ <span style="color:red;">updated 2020-04-02 at 6pm, GMT</span>
+- Source: https://www.ecdc.europa.eu/ <span style="color:red;">updated 2020-04-05 at 10pm, GMT</span>
 
 
 **Severity/Mortality by Age Category**
