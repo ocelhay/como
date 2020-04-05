@@ -15,23 +15,19 @@ ui <- function(request) {
     chooseSliderSkin('HTML5'),
     title = "CoMo COVID-19 App",
     
-    div(id = "float_feedback_process",
-        htmlOutput("feedback_process"),
-        
-        conditionalPanel("output.status_app_output == 'Locked Baseline' && input.tabs == 'tab_modelpredictions'",
-                         downloadButton("export", label = "Download Results (.csv)", class="btn btn-primary")
-        ),
-    ),
+    
     
     
     fluidRow(
       # column left ----
-      column(4, 
-             conditionalPanel("input.tabs == 'tab_welcome'",
-                              br()
+      column(5, 
+             div(id = "css_feedback_process",
+                 htmlOutput("feedback_process"),
              ),
+             
+             # conditionalPanel("input.tabs == 'tab_welcome'", br()),
              conditionalPanel("input.tabs != 'tab_welcome'",
-                              br(), br(), br(), br(), br(), br(),
+                              br(), 
                               conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
                                                p("Use customised data/ update default parameters:", a("download the template", href = "https://www.dropbox.com/s/eslw1x267iq6p5p/Template_data_comomodel.xlsx?dl=1", target = "_blank"), 
                                                  ", edit it and upload below."),
@@ -39,15 +35,15 @@ ui <- function(request) {
                                                hr()
                               ),
                               fluidRow(
-                                column(6,
+                                column(5,
                                        conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
                                                         br(), 
                                                         div(class = "baseline_left",
-                                                            bsButton("open_country_param", label = "Country/Area Data", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                            bsButton("open_country_param", label = "Country/Area", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                                      block = TRUE), br(),
-                                                            bsButton("open_virus_param", label = "Virus Parameters", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                            bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                                      block = TRUE), br(), 
-                                                            bsButton("open_hospitalisation_param", label = "Hospitalisation Parameters", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                            bsButton("open_hospitalisation_param", label = "Hospitalisation", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                                      block = TRUE), br(), 
                                                             sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
                                                                         value = 0.049, ticks = FALSE),
@@ -62,17 +58,12 @@ ui <- function(request) {
                                                         source("./www/pushbar_parameters_country.R", local = TRUE)[1],
                                                         source("./www/pushbar_parameters_virus.R", local = TRUE)[1],
                                                         source("./www/pushbar_parameters_hospitalisation.R", local = TRUE)[1]
-                                       ),
-                                       conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline')  && input.tabs == 'tab_visualfit'", 
-                                                        br(),
-                                                        bsButton("reset_baseline", label = "Reset the Baseline", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                 block = TRUE)
-                                       ),
+                                       )
                                 ),
-                                column(6,
+                                column(7,
                                        div(class = "interventions_left",
                                            conditionalPanel("! ((output.status_app_output == 'Validated Baseline' || output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_visualfit')",
-                                                            h4("Interventions Available:"),
+                                                            h4("Available:"),
                                                             # Lockdown ----
                                                             source("./www/interventions/lockdown.R", local = TRUE)$value,
                                                             # Self Isolation ----
@@ -112,30 +103,51 @@ ui <- function(request) {
                                                             source("./www/interventions/vaccination.R", local = TRUE)$value
                                            )
                                        )
-                                )
+                                ),
                               ),
-                              conditionalPanel("input.tabs == 'tab_visualfit' & !output.status_app_output == 'Locked Baseline'",
-                                               htmlOutput("feedback_choices")
-                              ),
+                              br(), br(), br(), br(), br(), br(), br(), # Space for buttons
+                              # conditionalPanel("input.tabs == 'tab_visualfit' & !output.status_app_output == 'Locked Baseline'",
+                              #                  
+                              # ),
                               
-                              div(class = "marginleft",
+                              div(class = "float_buttons",
                                   conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
-                                                   actionButton("run_baseline", "Run Baseline", class="btn btn-success"),
-                                                   br(),
+                                                   htmlOutput("feedback_choices")
                                   ),
-                                  conditionalPanel("output.status_app_output == 'Ok Baseline'",
-                                                   p("Satisfactory visual fit?"),
-                                                   actionButton("validate_baseline", span(icon("thumbs-up"), " Validate Baseline"), class="btn btn-success"),
+                                  fluidRow(
+                                    column(6, 
+                                           conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
+                                                            actionButton("run_baseline", "Run Baseline", class="btn btn-success"))
+                                    ),
+                                    column(6, 
+                                           conditionalPanel("output.status_app_output == 'Ok Baseline'",
+                                                            actionButton("validate_baseline", span(icon("thumbs-up"), " Validate Baseline"), class="btn btn-success"),
+                                           )
+                                    )
                                   ),
-                                  conditionalPanel("output.status_app_output == 'Validated Baseline' && input.tabs == 'tab_modelpredictions'",
-                                                   actionButton("run_interventions", "Run Interventions", class="btn btn-success")
-                                  )
+                                  conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline')  && input.tabs == 'tab_visualfit'", 
+                                                   actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success")
+                                  ),
+                                                   # bsButton("reset_baseline", label = "Reset the Baseline", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                   #          block = TRUE)),
+                                  conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_modelpredictions'",
+                                                   fluidRow(
+                                                     column(6, 
+                                                            actionButton("run_interventions", "Run Interventions", class="btn btn-success")
+                                                     ),
+                                                     column(6, 
+                                                            conditionalPanel("output.status_app_output == 'Locked Baseline'",
+                                                                             downloadButton("export", label = "Download Results", class="btn btn-success")
+                                                            )
+                                                     )
+                                                   ),
+                                  ),
                               )
              )
       ),
       
       # column right ----
-      column(8,
+      column(7,
              navbarPage(NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
                         tabPanel("Welcome", value = "tab_welcome",
                                  h3("CoMo COVID-19 App"),
@@ -352,8 +364,6 @@ server <- function(input, output, session) {
     simul_baseline$results <- process_ode_outcome(out)
     
     removeNotification(id = "model_run_notif", session = session)
-    
-    
     status_app$status <- "Ok Baseline"
     simul_baseline$baseline_available <- TRUE
   })

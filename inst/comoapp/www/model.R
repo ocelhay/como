@@ -232,8 +232,6 @@ parameters["lockdown_low_dur"]<-parameters["lockdown_low_dur"]*7
 parameters["lockdown_mid_dur"]<-parameters["lockdown_mid_dur"]*7
 parameters["lockdown_high_dur"]<-parameters["lockdown_high_dur"]*7
 
-shiny_parameters <<- parameters
-
 
 # Variables to bridge App and Ricardo/Lisa code ----
 popstruc <- population_rv$data %>% select(age_category, pop) %>% rename(agefloor = age_category) %>% as.data.frame()
