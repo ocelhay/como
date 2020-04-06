@@ -2,6 +2,11 @@
   color: red;
 }
 
+.largeh3{
+  font-size: 1.4em;
+}
+
+
 /* Pushbar */
 .pushbar.from_right {
 	width: 75%; !important;

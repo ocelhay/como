@@ -1,4 +1,6 @@
 # CoMo COVID-19 App
+version_app <- "v11.6"
+
 
 # Load packages
 source("./www/load_packages.R")
@@ -17,7 +19,7 @@ ui <- function(request) {
     
     fluidRow(
       # column left ----
-      column(5, 
+      column(4, 
              div(id = "css_feedback_process",
                  htmlOutput("feedback_process"),
              ),
@@ -123,8 +125,8 @@ ui <- function(request) {
                                   conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline')  && input.tabs == 'tab_visualfit'", 
                                                    actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success")
                                   ),
-                                                   # bsButton("reset_baseline", label = "Reset the Baseline", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                   #          block = TRUE)),
+                                  # bsButton("reset_baseline", label = "Reset the Baseline", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                  #          block = TRUE)),
                                   conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_modelpredictions'",
                                                    fluidRow(
                                                      column(6, 
@@ -142,11 +144,11 @@ ui <- function(request) {
       ),
       
       # column right ----
-      column(7,
+      column(8,
              navbarPage(NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
                         tabPanel("Welcome", value = "tab_welcome",
                                  h3("CoMo COVID-19 App"),
-                                 h4("v11.5"),
+                                 h4(version_app),
                                  br(),
                                  fluidRow(
                                    column(6, 
@@ -173,8 +175,8 @@ ui <- function(request) {
                                                                                        selected = "Observed", inline = TRUE)),
                                                     column(3, offset = 1, htmlOutput("text_doubling_time"))
                                                   ),
-                                                  highchartOutput("highchart_confirmed", height = "300px"), 
-                                                  highchartOutput("highchart_mortality", height = "300px")
+                                                  highchartOutput("highchart_cases", height = "350px"), 
+                                                  highchartOutput("highchart_deaths", height = "350px")
                                  )
                         ),
                         tabPanel("Model Predictions", value = "tab_modelpredictions",
@@ -185,35 +187,37 @@ ui <- function(request) {
                                                   fluidRow(
                                                     column(6, 
                                                            div(class = "box_outputs", h4("Baseline")),
-                                                           htmlOutput("text_baseline_pct_pop"), br(),
-                                                           htmlOutput("text_baseline_total_death"),
+                                                           htmlOutput("text_pct_pop_baseline"), br(),
+                                                           htmlOutput("text_total_death_baseline"),
                                                     ),
                                                     column(6, 
                                                            div(class = "box_outputs", h4("Interventions")),
-                                                           htmlOutput("text_interventions_pct_pop"), br(),
-                                                           htmlOutput("text_interventions_total_death")
+                                                           htmlOutput("text_pct_pop_interventions"), br(),
+                                                           htmlOutput("text_total_death_interventions")
                                                     ),
                                                   ),
                                                   br(),
                                                   prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
                                                                      selected = "Predicted Reported + Unreported", inline = TRUE),
-                                                  highchartOutput("highchart_confirmed_dup", height = "300px"), 
-                                                  highchartOutput("highchart_mortality_dup", height = "300px"),
-                                                  highchartOutput("highchart_ICU", height = "300px"),
                                                   fluidRow(
                                                     column(6, 
-                                                           highchartOutput("highchart_hospital_prevalences_baseline", height = "300px"), br()
+                                                           highchartOutput("highchart_cases_dual_baseline", height = "350px"), br(),
+                                                           highchartOutput("highchart_deaths_dual_baseline", height = "350px"), br()
                                                     ),
                                                     column(6, 
-                                                           highchartOutput("highchart_hospital_prevalences_interventions", height = "300px"), br()
+                                                           highchartOutput("highchart_cases_dual_interventions", height = "350px"), br(),
+                                                           highchartOutput("highchart_deaths_dual_interventions", height = "350px"), br()
                                                     )
                                                   ),
+                                                  prettyRadioButtons("focus_requirements", label = "Focus on:", 
+                                                                     choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
+                                                                     selected = "No Focus", inline = TRUE),
                                                   fluidRow(
                                                     column(6, 
-                                                           highchartOutput("highchart_hospital_deaths_baseline", height = "300px"), br()
+                                                           highchartOutput("highchart_requirements_dual_baseline", height = "350px"), br(),
                                                     ),
                                                     column(6, 
-                                                           highchartOutput("highchart_hospital_deaths_interventions", height = "300px"), br()
+                                                           highchartOutput("highchart_requirements_dual_interventions", height = "350px"), br(),
                                                     )
                                                   )
                                  )
@@ -276,7 +280,10 @@ server <- function(input, output, session) {
   observeEvent(input$own_data, {
     file_path <- input$own_data$datapath
     # Cases
-    cases_rv$data <- read_excel(file_path, sheet = "Cases") %>%
+    dta <- read_excel(file_path, sheet = "Cases")
+    names(dta) <- c("date", "cases", "deaths")
+    
+    cases_rv$data <- dta %>%
       mutate(date = as.Date(date), cumulative_death = cumsum(deaths)) %>%
       as.data.frame()
     
@@ -377,6 +384,7 @@ server <- function(input, output, session) {
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
     simul_baseline$baseline_available <- TRUE
+    shiny_baseline <<- simul_baseline$results
   })
   
   observeEvent(input$validate_baseline, {
@@ -412,33 +420,53 @@ server <- function(input, output, session) {
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"
     simul_interventions$interventions_available <- TRUE
+    shiny_interventions <<- simul_interventions$results
   })
   
   
   # Export Data ----
   results_aggregated <- reactive({
-    dta <- tibble(
+    
+    dta_baseline <- tibble(
       date = simul_baseline$results$time,
       baseline_daily_incidence = simul_baseline$results$daily_incidence,
       baseline_daily_total_cases = simul_baseline$results$daily_total_cases,
       baseline_required_beds = simul_baseline$results$required_beds,
-      baseline_cum_mortality = simul_baseline$results$cum_mortality)
+      baseline_cum_mortality = simul_baseline$results$cum_mortality,
+      baseline_hospital_surge_beds = simul_baseline$results$hospital_surge_beds,
+      baseline_icu_beds = simul_baseline$results$icu_beds,
+      baseline_ventilators = simul_baseline$results$ventilators,
+      baseline_death_treated_hospital = simul_baseline$results$death_treated_hospital,
+      baseline_death_treated_icu = simul_baseline$results$death_treated_icu,
+      baseline_death_treated_ventilator = simul_baseline$results$death_treated_ventilator,
+      baseline_death_untreated_hospital = simul_baseline$results$death_untreated_hospital,
+      baseline_death_untreated_icu = simul_baseline$results$death_untreated_icu,
+      baseline_death_untreated_ventilator = simul_baseline$results$death_untreated_ventilator)
     
-    dta <- left_join(dta, 
+    dta <- left_join(dta_baseline, 
                      cases_rv$data %>% rename(input_cases = cases,
                                               input_deaths = deaths,
                                               input_cumulative_death = cumulative_death), by = "date")
     
     if(simul_interventions$interventions_available){ 
       
-      dta_inter <- tibble(
+      dta_interventions <- tibble(
         date = simul_interventions$results$time,
         predictions_daily_incidence = simul_interventions$results$daily_incidence,
         predictions_daily_total_cases = simul_interventions$results$daily_total_cases,
         predictions_required_beds = simul_interventions$results$required_beds,
-        predictions_cum_mortality = simul_interventions$results$cum_mortality)
+        predictions_cum_mortality = simul_interventions$results$cum_mortality,
+        predictions_hospital_surge_beds = simul_interventions$results$hospital_surge_beds,
+        predictions_icu_beds = simul_interventions$results$icu_beds,
+        predictions_ventilators = simul_interventions$results$ventilators,
+        predictions_death_treated_hospital = simul_interventions$results$death_treated_hospital,
+        predictions_death_treated_icu = simul_interventions$results$death_treated_icu,
+        predictions_death_treated_ventilator = simul_interventions$results$death_treated_ventilator,
+        predictions_death_untreated_hospital = simul_interventions$results$death_untreated_hospital,
+        predictions_death_untreated_icu = simul_interventions$results$death_untreated_icu,
+        predictions_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator)
       
-      dta <- left_join(dta, dta_inter, by = "date") }
+      dta <- left_join(dta, dta_interventions, by = "date") }
     
     return(dta)
   })
