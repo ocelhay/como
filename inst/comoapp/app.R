@@ -1,4 +1,4 @@
-# COVID19 App
+# CoMo COVID-19 App
 
 # Load packages
 source("./www/load_packages.R")
@@ -15,17 +15,12 @@ ui <- function(request) {
     chooseSliderSkin('HTML5'),
     title = "CoMo COVID-19 App",
     
-    
-    
-    
     fluidRow(
       # column left ----
       column(5, 
              div(id = "css_feedback_process",
                  htmlOutput("feedback_process"),
              ),
-             
-             # conditionalPanel("input.tabs == 'tab_welcome'", br()),
              conditionalPanel("input.tabs != 'tab_welcome'",
                               br(), 
                               conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
@@ -151,7 +146,7 @@ ui <- function(request) {
              navbarPage(NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
                         tabPanel("Welcome", value = "tab_welcome",
                                  h3("CoMo COVID-19 App"),
-                                 h4("v11.4"),
+                                 h4("v11.5"),
                                  br(),
                                  fluidRow(
                                    column(6, 
@@ -204,7 +199,23 @@ ui <- function(request) {
                                                                      selected = "Predicted Reported + Unreported", inline = TRUE),
                                                   highchartOutput("highchart_confirmed_dup", height = "300px"), 
                                                   highchartOutput("highchart_mortality_dup", height = "300px"),
-                                                  highchartOutput("highchart_ICU", height = "300px"), br()
+                                                  highchartOutput("highchart_ICU", height = "300px"),
+                                                  fluidRow(
+                                                    column(6, 
+                                                           highchartOutput("highchart_hospital_prevalences_baseline", height = "300px"), br()
+                                                    ),
+                                                    column(6, 
+                                                           highchartOutput("highchart_hospital_prevalences_interventions", height = "300px"), br()
+                                                    )
+                                                  ),
+                                                  fluidRow(
+                                                    column(6, 
+                                                           highchartOutput("highchart_hospital_deaths_baseline", height = "300px"), br()
+                                                    ),
+                                                    column(6, 
+                                                           highchartOutput("highchart_hospital_deaths_interventions", height = "300px"), br()
+                                                    )
+                                                  )
                                  )
                         )
              )

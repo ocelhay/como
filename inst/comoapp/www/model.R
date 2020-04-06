@@ -543,6 +543,27 @@ process_ode_outcome <- function(out){
   inc_overloadH1<-cumsum(rowSums(inc_overloadH1))
   inc_overloadICU1<-cumsum(rowSums(inc_overloadICU1))
   
+  ##########################    CALCULATE MORTALITY 
+  pdeath_hc<-parameters["pdeath_hc"]
+  prob_icu<-parameters["prob_icu"]
+  prob_vent<-parameters["prob_vent"]
+  pdeath_icuc<-parameters["pdeath_icuc"]
+  pdeath_ventc<-parameters["pdeath_ventc"]
+  
+  npdeath_hc<-pdeath_hc*(1-prob_icu)+prob_icu*(1-prob_vent)*pdeath_icuc+prob_icu*prob_vent*pdeath_ventc
+  npdeath_icuc<-pdeath_icuc*(1-prob_vent)+prob_vent*pdeath_ventc
+  
+  for (i in 1:length(time)){
+    inc1h[i,]<-inc1h[i,]*ihr[,2]
+    inc1[i,]<-inc1[i,]*(1-ihr[,2])
+  }
+  cinc_mort_H1 <- cumsum(rowSums(parameters["nus"]*parameters["pdeath_h"]*(out[,(Hindex+1)]%*%ifr[,2])+ out[,(Hindex+1)]%*%mort))
+  cinc_mort_HC1 <- cumsum(rowSums(parameters["nusc"]*npdeath_hc*(out[,(HCindex+1)]%*%ifr[,2]) + out[,(HCindex+1)]%*%mort))
+  cinc_mort_ICU1 <- cumsum(rowSums(parameters["nu_icu"]*parameters["pdeath_icu"]*out[,(ICUindex+1)]%*%ifr[,2] + out[,(ICUindex+1)]%*%mort))
+  cinc_mort_ICUC1 <- cumsum(rowSums(parameters["nu_icuc"]*npdeath_icuc*out[,(ICUCindex+1)]%*%ifr[,2] + out[,(ICUCindex+1)]%*%mort))
+  cinc_mort_Vent1 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*out[,(Ventindex+1)]%*%ifr[,2] + out[,(Ventindex+1)]%*%mort))
+  cinc_mort_VentC1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out[,(VentCindex+1)]%*%ifr[,2] + out[,(VentCindex+1)]%*%mort))
+  
   
   MORTDF<-as.data.frame(cbind(out[30,CMindex+1]/out[30,Cindex+1],out[60,CMindex+1]/out[60,Cindex+1],out[90,CMindex+1]/out[90,Cindex+1],out[120,CMindex+1]/out[120,Cindex+1]))
   MORTDF<-cbind(popstruc$agefloor,MORTDF)
@@ -562,6 +583,15 @@ process_ode_outcome <- function(out){
   results$saturation <- parameters["beds_available"]  # saturation
   results$daily_incidence <- round(dailyinc1)  # daily incidence (Reported)
   results$daily_total_cases <- round(rowSums(parameters["gamma"]*out[,(Eindex+1)]))  # daily incidence (Reported + Unreported)
+  results$hospital_surge_beds <- round(previcureq1)
+  results$icu_beds <- round(previcureq21)
+  results$ventilators <- round(previcureq31)
+  results$death_treated_hospital <- round(cinc_mort_H1)
+  results$death_treated_icu <- round(cinc_mort_ICU1)
+  results$death_treated_ventilator <- round(cinc_mort_Vent1)
+  results$death_untreated_hospital <- round(cinc_mort_HC1)
+  results$death_untreated_icu <- round(cinc_mort_ICUC1)
+  results$death_untreated_ventilator <- round(cinc_mort_VentC1)
   
   shiny_results <<- results
   return(results)
