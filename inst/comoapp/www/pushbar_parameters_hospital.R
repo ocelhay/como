@@ -1,6 +1,6 @@
 list(
   pushbar(id = "pushbar_parameters_hospitalisation", from = "right", class = "pushbarcomp",
-          br(), br(), br(), br(), 
+          br(), br(), br(),
           fluidRow(
             column(4, 
                    numericInput("beds_available", label = "Maximum number of hospital beds:", value = 80000, min = 1),
@@ -26,6 +26,6 @@ list(
                    sliderInput("nu_ventc", label = "Duration of non-fatal denied ventilation infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
             )
           ),
-          div(class = "closebutton", bsButton("close_hospitalisation_param", "Close", icon("times"), style = "danger", size = "small"))
+          div(class = "closebutton", bsButton("close_hospital_param", "Close", icon("times"), style = "danger", size = "small"))
   )
 )

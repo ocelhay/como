@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v11.6"
+version_app <- "v11.8"
 
 
 # Load packages
@@ -36,11 +36,11 @@ ui <- function(request) {
                                        conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
                                                         br(), 
                                                         div(class = "baseline_left",
-                                                            bsButton("open_country_param", label = "Country/Area", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                            bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                                      block = TRUE), br(),
                                                             bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                                      block = TRUE), br(), 
-                                                            bsButton("open_hospitalisation_param", label = "Hospitalisation", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                            bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                                      block = TRUE), br(), 
                                                             sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
                                                                         value = 0.049, ticks = FALSE),
@@ -54,7 +54,7 @@ ui <- function(request) {
                                                         ),
                                                         source("./www/pushbar_parameters_country.R", local = TRUE)[1],
                                                         source("./www/pushbar_parameters_virus.R", local = TRUE)[1],
-                                                        source("./www/pushbar_parameters_hospitalisation.R", local = TRUE)[1]
+                                                        source("./www/pushbar_parameters_hospital.R", local = TRUE)[1]
                                        )
                                 ),
                                 column(7,
@@ -102,11 +102,7 @@ ui <- function(request) {
                                        )
                                 ),
                               ),
-                              br(), br(), br(), br(), br(), br(), br(), # Space for buttons
-                              # conditionalPanel("input.tabs == 'tab_visualfit' & !output.status_app_output == 'Locked Baseline'",
-                              #                  
-                              # ),
-                              
+                              br(), br(), br(), br(), br(), br(), br(),
                               div(class = "float_buttons",
                                   conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
                                                    htmlOutput("feedback_choices")
@@ -175,8 +171,8 @@ ui <- function(request) {
                                                                                        selected = "Observed", inline = TRUE)),
                                                     column(3, offset = 1, htmlOutput("text_doubling_time"))
                                                   ),
-                                                  highchartOutput("highchart_cases", height = "350px"), 
-                                                  highchartOutput("highchart_deaths", height = "350px")
+                                                  highchartOutput("highchart_cases", height = "350px") %>% withSpinner(), 
+                                                  highchartOutput("highchart_deaths", height = "350px") %>% withSpinner()
                                  )
                         ),
                         tabPanel("Model Predictions", value = "tab_modelpredictions",
@@ -187,13 +183,13 @@ ui <- function(request) {
                                                   fluidRow(
                                                     column(6, 
                                                            div(class = "box_outputs", h4("Baseline")),
-                                                           htmlOutput("text_pct_pop_baseline"), br(),
-                                                           htmlOutput("text_total_death_baseline"),
+                                                           htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
+                                                           htmlOutput("text_total_death_baseline") %>% withSpinner(),
                                                     ),
                                                     column(6, 
                                                            div(class = "box_outputs", h4("Interventions")),
-                                                           htmlOutput("text_pct_pop_interventions"), br(),
-                                                           htmlOutput("text_total_death_interventions")
+                                                           htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
+                                                           htmlOutput("text_total_death_interventions") %>% withSpinner()
                                                     ),
                                                   ),
                                                   br(),
@@ -201,12 +197,12 @@ ui <- function(request) {
                                                                      selected = "Predicted Reported + Unreported", inline = TRUE),
                                                   fluidRow(
                                                     column(6, 
-                                                           highchartOutput("highchart_cases_dual_baseline", height = "350px"), br(),
-                                                           highchartOutput("highchart_deaths_dual_baseline", height = "350px"), br()
+                                                           highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                                                           highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br()
                                                     ),
                                                     column(6, 
-                                                           highchartOutput("highchart_cases_dual_interventions", height = "350px"), br(),
-                                                           highchartOutput("highchart_deaths_dual_interventions", height = "350px"), br()
+                                                           highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                                                           highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br()
                                                     )
                                                   ),
                                                   prettyRadioButtons("focus_requirements", label = "Focus on:", 
@@ -214,10 +210,10 @@ ui <- function(request) {
                                                                      selected = "No Focus", inline = TRUE),
                                                   fluidRow(
                                                     column(6, 
-                                                           highchartOutput("highchart_requirements_dual_baseline", height = "350px"), br(),
+                                                           highchartOutput("highchart_requirements_dual_baseline", height = "350px") %>% withSpinner(), br(),
                                                     ),
                                                     column(6, 
-                                                           highchartOutput("highchart_requirements_dual_interventions", height = "350px"), br(),
+                                                           highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
                                                     )
                                                   )
                                  )
@@ -245,8 +241,8 @@ server <- function(input, output, session) {
   observeEvent(input$close_country_param, pushbar_close())
   observeEvent(input$open_virus_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_virus"))  
   observeEvent(input$close_virus_param, pushbar_close())
-  observeEvent(input$open_hospitalisation_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_hospitalisation"))  
-  observeEvent(input$close_hospitalisation_param, pushbar_close())
+  observeEvent(input$open_hospital_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_hospitalisation"))  
+  observeEvent(input$close_hospital_param, pushbar_close())
   
   # Define reactiveValues elements ----
   population_rv <- reactiveValues(data = NULL)

@@ -1,6 +1,6 @@
 list(
   pushbar(id = "pushbar_parameters_country", from = "right", class = "pushbarcomp",
-          h3("Demographic Data:"),
+          br(), br(), br(),
           fluidRow(
             column(4, includeMarkdown("./www/markdown/about_country_data.md"), includeMarkdown("./www/markdown/about_data.md")),
             column(4,
