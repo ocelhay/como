@@ -10,9 +10,9 @@ https://comomodel.net
 
 ### Installation Instructions
 
-Download and install R (any version above 3.6.1): https://cran.r-project.org
+- Download and install R (any version above 3.6.1): https://cran.r-project.org
+- Open R and run in the console:
 
-Install/update the CoMo App: open R and run the following lines in the console:
 ```
 # Install CoMo App for offline use
 if (!require('pacman')) install.packages('pacman', quiet = TRUE)
@@ -25,7 +25,7 @@ pacman::p_load(bsplus, deSolve, highcharter, lubridate, pushbar, RColorBrewer, r
 If prompted `--- Please select a CRAN mirror for use in this session ---`, select the nearest location to you.
 If prompted `Do you want to install from sources the packages which need compilation? (Yes/no/cancel)`, return `no`. 
 
-Close and reopen R and then run the following in the console:
+- Close and reopen R and then run in the console:
 
 ```
 remotes::install_github("ocelhay/como", upgrade = "never")
@@ -33,19 +33,16 @@ remotes::install_github("ocelhay/como", upgrade = "never")
 
 ### Update Instructions
 
-You can check the version by running in the R console `packageVersion("como")`. To update to the latest version, run in the console:
+You can check the version by running in the console `packageVersion("como")`. To update to the latest version, run in the console:
 
 ```
 remotes::install_github("ocelhay/como", upgrade = "never")
 ```
 
-```
-remotes::install_github("ocelhay/como", upgrade = "never")
-```
 
 ### Run Offline Version
 
-To launch the CoMo App, run the following lines in the R Console:
+To launch the CoMo App, run in the console:
 
 ```
 library(como)
