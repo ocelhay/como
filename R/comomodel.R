@@ -9,6 +9,6 @@
 #' @import shinyWidgets tidyverse timevis
 
 comomodel <- function() {
-  appDir <- system.file("comoapp", package = "comomodel")
+  appDir <- system.file("comoapp", package = "como")
   shiny::runApp(appDir, display.mode = "normal")
 }
