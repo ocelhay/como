@@ -32,6 +32,7 @@ If prompted `Do you want to install from sources the packages which need compila
 remotes::install_github("ocelhay/como", upgrade = "never")
 ```
 
+If the internet connection is not steady, re-run the commands as often as required for the download to proceed.
 
 ### Update Instructions
 
