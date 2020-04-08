@@ -10,27 +10,30 @@ https://comomodel.net
 
 ### Instructions
 
-Download and install R (versions 3.6.1 and above): https://cran.r-project.org
+Download and install R (any version above 3.6.1): https://cran.r-project.org
 
-#### Install/update the CoMo App
-
-Open R and run the following lines in the console :
+Install/update the CoMo App: open R and run the following lines in the console:
 ```
 # Install CoMo App for offline use
 if (!require('pacman')) install.packages('pacman', quiet = TRUE)
-pacman::p_load(curl, devtools, remotes, utils)
 
-pacman::p_load(bsplus, deSolve, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
+pacman::p_load(bsplus, deSolve, highcharter, lubridate, pushbar, RColorBrewer, readxl, remotes,
                reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinythemes, 
                shinyWidgets, tidyverse, timevis)
-
-remotes::install_github("ocelhay/como", upgrade = "never")
-packageVersion("como")
 ```
 
-#### Launch CoMo App
+If prompted `Do you want to install from sources the packages which need compilation? (Yes/no/cancel)`, return `no`. 
 
-To use the CoMo App, run the following lines in the R Console:
+Close and reopen R and then run the following in the console:
+
+```
+remotes::install_github("ocelhay/como", upgrade = "never")
+```
+
+
+### Launch CoMo App
+
+To launch the CoMo App, run the following lines in the R Console:
 
 ```
 library(como)
