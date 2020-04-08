@@ -2,13 +2,13 @@
 
 # CoMo COVID-19 App
 
-## Access Online
+## Online Version
 
 https://comomodel.net
 
-## Access Offline
+## Offline Version
 
-### Instructions
+### Installation Instructions
 
 Download and install R (any version above 3.6.1): https://cran.r-project.org
 
@@ -22,6 +22,7 @@ pacman::p_load(bsplus, deSolve, highcharter, lubridate, pushbar, RColorBrewer, r
                shinyWidgets, tidyverse, timevis)
 ```
 
+If prompted `--- Please select a CRAN mirror for use in this session ---`, select the nearest location to you.
 If prompted `Do you want to install from sources the packages which need compilation? (Yes/no/cancel)`, return `no`. 
 
 Close and reopen R and then run the following in the console:
@@ -30,8 +31,19 @@ Close and reopen R and then run the following in the console:
 remotes::install_github("ocelhay/como", upgrade = "never")
 ```
 
+### Update Instructions
 
-### Launch CoMo App
+You can check the version by running in the R console `packageVersion("como")`. To update to the latest version, run in the console:
+
+```
+remotes::install_github("ocelhay/como", upgrade = "never")
+```
+
+```
+remotes::install_github("ocelhay/como", upgrade = "never")
+```
+
+### Run Offline Version
 
 To launch the CoMo App, run the following lines in the R Console:
 
