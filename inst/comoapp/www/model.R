@@ -593,6 +593,5 @@ process_ode_outcome <- function(out){
   results$death_untreated_icu <- round(cinc_mort_ICUC1)
   results$death_untreated_ventilator <- round(cinc_mort_VentC1)
   
-  shiny_results <<- results
   return(results)
 }

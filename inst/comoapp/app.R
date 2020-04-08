@@ -1,12 +1,12 @@
 # CoMo COVID-19 App
-version_app <- "v11.8"
+version_app <- "v11.9"
 
 
 # Load packages
 source("./www/load_packages.R")
 
 # Import/Process data
-source("./www/prepare_data.R")
+source("./www/load_data.R")
 
 # Define UI ----
 ui <- function(request) {
