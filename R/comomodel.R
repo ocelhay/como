@@ -10,5 +10,6 @@
 
 comomodel <- function() {
   appDir <- system.file("comoapp", package = "como")
+  print(appDir)
   shiny::runApp(appDir, display.mode = "normal")
 }
