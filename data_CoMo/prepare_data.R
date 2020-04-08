@@ -1,5 +1,5 @@
 # Prolegomenon ----
-setwd("/Users/olivier/Documents/CoMo/como/data_app")
+setwd("/Users/olivier/Documents/CoMo/como/data_CoMo")
 
 library(readxl)
 library(tidyverse)
