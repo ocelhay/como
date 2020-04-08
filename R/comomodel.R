@@ -1,4 +1,4 @@
-#' Run the CoMo Model App
+#' Run the shiny app
 #'
 #' @return
 #' Open browser

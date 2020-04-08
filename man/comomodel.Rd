@@ -2,7 +2,7 @@
 % Please edit documentation in R/comomodel.R
 \name{comomodel}
 \alias{comomodel}
-\title{Run the CoMo Model App}
+\title{Run the shiny app}
 \usage{
 comomodel()
 }
@@ -10,5 +10,5 @@ comomodel()
 Open browser
 }
 \description{
-Run the CoMo Model App
+Run the shiny app
 }
