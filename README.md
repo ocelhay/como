@@ -10,7 +10,7 @@ https://comomodel.net
 
 ### Installation Instructions
 
-- Download and install R (any version above 3.6.1): https://cran.r-project.org
+- Download and install R (any version above 3.6.1) — https://cran.r-project.org.
 - Open R and run in the console:
 
 ```
@@ -22,14 +22,16 @@ pacman::p_load(bsplus, deSolve, highcharter, lubridate, pushbar, RColorBrewer, r
                shinyWidgets, tidyverse, timevis)
 ```
 
-If prompted `--- Please select a CRAN mirror for use in this session ---`, select the nearest location to you.
+If prompted `--- Please select a CRAN mirror for use in this session ---`, select 'Cloud'.
 If prompted `Do you want to install from sources the packages which need compilation? (Yes/no/cancel)`, return `no`. 
 
-- Close and reopen R and then run in the console:
+- Close and reopen R.
+- Run in the console:
 
 ```
 remotes::install_github("ocelhay/como", upgrade = "never")
 ```
+
 
 ### Update Instructions
 
