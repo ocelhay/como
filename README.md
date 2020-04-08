@@ -12,7 +12,9 @@ https://comomodel.net
 
 Download and install R (versions 3.6.1 and above): https://cran.r-project.org
 
-Open R and run the following lines in the console to install/update the CoMo App:
+#### Install/update the CoMo App
+
+Open R and run the following lines in the console :
 ```
 # Install CoMo App for offline use
 if (!require('pacman')) install.packages('pacman', quiet = TRUE)
@@ -26,7 +28,10 @@ remotes::install_github("ocelhay/como", upgrade = "never")
 packageVersion("como")
 ```
 
+#### Launch CoMo App
+
 To use the CoMo App, run the following lines in the R Console:
+
 ```
 library(como)
 comomodel()
