@@ -22,15 +22,10 @@ pacman::p_load(bsplus, deSolve, highcharter, lubridate, pushbar, RColorBrewer, r
                shinyWidgets, tidyverse, timevis)
 ```
 
-If prompted `--- Please select a CRAN mirror for use in this session ---`, select 'Cloud'.
-If prompted `Do you want to install from sources the packages which need compilation? (Yes/no/cancel)`, return `no`. 
-
+- If prompted `--- Please select a CRAN mirror for use in this session ---`, select 'Cloud'.
+- If prompted `Do you want to install from sources the packages which need compilation? (Yes/no/cancel)`, return `no`. 
 - Close and reopen R.
-- Run in the console:
-
-```
-remotes::install_github("ocelhay/como", upgrade = "never")
-```
+- Run in the console: `remotes::install_github("ocelhay/como", upgrade = "never")`
 
 
 Troubleshooting:
@@ -42,16 +37,12 @@ Troubleshooting:
 
 ### Update Instructions
 
-You can check the version by running in the console `packageVersion("como")`. To update to the latest version, run in the console:
-
-```
-remotes::install_github("ocelhay/como", upgrade = "never")
-```
+You can check the version by running in the console `packageVersion("como")`. To update to the latest version, run: `remotes::install_github("ocelhay/como", upgrade = "never")`
 
 
 ### Run Offline Version
 
-To launch the CoMo App, run in the console:
+To launch the CoMo App, open R and run in the console:
 
 ```
 library(como)
