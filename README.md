@@ -60,7 +60,8 @@ comomodel()
 
 Troubleshooting:
 
-- If your browser doesn't open, try to [set up a default browser](https://stackoverflow.com/questions/29624917/how-to-set-default-browser-to-internet-explorer-in-r)
+- Restart R
+- Update all packages `update.packages()`
 
 ## Important Disclaimer
 
