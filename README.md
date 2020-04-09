@@ -28,7 +28,11 @@ pacman::p_load(bsplus, deSolve, highcharter, lubridate, pushbar, RColorBrewer, r
 - Run in the console: `remotes::install_github("ocelhay/como", upgrade = "never")`
 
 
-**Troubleshooting: if the internet connection is not steady, re-run the commands as often as required for the download to proceed.**
+**Troubleshooting:**
+
+1. if the internet connection is not steady, re-run the commands as often as required for the download to proceed.
+2. restart R and update all packages `update.packages()`
+
 
 
 
@@ -47,7 +51,6 @@ library(como)
 comomodel()
 ```
 
-**Troubleshooting: restart R and update all packages `update.packages()`**
 
 ## Important Disclaimer
 
