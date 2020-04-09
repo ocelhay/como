@@ -32,7 +32,13 @@ If prompted `Do you want to install from sources the packages which need compila
 remotes::install_github("ocelhay/como", upgrade = "never")
 ```
 
-If the internet connection is not steady, re-run the commands as often as required for the download to proceed.
+
+Troubleshooting:
+
+- If the internet connection is not steady, re-run the commands as often as required for the download to proceed.
+
+
+
 
 ### Update Instructions
 
@@ -51,6 +57,10 @@ To launch the CoMo App, run in the console:
 library(como)
 comomodel()
 ```
+
+Troubleshooting:
+
+- If your browser doesn't open, try to [set up a default browser](https://stackoverflow.com/questions/29624917/how-to-set-default-browser-to-internet-explorer-in-r)
 
 ## Important Disclaimer
 
