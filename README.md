@@ -35,7 +35,7 @@ pacman::p_load(bsplus, deSolve, highcharter, lubridate, pushbar, RColorBrewer, r
 
 ### Update Instructions
 
-You can check the version by running in the console `packageVersion("como")`. To update to the latest version, run: `remotes::install_github("ocelhay/como", upgrade = "never")`
+To update to the latest version, run: `remotes::install_github("ocelhay/como", upgrade = "never")`
 
 
 ### Run Offline Version
