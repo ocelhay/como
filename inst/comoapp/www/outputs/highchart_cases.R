@@ -14,11 +14,11 @@ output$highchart_cases <- renderHighchart({
   }
   if(input$focus_axis == "Predicted Reported")  {
     max_x <- max(dta$time)
-    max_y <- 1.2 * max(simul_baseline$results$daily_incidence, simul_interventions$results$daily_incidence, na.rm = TRUE)
+    max_y <- 1.2 * max(simul_baseline$results$daily_incidence, na.rm = TRUE)
   }
   if(input$focus_axis == "Predicted Reported + Unreported")  {
     max_x <- max(dta$time)
-    max_y <- 1.2 * max(simul_baseline$results$daily_total_cases, simul_interventions$results$daily_total_cases, na.rm = TRUE)
+    max_y <- 1.2 * max(simul_baseline$results$daily_total_cases, na.rm = TRUE)
   }
   
   dta2 <- dta %>%

@@ -582,7 +582,7 @@ process_ode_outcome <- function(out){
   results$required_beds <- round(previcureq1)  # required beds
   results$saturation <- parameters["beds_available"]  # saturation
   results$daily_incidence <- round(dailyinc1)  # daily incidence (Reported)
-  results$daily_total_cases <- round(rowSums(parameters["gamma"]*out[,(Eindex+1)]))  # daily incidence (Reported + Unreported)
+  results$daily_total_cases <- round(rowSums(parameters["gamma"]*out[,(Eindex+1)]+parameters["gamma"]*out[,(QEindex+1)])) # daily incidence (Reported + Unreported)  # daily incidence (Reported + Unreported)
   results$hospital_surge_beds <- round(previcureq1)
   results$icu_beds <- round(previcureq21)
   results$ventilators <- round(previcureq31)
