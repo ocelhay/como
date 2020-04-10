@@ -2,17 +2,33 @@ Package: como
 Type: Package
 Title: CoMo App
 Version: 11.12.1
-Author: Olivier Celhay
-Maintainer: Olivier Celhay <olivier.celhay@gmail.com>
-Description: Developed by the Covid-19 International Modelling Consortium (CoMo Consortium).
-    This app allows to perform a model fit to the available data and 
-    investigate the potential impact of several non-pharmaceutical interventions.
+Authors@R: person("Olivier", "Celhay", email = "olivier.celhay@gmail.com", 
+    role = c("aut", "cre"))
+Description: Developed by the Covid-19 International Modelling Consortium 
+    (CoMo Consortium). This app allows to perform a model fit to the available 
+    data and investigate the potential impact of several non-pharmaceutical 
+    interventions.
 License: GPL-3
+Depends: R (>= 3.6)
+Imports:
+    shiny
+Suggests:
+    bsplus,
+    deSolve, 
+    highcharter, 
+    lubridate, 
+    pushbar, 
+    RColorBrewer, 
+    readxl, 
+    reshape2, 
+    scales, 
+    shinyBS, 
+    shinycssloaders, 
+    shinyhelper, 
+    shinythemes, 
+    shinyWidgets, 
+    tidyverse, 
+    timevis
 Encoding: UTF-8
 LazyData: true
-Depends:
-    R (>= 3.6),
-    bsplus, deSolve, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
-    reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinythemes, 
-    shinyWidgets, tidyverse, timevis
 RoxygenNote: 7.1.0
