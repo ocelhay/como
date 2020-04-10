@@ -233,12 +233,32 @@ parameters["lockdown_mid_dur"]<-parameters["lockdown_mid_dur"]*7
 parameters["lockdown_high_dur"]<-parameters["lockdown_high_dur"]*7
 
 
-# Variables to bridge App and Ricardo/Lisa code ----
-popstruc <- population_rv$data %>% select(age_category, pop) %>% rename(agefloor = age_category) %>% as.data.frame()
-popbirth <- population_rv$data %>% select(age_category, birth) %>% as.data.frame()
-mort <- population_rv$data %>% pull(death)
-ihr <- mort_sever_rv$data %>% select(age_category, ihr) %>% as.data.frame()
-ifr <- mort_sever_rv$data %>% select(age_category, ifr) %>% as.data.frame()
+# Bridge App and Ricardo/Lisa code ----
+popstruc <- population_rv$data %>% 
+  select(age_category, pop) %>% 
+  rename(agefloor = age_category) %>% 
+  as.data.frame()
+
+popbirth <- population_rv$data %>% 
+  select(age_category, birth) %>% 
+  as.data.frame() # unit should be per person per day
+
+mort <- population_rv$data %>% 
+  pull(death) # unit should be per person per day
+
+mort_sever_rv$data <- mort_sever_rv$data %>%
+  mutate(ihr = 4*ihr/100) %>% # starting unit should be % - scaling to a value between 0 and 4
+  mutate(ifr = ifr/max(ifr))  # starting unit should be % - scaling to a value between 0 and 1
+
+ihr <- mort_sever_rv$data %>% 
+  select(age_category, ihr) %>% 
+  as.data.frame()
+
+ifr <- mort_sever_rv$data %>% 
+  select(age_category, ifr) %>% 
+  as.data.frame()
+
+
 
 
 # START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----

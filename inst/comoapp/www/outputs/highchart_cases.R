@@ -27,8 +27,8 @@ output$highchart_cases <- renderHighchart({
     
     
       return(
-        hchart(dta2, "area", name = "Reported", hcaes(x = Date, y = daily_incidence), color = "#00441b") %>% 
-          hc_add_series(dta2, type = 'area', name = "Reported + Unreported", hcaes(y = daily_total_cases, x = Date), color = "#74c476", dashStyle = "longdash") %>%
+        hchart(dta2, "area", name = "Predicted Reported", hcaes(x = Date, y = daily_incidence), color = "#00441b") %>% 
+          hc_add_series(dta2, type = 'area', name = "Predicted Reported + Unreported", hcaes(y = daily_total_cases, x = Date), color = "#74c476", dashStyle = "longdash") %>%
           hc_add_series(dta2, type = 'line', name = "Observed", hcaes(y = cases, x = Date), color = "red") %>%
           hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
              {point.y:,.0f}<br/>", shared = TRUE) %>%

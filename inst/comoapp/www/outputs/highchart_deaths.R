@@ -3,7 +3,7 @@ output$highchart_deaths <- renderHighchart({
   
   dta <- left_join(tibble(cum_mortality = simul_baseline$results$cum_mortality,
                           time = simul_baseline$results$time), 
-                   cases_rv$data, 
+                   cases_rv$data, # cumulative_death
                    by = c("time" = "date"))
   
   # X/Y scales
@@ -26,8 +26,8 @@ output$highchart_deaths <- renderHighchart({
   
   
   return(
-    hchart(dta2, "line", name = "Reported Deaths", hcaes(x = Date, y = cumulative_death), color = "black") %>% 
-      hc_add_series(dta2, type = 'line', name = "Observed", hcaes(y = cum_mortality, x = Date), color = "red") %>%
+    hchart(dta2, "line", name = "Predicted Reported Deaths", hcaes(x = Date, y = cum_mortality), color = "#00441b") %>% 
+      hc_add_series(dta2, type = 'line', name = "Observed", hcaes(x = Date, y = cumulative_death), color = "red") %>%
       hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
              {point.y:,.0f}<br/>", shared = TRUE) %>%
       hc_title(text = "Baseline Cumulative Deaths") %>%

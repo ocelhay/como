@@ -279,6 +279,8 @@ server <- function(input, output, session) {
     dta <- read_excel(file_path, sheet = "Cases")
     names(dta) <- c("date", "cases", "deaths")
     
+    shiny_dta <<- dta
+    
     cases_rv$data <- dta %>%
       mutate(date = as.Date(date), cumulative_death = cumsum(deaths)) %>%
       as.data.frame()
@@ -290,9 +292,7 @@ server <- function(input, output, session) {
     dta <- read_excel(file_path, sheet = "Severity-Mortality") 
     names(dta) <- c("age_category",	"ifr",	"ihr")
     
-    mort_sever_rv$data <- dta %>%
-      mutate(ihr = 4*ihr) %>%
-      mutate(ifr = ifr/max(ifr))
+    mort_sever_rv$data <- dta
     
     # Population
     dta <- read_excel(file_path, sheet = "Population")

@@ -17,9 +17,7 @@ cases <- read_excel(file) %>%
 
 
 # Mortality/Severity
-mort_sever_default <- read.csv("COVID_severe_mortality_age.csv", header = TRUE) %>%
-  mutate(ihr = 4*ihr/100) %>%
-  mutate(ifr = ifr/max(ifr))
+mort_sever_default <- read.csv("COVID_severe_mortality_age.csv", header = TRUE)
 
 
 # Social Contacts ----
