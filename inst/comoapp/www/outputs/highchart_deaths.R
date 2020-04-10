@@ -26,8 +26,8 @@ output$highchart_deaths <- renderHighchart({
   
   
   return(
-    hchart(dta2, "line", name = "Reported Deaths", hcaes(x = Date, y = cum_mortality), color = "black") %>% 
-      hc_add_series(dta2, type = 'line', name = "Observed", hcaes(y = cumulative_death, x = Date), color = "red") %>%
+    hchart(dta2, "line", name = "Reported Deaths", hcaes(x = Date, y = cumulative_death), color = "black") %>% 
+      hc_add_series(dta2, type = 'line', name = "Observed", hcaes(y = cum_mortality, x = Date), color = "red") %>%
       hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
              {point.y:,.0f}<br/>", shared = TRUE) %>%
       hc_title(text = "Baseline Cumulative Deaths") %>%
