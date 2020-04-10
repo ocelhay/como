@@ -1,12 +1,12 @@
 # Prolegomenon ----
-setwd("/Users/olivier/Documents/CoMo/como/data_CoMo")
+setwd("/Users/olivier/Documents/CoMo/como/data")
 
 library(readxl)
 library(tidyverse)
 
 
 # Cases Data ----
-file <- "COVID-19-geographic-disbtribution-worldwide-2020-04-08.xlsx"
+file <- "COVID-19-geographic-disbtribution-worldwide-2020-04-10.xlsx"
 
 cases <- read_excel(file) %>%
   transmute(date = as.Date(dateRep), cases = cases, deaths = deaths, country = countriesAndTerritories) %>%

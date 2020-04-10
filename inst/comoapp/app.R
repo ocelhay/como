@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v11.11"
+version_app <- "v11.12"
 
 
 # Load packages
@@ -126,7 +126,7 @@ ui <- function(request) {
                                   conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_modelpredictions'",
                                                    fluidRow(
                                                      column(6, 
-                                                            actionButton("run_interventions", "Run Interventions", class="btn btn-success")
+                                                            actionButton("run_interventions", "Run Future Scenarios", class="btn btn-success")
                                                      ),
                                                      column(6, 
                                                             conditionalPanel("output.status_app_output == 'Locked Baseline'",
@@ -187,7 +187,7 @@ ui <- function(request) {
                                                            htmlOutput("text_total_death_baseline") %>% withSpinner(),
                                                     ),
                                                     column(6, 
-                                                           div(class = "box_outputs", h4("Interventions")),
+                                                           div(class = "box_outputs", h4("Future Scenarios")),
                                                            htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
                                                            htmlOutput("text_total_death_interventions") %>% withSpinner()
                                                     ),
@@ -392,7 +392,7 @@ server <- function(input, output, session) {
   
   # Process on "run_interventions" ----
   observeEvent(input$run_interventions, {
-    showNotification(span(h4(icon("hourglass-half"), "Running the Interventions..."), "typically runs in 10 secs."),
+    showNotification(span(h4(icon("hourglass-half"), "Running Future Scenarios..."), "typically runs in 10 secs."),
                      duration = NULL, type = "message", id = "run_interventions_notif")
     
     source("./www/model.R", local = TRUE)

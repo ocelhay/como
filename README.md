@@ -2,13 +2,16 @@
 
 # CoMo COVID-19 App
 
-## Online Version
+The interface was developed after consultation with several members of the CoMo Consortium. It possesses all the features and functionalities necessary to successfully perform a model fit to the available data and investigate the potential impact of several non-pharmaceutical interventions.
 
-https://comomodel.net
+Whilst every effort has been taken during the development of this tool/model for it to be as accurate and reliable as possible it is important that the user understands that the outputs are a prediction based on the assumptions chosen through the input parameter values. In view of the current uncertainty on the COVID-19 mechanisms of action, the output of the model should be used to explore multiple scenarios and in combination with a larger evidence base during decision-making.
 
-## Offline Version
+The appropriate use of this tool/model and its output can contribute to effective policymaking, but misuse or misinterpretation of the output can mislead decision-making. Any decisions taken whist using these tools are the responsibility of the user and no liability whatsoever will be taken by the developers/authors of the tool.
 
-### Installation Instructions
+The App is available at https://comomodel.net  but can also be run locally on a laptop. Follow the instructions below to install, update or launch the offline App.
+
+
+## Install Offline App
 
 - Download and install R (any version above 3.6.1) — https://cran.r-project.org.
 - Open R and run in the console:
@@ -34,15 +37,12 @@ pacman::p_load(bsplus, deSolve, highcharter, lubridate, pushbar, RColorBrewer, r
 2. restart R and update all packages `update.packages()`
 
 
-
-
-
-### Update Instructions
+## Update Offline App
 
 To update to the latest version, run: `remotes::install_github("ocelhay/como", upgrade = "never")`
 
 
-### Run Offline Version
+## Launch Offline App
 
 To launch the CoMo App, open R and run in the console:
 
@@ -50,10 +50,3 @@ To launch the CoMo App, open R and run in the console:
 library(como)
 comomodel()
 ```
-
-
-## Important Disclaimer
-
-Whilst every effort has been taken during the development of this tool/model for it to be as accurate and reliable as possible it is important that the user understands that the outputs are a prediction based on the assumptions chosen through the input parameter values. In view of the current uncertainty on the COVID-19 mechanisms of action, the output of the model should be used to explore multiple scenarios and in combination with a larger evidence base during decision-making.
-
-The appropriate use of this tool/model and its output can contribute to effective policymaking, but misuse or misinterpretation of the output can mislead decision-making. Any decisions taken whist using these tools are the responsibility of the user and no liability whatsoever will be taken by the developers/authors of the tool.

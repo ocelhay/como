@@ -1,3 +1,0 @@
-load("/Users/olivier/Documents/COVID19/Contact Matrices/contact_matrices_152_countries/contact_data.RData")
-ls()
-contact_home
