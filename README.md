@@ -8,7 +8,7 @@ Whilst every effort has been taken during the development of this tool/model for
 
 The appropriate use of this tool/model and its output can contribute to effective policymaking, but misuse or misinterpretation of the output can mislead decision-making. Any decisions taken whist using these tools are the responsibility of the user and no liability whatsoever will be taken by the developers/authors of the tool.
 
-The App is available at https://comomodel.net  but can also be run locally on a laptop. Follow the instructions below to install, update or launch the offline App.
+The App is available at https://comomodel.net  but can also be run locally. Follow the instructions below to install, update or launch the offline App.
 
 
 ## Install Offline App
