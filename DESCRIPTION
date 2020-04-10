@@ -1,7 +1,7 @@
 Package: como
 Type: Package
 Title: CoMo App
-Version: 11.12.1
+Version: 11.12.1.9000
 Authors@R: person("Olivier", "Celhay", email = "olivier.celhay@gmail.com", 
     role = c("aut", "cre"))
 Description: Developed by the Covid-19 International Modelling Consortium 
