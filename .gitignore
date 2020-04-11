@@ -3,3 +3,4 @@
 *.dcf
 *.history
 .Rproj.user
+inst/doc
