@@ -9,7 +9,7 @@ div(class = "interventions", id = 'interventions_selfis',
                                              width = "400px", tooltip = FALSE, right = FALSE,
                                              fluidRow(
                                                column(12,
-                                                      dateInput("date_selfis_on", label = "Start Date:", value = "2020-03-15", min = "2020-01-01"),
+                                                      dateInput("date_selfis_on", label = "Start Date:", value = "2020-03-15", min = "2020-04-01"),
                                                       sliderInput("selfis_dur", label = "Duration:", value = 52, min = 1, max = 52, step = 1, post = " weeks", ticks = FALSE),
                                                       sliderInput("selfis_cov", label = "Coverage of self isolation:", value = 50, min = 0, max = 100,
                                                                   step = 1, post = "%", ticks = FALSE),

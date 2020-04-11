@@ -10,7 +10,7 @@ div(class = "interventions", id = 'interventions_cocoon',
                                              width = "400px", tooltip = FALSE, right = FALSE, up = TRUE,
                                              fluidRow(
                                                column(12,
-                                                      dateInput("date_cocoon_on", label = "Start Date:", value = "2020-03-14"),
+                                                      dateInput("date_cocoon_on", label = "Start Date:", value = "2020-04-01"),
                                                       sliderInput("cocoon_dur", label = "Duration:", value = 16, min = 1, max = 52, step = 1, post = " weeks", ticks = FALSE),
                                                       sliderInput("cocoon_cov", label = "Coverage of elderly cocoon:", value = 90, min = 0, max = 100,
                                                                   step = 1, post = "%", ticks = FALSE),
