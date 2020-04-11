@@ -14,21 +14,26 @@ Imports:
     shiny
 Suggests:
     bsplus,
-    deSolve, 
-    highcharter, 
-    lubridate, 
-    pushbar, 
-    RColorBrewer, 
-    readxl, 
-    reshape2, 
-    scales, 
-    shinyBS, 
-    shinycssloaders, 
-    shinyhelper, 
-    shinythemes, 
-    shinyWidgets, 
-    tidyverse, 
-    timevis
+    deSolve,
+    highcharter,
+    lubridate,
+    pushbar,
+    RColorBrewer,
+    readxl,
+    reshape2,
+    scales,
+    shinyBS,
+    shinycssloaders,
+    shinyhelper,
+    shinythemes,
+    shinyWidgets,
+    tidyverse,
+    timevis,
+    rmarkdown,
+    knitr
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/ocelhay/como
+BugReports: https://github.com/ocelhay/como/issues
 RoxygenNote: 7.1.0
+VignetteBuilder: knitr
