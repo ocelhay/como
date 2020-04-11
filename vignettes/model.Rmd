@@ -1,0 +1,22 @@
+---
+title: "Modelling the impact of several non-pharmaceutical interventions to COVID-19"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Modelling the impact of several non-pharmaceutical interventions to COVID-19}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE, eval = FALSE}
+library(como)
+```
+
+
+**Write-up regarding the modelling approach and parameters**

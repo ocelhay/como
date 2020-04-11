@@ -1,0 +1,22 @@
+---
+title: "Using the CoMo COVID-19 application"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using the CoMo COVID-19 application}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE, eval = FALSE}
+library(como)
+```
+
+
+**Write-up on using the CoMo COVID-19 application**

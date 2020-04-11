@@ -1,3 +1,5 @@
+################################################################################
+#
 #' CoMo App
 #' 
 #' Developed by the Covid-19 International Modelling Consortium 
@@ -9,5 +11,8 @@
 #' @name como
 #' @keywords internal
 #' @importFrom shiny runApp
+#' @importFrom utils packageVersion
 #' 
+#
+################################################################################
 "_PACKAGE"

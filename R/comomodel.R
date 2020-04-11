@@ -1,14 +1,17 @@
+################################################################################
+#
 #' Run the shiny app
 #' 
 #' @return Open browser
 #' 
 #' @examples
-#' if(interactive) {
-#'   comomodel()
-#' }
+#' if(interactive()) comomodel()
 #' 
 #' @export
 #'
+#
+################################################################################
+
 comomodel <- function() {
   appDir <- system.file("comoapp", package = "como")
   

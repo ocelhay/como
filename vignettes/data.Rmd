@@ -1,0 +1,21 @@
+---
+title: "Sources of data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Sources of data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE, eval = TRUE}
+library(como)
+```
+
+**Write-up here regarding sources of data**
