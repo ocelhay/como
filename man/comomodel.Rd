@@ -12,3 +12,7 @@ Open browser
 \description{
 Run the shiny app
 }
+\examples{
+if(interactive()) comomodel()
+
+}
