@@ -1,0 +1,59 @@
+title: como
+
+url: https://ocelhay.github.io/como
+
+template:
+  params:
+    bootswatch: flatly
+    ganalytics: 
+
+navbar:
+  #type: inverse
+  
+  structure:
+    left: [home, intro, reference, articles, news]
+    right: [application, github]
+    
+  components:
+    application:
+      icon: fa-desktop fa-lg
+      href: "https://comomodel.net"
+      target: _blank
+
+    articles:
+      text: Articles
+      menu:
+      - text: "Modelling the impact of several non-pharmaceutical interventions to COVID-19"
+        href: articles/model.html
+      - text: "Sources of data"
+        href: articles/data.html
+      - text: "Using the CoMo COVID-19 application"
+        href: articles/application.html
+
+home:
+  title: CoMo App
+  links:
+  - text: Read about the CoMo Consortium
+    href: https://ADD_LINK_HERE
+
+reference:
+  - title: Description
+    contents:
+    - como
+
+  - title: Run Shiny app
+    contents:
+    - comomodel
+    
+  - title: Datasets
+    contents:
+    - cases
+    - mort_sever_default
+    - contact_home
+    - contact_work
+    - contact_school
+    - contact_other
+    - population
+
+
+

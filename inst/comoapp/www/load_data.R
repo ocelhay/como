@@ -1,4 +1,4 @@
-load(file = "./www/data/data_CoMo.RData")
+#load(file = "./www/data/data_CoMo.RData")
 
 # choices of countries for cases
 countries_cases <- c("-- Own Value ---", cases %>% pull(country) %>% unique() %>% sort())
