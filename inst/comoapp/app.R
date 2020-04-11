@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v11.13"
+version_app <- "v11.14"
 
 
 # Load packages
@@ -293,6 +293,10 @@ server <- function(input, output, session) {
     names(dta) <- c("age_category",	"ifr",	"ihr")
     
     mort_sever_rv$data <- dta
+    
+    mort_sever_rv$data <- mort_sever_rv$data %>%
+      mutate(ihr = 4*ihr/100) %>% # starting unit should be % - scaling to a value between 0 and 4
+      mutate(ifr = ifr/max(ifr))  # starting unit should be % - scaling to a value between 0 and 1
     
     # Population
     dta <- read_excel(file_path, sheet = "Population")

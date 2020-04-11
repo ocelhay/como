@@ -246,10 +246,6 @@ popbirth <- population_rv$data %>%
 mort <- population_rv$data %>% 
   pull(death) # unit should be per person per day
 
-mort_sever_rv$data <- mort_sever_rv$data %>%
-  mutate(ihr = 4*ihr/100) %>% # starting unit should be % - scaling to a value between 0 and 4
-  mutate(ifr = ifr/max(ifr))  # starting unit should be % - scaling to a value between 0 and 1
-
 ihr <- mort_sever_rv$data %>% 
   select(age_category, ihr) %>% 
   as.data.frame()
