@@ -20,7 +20,7 @@ cases <- read_excel(file) %>%
 mort_sever_default <- read.csv("COVID_severe_mortality_age.csv", header = TRUE)
 
 mort_sever_default <- mort_sever_default %>%
-  mutate(ihr = 4*ihr/100) %>% # starting unit should be % - scaling to a value between 0 and 4
+  mutate(ihr = ihr / 100) %>% # starting unit should be % - scaling to a value between 0 and 1
   mutate(ifr = ifr/max(ifr))  # starting unit should be % - scaling to a value between 0 and 1
 
 

@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v11.14"
+version_app <- "v11.15"
 
 
 # Load packages
@@ -295,7 +295,7 @@ server <- function(input, output, session) {
     mort_sever_rv$data <- dta
     
     mort_sever_rv$data <- mort_sever_rv$data %>%
-      mutate(ihr = 4*ihr/100) %>% # starting unit should be % - scaling to a value between 0 and 4
+      mutate(ihr = ihr/100) %>% # starting unit should be % - scaling to a value between 0 and 1
       mutate(ifr = ifr/max(ifr))  # starting unit should be % - scaling to a value between 0 and 1
     
     # Population
