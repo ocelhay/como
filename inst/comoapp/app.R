@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v11.17"
+version_app <- "v11.18"
 
 
 # Load packages
@@ -130,7 +130,7 @@ ui <- function(request) {
                                                      ),
                                                      column(6, 
                                                             conditionalPanel("output.status_app_output == 'Locked Baseline'",
-                                                                             downloadButton("export", label = "Download Results", class="btn btn-success")
+                                                                             downloadButton("export_res", label = "Download Results", class="btn btn-success")
                                                             )
                                                      )
                                                    ),
@@ -471,10 +471,11 @@ server <- function(input, output, session) {
     return(dta)
   })
   
-  output$export <- downloadHandler(
-    filename = paste0("Results_", Sys.Date(), ".csv"),
+  output$export_res <- downloadHandler(
+    filename = "Results_CoMoApp.csv",
     content = function(file) {
-      write.csv(results_aggregated(), file, row.names = FALSE)
+      dta <- results_aggregated()
+      write.csv(dta, file = file, row.names = FALSE)
     }
   )
 }
