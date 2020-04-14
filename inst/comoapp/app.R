@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v11.17"
+version_app <- "v11.18"
 
 
 # Load packages
@@ -121,19 +121,8 @@ ui <- function(request) {
                                   conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline')  && input.tabs == 'tab_visualfit'", 
                                                    actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success")
                                   ),
-                                  # bsButton("reset_baseline", label = "Reset the Baseline", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                  #          block = TRUE)),
                                   conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_modelpredictions'",
-                                                   fluidRow(
-                                                     column(6, 
-                                                            actionButton("run_interventions", "Run Future Scenarios", class="btn btn-success")
-                                                     ),
-                                                     column(6, 
-                                                            conditionalPanel("output.status_app_output == 'Locked Baseline'",
-                                                                             downloadButton("export", label = "Download Results", class="btn btn-success")
-                                                            )
-                                                     )
-                                                   ),
+                                                   actionButton("run_interventions", "Run Future Scenarios", class="btn btn-success")
                                   ),
                               )
              )
@@ -215,7 +204,11 @@ ui <- function(request) {
                                                     column(6, 
                                                            highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
                                                     )
-                                                  )
+                                                  ),
+                                                  div(class = "box_outputs", h4("Data Table")),
+                                                  dataTableOutput("table_results")
+                                                  
+                                                  
                                  )
                         )
              )
@@ -228,9 +221,9 @@ ui <- function(request) {
 server <- function(input, output, session) {
   # On deployment only:
   # Stop the shiny app when the browser window is closed
-  session$onSessionEnded(function() {
-    stopApp()
-  })
+  # session$onSessionEnded(function() {
+  #   stopApp()
+  # })
   
   # Hide tabs on app launch ----
   hideTab(inputId = "tabs", target = "tab_modelpredictions")
@@ -452,31 +445,24 @@ server <- function(input, output, session) {
       
       dta_interventions <- tibble(
         date = simul_interventions$results$time,
-        predictions_daily_incidence = simul_interventions$results$daily_incidence,
-        predictions_daily_total_cases = simul_interventions$results$daily_total_cases,
-        predictions_required_beds = simul_interventions$results$required_beds,
-        predictions_cum_mortality = simul_interventions$results$cum_mortality,
-        predictions_hospital_surge_beds = simul_interventions$results$hospital_surge_beds,
-        predictions_icu_beds = simul_interventions$results$icu_beds,
-        predictions_ventilators = simul_interventions$results$ventilators,
-        predictions_death_treated_hospital = simul_interventions$results$death_treated_hospital,
-        predictions_death_treated_icu = simul_interventions$results$death_treated_icu,
-        predictions_death_treated_ventilator = simul_interventions$results$death_treated_ventilator,
-        predictions_death_untreated_hospital = simul_interventions$results$death_untreated_hospital,
-        predictions_death_untreated_icu = simul_interventions$results$death_untreated_icu,
-        predictions_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator)
+        future_scenario_daily_incidence = simul_interventions$results$daily_incidence,
+        future_scenario_daily_total_cases = simul_interventions$results$daily_total_cases,
+        future_scenario_required_beds = simul_interventions$results$required_beds,
+        future_scenario_cum_mortality = simul_interventions$results$cum_mortality,
+        future_scenario_hospital_surge_beds = simul_interventions$results$hospital_surge_beds,
+        future_scenario_icu_beds = simul_interventions$results$icu_beds,
+        future_scenario_ventilators = simul_interventions$results$ventilators,
+        future_scenario_death_treated_hospital = simul_interventions$results$death_treated_hospital,
+        future_scenario_death_treated_icu = simul_interventions$results$death_treated_icu,
+        future_scenario_death_treated_ventilator = simul_interventions$results$death_treated_ventilator,
+        future_scenario_death_untreated_hospital = simul_interventions$results$death_untreated_hospital,
+        future_scenario_death_untreated_icu = simul_interventions$results$death_untreated_icu,
+        future_scenario_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator)
       
       dta <- left_join(dta, dta_interventions, by = "date") }
     
     return(dta)
   })
-  
-  output$export <- downloadHandler(
-    filename = paste0("Results_", Sys.Date(), ".csv"),
-    content = function(file) {
-      write.csv(results_aggregated(), file, row.names = FALSE)
-    }
-  )
 }
 
 # Run the App ----

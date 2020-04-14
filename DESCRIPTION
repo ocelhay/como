@@ -1,7 +1,7 @@
 Package: como
 Type: Package
 Title: CoMo App
-Version: 11.17
+Version: 11.18
 Author: Olivier Celhay
 Maintainer: Olivier Celhay <olivier.celhay@gmail.com>
 Description: Developed by the Covid-19 International Modelling Consortium (CoMo Consortium).
@@ -12,7 +12,7 @@ Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 3.6),
-    bsplus, deSolve, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
+    bsplus, deSolve, DT, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
     reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinythemes, 
     shinyWidgets, tidyverse, timevis
 RoxygenNote: 7.1.0
