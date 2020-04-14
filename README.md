@@ -44,9 +44,4 @@ To update to the latest version, run: `remotes::install_github("ocelhay/como", u
 
 ## Launch Offline App
 
-To launch the CoMo App, open R and run in the console:
-
-```
-library(como)
-comomodel()
-```
+To launch the CoMo App, open R and run in the console: `como::comomodel()`
