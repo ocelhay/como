@@ -20,7 +20,7 @@ The App is available at https://comomodel.net  but can also be run locally. Foll
 # Install CoMo App for offline use
 if (!require('pacman')) install.packages('pacman', quiet = TRUE)
 
-pacman::p_load(bsplus, deSolve, highcharter, lubridate, pushbar, RColorBrewer, readxl, remotes,
+pacman::p_load(bsplus, DT, deSolve, highcharter, lubridate, pushbar, RColorBrewer, readxl, remotes,
                reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinythemes, 
                shinyWidgets, tidyverse, timevis)
 ```
