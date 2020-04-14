@@ -1,5 +1,6 @@
 library(bsplus)
 library(deSolve)
+library(DT)
 library(highcharter)
 library(lubridate)
 library(pushbar)
