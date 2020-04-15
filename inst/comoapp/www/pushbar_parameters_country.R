@@ -15,7 +15,7 @@ list(
                                options = pickerOptions(liveSearch = TRUE), selected = "Pakistan"),
                    sliderInput("household_size", label = "Mean household size:", value = 2.5, min = 1, max = 10,
                                step = 0.1, post = " indiv.", ticks = FALSE),
-                   numericInput("mean_imports", label = "Mean number of infectious migrants per day:", value = 0, min = 0, max = 500,
+                   numericInput("mean_imports", label = "Mean number of infectious migrants per day:", value = 0, min = 0, max = NA,
                                 width = "50%")
             )
           ),

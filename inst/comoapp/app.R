@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v11.18"
+version_app <- "v11.19"
 
 
 # Load packages
@@ -205,8 +205,8 @@ ui <- function(request) {
                                                            highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
                                                     )
                                                   ),
-                                                  div(class = "box_outputs", h4("Data Table")),
-                                                  dataTableOutput("table_results")
+                                                  div(class = "box_outputs", h4("Model Output Table")),
+                                                  DTOutput("table_results")
                                                   
                                                   
                                  )

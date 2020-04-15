@@ -18,12 +18,12 @@ list(
                    sliderInput("pdeath_ventc", label = "Probability of dying when ventilator denied:", value = 95, min = 0, max = 100, step = 1, post = "%", ticks = FALSE)
             ),
             column(4,
-                   sliderInput("nus", label = "Duration of non-fatal hospitalised infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
-                   sliderInput("nusc", label = "Duration of non-fatal denied hospitalisation infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
-                   sliderInput("nu_icu", label = "Duration of non-fatal ICU infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
-                   sliderInput("nu_icuc", label = "Duration of non-fatal denied ICU infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
-                   sliderInput("nu_vent", label = "Duration of non-fatal ventilated infection:", value = 25, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
-                   sliderInput("nu_ventc", label = "Duration of non-fatal denied ventilation infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
+                   sliderInput("nus", label = "Duration of hospitalised infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
+                   sliderInput("nusc", label = "Duration of denied hospitalisation infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
+                   sliderInput("nu_icu", label = "Duration of ICU infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
+                   sliderInput("nu_icuc", label = "Duration of denied ICU infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
+                   sliderInput("nu_vent", label = "Duration of ventilated infection:", value = 25, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
+                   sliderInput("nu_ventc", label = "Duration of denied ventilation infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
             )
           ),
           div(class = "closebutton", bsButton("close_hospital_param", "Close", icon("times"), style = "danger", size = "small"))
