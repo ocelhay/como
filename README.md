@@ -2,6 +2,7 @@
 [![(https://img.shields.io/badge/devel%20version-11.20-blue.svg)](https://github.com/ocelhay/como)
 [![Build Status](https://travis-ci.org/github/ocelhay/como.svg?branch=master)](https://travis-ci.org/github/ocelhay/como)
 
+
 # CoMo COVID-19 App
 
 The interface was developed after consultation with several members of the CoMo Consortium. It possesses all the features and functionalities necessary to successfully perform a model fit to the available data and investigate the potential impact of several non-pharmaceutical interventions.
