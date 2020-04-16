@@ -1,6 +1,5 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-"[![](https://img.shields.io/badge/devel%20version-11.20-blue.svg)](https://github.com/ocelhay/como)"
-[![Build Status](https://travis-ci.org/juliasilge/janeaustenr.svg?branch=master)](https://travis-ci.org/juliasilge/janeaustenr)
+[![](https://img.shields.io/badge/devel%20version-11.20-blue.svg)](https://github.com/ocelhay/como)
 
 # CoMo COVID-19 App
 
