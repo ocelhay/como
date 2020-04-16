@@ -6,7 +6,7 @@
 #'
 #' @import bsplus deSolve highcharter lubridate pushbar RColorBrewer readxl 
 #' @import reshape2 scales shiny shinyBS shinycssloaders shinyhelper shinythemes 
-#' @import shinyWidgets tidyverse timevis
+#' @import shinyWidgets tidyverse
 
 comomodel <- function() {
   appDir <- system.file("comoapp", package = "como")

@@ -14,5 +14,5 @@ Depends:
     R (>= 3.6),
     bsplus, deSolve, DT, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
     reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinythemes, 
-    shinyWidgets, tidyverse, timevis
+    shinyWidgets, tidyverse
 RoxygenNote: 7.1.0

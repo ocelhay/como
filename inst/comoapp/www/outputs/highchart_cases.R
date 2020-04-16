@@ -9,7 +9,7 @@ output$highchart_cases <- renderHighchart({
   
   # X/Y scales
   if(input$focus_axis == "Observed")  {
-    max_x <- dta$time[last(which(!is.na(dta$cases)))]
+    max_x <- dta$time[last(which(!is.na(dta$cases))) + 3]
     max_y <- 1.2 * max(dta$cases, na.rm = TRUE)
   }
   if(input$focus_axis == "Predicted Reported")  {

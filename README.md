@@ -25,7 +25,7 @@ if (!require('pacman')) install.packages('pacman', quiet = TRUE)
 
 pacman::p_load(bsplus, DT, deSolve, highcharter, lubridate, pushbar, RColorBrewer, readxl, remotes,
                reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinythemes, 
-               shinyWidgets, tidyverse, timevis)
+               shinyWidgets, tidyverse)
 ```
 
 - If prompted `--- Please select a CRAN mirror for use in this session ---`, select 'Cloud'.

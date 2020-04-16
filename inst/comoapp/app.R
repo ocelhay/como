@@ -31,6 +31,11 @@ ui <- function(request) {
                                                hr()
                               ),
                               fluidRow(
+                                conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
+                                                 div(class = "baseline_left",
+                                                     dateRangeInput("date_range", label = "Range of dates", start = "2020-02-10", end = "2020-09-01")
+                                                 )
+                                ),
                                 column(5,
                                        conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
                                                         br(), 
@@ -48,7 +53,6 @@ ui <- function(request) {
                                                             sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
                                                                         value = 5, post = "%", ticks = FALSE),
                                                             
-                                                            dateRangeInput("date_range", label = "Range of dates", start = "2020-02-10", end = "2020-09-01"),
                                                             br()
                                                         ),
                                                         source("./www/pushbar_parameters_country.R", local = TRUE)[1],
@@ -166,7 +170,7 @@ ui <- function(request) {
                         tabPanel("Model Predictions", value = "tab_modelpredictions",
                                  br(), br(),
                                  div(class = "box_outputs", h4("Timeline")),
-                                 timevisOutput("timeline"),
+                                 plotOutput("timevis"),
                                  conditionalPanel("output.status_app_output == 'Locked Baseline'",
                                                   fluidRow(
                                                     column(6, 
@@ -267,11 +271,10 @@ server <- function(input, output, session) {
   # Process on uploading a file of data/parameters
   observeEvent(input$own_data, {
     file_path <- input$own_data$datapath
+    
     # Cases
     dta <- read_excel(file_path, sheet = "Cases")
     names(dta) <- c("date", "cases", "deaths")
-    
-    shiny_dta <<- dta
     
     cases_rv$data <- dta %>%
       mutate(date = as.Date(date), cumulative_death = cumsum(deaths)) %>%
@@ -284,9 +287,7 @@ server <- function(input, output, session) {
     dta <- read_excel(file_path, sheet = "Severity-Mortality") 
     names(dta) <- c("age_category",	"ifr",	"ihr")
     
-    mort_sever_rv$data <- dta
-    
-    mort_sever_rv$data <- mort_sever_rv$data %>%
+    mort_sever_rv$data <- dta %>%
       mutate(ihr = ihr/100) %>% # starting unit should be % - scaling to a value between 0 and 1
       mutate(ifr = ifr/max(ifr))  # starting unit should be % - scaling to a value between 0 and 1
     
@@ -320,8 +321,8 @@ server <- function(input, output, session) {
       }}
     
     # Update month text slider
-    if(!is_empty(param$Parameter[param$Type == 'slider_text'])) {
-      updateSliderTextInput(session = session, inputId = "phi", selected = month.name[param$Value[param$Parameter == input_excel]])
+    if(!is_empty(param$Parameter[param$Parameter == 'phi'])) {
+      updateSliderTextInput(session = session, inputId = "phi", selected = month.name[param$Value[param$Parameter == "phi"]])
     }
     
     # Update switch
@@ -356,9 +357,9 @@ server <- function(input, output, session) {
     simul_interventions$results <- NULL
     
     source("./www/model.R", local = TRUE)
-    if(! input$lockdown_low_switch) parameters["lockdown_low_on"]<-10e5
-    if(! input$lockdown_mid_switch) parameters["lockdown_mid_on"]<-10e5
-    if(! input$lockdown_high_switch) parameters["lockdown_high_on"]<-10e5
+    if(! input$lockdown_low_switch) parameters["lockdown_low_on"] <- 10e5
+    if(! input$lockdown_mid_switch) parameters["lockdown_mid_on"] <- 10e5
+    if(! input$lockdown_high_switch) parameters["lockdown_high_on"] <- 10e5
     if(! input$selfis_switch) parameters["selfis_on"] <- 10e5
     if(! input$dist_switch) parameters["dist_on"] <- 10e5
     if(! input$hand_switch) parameters["hand_on"] <- 10e5

@@ -48,7 +48,8 @@
 /* Sidebar */
 
 .baseline_left{
-  width: 80%;
+  width: 95%;
+  margin-left: 12px;
 }
 
 .float_buttons{
