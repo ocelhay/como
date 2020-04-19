@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v11.20"
+version_app <- "v11.21"
 
 # Load packages
 source("./www/load_packages.R")

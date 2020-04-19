@@ -1,1 +1,3 @@
-.travis.yml
+^data_preparation$
+^Template_CoMoCOVID-19App\.xlsx$
+^\.travis\.yml$
