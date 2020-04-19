@@ -33,7 +33,7 @@ ui <- function(request) {
                               fluidRow(
                                 conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
                                                  div(class = "baseline_left",
-                                                     dateRangeInput("date_range", label = "Range of dates", start = "2020-02-10", end = "2020-09-01")
+                                                     dateRangeInput("date_range", label = "Range of simulation:", start = "2020-02-10", end = "2020-09-01")
                                                  )
                                 ),
                                 column(5,
@@ -206,6 +206,14 @@ ui <- function(request) {
                                                     ),
                                                     column(6, 
                                                            highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                                                    )
+                                                  ),
+                                                  fluidRow(
+                                                    column(6, 
+                                                           highchartOutput("highchart_Rt_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                                                    ),
+                                                    column(6, 
+                                                           highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
                                                     )
                                                   ),
                                                   div(class = "box_outputs", h4("Model Output Table")),

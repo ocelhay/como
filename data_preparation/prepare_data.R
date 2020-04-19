@@ -1,12 +1,15 @@
-# Prolegomenon ----
-setwd("/Users/olivier/Documents/CoMo/como/data_preparation")
+# From data on raw_data folder, generate data_CoMo.RData to be loaded in the App
+# data_CoMo.RData should be added/updated in the www/data folder of the App
+# about_data.md in the www/markdown folder should be updated to reflect whenever cases data is updated
 
+# Prolegomenon ----
+setwd("/Users/olivier/Documents/CoMo/como/data_preparation/raw_data/")
 library(readxl)
 library(tidyverse)
 
 
 # Cases Data ----
-file <- "COVID-19-geographic-disbtribution-worldwide-2020-04-15.xlsx"
+file <- "COVID-19-geographic-disbtribution-worldwide-2020-04-19.xlsx"
 
 cases <- read_excel(file) %>%
   transmute(date = as.Date(dateRep), cases = cases, deaths = deaths, country = countriesAndTerritories) %>%
@@ -129,7 +132,7 @@ countries_demog <- c("Afghanistan", "Albania", "Algeria", "Angola", "Antigua and
                      "Venezuela (Bolivarian Republic of)", "Viet Nam", "Western Sahara", 
                      "Yemen", "Zambia", "Zimbabwe")
 
-population <- read_excel("population_data/WPP2019_POP_F07_1_POPULATION_BY_AGE_BOTH_SEXES.xlsx", 
+population <- read_excel("population_UN/WPP2019_POP_F07_1_POPULATION_BY_AGE_BOTH_SEXES.xlsx", 
                          sheet = 1, skip = 16) %>%
   filter(Type == "Country/Area", `Reference date (as of 1 July)` == 2020) %>%
   rename(country = `Region, subregion, country or area *`) %>%
@@ -139,7 +142,7 @@ population <- read_excel("population_data/WPP2019_POP_F07_1_POPULATION_BY_AGE_BO
   mutate(age_category = factor(age_category, levels = age_categories))
 
 
-population_birth <- read_excel("population_data/WPP2019_FERT_F06_BIRTHS_BY_AGE_OF_MOTHER.xlsx", 
+population_birth <- read_excel("population_UN/WPP2019_FERT_F06_BIRTHS_BY_AGE_OF_MOTHER.xlsx", 
                                sheet = 1, skip = 16) %>%
   filter(Type == "Country/Area", Period == "2015-2020") %>%
   rename(country = `Region, subregion, country or area *`) %>%
@@ -150,7 +153,7 @@ population_birth <- read_excel("population_data/WPP2019_FERT_F06_BIRTHS_BY_AGE_O
   complete(country, age_category, fill = list(birth = 0))
 
 
-population_death <- read_excel("population_data/WPP2019_MORT_F04_1_DEATHS_BY_AGE_BOTH_SEXES.xlsx", 
+population_death <- read_excel("population_UN/WPP2019_MORT_F04_1_DEATHS_BY_AGE_BOTH_SEXES.xlsx", 
                                sheet = 1, skip = 16) %>%
   filter(Type == "Country/Area", Period == "2015-2020") %>%
   rename(country = `Region, subregion, country or area *`) %>%
@@ -175,4 +178,4 @@ population <- population %>%
 save(cases, mort_sever_default,
      contact_home, contact_work, contact_school, contact_other,
      age_categories, countries_demog, population,
-     file = "data_CoMo.RData")
+     file = "../data_CoMo.RData")
