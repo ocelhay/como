@@ -180,6 +180,7 @@ parameters <- c(
   quarantine_cov = input$quarantine_cov,
   quarantine_dur = input$quarantine_dur,
   quarantine_days = input$quarantine_days,
+  quarantine_effort = input$quarantine_effort,
   quarantine_eff_home = input$quarantine_eff_home,
   quarantine_eff_other = input$quarantine_eff_other,
   
