@@ -19,7 +19,7 @@ list(
                    sliderInput("amp", label = "Annual variation in infectivity of the virus:", post = "%", ticks = FALSE,
                                value = 0, min = 0, max = 100, step = 1),
                    sliderInput("omega", label = "Average duration of immunity:", post = " years", ticks = FALSE,
-                               value = 150, min = 0.5, max = 150, step = 0.5)
+                               value = 150, min = 0.5, max = 200, step = 0.5)
                    
             ),
             column(4,  

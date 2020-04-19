@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v11.21"
+version_app <- "v12.01"
 
 # Load packages
 source("./www/load_packages.R")
@@ -25,8 +25,8 @@ ui <- function(request) {
              conditionalPanel("input.tabs != 'tab_welcome'",
                               br(), 
                               conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
-                                               p("Use customised data/ update default parameters:", a("download the template", href = "https://www.dropbox.com/s/zeysa1jle0yj9zx/Template_data_comomodel_v11.xlsx?dl=1", target = "_blank"), 
-                                                 ", edit it and upload below."),
+                                               p("Use customised data/update default parameters: ", a("download the file 'Template_CoMo_App.xlsx' on the GitHub repository", href = "https://github.com/ocelhay/como", target = "_blank"), 
+                                                 ", edit it and upload it below."),
                                                fileInput("own_data", label = NULL, accept = ".xlsx", multiple = FALSE),
                                                hr()
                               ),
@@ -52,7 +52,8 @@ ui <- function(request) {
                                                                         value = 2.5, post = "%", ticks = FALSE),
                                                             sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
                                                                         value = 5, post = "%", ticks = FALSE),
-                                                            
+                                                            sliderInput("reporth", label = span("Percentage of all infections requiring hospitalisation that are actually admitted to hospital:"), min = 0, max = 100, step = 0.1,
+                                                                        value = 50, post = "%", ticks = FALSE),
                                                             br()
                                                         ),
                                                         source("./www/pushbar_parameters_country.R", local = TRUE)[1],
