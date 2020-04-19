@@ -25,7 +25,7 @@ ui <- function(request) {
              conditionalPanel("input.tabs != 'tab_welcome'",
                               br(), 
                               conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
-                                               p("Use customised data/update default parameters: ", a("download the file 'Template_CoMo_App.xlsx' on the GitHub repository", href = "https://github.com/ocelhay/como", target = "_blank"), 
+                                               p("Use customised data/update default parameters: ", a("download the file 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
                                                  ", edit it and upload it below."),
                                                fileInput("own_data", label = NULL, accept = ".xlsx", multiple = FALSE),
                                                hr()
