@@ -16,7 +16,9 @@ div(class = "interventions", id = 'interventions_quarantine',
                                                       sliderInput("quarantine_days", label = "Days in isolation for average person:", value = 14, min = 1, max = 21,
                                                                   step = 1, post = " days", ticks = FALSE),
                                                       sliderInput("quarantine_cov", label = "Coverage of quarantine:", value = 70, min = 0, max = 100,
-                                                                  step = 1, post = "%", ticks = FALSE)
+                                                                  step = 1, post = "%", ticks = FALSE),
+                                                      sliderInput("quarantine_effort", label = "Days to implement maximum quarantine coverage:", value = 2, 
+                                                                  min = 1, max = 5, step = 1, post = "%", ticks = FALSE)
                                                       
                                                ),
                                                column(6,
