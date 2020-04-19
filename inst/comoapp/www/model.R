@@ -465,7 +465,6 @@ covid<-function(t, Y, parameters)
          npdeath_icuc<-pdeath_icuc*(1-prob_vent)+prob_vent*pdeath_ventc
          
          # ODE system
-         # ODE system
          dSdt <- -S*lam-S*vaccinate+omega*R+ageing%*%S-mort*S+birth-quarantine_rate*S +(1/quarantine_days)*QS
          dEdt <- S*lam-gamma*E+ageing%*%E-mort*E + (1-vaccine_eff)*lam*V-quarantine_rate*E+(1/quarantine_days)*QE
          dIdt <- gamma*(1-pclin)*(1-ihr[,2])*E-nui*I+ageing%*%I-mort*I + (1/quarantine_days)*QI - quarantine_rate*I
