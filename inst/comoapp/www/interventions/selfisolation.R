@@ -25,9 +25,9 @@ div(class = "interventions", id = 'interventions_selfis',
                                                                        sliderInput("screen_dur", label = "Duration of screening:", value = 32, min = 1, max = 52,
                                                                                    step = 1, post = " weeks", ticks = FALSE),
                                                                        sliderInput("screen_overdispersion", label = "Overdispersion of cases around index case. If  1 likelihood same as general population:", value = 4, min = 1, max = 5,
-                                                                                   step = 0.2, post = " weeks", ticks = FALSE),
+                                                                                   step = 0.2, ticks = FALSE),
                                                                        sliderInput("screen_contacts", label = "Number of contacts screened per index case:", value = 4, min = 1, max = 10,
-                                                                                   step = 1, post = " weeks", ticks = FALSE)
+                                                                                   step = 1, post = " contacts", ticks = FALSE)
                                                       )
                                                )
                                              )
