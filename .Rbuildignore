@@ -1,5 +1,6 @@
 ^data_preparation$
 ^raw_data$
+^original_model$
 ^Template_CoMoCOVID-19App\.xlsx$
 ^\.travis\.yml$
 ^appveyor\.yml$
