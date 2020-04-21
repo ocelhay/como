@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v12.01"
+version_app <- "v12.02"
 
 # Load packages
 source("./www/load_packages.R")
@@ -26,14 +26,14 @@ ui <- function(request) {
                               br(), 
                               conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
                                                p("Use customised data/update default parameters: ", a("download the file 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
-                                                 ", edit it and upload it below."),
-                                               fileInput("own_data", label = NULL, accept = ".xlsx", multiple = FALSE),
+                                                 ", edit it and upload it."),
+                                               fileInput("own_data", label = "Upload your template", accept = ".xlsx", multiple = FALSE),
                                                hr()
                               ),
                               fluidRow(
                                 conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
                                                  div(class = "baseline_left",
-                                                     dateRangeInput("date_range", label = "Range of simulation:", start = "2020-02-10", end = "2020-09-01")
+                                                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01")
                                                  )
                                 ),
                                 column(5,
@@ -69,7 +69,7 @@ ui <- function(request) {
                                                             source("./www/interventions/lockdown.R", local = TRUE)$value,
                                                             # Self Isolation ----
                                                             source("./www/interventions/selfisolation.R", local = TRUE)$value,
-                                                            bsPopover("interventions_selfis", title='Self-isolation', "<p>Coverages gives the proportion of people whom self-isolate after testing positive for coronavirus. The efficacy indicates how many less infectious contacts isolating people have (across all contact matrices).</p>", 
+                                                            bsPopover("interventions_selfis", title='Self-isolation', "<p>Coverage gives the proportion of people whom self-isolate after testing positive for coronavirus. The efficacy indicates how many less infectious contacts isolating people have (across all contact matrices).</p>", 
                                                                       "top", trigger='hover', options = list(container = "body")),
                                                             # Social Distancing ----
                                                             source("./www/interventions/socialdistancing.R", local = TRUE)$value,
@@ -81,7 +81,7 @@ ui <- function(request) {
                                                                       "top", trigger='hover', options = list(container = "body")),
                                                             # Working from Home ----
                                                             source("./www/interventions/work.R", local = TRUE)$value,
-                                                            bsPopover("interventions_work", title='Working at home', "<p>Sets the proportion of workers working from home. Those who don’t, have a reduction in contacts at work defined by efficacy. Those who work at home have increased contacts at home defined by w2h.</p>", 
+                                                            bsPopover("interventions_work", title='Working at home', "<p>Sets the proportion of workers working from home. Those who don’t from home have a reduction in contacts at work defined by efficacy. Those who work at home have increased contacts at home defined by w2h.</p>", 
                                                                       "top", trigger='hover', options = list(container = "body")),
                                                             # School Closure ----
                                                             source("./www/interventions/school.R", local = TRUE)$value,
@@ -93,7 +93,7 @@ ui <- function(request) {
                                                                       "top", trigger='hover', options = list(container = "body")),
                                                             # Travel Ban ----
                                                             source("./www/interventions/travel.R", local = TRUE)$value,
-                                                            bsPopover("interventions_travelban", title='Travel ban', "<p>Reduced the number of imported cases per day by a percentage given by efficacy.</p>", 
+                                                            bsPopover("interventions_travelban", title='Travel ban', "<p>Reduces the number of imported cases per day by a percentage given by efficacy.</p>", 
                                                                       "bottom", trigger='hover', options = list(container = "body")),
                                                             # Quarantine ----
                                                             source("./www/interventions/quarantine.R", local = TRUE)$value,
