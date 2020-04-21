@@ -6,7 +6,7 @@ list(
                    numericInput("beds_available", label = "Maximum number of hospital beds:", value = 80000, min = 1),
                    numericInput("icu_beds_available", label = "Maximum number of ICU beds:", value = 8000, min = 1),
                    numericInput("ventilators_available", label = "Maximum number of ventilators:", value = 6000, min = 1),
-                   sliderInput("rhos", label = "Relative level of contacts from severely ill patients:", post = "%", ticks = FALSE,
+                   sliderInput("rhos", label = "Relative percentage of regular daily contacts when hospitalised:", post = "%", ticks = FALSE,
                                value = 15, min = 0, max = 100, step = 1),
                    sliderInput("ihr_scaling", label = "Scaling factor for infection hospitalisation rate:", ticks = FALSE,
                                value = 1, min = 1, max = 4, step = 1)

@@ -511,8 +511,8 @@ covid<-function(t, Y, parameters)
          dCdt <- report*gamma*(1-pclin)*(1-ihr[,2])*(E+QE)+reportc*gamma*pclin*(1-ihr[,2])*(E+QE)+ 
            gamma*ihr[,2]*(1-critH)*(1-prob_icu)*(E+QE)+gamma*ihr[,2]*critH*reporth*(1-prob_icu)*(E+QE)+
            gamma*ihr[,2]*prob_icu*(E+QE)
-         dCMdt<- nus*pdeath_h*ifr[,2]*H + nusc*pdeath_hc*ifr[,2]*HC + nu_icu*pdeath_icu*ifr[,2]*ICU + nu_icuc*pdeath_icuc*ifr[,2]*ICUC +  nu_vent*pdeath_vent*ifr[,2]*Vent + nu_ventc*pdeath_ventc*ifr[,2]*VentC + 
-           mort*H + mort*HC + mort*ICU + mort*ICUC + mort*Vent + mort*VentC + mort*I + mort*X
+         dCMdt<- nus*pdeath_h*ifr[,2]*H + nusc*pdeath_hc*ifr[,2]*HC + nu_icu*pdeath_icu*ifr[,2]*ICU + nu_icuc*pdeath_icuc*ifr[,2]*ICUC + nu_vent*pdeath_vent*ifr[,2]*Vent + nu_ventc*pdeath_ventc*ifr[,2]*VentC +
+           mort*H + mort*HC + mort*ICU + mort*ICUC + mort*Vent + mort*VentC
          dCMCdt <- nusc*pdeath_hc*ifr[,2]*HC+nu_icuc*pdeath_icuc*ifr[,2]*ICUC + nu_ventc*pdeath_ventc*ifr[,2]*VentC + 
            mort*HC + mort*ICUC + mort*VentC
          
@@ -625,12 +625,12 @@ process_ode_outcome <- function(out){
     Rt1[i]<-cumsum(sum(parameters["gamma"]*out[i,(Eindex+1)]))/cumsum(sum(parameters["gamma"]*out[(i-1/parameters["nui"]),(Eindex+1)]))
   }
   
+  
   # Export in a cohesive format ----
   results <- list()
   results$time <- time  # dates
   results$Rt <- c(NA, Rt1)
   results$cum_mortality <- round(cmortality1)  # cumulative mortality
-  results$total_deaths <- round(last(cmortality1))  # total deaths at the end of the simulation
   results$pct_total_pop_infected <- round(100 * tail(cumsum(rowSums(parameters["gamma"]*out[,(Eindex+1)])),1)/sum(popstruc[,2]), 1)  # proportion of the  population that has been infected at the end of the simulation
   results$doubling_time <- round(log(2)*7 / (log(dailyinc1[2+7] / dailyinc1[2])), 2)  # (Baseline only) to double the number of infections at inception
   results$required_beds <- round(previcureq1)  # required beds
@@ -640,12 +640,16 @@ process_ode_outcome <- function(out){
   results$hospital_surge_beds <- round(previcureq1)
   results$icu_beds <- round(previcureq21)
   results$ventilators <- round(previcureq31)
+  
   results$death_treated_hospital <- round(cinc_mort_H1)
   results$death_treated_icu <- round(cinc_mort_ICU1)
   results$death_treated_ventilator <- round(cinc_mort_Vent1)
   results$death_untreated_hospital <- round(cinc_mort_HC1)
   results$death_untreated_icu <- round(cinc_mort_ICUC1)
   results$death_untreated_ventilator <- round(cinc_mort_VentC1)
+  results$total_deaths <- results$death_treated_hospital + results$death_treated_icu + results$death_treated_ventilator +
+    results$death_untreated_hospital + results$death_untreated_icu + results$death_untreated_ventilator
+  results$total_deaths_end <- last(results$total_deaths)
   
   return(results)
 }
