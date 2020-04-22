@@ -27,7 +27,7 @@ ui <- function(request) {
                               conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
                                                p("Use customised data/update default parameters: ", a("download the file 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
                                                  ", edit it and upload it."),
-                                               fileInput("own_data", label = "Upload your template", accept = ".xlsx", multiple = FALSE),
+                                               fileInput("own_data", label = "Upload your v12-B template", accept = ".xlsx", multiple = FALSE),
                                                hr()
                               ),
                               fluidRow(
