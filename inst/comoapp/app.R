@@ -107,14 +107,15 @@ ui <- function(request) {
                                 ),
                               ),
                               br(), br(), br(), br(), br(), br(), br(),
-                              div(class = "float_buttons",
+                              div(id = "float_action",
                                   conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
                                                    htmlOutput("feedback_choices")
                                   ),
                                   fluidRow(
                                     column(6, 
                                            conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
-                                                            actionButton("run_baseline", "Run Baseline", class="btn btn-success"))
+                                                            div(class = "front_btn", actionButton("run_baseline", "Run Baseline", class="btn btn-success"))
+                                           )
                                     ),
                                     column(6, 
                                            conditionalPanel("output.status_app_output == 'Ok Baseline'",
