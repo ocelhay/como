@@ -14,12 +14,12 @@ output$highchart_deaths_dual_baseline <- renderHighchart({
   max_y <- max(simul_baseline$results$total_deaths, simul_interventions$results$total_deaths)
   
   hchart(dta, type = "area", name = "Death Treated Hospital", color = "#66c2a5", hcaes(x = time, y = death_treated_hospital)) %>%
-    hc_add_series(dta, type = 'area', name = "Death Treated ICU", color = "#3288bd", hcaes(x = time, y = death_treated_icu)) %>%
-    hc_add_series(dta, type = 'area', name = "Death Treated Ventilator", color = "#5e4fa2", hcaes(x = time, y = death_treated_ventilator)) %>%
+    hc_add_series(dta, type = 'area', name = "Death Treated ICU no Ventilator", color = "#3288bd", hcaes(x = time, y = death_treated_icu)) %>%
+    hc_add_series(dta, type = 'area', name = "Death Treated ICU and Ventilator", color = "#5e4fa2", hcaes(x = time, y = death_treated_ventilator)) %>%
     
     hc_add_series(dta, type = 'area', name = "Death Untreated Hospital", color = "#fdae61", hcaes(x = time, y = death_untreated_hospital)) %>%
-    hc_add_series(dta, type = 'area', name = "Death Untreated ICU", color = "#d53e4f", hcaes(x = time, y = death_untreated_icu)) %>%
-    hc_add_series(dta, type = 'area', name = "Death Untreated Ventilator", color = "#9e0142", hcaes(x = time, y = death_untreated_ventilator)) %>%
+    hc_add_series(dta, type = 'area', name = "Death Untreated ICU no Ventilator", color = "#d53e4f", hcaes(x = time, y = death_untreated_icu)) %>%
+    hc_add_series(dta, type = 'area', name = "Death Untreated ICU and Ventilator", color = "#9e0142", hcaes(x = time, y = death_untreated_ventilator)) %>%
     hc_add_series(dta, type = 'line', name = "Total Death", color = "black", hcaes(x = time, y = total_deaths)) %>%
     hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
              {point.y:,.0f} deaths<br/>",shared = TRUE) %>%
@@ -45,12 +45,12 @@ output$highchart_deaths_dual_interventions <- renderHighchart({
   max_y <- max(simul_baseline$results$total_deaths, simul_interventions$results$total_deaths)
   
   hchart(dta, type = "area", name = "Death Treated Hospital", color = "#66c2a5", hcaes(x = time, y = death_treated_hospital)) %>%
-    hc_add_series(dta, type = 'area', name = "Death Treated ICU", color = "#3288bd", hcaes(x = time, y = death_treated_icu)) %>%
-    hc_add_series(dta, type = 'area', name = "Death Treated Ventilator", color = "#5e4fa2", hcaes(x = time, y = death_treated_ventilator)) %>%
+    hc_add_series(dta, type = 'area', name = "Death Treated ICU no Ventilator", color = "#3288bd", hcaes(x = time, y = death_treated_icu)) %>%
+    hc_add_series(dta, type = 'area', name = "Death Treated ICU and Ventilator", color = "#5e4fa2", hcaes(x = time, y = death_treated_ventilator)) %>%
     
     hc_add_series(dta, type = 'area', name = "Death Untreated Hospital", color = "#fdae61", hcaes(x = time, y = death_untreated_hospital)) %>%
-    hc_add_series(dta, type = 'area', name = "Death Untreated ICU", color = "#d53e4f", hcaes(x = time, y = death_untreated_icu)) %>%
-    hc_add_series(dta, type = 'area', name = "Death Untreated Ventilator", color = "#9e0142", hcaes(x = time, y = death_untreated_ventilator)) %>%
+    hc_add_series(dta, type = 'area', name = "Death Untreated ICU no Ventilator", color = "#d53e4f", hcaes(x = time, y = death_untreated_icu)) %>%
+    hc_add_series(dta, type = 'area', name = "Death Untreated ICU and Ventilator", color = "#9e0142", hcaes(x = time, y = death_untreated_ventilator)) %>%
     hc_add_series(dta, type = 'line', name = "Total Death", color = "black", hcaes(x = time, y = total_deaths)) %>%
     hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
              {point.y:,.0f} deaths<br/>", shared = TRUE) %>%
