@@ -349,8 +349,13 @@ server <- function(input, output, session) {
     
     # Update date range of simulation
     if(!is_empty(param$Parameter[param$Type == 'date_range_simul'])) {
-    updateDateRangeInput(session, inputId = "date_range" , label = NULL, start = param$Value_Date[param$Parameter == "date_range_simul_start"], 
+    updateDateRangeInput(session, inputId = "date_range", start = param$Value_Date[param$Parameter == "date_range_simul_start"], 
                          end = param$Value_Date[param$Parameter == "date_range_simul_end"])
+    }
+    
+    # Update social contact
+    if(!is_empty(param$Parameter[param$Type == 'picker'])) {
+      updatePickerInput(session, inputId = "country_contact", selected = param$Value_Country[param$Parameter == "country_contact"])
     }
   })
   
