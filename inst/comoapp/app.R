@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v12.02"
+version_app <- "v12.03"
 
 # Load packages
 source("./www/load_packages.R")
@@ -310,7 +310,8 @@ server <- function(input, output, session) {
     updatePickerInput(session, inputId = "country", selected = "-- Own Value ---")
     
     # Parameters
-    param <- bind_rows(read_excel(file_path, sheet = "Country Area Parameters"),
+    param <- bind_rows(read_excel(file_path, sheet = "Parameters"),
+                       read_excel(file_path, sheet = "Country Area Parameters"),
                        read_excel(file_path, sheet = "Virus Parameters"),
                        read_excel(file_path, sheet = "Hospitalisation Parameters"),
                        read_excel(file_path, sheet = "Interventions")) %>%
@@ -345,6 +346,12 @@ server <- function(input, output, session) {
       for (input_excel in param$Parameter[param$Type == 'date']){
         updateDateInput(session = session, inputId = input_excel, value = param$Value_Date[param$Parameter == input_excel])
       }}
+    
+    # Update date range of simulation
+    if(!is_empty(param$Parameter[param$Type == 'date_range_simul'])) {
+    updateDateRangeInput(session, inputId = "date_range" , label = NULL, start = param$Value_Date[param$Parameter == "date_range_simul_start"], 
+                         end = param$Value_Date[param$Parameter == "date_range_simul_end"])
+    }
   })
   
   # Process on "reset_baseline" ----
