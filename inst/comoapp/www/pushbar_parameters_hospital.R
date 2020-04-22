@@ -8,7 +8,7 @@ list(
                    numericInput("ventilators_available", label = "Maximum number of ventilators:", value = 6000, min = 1),
                    sliderInput("rhos", label = "Relative percentage of regular daily contacts when hospitalised:", post = "%", ticks = FALSE,
                                value = 15, min = 0, max = 100, step = 1),
-                   sliderInput("ihr_scaling", label = "Scaling factor for infection hospitalisation rate:", ticks = FALSE,
+                   sliderInput("ihr_scaling", label = "Scaling factor for infection hospitalisation rate: (NOT USED IN CURRENT VERSION)", ticks = FALSE,
                                value = 1, min = 1, max = 4, step = 1)
             ),
             column(4,

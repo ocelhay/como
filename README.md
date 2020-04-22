@@ -1,6 +1,6 @@
 <!-- badges: start -->
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![](https://img.shields.io/badge/devel%20version-12.02-blue.svg)](https://github.com/ocelhay/como)
+[![](https://img.shields.io/badge/devel%20version-12.3-blue.svg)](https://github.com/ocelhay/como)
 [![Build Status](https://travis-ci.org/ocelhay/como.svg?branch=master)](https://travis-ci.org/ocelhay/como)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/ocelhay/como?branch=master&svg=true)](https://ci.appveyor.com/project/ocelhay/como)
 <!-- badges: end -->
@@ -25,7 +25,7 @@ The [App is online](https://comomodel.net) but can also be run locally. Follow t
 
 ### Install Offline App
 
-- Download and install R (any version above 3.6.1) — https://cran.r-project.org.
+- [Download and install R](https://cran.r-project.org) (any version above 3.6.1)
 - Open R and run in the console:
 
 ```

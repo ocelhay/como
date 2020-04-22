@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v12.02"
+version_app <- "v12.3"
 
 # Load packages
 source("./www/load_packages.R")
@@ -27,7 +27,7 @@ ui <- function(request) {
                               conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
                                                p("Use customised data/update default parameters: ", a("download the file 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
                                                  ", edit it and upload it."),
-                                               fileInput("own_data", label = "Upload your template", accept = ".xlsx", multiple = FALSE),
+                                               fileInput("own_data", label = span("Upload your ", icon("exclamation-triangle"), " v12-B template."), accept = ".xlsx", multiple = FALSE),
                                                hr()
                               ),
                               fluidRow(
@@ -107,14 +107,15 @@ ui <- function(request) {
                                 ),
                               ),
                               br(), br(), br(), br(), br(), br(), br(),
-                              div(class = "float_buttons",
+                              div(id = "float_action",
                                   conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
                                                    htmlOutput("feedback_choices")
                                   ),
                                   fluidRow(
                                     column(6, 
                                            conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
-                                                            actionButton("run_baseline", "Run Baseline", class="btn btn-success"))
+                                                            div(class = "front_btn", actionButton("run_baseline", "Run Baseline", class="btn btn-success"))
+                                           )
                                     ),
                                     column(6, 
                                            conditionalPanel("output.status_app_output == 'Ok Baseline'",
@@ -310,7 +311,8 @@ server <- function(input, output, session) {
     updatePickerInput(session, inputId = "country", selected = "-- Own Value ---")
     
     # Parameters
-    param <- bind_rows(read_excel(file_path, sheet = "Country Area Parameters"),
+    param <- bind_rows(read_excel(file_path, sheet = "Parameters"),
+                       read_excel(file_path, sheet = "Country Area Parameters"),
                        read_excel(file_path, sheet = "Virus Parameters"),
                        read_excel(file_path, sheet = "Hospitalisation Parameters"),
                        read_excel(file_path, sheet = "Interventions")) %>%
@@ -345,6 +347,17 @@ server <- function(input, output, session) {
       for (input_excel in param$Parameter[param$Type == 'date']){
         updateDateInput(session = session, inputId = input_excel, value = param$Value_Date[param$Parameter == input_excel])
       }}
+    
+    # Update date range of simulation
+    if(!is_empty(param$Parameter[param$Type == 'date_range_simul'])) {
+    updateDateRangeInput(session, inputId = "date_range", start = param$Value_Date[param$Parameter == "date_range_simul_start"], 
+                         end = param$Value_Date[param$Parameter == "date_range_simul_end"])
+    }
+    
+    # Update social contact
+    if(!is_empty(param$Parameter[param$Type == 'picker'])) {
+      updatePickerInput(session, inputId = "country_contact", selected = param$Value_Country[param$Parameter == "country_contact"])
+    }
   })
   
   # Process on "reset_baseline" ----

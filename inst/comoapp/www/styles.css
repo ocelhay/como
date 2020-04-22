@@ -2,15 +2,10 @@
   color: red;
 }
 
-.largeh3{
-  font-size: 1.4em;
-}
-
-
 /* Pushbar */
 .pushbar.from_right {
 	width: 75%; !important;
-	z-index: 99999;
+	z-index: 9;
 }
 
 .closebutton{
@@ -19,11 +14,11 @@
   position: fixed;
 }
 
-/* Floating feedback */
+/* Floating feedback 
 #float_feedback_process {
   top: calc(1%);;
   left: calc(2%);;
-  z-index: 9999;
+  z-index: 99;
   position: fixed;
   padding: 10px 10px 5px 5px;
   border-radius: 5px;
@@ -34,6 +29,7 @@
   border-color: red;
   border-width: 5px;
 }
+*/
 
 #css_feedback_process {
   padding: 10px 10px 5px 5px;
@@ -52,7 +48,7 @@
   margin-left: 12px;
 }
 
-.float_buttons{
+#float_action{
   bottom: calc(2%);;
   left: calc(2%);;
   border-radius: 5px;
@@ -62,6 +58,10 @@
   width: 30%;
   z-index: 999;
   position: fixed;
+}
+
+.front_btn{
+  z-index: 9999;
 }
 
 
