@@ -114,19 +114,19 @@ ui <- function(request) {
                                   fluidRow(
                                     column(6, 
                                            conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
-                                                            actionButton("run_baseline", "Run Baseline"))
+                                                            actionButton("run_baseline", "Run Baseline", class="btn btn-success"))
                                     ),
                                     column(6, 
                                            conditionalPanel("output.status_app_output == 'Ok Baseline'",
-                                                            actionButton("validate_baseline", span(icon("thumbs-up"), " Validate Baseline")),
+                                                            actionButton("validate_baseline", span(icon("thumbs-up"), " Validate Baseline"), class="btn btn-success"),
                                            )
                                     )
                                   ),
                                   conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline')  && input.tabs == 'tab_visualfit'", 
-                                                   actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"))
+                                                   actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success")
                                   ),
                                   conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_modelpredictions'",
-                                                   actionButton("run_interventions", "Run Future Scenarios")
+                                                   actionButton("run_interventions", "Run Future Scenarios", class="btn btn-success")
                                   ),
                               )
              )
