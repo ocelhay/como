@@ -171,57 +171,63 @@ ui <- function(request) {
                         ),
                         tabPanel("Model Predictions", value = "tab_modelpredictions",
                                  br(), br(),
-                                 div(class = "box_outputs", h4("Timeline")),
-                                 plotOutput("timevis"),
+                                 
+                                 
                                  conditionalPanel("output.status_app_output == 'Locked Baseline'",
-                                                  fluidRow(
-                                                    column(6, 
-                                                           div(class = "box_outputs", h4("Baseline")),
-                                                           htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
-                                                           htmlOutput("text_total_death_baseline") %>% withSpinner(),
-                                                    ),
-                                                    column(6, 
-                                                           div(class = "box_outputs", h4("Future Scenarios")),
-                                                           htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
-                                                           htmlOutput("text_total_death_interventions") %>% withSpinner()
-                                                    ),
-                                                  ),
-                                                  br(),
-                                                  prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
-                                                                     selected = "Predicted Reported + Unreported", inline = TRUE),
-                                                  fluidRow(
-                                                    column(6, 
-                                                           highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                                                           highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br()
-                                                    ),
-                                                    column(6, 
-                                                           highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                                                           highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br()
-                                                    )
-                                                  ),
-                                                  prettyRadioButtons("focus_requirements", label = "Focus on:", 
-                                                                     choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
-                                                                     selected = "No Focus", inline = TRUE),
-                                                  fluidRow(
-                                                    column(6, 
-                                                           highchartOutput("highchart_requirements_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                                                    ),
-                                                    column(6, 
-                                                           highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                                                    )
-                                                  ),
-                                                  fluidRow(
-                                                    column(6, 
-                                                           highchartOutput("highchart_Rt_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                                                    ),
-                                                    column(6, 
-                                                           highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                                                    )
-                                                  ),
-                                                  div(class = "box_outputs", h4("Model Output Table")),
-                                                  DTOutput("table_results")
-                                                  
-                                                  
+                                                  div(class = "box_outputs", h4("Timeline")),
+                                                  plotOutput("timevis"),
+                                                  conditionalPanel("output.status_app_output == 'Locked Baseline'",
+                                                                   fluidRow(
+                                                                     column(6,
+                                                                            div(class = "box_outputs", h4("Baseline")),
+                                                                            htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
+                                                                            htmlOutput("text_total_death_baseline") %>% withSpinner(),
+                                                                     ),
+                                                                     column(6,
+                                                                            div(class = "box_outputs", h4("Future Scenarios")),
+                                                                            htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
+                                                                            htmlOutput("text_total_death_interventions") %>% withSpinner()
+                                                                     ),
+                                                                   ),
+                                                                   br(),
+                                                                   materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days — ', tags$small("You can either display only Monday data (Default) or all days in the plots/table (Slower)")), value = FALSE,
+                                                                                  status = "danger", right = TRUE, inline = FALSE, width = "100%"),
+                                                                   br(),
+                                                                   prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
+                                                                                      selected = "Predicted Reported + Unreported", inline = TRUE),
+                                                                   fluidRow(
+                                                                     column(6,
+                                                                            highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                                                                            highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br()
+                                                                     ),
+                                                                     column(6,
+                                                                            highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                                                                            highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br()
+                                                                     )
+                                                                   ),
+                                                                   prettyRadioButtons("focus_requirements", label = "Focus on:", 
+                                                                                      choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
+                                                                                      selected = "No Focus", inline = TRUE),
+                                                                   fluidRow(
+                                                                     column(6, 
+                                                                            highchartOutput("highchart_requirements_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                                                                     ),
+                                                                     column(6, 
+                                                                            highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                                                                     )
+                                                                   ),
+                                                                   fluidRow(
+                                                                     column(6, 
+                                                                            highchartOutput("highchart_Rt_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                                                                     ),
+                                                                     column(6, 
+                                                                            highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                                                                     )
+                                                                   ),
+                                                                   div(class = "box_outputs", h4("Model Output Table")),
+                                                                   DTOutput("table_results")
+                                                                   
+                                                  )                
                                  )
                         )
              )
@@ -350,8 +356,8 @@ server <- function(input, output, session) {
     
     # Update date range of simulation
     if(!is_empty(param$Parameter[param$Type == 'date_range_simul'])) {
-    updateDateRangeInput(session, inputId = "date_range", start = param$Value_Date[param$Parameter == "date_range_simul_start"], 
-                         end = param$Value_Date[param$Parameter == "date_range_simul_end"])
+      updateDateRangeInput(session, inputId = "date_range", start = param$Value_Date[param$Parameter == "date_range_simul_start"], 
+                           end = param$Value_Date[param$Parameter == "date_range_simul_end"])
     }
     
     # Update social contact
@@ -482,6 +488,8 @@ server <- function(input, output, session) {
         future_scenario_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator)
       
       dta <- left_join(dta, dta_interventions, by = "date") }
+    
+    if (!input$show_all_days) dta <- dta %>% filter(wday(date) == 2)
     
     return(dta)
   })
