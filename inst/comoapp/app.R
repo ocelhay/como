@@ -87,9 +87,9 @@ ui <- function(request) {
                                                             source("./www/interventions/school.R", local = TRUE)$value,
                                                             bsPopover("interventions_school", title='School closure', "<p>We assume all schools close at the same time. Efficacy defines the reduction of contacts between school children when school is closed. Children at home have increased home contacts given by s2h.</p>", 
                                                                       "top", trigger='hover', options = list(container = "body")),
-                                                            # Cocooning the elderly ----
+                                                            # Cocooning/Shielding the elderly ----
                                                             source("./www/interventions/cocoon.R", local = TRUE)$value,
-                                                            bsPopover("interventions_cocoon", title='Cocooning the elderly', "<p>Defining an age cut-off, this intervention is designed to isolate a proportion (coverage) of the elderly population and reduce their overall contacts by efficacy.</p>", 
+                                                            bsPopover("interventions_cocoon", title='Shielding the elderly', "<p>Defining an age cut-off, this intervention is designed to isolate a proportion (coverage) of the elderly population and reduce their overall contacts by efficacy.</p>", 
                                                                       "top", trigger='hover', options = list(container = "body")),
                                                             # Travel Ban ----
                                                             source("./www/interventions/travel.R", local = TRUE)$value,
