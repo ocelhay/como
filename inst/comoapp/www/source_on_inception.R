@@ -1,3 +1,21 @@
+library(bsplus)
+library(deSolve)
+library(DT)
+library(highcharter)
+library(lubridate)
+library(pushbar)
+library(readxl)
+library(reshape2)
+library(scales)
+library(shiny)
+library(shinyBS)
+library(shinycssloaders)
+library(shinyhelper)
+library(shinythemes)
+library(shinyWidgets)
+library(tidyverse)
+
+
 load(file = "./www/data/data_CoMo.RData")
 
 # choices of countries for cases
