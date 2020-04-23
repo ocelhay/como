@@ -7,7 +7,7 @@ div(class = "interventions", id = 'interventions_cocoon',
       column(width = 3,
              conditionalPanel("input.cocoon_switch",
                               dropdownButton(label = "", circle = FALSE, status = "default", size = 'sm', icon = icon("gear"), 
-                                             width = "400px", tooltip = FALSE, right = FALSE, up = TRUE,
+                                             width = "400px", tooltip = FALSE, right = FALSE, up = FALSE,
                                              fluidRow(
                                                column(12,
                                                       dateInput("date_cocoon_on", label = "Start Date:", value = "2020-04-01"),
