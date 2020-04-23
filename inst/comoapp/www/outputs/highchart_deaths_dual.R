@@ -11,7 +11,7 @@ output$highchart_deaths_dual_baseline <- renderHighchart({
                 death_untreated_ventilator = simul_baseline$results$death_untreated_ventilator,
                 total_deaths = simul_baseline$results$total_deaths)
   
-  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 2)
+  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
   max_y <- max(simul_baseline$results$total_deaths, simul_interventions$results$total_deaths)
   
@@ -44,7 +44,7 @@ output$highchart_deaths_dual_interventions <- renderHighchart({
                 death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator,
                 total_deaths = simul_interventions$results$total_deaths)
   
-  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 2)
+  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
   max_y <- max(simul_baseline$results$total_deaths, simul_interventions$results$total_deaths)
   

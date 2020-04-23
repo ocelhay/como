@@ -6,7 +6,7 @@ output$highchart_Rt_dual_baseline <- renderHighchart({
                 Date = simul_baseline$results$time,
                 One = 1)
   
-  if (!input$show_all_days) dta <- dta %>% filter(wday(Date) == 2)
+  if (!input$show_all_days) dta <- dta %>% filter(wday(Date) == 4)
   
   max_y <- 1.2 * max(simul_baseline$results$Rt, simul_baseline$results$Rt, na.rm = TRUE)
   
@@ -29,7 +29,7 @@ output$highchart_Rt_dual_interventions <- renderHighchart({
                 Date = simul_interventions$results$time,
                 One = 1)
   
-  if (!input$show_all_days) dta <- dta %>% filter(wday(Date) == 2)
+  if (!input$show_all_days) dta <- dta %>% filter(wday(Date) == 4)
   
   max_y <- 1.2 * max(simul_interventions$results$Rt, simul_interventions$results$Rt, na.rm = TRUE)
   

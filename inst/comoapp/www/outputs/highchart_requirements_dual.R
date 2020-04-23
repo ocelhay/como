@@ -10,7 +10,7 @@ output$highchart_requirements_dual_baseline <- renderHighchart({
                 max_icu_beds = input$icu_beds_available,
                 max_ventilators = input$ventilators_available)
   
-  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 2)
+  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
   if(input$focus_requirements == "No Focus") max_y <- max((simul_baseline$results$hospital_surge_beds + simul_baseline$results$icu_beds + simul_baseline$results$ventilators), 
                                                           (simul_interventions$results$hospital_surge_beds + simul_interventions$results$icu_beds + simul_interventions$results$ventilators))
@@ -75,7 +75,7 @@ output$highchart_requirements_dual_interventions <- renderHighchart({
                 max_icu_beds = input$icu_beds_available,
                 max_ventilators = input$ventilators_available)
   
-  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 2)
+  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
   if(input$focus_requirements == "No Focus") max_y <- max((simul_baseline$results$hospital_surge_beds + simul_baseline$results$icu_beds + simul_baseline$results$ventilators), 
                                                           (simul_interventions$results$hospital_surge_beds + simul_interventions$results$icu_beds + simul_interventions$results$ventilators))

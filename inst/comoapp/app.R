@@ -190,7 +190,7 @@ ui <- function(request) {
                                                                      ),
                                                                    ),
                                                                    br(),
-                                                                   materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days — ', tags$small("You can either display only Monday data (Default) or all days in the plots/table (Slower)")), value = FALSE,
+                                                                   materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
                                                                                   status = "danger", right = TRUE, inline = FALSE, width = "100%"),
                                                                    br(),
                                                                    prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),

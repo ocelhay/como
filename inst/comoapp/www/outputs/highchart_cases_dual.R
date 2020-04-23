@@ -8,7 +8,7 @@ output$highchart_cases_dual_baseline <- renderHighchart({
                    cases_rv$data, 
                    by = c("time" = "date"))
   
-  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 2)
+  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
   # X/Y scales
   if(input$focus_axis_dup == "Observed")  {
@@ -50,7 +50,7 @@ output$highchart_cases_dual_interventions <- renderHighchart({
                    cases_rv$data, 
                    by = c("time" = "date"))
   
-  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 2)
+  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
   # X/Y scales
   if(input$focus_axis_dup == "Observed")  {
