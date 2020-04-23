@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v12.3"
+version_app <- "v12.4"
 
 # Load packages
 source("./www/load_packages.R")
@@ -52,7 +52,7 @@ ui <- function(request) {
                                                                         value = 2.5, post = "%", ticks = FALSE),
                                                             sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
                                                                         value = 5, post = "%", ticks = FALSE),
-                                                            sliderInput("reporth", label = span("Percentage of all infections requiring hospitalisation that are actually admitted to hospital:"), min = 0, max = 100, step = 0.1,
+                                                            sliderInput("reporth", label = span("Percentage of all hospitalisations that are reported:"), min = 0, max = 100, step = 0.1,
                                                                         value = 50, post = "%", ticks = FALSE),
                                                             br()
                                                         ),
