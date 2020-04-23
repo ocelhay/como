@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v12.3"
+version_app <- "v12.4"
 
 # Load packages
 source("./www/load_packages.R")
@@ -52,7 +52,7 @@ ui <- function(request) {
                                                                         value = 2.5, post = "%", ticks = FALSE),
                                                             sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
                                                                         value = 5, post = "%", ticks = FALSE),
-                                                            sliderInput("reporth", label = span("Percentage of all infections requiring hospitalisation that are actually admitted to hospital:"), min = 0, max = 100, step = 0.1,
+                                                            sliderInput("reporth", label = span("Percentage of all hospitalisations that are reported:"), min = 0, max = 100, step = 0.1,
                                                                         value = 50, post = "%", ticks = FALSE),
                                                             br()
                                                         ),
@@ -87,9 +87,9 @@ ui <- function(request) {
                                                             source("./www/interventions/school.R", local = TRUE)$value,
                                                             bsPopover("interventions_school", title='School closure', "<p>We assume all schools close at the same time. Efficacy defines the reduction of contacts between school children when school is closed. Children at home have increased home contacts given by s2h.</p>", 
                                                                       "top", trigger='hover', options = list(container = "body")),
-                                                            # Cocooning the elderly ----
+                                                            # Cocooning/Shielding the elderly ----
                                                             source("./www/interventions/cocoon.R", local = TRUE)$value,
-                                                            bsPopover("interventions_cocoon", title='Cocooning the elderly', "<p>Defining an age cut-off, this intervention is designed to isolate a proportion (coverage) of the elderly population and reduce their overall contacts by efficacy.</p>", 
+                                                            bsPopover("interventions_cocoon", title='Shielding the elderly', "<p>Defining an age cut-off, this intervention is designed to isolate a proportion (coverage) of the elderly population and reduce their overall contacts by efficacy.</p>", 
                                                                       "top", trigger='hover', options = list(container = "body")),
                                                             # Travel Ban ----
                                                             source("./www/interventions/travel.R", local = TRUE)$value,
@@ -171,57 +171,63 @@ ui <- function(request) {
                         ),
                         tabPanel("Model Predictions", value = "tab_modelpredictions",
                                  br(), br(),
-                                 div(class = "box_outputs", h4("Timeline")),
-                                 plotOutput("timevis"),
+                                 
+                                 
                                  conditionalPanel("output.status_app_output == 'Locked Baseline'",
-                                                  fluidRow(
-                                                    column(6, 
-                                                           div(class = "box_outputs", h4("Baseline")),
-                                                           htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
-                                                           htmlOutput("text_total_death_baseline") %>% withSpinner(),
-                                                    ),
-                                                    column(6, 
-                                                           div(class = "box_outputs", h4("Future Scenarios")),
-                                                           htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
-                                                           htmlOutput("text_total_death_interventions") %>% withSpinner()
-                                                    ),
-                                                  ),
-                                                  br(),
-                                                  prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
-                                                                     selected = "Predicted Reported + Unreported", inline = TRUE),
-                                                  fluidRow(
-                                                    column(6, 
-                                                           highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                                                           highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br()
-                                                    ),
-                                                    column(6, 
-                                                           highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                                                           highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br()
-                                                    )
-                                                  ),
-                                                  prettyRadioButtons("focus_requirements", label = "Focus on:", 
-                                                                     choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
-                                                                     selected = "No Focus", inline = TRUE),
-                                                  fluidRow(
-                                                    column(6, 
-                                                           highchartOutput("highchart_requirements_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                                                    ),
-                                                    column(6, 
-                                                           highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                                                    )
-                                                  ),
-                                                  fluidRow(
-                                                    column(6, 
-                                                           highchartOutput("highchart_Rt_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                                                    ),
-                                                    column(6, 
-                                                           highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                                                    )
-                                                  ),
-                                                  div(class = "box_outputs", h4("Model Output Table")),
-                                                  DTOutput("table_results")
-                                                  
-                                                  
+                                                  div(class = "box_outputs", h4("Timeline")),
+                                                  plotOutput("timevis"),
+                                                  conditionalPanel("output.status_app_output == 'Locked Baseline'",
+                                                                   fluidRow(
+                                                                     column(6,
+                                                                            div(class = "box_outputs", h4("Baseline")),
+                                                                            htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
+                                                                            htmlOutput("text_total_death_baseline") %>% withSpinner(),
+                                                                     ),
+                                                                     column(6,
+                                                                            div(class = "box_outputs", h4("Future Scenarios")),
+                                                                            htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
+                                                                            htmlOutput("text_total_death_interventions") %>% withSpinner()
+                                                                     ),
+                                                                   ),
+                                                                   br(),
+                                                                   materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days — ', tags$small("You can either display only Monday data (Default) or all days in the plots/table (Slower)")), value = FALSE,
+                                                                                  status = "danger", right = TRUE, inline = FALSE, width = "100%"),
+                                                                   br(),
+                                                                   prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
+                                                                                      selected = "Predicted Reported + Unreported", inline = TRUE),
+                                                                   fluidRow(
+                                                                     column(6,
+                                                                            highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                                                                            highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br()
+                                                                     ),
+                                                                     column(6,
+                                                                            highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                                                                            highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br()
+                                                                     )
+                                                                   ),
+                                                                   prettyRadioButtons("focus_requirements", label = "Focus on:", 
+                                                                                      choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
+                                                                                      selected = "No Focus", inline = TRUE),
+                                                                   fluidRow(
+                                                                     column(6, 
+                                                                            highchartOutput("highchart_requirements_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                                                                     ),
+                                                                     column(6, 
+                                                                            highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                                                                     )
+                                                                   ),
+                                                                   fluidRow(
+                                                                     column(6, 
+                                                                            highchartOutput("highchart_Rt_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                                                                     ),
+                                                                     column(6, 
+                                                                            highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                                                                     )
+                                                                   ),
+                                                                   div(class = "box_outputs", h4("Model Output Table")),
+                                                                   DTOutput("table_results")
+                                                                   
+                                                  )                
                                  )
                         )
              )
@@ -350,8 +356,8 @@ server <- function(input, output, session) {
     
     # Update date range of simulation
     if(!is_empty(param$Parameter[param$Type == 'date_range_simul'])) {
-    updateDateRangeInput(session, inputId = "date_range", start = param$Value_Date[param$Parameter == "date_range_simul_start"], 
-                         end = param$Value_Date[param$Parameter == "date_range_simul_end"])
+      updateDateRangeInput(session, inputId = "date_range", start = param$Value_Date[param$Parameter == "date_range_simul_start"], 
+                           end = param$Value_Date[param$Parameter == "date_range_simul_end"])
     }
     
     # Update social contact
@@ -482,6 +488,8 @@ server <- function(input, output, session) {
         future_scenario_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator)
       
       dta <- left_join(dta, dta_interventions, by = "date") }
+    
+    if (!input$show_all_days) dta <- dta %>% filter(wday(date) == 2)
     
     return(dta)
   })

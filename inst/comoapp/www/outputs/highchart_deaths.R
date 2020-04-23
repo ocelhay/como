@@ -8,7 +8,7 @@ output$highchart_deaths <- renderHighchart({
   
   # X/Y scales
   if(input$focus_axis == "Observed")  {
-    max_x <- dta$time[last(which(!is.na(dta$cumulative_death))) + 3]
+    max_x <- dta$time[last(which(!is.na(dta$cumulative_death)))]  + 3
     max_y <- 1.2 * max(dta$cumulative_death, na.rm = TRUE)
   }
   if(input$focus_axis == "Predicted Reported")  {
@@ -23,7 +23,6 @@ output$highchart_deaths <- renderHighchart({
   dta2 <- dta %>%
     rename(Date = time) %>%
     filter(Date <= max_x)
-  
   
   return(
     hchart(dta2, "line", name = "Predicted Reported Deaths", hcaes(x = Date, y = cum_mortality), color = "#00441b") %>% 
