@@ -11,6 +11,8 @@ output$highchart_deaths_dual_baseline <- renderHighchart({
                 death_untreated_ventilator = simul_baseline$results$death_untreated_ventilator,
                 total_deaths = simul_baseline$results$total_deaths)
   
+  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 2)
+  
   max_y <- max(simul_baseline$results$total_deaths, simul_interventions$results$total_deaths)
   
   hchart(dta, type = "area", name = "Death Treated Hospital", color = "#66c2a5", hcaes(x = time, y = death_treated_hospital)) %>%
@@ -41,6 +43,8 @@ output$highchart_deaths_dual_interventions <- renderHighchart({
                 death_untreated_icu = simul_interventions$results$death_untreated_icu,
                 death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator,
                 total_deaths = simul_interventions$results$total_deaths)
+  
+  if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 2)
   
   max_y <- max(simul_baseline$results$total_deaths, simul_interventions$results$total_deaths)
   

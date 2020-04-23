@@ -40,7 +40,7 @@ output$timevis <- renderPlot({
                                  end = as.Date(input$date_school_on + 7*input$school_dur), type = "intervention")
   }
   if(input$cocoon_switch) {
-    dta <- dta %>% add_row(id = 3, content = "Cocooning the Elderly", start = input$date_cocoon_on,
+    dta <- dta %>% add_row(id = 3, content = "Shielding the Elderly", start = input$date_cocoon_on,
                                  end = as.Date(input$date_cocoon_on + 7*input$cocoon_dur), type = "intervention")
   }
   if(input$travelban_switch) {

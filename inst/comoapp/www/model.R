@@ -591,19 +591,9 @@ process_ode_outcome <- function(out){
   }
   inc_overloadH1<-cumsum(rowSums(inc_overloadH1))
   inc_overloadICU1<-cumsum(rowSums(inc_overloadICU1))
+  # END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   
-  
-  MORTDF<-as.data.frame(cbind(out[30,CMindex+1]/out[30,Cindex+1],out[60,CMindex+1]/out[60,Cindex+1],out[90,CMindex+1]/out[90,Cindex+1],out[120,CMindex+1]/out[120,Cindex+1]))
-  MORTDF<-cbind(popstruc$agefloor,MORTDF)
-  colnames(MORTDF)<-c("Age","day30","day60","day90","day120")
-  MORTDF$day30[is.infinite(MORTDF$day30)]<-0
-  MORTDF$day60[is.infinite(MORTDF$day60)]<-0
-  MORTDF$day90[is.infinite(MORTDF$day90)]<-0
-  MORTDF$day120[is.infinite(MORTDF$day120)]<-0
-  MORT1<-melt(MORTDF, id.vars="Age",measure.vars = c("day30","day60","day90","day120"))
-  
-  
-  
+  # START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   ##########################    CALCULATE MORTALITY 
   pdeath_hc<-parameters["pdeath_hc"]
   prob_icu<-parameters["prob_icu"]
