@@ -354,8 +354,8 @@ covid<-function(t, Y, parameters)
          fH <- splinefun(x.H, f, method = "hyman")
          fICU <- splinefun(x.ICU, f, method = "hyman")
          fVent<- splinefun(x.Vent, f, method = "hyman")
-         critH<-min(1-fH(sum(H))+(1-reporth),1)
-         crit<-min(1-fICU(sum(ICU)+sum(Vent)),1)
+         critH<-min(1-fH(sum(H)+sum(ICUC))+(1-reporth),1)
+         crit<-min(1-fICU(sum(ICU)+sum(Vent)+sum(VentC)),1)
          critV<-min(1-fVent(sum(Vent)),1)
          # print(fH(sum(H)))
          
@@ -548,7 +548,7 @@ process_ode_outcome <- function(out){
   fICU <- splinefun(x.ICU, f, method = "hyman") 
   fVent<- splinefun(x.Vent, f, method = "hyman") 
   for (i in 1:length(time)){
-    critH[i]<-min(1-fH(sum(out[i,(Hindex+1)]))+parameters["reporth"],1)
+    critH[i]<-min(1-fH(sum(out[i,(Hindex+1)]))+(1-parameters["reporth"]),1)
     crit[i]<-min(1-fICU((sum(out[i,(ICUindex+1)]))+(sum(out[i,(Ventindex+1)]))+(sum(out[i,(VentCindex+1)]))))
     critV[i]<-min(1-fVent((sum(out[i,(Ventindex+1)]))),1)
   }

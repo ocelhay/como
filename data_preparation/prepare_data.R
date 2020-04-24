@@ -9,7 +9,7 @@ library(tidyverse)
 
 
 # Cases Data ----
-file <- "COVID-19-geographic-disbtribution-worldwide-2020-04-19.xlsx"
+file <- "COVID-19-geographic-disbtribution-worldwide-2020-04-23.xlsx"
 
 cases <- read_excel(file) %>%
   transmute(date = as.Date(dateRep), cases = cases, deaths = deaths, country = countriesAndTerritories) %>%
@@ -175,7 +175,8 @@ population <- population %>%
 
 
 # Export data ----
-save(cases, mort_sever_default,
-     contact_home, contact_work, contact_school, contact_other,
-     age_categories, countries_demog, population,
-     file = "../data_CoMo.RData")
+setwd("/Users/olivier/Documents/CoMo/como/data_preparation/")
+save(cases, file = "cases.Rda")
+save(mort_sever_default, file = "mort_sever_default.Rda")
+save(contact_home, contact_work, contact_school, contact_other, file = "contacts.Rda")
+save(age_categories, countries_demog, population, file = "demog.Rda")
