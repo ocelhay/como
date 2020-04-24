@@ -21,14 +21,13 @@ load(file = "./www/data/contacts.Rda")
 load(file = "./www/data/demog.Rda")
 load(file = "./www/data/mort_sever_default.Rda")
 
-# choices of countries for cases
+# choices of countries for dropdown cases / social contact
 countries_cases <- c("-- Own Value ---", cases %>% pull(country) %>% unique() %>% sort())
+countries_contact <- names(contact_home)
+countries_demographic <- sort(unique(population$country))
 
 # per year ageing matrix
 A <- length(age_categories)
 dd <- seq(1:A)/seq(1:A)
 ageing <- t(diff(diag(dd), lag = 1)/(5*365.25))
 ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
-
-# choices of countries for social contact
-countries_contact <- names(contact_home)

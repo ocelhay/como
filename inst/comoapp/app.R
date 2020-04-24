@@ -262,10 +262,10 @@ server <- function(input, output, session) {
   simul_interventions <- reactiveValues(results = NULL, interventions_available = FALSE)
   
   # Manage population and cases data reactive values ----
-  observeEvent(input$country, if(input$country != "-- Own Value ---"){
-    population_rv$data <- population %>% filter(country == input$country)
+  observeEvent(input$country_demographic, if(input$country_demographic != "-- Own Value ---"){
+    population_rv$data <- population %>% filter(country == input$country_demographic)
   })
-  observeEvent(input$country_cases, if(input$country != "-- Own Value ---"){
+  observeEvent(input$country_cases, if(input$country_cases != "-- Own Value ---"){
     cases_rv$data <- cases %>% filter(country == input$country_cases) %>%
       select(-country)
   })
@@ -311,7 +311,7 @@ server <- function(input, output, session) {
     population_rv$data <- dta %>%
       transmute(country = NA, age_category, pop, birth, death)
     
-    updatePickerInput(session, inputId = "country", selected = "-- Own Value ---")
+    updatePickerInput(session, inputId = "country_demographic", selected = "-- Own Value ---")
     
     # Parameters
     param <- bind_rows(read_excel(file_path, sheet = "Parameters"),

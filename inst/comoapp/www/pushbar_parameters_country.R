@@ -4,7 +4,7 @@ list(
           fluidRow(
             column(4, includeMarkdown("./www/markdown/about_country_data.md"), includeMarkdown("./www/markdown/about_data.md")),
             column(4,
-                   pickerInput("country", label = "Demographic Data:", choices = c("-- Own Value ---", countries_demog),
+                   pickerInput("country_demographic", label = "Demographic Data:", choices = c("-- Own Value ---", countries_demographic),
                                selected = "Afghanistan",
                                options = pickerOptions(liveSearch = TRUE)),
                    pickerInput("country_cases", label = "Cases/Deaths:", choices = countries_cases,
