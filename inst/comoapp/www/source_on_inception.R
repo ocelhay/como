@@ -16,7 +16,10 @@ library(shinyWidgets)
 library(tidyverse)
 
 
-load(file = "./www/data/data_CoMo.RData")
+load(file = "./www/data/cases.Rda")
+load(file = "./www/data/contacts.Rda")
+load(file = "./www/data/demog.Rda")
+load(file = "./www/data/mort_sever_default.Rda")
 
 # choices of countries for cases
 countries_cases <- c("-- Own Value ---", cases %>% pull(country) %>% unique() %>% sort())
