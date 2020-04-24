@@ -50,7 +50,7 @@ ui <- function(request) {
                                                             sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
                                                                         value = 5, post = "%", ticks = FALSE),
                                                             sliderInput("reporth", label = span("Percentage of all hospitalisations that are reported:"), min = 0, max = 100, step = 0.1,
-                                                                        value = 50, post = "%", ticks = FALSE),
+                                                                        value = 100, post = "%", ticks = FALSE),
                                                             br()
                                                         ),
                                                         source("./www/pushbar_parameters_country.R", local = TRUE)[1],
