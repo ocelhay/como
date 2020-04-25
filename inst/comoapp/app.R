@@ -293,7 +293,8 @@ server <- function(input, output, session) {
       mutate(date = as.Date(date), cumulative_death = cumsum(deaths)) %>%
       as.data.frame()
     
-    updatePickerInput(session, inputId = "country_cases", selected = "-- Own Value ---")
+    updatePickerInput(session, inputId = "country_cases", choices = c("-- Own Value ---", countries_cases), selected = "-- Own Value ---")
+    updatePickerInput(session, inputId = "country_demographic", choices = c("-- Own Value ---", countries_demographic), selected = "-- Own Value ---")
     
     
     # Severity/Mortality
@@ -402,7 +403,6 @@ server <- function(input, output, session) {
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
     simul_baseline$baseline_available <- TRUE
-    shiny_baseline <<- simul_baseline$results
   })
   
   observeEvent(input$validate_baseline, {

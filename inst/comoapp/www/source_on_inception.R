@@ -21,8 +21,8 @@ load(file = "./www/data/contacts.Rda")
 load(file = "./www/data/demog.Rda")
 load(file = "./www/data/mort_sever_default.Rda")
 
-# choices of countries for dropdown cases / social contact
-countries_cases <- c("-- Own Value ---", cases %>% pull(country) %>% unique() %>% sort())
+# choices of countries for dropdown
+countries_cases <- sort(unique(cases$country))
 countries_contact <- names(contact_home)
 countries_demographic <- sort(unique(population$country))
 
