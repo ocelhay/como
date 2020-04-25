@@ -26,6 +26,14 @@ c_other <- contact_other[[input$country_contact]] %>% as.matrix()
 # END Bridge ----
 
 # START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# per year ageing matrix
+A <- length(age_categories)
+dd <- seq(1:A)/seq(1:A)
+ageing <- t(diff(diag(dd), lag = 1)/(5*365.25))
+ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
+# END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+
+# START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
 nce <-A-length(c_home[1,])
 
 contact_home<-matrix(0,nrow=A,ncol=A)
