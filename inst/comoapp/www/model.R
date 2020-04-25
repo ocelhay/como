@@ -535,7 +535,6 @@ process_ode_outcome <- function(out){
   critV<-c()
   # End Bridge ----
   
-  
   # START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0) 
   KH<-parameters["beds_available"]
@@ -547,7 +546,7 @@ process_ode_outcome <- function(out){
   fH <- splinefun(x.H, f, method = "hyman") 
   fICU <- splinefun(x.ICU, f, method = "hyman") 
   fVent<- splinefun(x.Vent, f, method = "hyman") 
-  for (i in 1:length(time)){
+  for (i in 1:length(times)){
     critH[i]<-min(1-fH(sum(out[i,(Hindex+1)]))+(1-parameters["reporth"]),1)
     crit[i]<-min(1-fICU((sum(out[i,(ICUindex+1)]))+(sum(out[i,(Ventindex+1)]))+(sum(out[i,(VentCindex+1)]))))
     critV[i]<-min(1-fVent((sum(out[i,(Ventindex+1)]))),1)
@@ -585,7 +584,7 @@ process_ode_outcome <- function(out){
   
   inc_overloadH1<-((parameters["gamma"]*(1-parameters["prob_icu"])*out[,(Eindex+1)]))
   inc_overloadICU1<-((parameters["gamma"]*parameters["prob_icu"]*(1-parameters["prob_vent"])*out[,(Eindex+1)]))
-  for (i in 1:length(time)) {
+  for (i in 1:length(times)) {
     inc_overloadH1[i,]<-inc_overloadH1[i,]*critH[i]*ihr[,2]
     inc_overloadICU1[i,]<-inc_overloadICU1[i,]*crit[i]*ihr[,2]
   }
@@ -611,14 +610,14 @@ process_ode_outcome <- function(out){
   # END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   
   Rt1<-c()
-  for (i in (1/parameters["nui"]+1):length(time)){
+  for (i in (1/parameters["nui"]+1):length(times)){
     Rt1[i]<-cumsum(sum(parameters["gamma"]*out[i,(Eindex+1)]))/cumsum(sum(parameters["gamma"]*out[(i-1/parameters["nui"]),(Eindex+1)]))
   }
   
   
   # Export in a cohesive format ----
   results <- list()
-  results$time <- time  # dates
+  results$time <- startdate + times  # dates
   results$Rt <- c(NA, Rt1)
   results$cum_mortality <- round(cmortality1)  # cumulative mortality
   results$pct_total_pop_infected <- round(100 * tail(cumsum(rowSums(parameters["gamma"]*out[,(Eindex+1)])),1)/sum(popstruc[,2]), 1)  # proportion of the  population that has been infected at the end of the simulation
