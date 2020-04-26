@@ -438,7 +438,6 @@ server <- function(input, output, session) {
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"
     simul_interventions$interventions_available <- TRUE
-    shiny_interventions <<- simul_interventions$results
   })
   
   

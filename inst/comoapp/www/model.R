@@ -615,6 +615,23 @@ process_ode_outcome <- function(out){
   cinc_mort_ICUC1 <- cumsum(rowSums(parameters["nu_icuc"]*parameters["pdeath_icuc"]*out[,(ICUCindex+1)]%*%ifr[,2] + out[,(ICUCindex+1)]%*%mort))
   cinc_mort_Vent1 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*out[,(Ventindex+1)]%*%ifr[,2] + out[,(Ventindex+1)]%*%mort))
   cinc_mort_VentC1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out[,(VentCindex+1)]%*%ifr[,2] + out[,(VentCindex+1)]%*%mort))
+  base_mort_H1 <- cumsum(rowSums(out[,(Hindex+1)]%*%mort))
+  base_mort_HC1 <- cumsum(rowSums(out[,(HCindex+1)]%*%mort))
+  base_mort_ICU1 <- cumsum(rowSums(out[,(ICUindex+1)]%*%mort))
+  base_mort_ICUC1 <- cumsum(rowSums(out[,(ICUCindex+1)]%*%mort))
+  base_mort_Vent1 <- cumsum(rowSums(out[,(Ventindex+1)]%*%mort))
+  base_mort_VentC1 <- cumsum(rowSums(out[,(VentCindex+1)]%*%mort))
+  base_mort_S1 <- cumsum(rowSums(out[,(Sindex+1)]%*%mort))
+  base_mort_E1 <- cumsum(rowSums(out[,(Eindex+1)]%*%mort))
+  base_mort_I1 <- cumsum(rowSums(out[,(Iindex+1)]%*%mort))
+  base_mort_CL1 <- cumsum(rowSums(out[,(CLindex+1)]%*%mort))
+  base_mort_X1 <- cumsum(rowSums(out[,(Xindex+1)]%*%mort))
+  base_mort_QS1 <- cumsum(rowSums(out[,(QSindex+1)]%*%mort))
+  base_mort_QE1 <- cumsum(rowSums(out[,(QEindex+1)]%*%mort))
+  base_mort_QI1 <- cumsum(rowSums(out[,(QIindex+1)]%*%mort))
+  base_mort_QC1 <- cumsum(rowSums(out[,(QCindex+1)]%*%mort))
+  base_mort_QR1 <- cumsum(rowSums(out[,(QRindex+1)]%*%mort))
+  base_mort_R1 <- cumsum(rowSums(out[,(Rindex+1)]%*%mort))
   # END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   
   Rt1<-c()
@@ -638,6 +655,11 @@ process_ode_outcome <- function(out){
   results$icu_beds <- round(previcureq21)
   results$ventilators <- round(previcureq31)
   
+  
+  
+  results$death_natural_non_exposed <- round(base_mort_S1)
+  results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 + base_mort_QS1 + 
+                                           base_mort_QE1 + base_mort_QI1 + base_mort_QC1 + base_mort_QR1 + base_mort_R1)
   results$death_treated_hospital <- round(cinc_mort_H1)
   results$death_treated_icu <- round(cinc_mort_ICU1)
   results$death_treated_ventilator <- round(cinc_mort_Vent1)
