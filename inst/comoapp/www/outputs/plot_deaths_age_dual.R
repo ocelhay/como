@@ -6,7 +6,7 @@ output$plot_deaths_age_baseline <- renderPlot({
     ylab("Proportion of Deaths") + xlab("") +
     theme_minimal(base_size = 15) + 
     theme(legend.title = element_blank(), legend.position="bottom") + 
-    labs(title="Proportion of Deaths per Age Category", subtitle = "Baseline")
+    labs(title="Proportion of Covid-19 Deaths per Age Category", subtitle = "Baseline")
 })
 
 output$plot_deaths_age_interventions <- renderPlot({
@@ -17,5 +17,5 @@ output$plot_deaths_age_interventions <- renderPlot({
     ylab("Proportion of Deaths") + xlab("") +
     theme_minimal(base_size = 15) +
     theme(legend.title = element_blank(), legend.position="bottom") + 
-    labs(title="Proportion of Deaths per Age Category", subtitle = "Future Scenarios")
+    labs(title="Proportion of Covid-19 Deaths per Age Category", subtitle = "Future Scenarios")
 })
