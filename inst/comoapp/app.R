@@ -195,11 +195,13 @@ ui <- function(request) {
                                                                    fluidRow(
                                                                      column(6,
                                                                             highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                                                                            highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br()
+                                                                            highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                                                                            plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br()
                                                                      ),
                                                                      column(6,
                                                                             highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                                                                            highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br()
+                                                                            highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                                                                            plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br()
                                                                      )
                                                                    ),
                                                                    prettyRadioButtons("focus_requirements", label = "Focus on:", 

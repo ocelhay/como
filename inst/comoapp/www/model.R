@@ -639,7 +639,6 @@ process_ode_outcome <- function(out){
     Rt[i] <- cumsum(sum(parameters["gamma"]*out[i,(Eindex+1)]))/cumsum(sum(parameters["gamma"]*out[(i-1/parameters["nui"]),(Eindex+1)]))
   }
   
-  
   # Export in a cohesive format ----
   results <- list()
   results$time <- startdate + times  # dates
@@ -655,8 +654,6 @@ process_ode_outcome <- function(out){
   results$icu_beds <- round(previcureq21)
   results$ventilators <- round(previcureq31)
   
-  
-  
   results$death_natural_non_exposed <- round(base_mort_S1)
   results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 + base_mort_QS1 + 
                                            base_mort_QE1 + base_mort_QI1 + base_mort_QC1 + base_mort_QR1 + base_mort_R1)
@@ -669,6 +666,45 @@ process_ode_outcome <- function(out){
   results$total_deaths <- results$death_treated_hospital + results$death_treated_icu + results$death_treated_ventilator +
     results$death_untreated_hospital + results$death_untreated_icu + results$death_untreated_ventilator
   results$total_deaths_end <- last(results$total_deaths)
+  
+  
+  # !!!! code re-using of variable names but with different str() !!! - request some cleaning
+  # START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+  ## AGE DEPENDENT MORTALITY
+  cinc_mort_H1 <- parameters["nus"]*parameters["pdeath_h"]*(out[,(Hindex+1)])
+  cinc_mort_HC1 <- parameters["nusc"]*parameters["pdeath_hc"]*(out[,(HCindex+1)])
+  cinc_mort_ICU1 <- parameters["nu_icu"]*parameters["pdeath_icu"]*out[,(ICUindex+1)]
+  cinc_mort_ICUC1 <- parameters["nu_icuc"]*parameters["pdeath_icuc"]*out[,(ICUCindex+1)] 
+  cinc_mort_Vent1 <- parameters["nu_vent"]*parameters["pdeath_vent"]*out[,(Ventindex+1)] 
+  cinc_mort_VentC1 <- parameters["nu_ventc"]*parameters["pdeath_ventc"]*out[,(VentCindex+1)] 
+  totage1<-as.data.frame(cinc_mort_H1+cinc_mort_HC1+cinc_mort_ICU1+cinc_mort_ICUC1+cinc_mort_Vent1+cinc_mort_VentC1)
+  basemort_H1<-(out[,(Hindex+1)])
+  basemort_HC1<-(out[,(HCindex+1)])
+  basemort_ICU1<-(out[,(ICUindex+1)])
+  basemort_ICUC1<-(out[,(ICUCindex+1)])
+  basemort_Vent1<-(out[,(Ventindex+1)])
+  basemort_VentC1<-(out[,(VentCindex+1)])
+  totbase1<-as.data.frame(basemort_H1+basemort_HC1+basemort_ICU1+basemort_ICUC1+basemort_Vent1+basemort_VentC1)
+  tc<-c()
+  for (i in 1:dim(cinc_mort_H1)[1]) {
+    for (j in 1:dim(cinc_mort_H1)[2]) {
+      tc<-rbind(tc,c(i,ifr[j,1],totage1[i,j]*ifr[j,2]+totbase1[i,j]*mort[j])) 
+    }
+  }
+  tc<-as.data.frame(tc)
+  colnames(tc)<-c("Day","Age","value")
+  # END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+  results$tc <- tc %>%
+    mutate(Date = input$date_range[1] + Day,
+           age_cat = case_when(
+             Age >=  1 & Age <= 6   ~ "≤ 30 y.o.",
+             Age >  6 & Age <= 8    ~ "30-40 y.o.",
+             Age >  8 & Age <= 10    ~ "40-50 y.o.",
+             Age >  10 & Age <= 12    ~ "50-60 y.o.",
+             Age >  12 & Age <= 14    ~ "60-70 y.o.",
+             Age >=  15  ~ "≥ 70 y.o.")) %>%
+    mutate(age_cat = factor(age_cat, levels = rev(c("≤ 30 y.o.", "30-40 y.o.",
+                                                    "40-50 y.o.", "50-60 y.o.", "60-70 y.o.", "≥ 70 y.o."))))
   
   return(results)
 }
