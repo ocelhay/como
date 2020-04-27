@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v12.6"
+version_app <- "v12.7"
 
 # Load packages and data
 source("./www/source_on_inception.R")
@@ -195,11 +195,13 @@ ui <- function(request) {
                                                                    fluidRow(
                                                                      column(6,
                                                                             highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                                                                            highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br()
+                                                                            highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                                                                            plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br()
                                                                      ),
                                                                      column(6,
                                                                             highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                                                                            highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br()
+                                                                            highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                                                                            plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br()
                                                                      )
                                                                    ),
                                                                    prettyRadioButtons("focus_requirements", label = "Focus on:", 
@@ -403,6 +405,7 @@ server <- function(input, output, session) {
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
     simul_baseline$baseline_available <- TRUE
+    shiny_simul_baseline <<- simul_baseline$results  # for development only
   })
   
   observeEvent(input$validate_baseline, {
@@ -438,6 +441,7 @@ server <- function(input, output, session) {
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"
     simul_interventions$interventions_available <- TRUE
+    shiny_simul_interventions <<- simul_interventions$results  # for development only
   })
   
   
