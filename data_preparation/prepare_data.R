@@ -90,48 +90,6 @@ age_categories <- c("0-4 y.o.", "5-9 y.o.", "10-14 y.o.", "15-19 y.o.", "20-24 y
                     "35-39 y.o.", "40-44 y.o.", "45-49 y.o.", "50-54 y.o.", "55-59 y.o.", "60-64 y.o.", "65-69 y.o.", 
                     "70-74 y.o.", "75-79 y.o.", "80-84 y.o.", "85-89 y.o.", "90-94 y.o.", "95-99 y.o.", "100+ y.o.")
 
-countries_demog <- c("Afghanistan", "Albania", "Algeria", "Angola", "Antigua and Barbuda", 
-                     "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", 
-                     "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", 
-                     "Belize", "Benin", "Bhutan", "Bolivia (Plurinational State of)", 
-                     "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei Darussalam", 
-                     "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", 
-                     "Cameroon", "Canada", "Central African Republic", "Chad", "Channel Islands", 
-                     "Chile", "China", "China, Hong Kong SAR", "China, Macao SAR", 
-                     "China, Taiwan Province of China", "Colombia", "Comoros", "Congo", 
-                     "Costa Rica", "Côte d'Ivoire", "Croatia", "Cuba", "Curaçao", 
-                     "Cyprus", "Czechia", "Dem. People's Republic of Korea", "Democratic Republic of the Congo", 
-                     "Denmark", "Djibouti", "Dominican Republic", "Ecuador", "Egypt", 
-                     "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", 
-                     "Ethiopia", "Fiji", "Finland", "France", "French Guiana", "French Polynesia", 
-                     "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", 
-                     "Guadeloupe", "Guam", "Guatemala", "Guinea", "Guinea-Bissau", 
-                     "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", 
-                     "Indonesia", "Iran (Islamic Republic of)", "Iraq", "Ireland", 
-                     "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", 
-                     "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Lao People's Democratic Republic", 
-                     "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Lithuania", 
-                     "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", 
-                     "Mali", "Malta", "Martinique", "Mauritania", "Mauritius", "Mayotte", 
-                     "Mexico", "Micronesia (Fed. States of)", "Mongolia", "Montenegro", 
-                     "Morocco", "Mozambique", "Myanmar", "Namibia", "Nepal", "Netherlands", 
-                     "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", 
-                     "North Macedonia", "Norway", "Oman", "Pakistan", "Panama", "Papua New Guinea", 
-                     "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Puerto Rico", 
-                     "Qatar", "Republic of Korea", "Republic of Moldova", "Réunion", 
-                     "Romania", "Russian Federation", "Rwanda", "Saint Lucia", "Saint Vincent and the Grenadines", 
-                     "Samoa", "Sao Tome and Principe", "Saudi Arabia", "Senegal", 
-                     "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", 
-                     "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan", 
-                     "Spain", "Sri Lanka", "State of Palestine", "Sudan", "Suriname", 
-                     "Sweden", "Switzerland", "Syrian Arab Republic", "Tajikistan", 
-                     "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", 
-                     "Tunisia", "Turkey", "Turkmenistan", "Uganda", "Ukraine", "United Arab Emirates", 
-                     "United Kingdom", "United Republic of Tanzania", "United States of America", 
-                     "United States Virgin Islands", "Uruguay", "Uzbekistan", "Vanuatu", 
-                     "Venezuela (Bolivarian Republic of)", "Viet Nam", "Western Sahara", 
-                     "Yemen", "Zambia", "Zimbabwe")
-
 population <- read_excel("population_UN/WPP2019_POP_F07_1_POPULATION_BY_AGE_BOTH_SEXES.xlsx", 
                          sheet = 1, skip = 16) %>%
   filter(Type == "Country/Area", `Reference date (as of 1 July)` == 2020) %>%
@@ -179,4 +137,4 @@ setwd("/Users/olivier/Documents/CoMo/como/data_preparation/")
 save(cases, file = "cases.Rda")
 save(mort_sever_default, file = "mort_sever_default.Rda")
 save(contact_home, contact_work, contact_school, contact_other, file = "contacts.Rda")
-save(age_categories, countries_demog, population, file = "demog.Rda")
+save(age_categories, population, file = "demog.Rda")

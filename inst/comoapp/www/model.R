@@ -26,6 +26,14 @@ c_other <- contact_other[[input$country_contact]] %>% as.matrix()
 # END Bridge ----
 
 # START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# per year ageing matrix
+A <- length(age_categories)
+dd <- seq(1:A)/seq(1:A)
+ageing <- t(diff(diag(dd), lag = 1)/(5*365.25))
+ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
+# END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+
+# START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
 nce <-A-length(c_home[1,])
 
 contact_home<-matrix(0,nrow=A,ncol=A)
@@ -535,7 +543,6 @@ process_ode_outcome <- function(out){
   critV<-c()
   # End Bridge ----
   
-  
   # START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0) 
   KH<-parameters["beds_available"]
@@ -547,7 +554,7 @@ process_ode_outcome <- function(out){
   fH <- splinefun(x.H, f, method = "hyman") 
   fICU <- splinefun(x.ICU, f, method = "hyman") 
   fVent<- splinefun(x.Vent, f, method = "hyman") 
-  for (i in 1:length(time)){
+  for (i in 1:length(times)){
     critH[i]<-min(1-fH(sum(out[i,(Hindex+1)]))+(1-parameters["reporth"]),1)
     crit[i]<-min(1-fICU((sum(out[i,(ICUindex+1)]))+(sum(out[i,(Ventindex+1)]))+(sum(out[i,(VentCindex+1)]))))
     critV[i]<-min(1-fVent((sum(out[i,(Ventindex+1)]))),1)
@@ -585,7 +592,7 @@ process_ode_outcome <- function(out){
   
   inc_overloadH1<-((parameters["gamma"]*(1-parameters["prob_icu"])*out[,(Eindex+1)]))
   inc_overloadICU1<-((parameters["gamma"]*parameters["prob_icu"]*(1-parameters["prob_vent"])*out[,(Eindex+1)]))
-  for (i in 1:length(time)) {
+  for (i in 1:length(times)) {
     inc_overloadH1[i,]<-inc_overloadH1[i,]*critH[i]*ihr[,2]
     inc_overloadICU1[i,]<-inc_overloadICU1[i,]*crit[i]*ihr[,2]
   }
@@ -608,17 +615,34 @@ process_ode_outcome <- function(out){
   cinc_mort_ICUC1 <- cumsum(rowSums(parameters["nu_icuc"]*parameters["pdeath_icuc"]*out[,(ICUCindex+1)]%*%ifr[,2] + out[,(ICUCindex+1)]%*%mort))
   cinc_mort_Vent1 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*out[,(Ventindex+1)]%*%ifr[,2] + out[,(Ventindex+1)]%*%mort))
   cinc_mort_VentC1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out[,(VentCindex+1)]%*%ifr[,2] + out[,(VentCindex+1)]%*%mort))
+  base_mort_H1 <- cumsum(rowSums(out[,(Hindex+1)]%*%mort))
+  base_mort_HC1 <- cumsum(rowSums(out[,(HCindex+1)]%*%mort))
+  base_mort_ICU1 <- cumsum(rowSums(out[,(ICUindex+1)]%*%mort))
+  base_mort_ICUC1 <- cumsum(rowSums(out[,(ICUCindex+1)]%*%mort))
+  base_mort_Vent1 <- cumsum(rowSums(out[,(Ventindex+1)]%*%mort))
+  base_mort_VentC1 <- cumsum(rowSums(out[,(VentCindex+1)]%*%mort))
+  base_mort_S1 <- cumsum(rowSums(out[,(Sindex+1)]%*%mort))
+  base_mort_E1 <- cumsum(rowSums(out[,(Eindex+1)]%*%mort))
+  base_mort_I1 <- cumsum(rowSums(out[,(Iindex+1)]%*%mort))
+  base_mort_CL1 <- cumsum(rowSums(out[,(CLindex+1)]%*%mort))
+  base_mort_X1 <- cumsum(rowSums(out[,(Xindex+1)]%*%mort))
+  base_mort_QS1 <- cumsum(rowSums(out[,(QSindex+1)]%*%mort))
+  base_mort_QE1 <- cumsum(rowSums(out[,(QEindex+1)]%*%mort))
+  base_mort_QI1 <- cumsum(rowSums(out[,(QIindex+1)]%*%mort))
+  base_mort_QC1 <- cumsum(rowSums(out[,(QCindex+1)]%*%mort))
+  base_mort_QR1 <- cumsum(rowSums(out[,(QRindex+1)]%*%mort))
+  base_mort_R1 <- cumsum(rowSums(out[,(Rindex+1)]%*%mort))
   # END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   
   Rt1<-c()
-  for (i in (1/parameters["nui"]+1):length(time)){
+  for (i in (1/parameters["nui"]+1):length(times)){
     Rt1[i]<-cumsum(sum(parameters["gamma"]*out[i,(Eindex+1)]))/cumsum(sum(parameters["gamma"]*out[(i-1/parameters["nui"]),(Eindex+1)]))
   }
   
   
   # Export in a cohesive format ----
   results <- list()
-  results$time <- time  # dates
+  results$time <- startdate + times  # dates
   results$Rt <- c(NA, Rt1)
   results$cum_mortality <- round(cmortality1)  # cumulative mortality
   results$pct_total_pop_infected <- round(100 * tail(cumsum(rowSums(parameters["gamma"]*out[,(Eindex+1)])),1)/sum(popstruc[,2]), 1)  # proportion of the  population that has been infected at the end of the simulation
@@ -631,6 +655,11 @@ process_ode_outcome <- function(out){
   results$icu_beds <- round(previcureq21)
   results$ventilators <- round(previcureq31)
   
+  
+  
+  results$death_natural_non_exposed <- round(base_mort_S1)
+  results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 + base_mort_QS1 + 
+                                           base_mort_QE1 + base_mort_QI1 + base_mort_QC1 + base_mort_QR1 + base_mort_R1)
   results$death_treated_hospital <- round(cinc_mort_H1)
   results$death_treated_icu <- round(cinc_mort_ICU1)
   results$death_treated_ventilator <- round(cinc_mort_Vent1)

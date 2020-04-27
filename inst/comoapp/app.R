@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v12.5"
+version_app <- "v12.6"
 
 # Load packages and data
 source("./www/source_on_inception.R")
@@ -262,10 +262,10 @@ server <- function(input, output, session) {
   simul_interventions <- reactiveValues(results = NULL, interventions_available = FALSE)
   
   # Manage population and cases data reactive values ----
-  observeEvent(input$country, if(input$country != "-- Own Value ---"){
-    population_rv$data <- population %>% filter(country == input$country)
+  observeEvent(input$country_demographic, if(input$country_demographic != "-- Own Value ---"){
+    population_rv$data <- population %>% filter(country == input$country_demographic)
   })
-  observeEvent(input$country_cases, if(input$country != "-- Own Value ---"){
+  observeEvent(input$country_cases, if(input$country_cases != "-- Own Value ---"){
     cases_rv$data <- cases %>% filter(country == input$country_cases) %>%
       select(-country)
   })
@@ -293,7 +293,8 @@ server <- function(input, output, session) {
       mutate(date = as.Date(date), cumulative_death = cumsum(deaths)) %>%
       as.data.frame()
     
-    updatePickerInput(session, inputId = "country_cases", selected = "-- Own Value ---")
+    updatePickerInput(session, inputId = "country_cases", choices = c("-- Own Value ---", countries_cases), selected = "-- Own Value ---")
+    updatePickerInput(session, inputId = "country_demographic", choices = c("-- Own Value ---", countries_demographic), selected = "-- Own Value ---")
     
     
     # Severity/Mortality
@@ -311,7 +312,7 @@ server <- function(input, output, session) {
     population_rv$data <- dta %>%
       transmute(country = NA, age_category, pop, birth, death)
     
-    updatePickerInput(session, inputId = "country", selected = "-- Own Value ---")
+    updatePickerInput(session, inputId = "country_demographic", selected = "-- Own Value ---")
     
     # Parameters
     param <- bind_rows(read_excel(file_path, sheet = "Parameters"),
@@ -402,7 +403,6 @@ server <- function(input, output, session) {
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
     simul_baseline$baseline_available <- TRUE
-    shiny_baseline <<- simul_baseline$results
   })
   
   observeEvent(input$validate_baseline, {
@@ -438,7 +438,6 @@ server <- function(input, output, session) {
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"
     simul_interventions$interventions_available <- TRUE
-    shiny_interventions <<- simul_interventions$results
   })
   
   
