@@ -686,14 +686,15 @@ process_ode_outcome <- function(out){
   basemort_VentC1<-(out[,(VentCindex+1)])
   totbase1<-as.data.frame(basemort_H1+basemort_HC1+basemort_ICU1+basemort_ICUC1+basemort_Vent1+basemort_VentC1)
   tc<-c()
+  # END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   for (i in 1:dim(cinc_mort_H1)[1]) {
     for (j in 1:dim(cinc_mort_H1)[2]) {
-      tc<-rbind(tc,c(i,ifr[j,1],totage1[i,j]*ifr[j,2]+totbase1[i,j]*mort[j])) 
+      tc<-rbind(tc,c(i, j, totage1[i,j]*ifr[j,2]+totbase1[i,j]*mort[j])) 
     }
   }
   tc<-as.data.frame(tc)
   colnames(tc)<-c("Day","Age","value")
-  # END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+  
   results$tc <- tc %>%
     mutate(Date = input$date_range[1] + Day,
            age_cat = case_when(
