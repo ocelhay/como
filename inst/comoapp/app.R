@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v12.7"
+version_app <- "v12.8"
 
 # Load packages and data
 source("./www/source_on_inception.R")
@@ -194,16 +194,26 @@ ui <- function(request) {
                                                                                       selected = "Predicted Reported + Unreported", inline = TRUE),
                                                                    fluidRow(
                                                                      column(6,
-                                                                            highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                                                                            highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br()
+                                                                     ),
+                                                                     column(6,
+                                                                            highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br()
+                                                                     )
+                                                                   ),
+                                                                   prettyRadioButtons("focus_natural_death", label = "Focus on:", 
+                                                                                      choices = c("No Focus", "COVID-19 Deaths"), 
+                                                                                      selected = "No Focus", inline = TRUE),
+                                                                   fluidRow(
+                                                                     column(6,
                                                                             highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
                                                                             plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br()
                                                                      ),
                                                                      column(6,
-                                                                            highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br(),
                                                                             highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
                                                                             plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br()
                                                                      )
                                                                    ),
+                                                                   
                                                                    prettyRadioButtons("focus_requirements", label = "Focus on:", 
                                                                                       choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
                                                                                       selected = "No Focus", inline = TRUE),

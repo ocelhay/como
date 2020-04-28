@@ -15,7 +15,15 @@ output$highchart_deaths_dual_baseline <- renderHighchart({
   
   if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
-  max_y <- max(simul_baseline$results$total_deaths, simul_interventions$results$total_deaths)
+  if(input$focus_natural_death == "No Focus"){
+    max_y <- max(simul_baseline$results$total_deaths + simul_baseline$results$death_natural_non_exposed + simul_baseline$results$death_natural_exposed, 
+                 simul_interventions$results$total_deaths + simul_interventions$results$death_natural_non_exposed + simul_interventions$results$death_natural_exposed)
+  }
+  
+  if(input$focus_natural_death == "COVID-19 Deaths"){
+    max_y <- max(simul_baseline$results$total_deaths, 
+                 simul_interventions$results$total_deaths)
+  }
   
   hchart(dta, type = "area", name = "Natural Death, Non Exposed", color = "#636363", hcaes(x = time, y = death_natural_non_exposed)) %>%
     hc_add_series(dta, type = 'area', name = "Natural Death, Exposed", color = "#bdbdbd", hcaes(x = time, y = death_natural_exposed)) %>%
@@ -51,7 +59,15 @@ output$highchart_deaths_dual_interventions <- renderHighchart({
   
   if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
-  max_y <- max(simul_baseline$results$total_deaths, simul_interventions$results$total_deaths)
+  if(input$focus_natural_death == "No Focus"){
+    max_y <- max(simul_baseline$results$total_deaths + simul_baseline$results$death_natural_non_exposed + simul_baseline$results$death_natural_exposed, 
+                 simul_interventions$results$total_deaths + simul_interventions$results$death_natural_non_exposed + simul_interventions$results$death_natural_exposed)
+  }
+  
+  if(input$focus_natural_death == "COVID-19 Deaths"){
+    max_y <- max(simul_baseline$results$total_deaths, 
+                 simul_interventions$results$total_deaths)
+  }
   
   hchart(dta, type = "area", name = "Natural Death, Non Exposed", color = "#636363", hcaes(x = time, y = death_natural_non_exposed)) %>%
     hc_add_series(dta, type = 'area', name = "Natural Death, Exposed", color = "#bdbdbd", hcaes(x = time, y = death_natural_exposed)) %>%
