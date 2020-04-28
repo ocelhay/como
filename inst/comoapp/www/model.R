@@ -512,9 +512,10 @@ covid<-function(t, Y, parameters)
          dHCdt <- gamma*ihr[,2]*(1-prob_icu)*critH*E + gamma*ihr[,2]*(1-prob_icu)*critH*QE - nusc*HC + ageing%*%HC-mort*HC 
          dICUdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-prob_vent)*QE - nu_icu*ICU +ageing%*%ICU - mort*ICU 
          dICUCdt <- gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*QE - nu_icuc*ICUC +ageing%*%ICUC - mort*ICUC 
-         dVentdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*QE - nu_vent*Vent +ageing%*%Vent - mort*Vent 
+         dVentdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*QE + (1-critV)*VentC*1/2 - nu_vent*Vent +ageing%*%Vent - mort*Vent
          dVentCdt <- gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*E +gamma*ihr[,2]*prob_icu*prob_vent*crit*E+
-           gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*QE+ gamma*ihr[,2]*prob_icu*prob_vent*crit*QE - nu_ventc*VentC +ageing%*%VentC - mort*VentC 
+           gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*QE + gamma*ihr[,2]*prob_icu*prob_vent*crit*QE -
+           (1-critV)*VentC*1/2-nu_ventc*VentC +ageing%*%VentC - mort*VentC
          
          dCdt <- report*gamma*(1-pclin)*(1-ihr[,2])*(E+QE)+reportc*gamma*pclin*(1-ihr[,2])*(E+QE)+ 
            gamma*ihr[,2]*(1-critH)*(1-prob_icu)*(E+QE)+gamma*ihr[,2]*critH*reporth*(1-prob_icu)*(E+QE)+
@@ -581,8 +582,8 @@ process_ode_outcome <- function(out){
   
   dailyinc1<-rowSums(inc1)+rowSums(inc1h)      # daily incidence
   cuminc1<-colSums(inc1)+colSums(inc1h)        # cumulative incidence
-  previcureq1<-rowSums(out[,(Hindex+1)])       # requirement for beds
-  previcureq21<-rowSums(out[,(ICUindex+1)])    # requirement for icu
+  previcureq1<-rowSums(out[,(Hindex+1)])+ rowSums(out[,(ICUCindex+1)])      # requirement for beds
+  previcureq21<-rowSums(out[,(ICUindex+1)])+rowSums(out[,(VentCindex+1)])    # requirement for icu
   previcureq31<-rowSums(out[,(Ventindex+1)])   # requirement for icu
   cmortality1<-rowSums(out[,(CMindex+1)])      # cumulative mortality
   overloadH1<-rowSums(out[,(HCindex+1)])       # requirement for beds
