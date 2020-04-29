@@ -114,6 +114,14 @@ h4 {
   border-width: 3px 0 0 0;
 }
 
+.box_interventions {
+  margin-top: 35px;
+  margin-bottom: 15px;
+  border-color: #2c3e50;
+  border-top-style: inset;
+  border-width: 3px 0 0 0;
+}
+
 .n_box {
   border: 2px solid black;
   padding: 0 0 5px 5px;

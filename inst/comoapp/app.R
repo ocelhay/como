@@ -28,15 +28,12 @@ ui <- function(request) {
                                                hr()
                               ),
                               fluidRow(
-                                conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
-                                                 div(class = "baseline_left",
-                                                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01")
-                                                 )
-                                ),
-                                column(5,
+                                column(12,
                                        conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
-                                                        br(), 
                                                         div(class = "baseline_left",
+                                                            dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
+                                                            bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "danger", type = "action", value = FALSE, 
+                                                                     block = TRUE), br(),
                                                             bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                                      block = TRUE), br(),
                                                             bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
@@ -53,55 +50,12 @@ ui <- function(request) {
                                                                         value = 100, post = "%", ticks = FALSE),
                                                             br()
                                                         ),
+                                                        source("./www/pushbar_parameters_interventions.R", local = TRUE)[1],
                                                         source("./www/pushbar_parameters_country.R", local = TRUE)[1],
                                                         source("./www/pushbar_parameters_virus.R", local = TRUE)[1],
                                                         source("./www/pushbar_parameters_hospital.R", local = TRUE)[1]
                                        )
-                                ),
-                                column(7,
-                                       div(class = "interventions_left",
-                                           conditionalPanel("! ((output.status_app_output == 'Validated Baseline' || output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_visualfit')",
-                                                            h4("Available:"),
-                                                            # Lockdown ----
-                                                            source("./www/interventions/lockdown.R", local = TRUE)$value,
-                                                            # Self Isolation ----
-                                                            source("./www/interventions/selfisolation.R", local = TRUE)$value,
-                                                            bsPopover("interventions_selfis", title='Self-isolation', "<p>Coverage gives the proportion of people whom self-isolate after testing positive for coronavirus. The efficacy indicates how many less infectious contacts isolating people have (across all contact matrices).</p>", 
-                                                                      "top", trigger='hover', options = list(container = "body")),
-                                                            # Social Distancing ----
-                                                            source("./www/interventions/socialdistancing.R", local = TRUE)$value,
-                                                            bsPopover("interventions_dist", title='Social distancing', "<p>Coverage reflects the proportion of people that reduce their societal contacts (excluding those at home, work and school). Efficacy changes the percent reduction in those contacts.</p>", 
-                                                                      "top", trigger='hover', options = list(container = "body")),
-                                                            # Handwashing ----
-                                                            source("./www/interventions/handwashing.R", local = TRUE)$value,
-                                                            bsPopover("interventions_hand", title='Hand washing', "<p>This indicates improvements in personal hygiene and reduction in risk behaviours (touching face, nose, mouth). It reduces the risk of infection by efficacy for the duration of the intervention.</p>", 
-                                                                      "top", trigger='hover', options = list(container = "body")),
-                                                            # Working from Home ----
-                                                            source("./www/interventions/work.R", local = TRUE)$value,
-                                                            bsPopover("interventions_work", title='Working at home', "<p>Sets the proportion of workers working from home. Those who don’t from home have a reduction in contacts at work defined by efficacy. Those who work at home have increased contacts at home defined by w2h.</p>", 
-                                                                      "top", trigger='hover', options = list(container = "body")),
-                                                            # School Closure ----
-                                                            source("./www/interventions/school.R", local = TRUE)$value,
-                                                            bsPopover("interventions_school", title='School closure', "<p>We assume all schools close at the same time. Efficacy defines the reduction of contacts between school children when school is closed. Children at home have increased home contacts given by s2h.</p>", 
-                                                                      "top", trigger='hover', options = list(container = "body")),
-                                                            # Cocooning/Shielding the elderly ----
-                                                            source("./www/interventions/cocoon.R", local = TRUE)$value,
-                                                            bsPopover("interventions_cocoon", title='Shielding the elderly', "<p>Defining an age cut-off, this intervention is designed to isolate a proportion (coverage) of the elderly population and reduce their overall contacts by efficacy.</p>", 
-                                                                      "top", trigger='hover', options = list(container = "body")),
-                                                            # Travel Ban ----
-                                                            source("./www/interventions/travel.R", local = TRUE)$value,
-                                                            bsPopover("interventions_travelban", title='Travel ban', "<p>Reduces the number of imported cases per day by a percentage given by efficacy.</p>", 
-                                                                      "bottom", trigger='hover', options = list(container = "body")),
-                                                            # Quarantine ----
-                                                            source("./www/interventions/quarantine.R", local = TRUE)$value,
-                                                            bsPopover("interventions_quarantine", title='Quarantine', "<p>This indicates how many people will self-isolate for X days if a person they live with tests positive. As such, coverage depends on the number of people isolating and the number of persons per household. During their isolation period, these people will have increased contacts at home and reduced societal contacts.</p>", 
-                                                                      "bottom", trigger='hover', options = list(container = "body")),
-                                                            # Vaccination ----
-                                                            h4("Not Yet Available:"),
-                                                            source("./www/interventions/vaccination.R", local = TRUE)$value
-                                           )
-                                       )
-                                ),
+                                )
                               ),
                               br(), br(), br(), br(), br(), br(), br(),
                               div(id = "float_action",
@@ -260,6 +214,8 @@ server <- function(input, output, session) {
   
   # Pushbar for parameters ----
   setup_pushbar(overlay = TRUE, blur = TRUE)
+  observeEvent(input$open_interventions_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_interventions"))  
+  observeEvent(input$close_interventions_param, pushbar_close())
   observeEvent(input$open_country_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_country"))  
   observeEvent(input$close_country_param, pushbar_close())
   observeEvent(input$open_virus_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_virus"))  
