@@ -64,6 +64,9 @@
   z-index: 9999;
 }
 
+.red {
+  color: red;
+}
 
 #margin_month_slider {
   margin-left:10px;
