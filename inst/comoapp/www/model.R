@@ -708,5 +708,20 @@ process_ode_outcome <- function(out){
     mutate(age_cat = factor(age_cat, levels = rev(c("≤ 30 y.o.", "30-40 y.o.",
                                                     "40-50 y.o.", "50-60 y.o.", "60-70 y.o.", "≥ 70 y.o."))))
   
+  MORTDF <- data.frame(Age = popstruc$agefloor)
+  if(nrow(out) >= 30)  MORTDF <- bind_cols(MORTDF, 
+                                           data.frame(day30 = out[30,CMindex+1]/out[30,Cindex+1]) %>%
+                                             mutate(day30 = ifelse(is.infinite(day30), 0, day30)))
+  if(nrow(out) >= 60)  MORTDF <- bind_cols(MORTDF, 
+                                           data.frame(day60 = out[60,CMindex+1]/out[60,Cindex+1]) %>%
+                                             mutate(day60 = ifelse(is.infinite(day60), 0, day60)))
+  if(nrow(out) >= 90)  MORTDF <- bind_cols(MORTDF, 
+                                           data.frame(day90 = out[90,CMindex+1]/out[90,Cindex+1]) %>%
+                                             mutate(day90 = ifelse(is.infinite(day90), 0, day90)))
+  if(nrow(out) >= 120)  MORTDF <- bind_cols(MORTDF, 
+                                            data.frame(day120 = out[120,CMindex+1]/out[120,Cindex+1]) %>%
+                                              mutate(day120 = ifelse(is.infinite(day120), 0, day120)))
+  
+  results$MORTDF <- MORTDF
   return(results)
 }
