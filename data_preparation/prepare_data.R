@@ -9,7 +9,7 @@ library(tidyverse)
 
 
 # Cases Data ----
-file <- "COVID-19-geographic-disbtribution-worldwide-2020-04-23.xlsx"
+file <- "COVID-19-geographic-disbtribution-worldwide-2020-04-29.xlsx"
 
 cases <- read_excel(file) %>%
   transmute(date = as.Date(dateRep), cases = cases, deaths = deaths, country = countriesAndTerritories) %>%
