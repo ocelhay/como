@@ -23,7 +23,7 @@ output$plot_mortality_lag_baseline <- renderPlot({
     theme_minimal(base_size = 14) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1.2),
           legend.position = "bottom", legend.text = element_text(size = 13)) +
-    labs(title = "Case Fatality Rate by Age", subtitle = "Future Scenarios",
+    labs(title = "Case Fatality Rate by Age", subtitle = "Baseline",
          x = "", y = "Fatality Rate", color = "Measured at:")
 })
 
