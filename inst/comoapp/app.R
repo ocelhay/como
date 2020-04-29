@@ -13,6 +13,11 @@ ui <- function(request) {
     chooseSliderSkin('HTML5'),
     title = "CoMo COVID-19 App",
     
+    source("./www/pushbar_parameters_interventions.R", local = TRUE)[1],
+    source("./www/pushbar_parameters_country.R", local = TRUE)[1],
+    source("./www/pushbar_parameters_virus.R", local = TRUE)[1],
+    source("./www/pushbar_parameters_hospital.R", local = TRUE)[1],
+    
     fluidRow(
       # column left ----
       column(4, 
@@ -22,42 +27,39 @@ ui <- function(request) {
              conditionalPanel("input.tabs != 'tab_welcome'",
                               br(), 
                               conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
-                                               p("Use customised data/update default parameters: ", a("download the file 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
+                                               p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
                                                  ", edit it and upload it."),
-                                               fileInput("own_data", label = span("Upload your ", span("v13", class = "red"), " template"), accept = ".xlsx", multiple = FALSE),
-                                               hr()
+                                               fileInput("own_data", label = span("Upload your ", span("v13", class = "red"), " template:"), accept = ".xlsx", multiple = FALSE)
                               ),
-                              fluidRow(
-                                column(12,
-                                       conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
-                                                        div(class = "baseline_left",
-                                                            dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
-                                                            bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "danger", type = "action", value = FALSE, 
-                                                                     block = TRUE), br(),
-                                                            bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                     block = TRUE), br(),
-                                                            bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                     block = TRUE), br(), 
-                                                            bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                     block = TRUE), br(), 
-                                                            sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
-                                                                        value = 0.049, ticks = FALSE),
-                                                            sliderInput("report", label = span("Percentage of all", strong(" asymptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
-                                                                        value = 2.5, post = "%", ticks = FALSE),
-                                                            sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
-                                                                        value = 5, post = "%", ticks = FALSE),
-                                                            sliderInput("reporth", label = span("Percentage of all hospitalisations that are reported:"), min = 0, max = 100, step = 0.1,
-                                                                        value = 100, post = "%", ticks = FALSE),
-                                                            br()
-                                                        ),
-                                                        source("./www/pushbar_parameters_interventions.R", local = TRUE)[1],
-                                                        source("./www/pushbar_parameters_country.R", local = TRUE)[1],
-                                                        source("./www/pushbar_parameters_virus.R", local = TRUE)[1],
-                                                        source("./www/pushbar_parameters_hospital.R", local = TRUE)[1]
-                                       )
-                                )
+                              conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
+                                               tabsetPanel(
+                                                 tabPanel("Global Parameters",
+                                                          div(class = "baseline_left",
+                                                              dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
+                                                              bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "danger", type = "action", value = FALSE, 
+                                                                       block = TRUE), br(),
+                                                              bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                       block = TRUE), br(),
+                                                              bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                       block = TRUE), br(), 
+                                                              bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                       block = TRUE), br(), 
+                                                              sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
+                                                                          value = 0.049, ticks = FALSE),
+                                                              sliderInput("report", label = span("Percentage of all", strong(" asymptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
+                                                                          value = 2.5, post = "%", ticks = FALSE),
+                                                              sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
+                                                                          value = 5, post = "%", ticks = FALSE),
+                                                              sliderInput("reporth", label = span("Percentage of all hospitalisations that are reported:"), min = 0, max = 100, step = 0.1,
+                                                                          value = 100, post = "%", ticks = FALSE)
+                                                          )
+                                                 ),
+                                                 tabPanel("Baseline Interventions",
+                                                          HTML("All Interventions that should be part of the baseline")
+                                                 )
+                                               )
                               ),
-                              br(), br(), br(), br(), br(), br(), br(),
+                              br(), br(), br(), br(), br(), br(), br(), br(),
                               div(id = "float_action",
                                   conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
                                                    htmlOutput("feedback_choices")

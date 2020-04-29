@@ -1,6 +1,6 @@
 list(
   pushbar(id = "pushbar_parameters_interventions", from = "right", class = "pushbarcomp",
-          br(), 
+          br(),
           fluidRow(
             column(3, 
                    div(class = "box_interventions", h4(icon("lock"), " Lockdown")),
