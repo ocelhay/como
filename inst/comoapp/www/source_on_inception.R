@@ -25,3 +25,18 @@ load(file = "./www/data/mort_sever_default.Rda")
 countries_cases <- sort(unique(cases$country))
 countries_contact <- names(contact_home)
 countries_demographic <- sort(unique(population$country))
+
+
+all_interventions <- c("Lockdown, Low",
+                       "Lockdown, Mid",
+                       "Lockdown, High",
+                       "Self-isolation if Symptomatic",
+                       "Screening (when Self-isolation)",
+                       "Social Distancing",
+                       "Handwashing",
+                       "Working at Home",
+                       "School Closures",
+                       "Shielding the Elderly",
+                       "Travel Ban",
+                       "Voluntary home quarantine",
+                       "Vaccination")

@@ -54,8 +54,20 @@ ui <- function(request) {
                                                                           value = 100, post = "%", ticks = FALSE)
                                                           )
                                                  ),
-                                                 tabPanel("Baseline Interventions",
-                                                          HTML("All Interventions that should be part of the baseline")
+                                                 tabPanel("[Baseline + FS] Interventions",
+                                                          fluidRow(
+                                                            column(4, h5("Intervention:")),
+                                                            column(5, h5("Date Range:")),
+                                                            column(3, h5("Coverage:"))
+                                                          ),
+                                                          uiOutput("interventions_baseline"),
+                                                          conditionalPanel("output.test_file_uploaded",
+                                                                           actionButton("unlock", span(icon("lock"), "Unlock to Edit"))
+                                                          ),
+                                                          conditionalPanel(condition = "output.test_edit_manual",
+                                                                           actionButton("appendInput", icon("plus")),
+                                                                           actionButton("removeInput", icon("minus"))
+                                                          )
                                                  )
                                                )
                               ),
@@ -95,22 +107,19 @@ ui <- function(request) {
                                  br(),
                                  fluidRow(
                                    column(6, 
-                                          div(class = "box_outputs",
-                                              h4("Important Disclaimer:")
-                                          ),
+                                          div(class = "box_outputs", h4("Important Disclaimer:")),
                                           includeMarkdown("./www/markdown/disclaimer.md")
                                    ),
                                    column(6,
-                                          div(class = "box_outputs",
-                                              h4("Sources of Data:")
-                                          ),
+                                          div(class = "box_outputs", h4("Sources of Data:")),
                                           includeMarkdown("./www/markdown/about_country_data.md"),
                                           includeMarkdown("./www/markdown/about_data.md"),
                                    )
                                  )
                         ),
                         tabPanel("Visual Calibration", value = "tab_visualfit",
-                                 
+                                 div(class = "box_outputs", h4("Timeline")),
+                                 plotOutput("timevis"),
                                  conditionalPanel("output.status_app_output == 'Ok Baseline' | output.status_app_output == 'Validated Baseline'",
                                                   br(), br(), br(), br(),
                                                   fluidRow(
@@ -124,11 +133,9 @@ ui <- function(request) {
                         ),
                         tabPanel("Model Predictions", value = "tab_modelpredictions",
                                  br(), br(),
-                                 
-                                 
                                  conditionalPanel("output.status_app_output == 'Locked Baseline'",
                                                   div(class = "box_outputs", h4("Timeline")),
-                                                  plotOutput("timevis"),
+                                                  plotOutput("timevis_dup"),
                                                   conditionalPanel("output.status_app_output == 'Locked Baseline'",
                                                                    fluidRow(
                                                                      column(6,
@@ -233,6 +240,86 @@ server <- function(input, output, session) {
   simul_baseline <- reactiveValues(results = NULL, baseline_available = FALSE)
   simul_interventions <- reactiveValues(results = NULL, interventions_available = FALSE)
   
+  
+  
+  
+  # START CODE V13 ----
+  mat_interventions <- reactiveVal()
+  method_input <- reactiveVal("manual")
+  nb_interventions <- reactiveVal(1)
+  mat_xlsx_interventions <- reactiveVal(NULL)
+  show_click_edit <- reactiveVal(FALSE)
+  
+  observeEvent(input$unlock, {
+    show_click_edit(FALSE)
+    method_input("manual")
+  })
+  
+  observeEvent(input$appendInput, {
+    new_value <- nb_interventions() + 1
+    nb_interventions(new_value)
+    method_input("manual")
+  })
+  
+  observeEvent(input$removeInput, {
+    new_value <- max(1, nb_interventions() - 1)
+    nb_interventions(new_value)
+    method_input("manual")
+  })
+  
+  output$interventions_baseline <- renderUI({
+    # Initialize list of inputs
+    inputTagList <- tagList()
+    
+    # Populate the list of inputs
+    lapply(1:nb_interventions(), function(i){
+      # Define unique input ids
+      new_intervention_id <- paste0("input_intervention_", i)
+      new_daterange_id <- paste0("input_daterange_", i)
+      new_coverage_id <- paste0("input_coverage_", i)
+      
+      # Defaultt values
+      new_intervention_value <- all_interventions[4]
+      new_daterange_value <- c(as.Date("2020-01-01"), as.Date("2020-12-31"))
+      new_coverage_value <- 0
+      
+      if (new_intervention_id %in% names(input)) {
+        new_intervention_value <- input[[new_intervention_id]]
+        new_daterange_value <-  input[[new_daterange_id]]
+        new_coverage_value <-  input[[new_coverage_id]]
+      }
+      
+      if (method_input() == "excel") {
+        new_intervention_value <- mat_xlsx_interventions()$intervention[i]
+        new_daterange_value <-  c(mat_xlsx_interventions()$date_start[i], mat_xlsx_interventions()$date_end[i])
+        new_coverage_value <-  mat_xlsx_interventions()$coverage[i]
+      }
+      
+      # Define new input
+      newInput <- fluidRow(
+        column(4, selectInput(new_intervention_id, NULL, all_interventions, selected = new_intervention_value)),
+        column(5, dateRangeInput(new_daterange_id, NULL, start = new_daterange_value[1], end = new_daterange_value[2])),
+        column(3, numericInput(new_coverage_id, NULL, min = 0, max = 100, value = new_coverage_value))
+      )
+      
+      # Append new input to list of existing inputs
+      inputTagList <<- tagAppendChild(inputTagList, newInput)
+    })
+    
+    return(inputTagList)
+  })
+  
+  # To show the lock/unlock button
+  output$test_file_uploaded <- reactive(show_click_edit())
+  outputOptions(output, 'test_file_uploaded', suspendWhenHidden = FALSE)
+  
+  # To show the +/- buttons
+  output$test_edit_manual <- reactive(method_input() == "manual")
+  outputOptions(output, "test_edit_manual", suspendWhenHidden = FALSE)
+  # END CODE V13 ----
+  
+  
+  
   # Manage population and cases data reactive values ----
   observeEvent(input$country_demographic, if(input$country_demographic != "-- Own Value ---"){
     population_rv$data <- population %>% filter(country == input$country_demographic)
@@ -286,14 +373,15 @@ server <- function(input, output, session) {
     
     updatePickerInput(session, inputId = "country_demographic", selected = "-- Own Value ---")
     
+    
     # Parameters
     param <- bind_rows(read_excel(file_path, sheet = "Parameters"),
-                       read_excel(file_path, sheet = "Country Area Parameters"),
-                       read_excel(file_path, sheet = "Virus Parameters"),
-                       read_excel(file_path, sheet = "Hospitalisation Parameters"),
-                       read_excel(file_path, sheet = "Interventions")) %>%
-      mutate(Value_Date = as.Date(Value_Date))
-    
+                       read_excel(file_path, sheet = "Country Area Param"),
+                       read_excel(file_path, sheet = "Virus Param"),
+                       read_excel(file_path, sheet = "Hospitalisation Param"),
+                       read_excel(file_path, sheet = "Interventions Param")) %>%
+      mutate(Value_Date = as.Date(Value_Date)) %>%
+      drop_na(Parameter)
     
     # Update all sliders
     if(!is_empty(param$Parameter[param$Type == 'slider'])) {
@@ -312,18 +400,6 @@ server <- function(input, output, session) {
       updateSliderTextInput(session = session, inputId = "phi", selected = month.name[param$Value[param$Parameter == "phi"]])
     }
     
-    # Update switch
-    if(!is_empty(param$Parameter[param$Type == 'switch'])) {
-      for (input_excel in param$Parameter[param$Type == 'switch']){
-        updateMaterialSwitch(session = session, inputId = input_excel, value = param$Value_Logical[param$Parameter == input_excel])
-      }}
-    
-    # Update dates
-    if(!is_empty(param$Parameter[param$Type == 'date'])) {
-      for (input_excel in param$Parameter[param$Type == 'date']){
-        updateDateInput(session = session, inputId = input_excel, value = param$Value_Date[param$Parameter == input_excel])
-      }}
-    
     # Update date range of simulation
     if(!is_empty(param$Parameter[param$Type == 'date_range_simul'])) {
       updateDateRangeInput(session, inputId = "date_range", start = param$Value_Date[param$Parameter == "date_range_simul_start"], 
@@ -334,6 +410,22 @@ server <- function(input, output, session) {
     if(!is_empty(param$Parameter[param$Type == 'picker'])) {
       updatePickerInput(session, inputId = "country_contact", selected = param$Value_Country[param$Parameter == "country_contact"])
     }
+    
+    # START CODE V13 ----
+    interventions_excel <- read_excel(file_path, sheet = "Interventions")
+    names(interventions_excel) <- c("intervention", "date_start", "date_end", "coverage", "apply_to")
+    
+    interventions_excel_baseline <- interventions_excel %>% filter(apply_to == "Baseline + Future Scenario")
+    interventions_excel_future <- interventions_excel %>% filter(apply_to == "Future Scenario")
+    
+    # Interventions [Baseline + Future Scenario]
+    nb_interventions(nrow(interventions_excel_baseline))
+    mat_xlsx_interventions(interventions_excel_baseline)
+    method_input("excel")
+    show_click_edit(TRUE)
+    
+    # Interventions [Future Scenario]
+    # END CODE V13 ----
   })
   
   # Process on "reset_baseline" ----
@@ -350,6 +442,30 @@ server <- function(input, output, session) {
   observeEvent(input$run_baseline, {
     showNotification(span(h4(icon("hourglass-half"), "Running the Baseline..."), "typically runs in 10 secs."),
                      duration = NULL, type = "message", id = "model_run_notif")
+    
+    
+    # START CODE V13 ----
+    mat <- tibble(id = 1, 
+                  intervention = input[["input_intervention_1"]],
+                  start_date = input[["input_daterange_1"]][1],
+                  end_date = input[["input_daterange_1"]][2],
+                  coverage = input[["input_coverage_1"]])
+    
+    if(nb_interventions() > 1){
+      for (i in 2:nb_interventions()){ 
+        mat <- mat %>% bind_rows(tibble(
+          id = i, 
+          intervention = input[[paste0("input_intervention_", i)]],
+          start_date = input[[paste0("input_daterange_", i)]][1],
+          end_date = input[[paste0("input_daterange_", i)]][2],
+          coverage = input[[paste0("input_coverage_", i)]])
+        )
+      }
+    }
+    
+    mat_interventions(mat)
+    print(mat_interventions())
+    # END CODE V13 ----
     
     # Reset simul_interventions and elements of the UI
     simul_interventions$results <- NULL
