@@ -21,57 +21,46 @@ ui <- function(request) {
     fluidRow(
       # column left ----
       column(4, 
-             div(id = "css_feedback_process",
-                 htmlOutput("feedback_process"),
+             div(id = "css_feedback_process", htmlOutput("feedback_process")),
+             br(), 
+             conditionalPanel("input.tabs != 'tab_welcome' && output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
+                              p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
+                                ", edit it and upload it."),
+                              fileInput("own_data", label = span("Upload your ", span("v13", class = "red"), " template:"), accept = ".xlsx", multiple = FALSE),
+                              tabsetPanel(
+                                tabPanel("Global Parameters",
+                                         div(class = "baseline_left",
+                                             dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
+                                             bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "danger", type = "action", value = FALSE, 
+                                                      block = TRUE), br(),
+                                             bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                      block = TRUE), br(),
+                                             bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                      block = TRUE), br(), 
+                                             bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                      block = TRUE), br(), 
+                                             sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
+                                                         value = 0.049, ticks = FALSE),
+                                             sliderInput("report", label = span("Percentage of all", strong(" asymptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
+                                                         value = 2.5, post = "%", ticks = FALSE),
+                                             sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
+                                                         value = 5, post = "%", ticks = FALSE),
+                                             sliderInput("reporth", label = span("Percentage of all hospitalisations that are reported:"), min = 0, max = 100, step = 0.1,
+                                                         value = 100, post = "%", ticks = FALSE)
+                                         )
+                                ),
+                                # V13
+                                tabPanel("[Baseline + FS] Interventions",
+                                         source("./www/ui_interventions_baseline.R", local = TRUE)$value
+                                )
+                              )
              ),
+             # V13
+             conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_modelpredictions'",
+                              source("./www/ui_interventions_future.R", local = TRUE)$value
+             ),
+             br(), br(), br(), br(), br(), br(), br(), br(),
              conditionalPanel("input.tabs != 'tab_welcome'",
-                              br(), 
-                              conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
-                                               p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
-                                                 ", edit it and upload it."),
-                                               fileInput("own_data", label = span("Upload your ", span("v13", class = "red"), " template:"), accept = ".xlsx", multiple = FALSE)
-                              ),
-                              conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
-                                               tabsetPanel(
-                                                 tabPanel("Global Parameters",
-                                                          div(class = "baseline_left",
-                                                              dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
-                                                              bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "danger", type = "action", value = FALSE, 
-                                                                       block = TRUE), br(),
-                                                              bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                       block = TRUE), br(),
-                                                              bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                       block = TRUE), br(), 
-                                                              bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                       block = TRUE), br(), 
-                                                              sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
-                                                                          value = 0.049, ticks = FALSE),
-                                                              sliderInput("report", label = span("Percentage of all", strong(" asymptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
-                                                                          value = 2.5, post = "%", ticks = FALSE),
-                                                              sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
-                                                                          value = 5, post = "%", ticks = FALSE),
-                                                              sliderInput("reporth", label = span("Percentage of all hospitalisations that are reported:"), min = 0, max = 100, step = 0.1,
-                                                                          value = 100, post = "%", ticks = FALSE)
-                                                          )
-                                                 ),
-                                                 tabPanel("[Baseline + FS] Interventions",
-                                                          fluidRow(
-                                                            column(4, h5("Intervention:")),
-                                                            column(5, h5("Date Range:")),
-                                                            column(3, h5("Coverage:"))
-                                                          ),
-                                                          uiOutput("interventions_baseline"),
-                                                          conditionalPanel("output.test_file_uploaded",
-                                                                           actionButton("unlock", span(icon("lock"), "Unlock to Edit"))
-                                                          ),
-                                                          conditionalPanel(condition = "output.test_edit_manual",
-                                                                           actionButton("appendInput", icon("plus")),
-                                                                           actionButton("removeInput", icon("minus"))
-                                                          )
-                                                 )
-                                               )
-                              ),
-                              br(), br(), br(), br(), br(), br(), br(), br(),
                               div(id = "float_action",
                                   conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
                                                    htmlOutput("feedback_choices")
@@ -119,7 +108,8 @@ ui <- function(request) {
                         ),
                         tabPanel("Visual Calibration", value = "tab_visualfit",
                                  div(class = "box_outputs", h4("Timeline")),
-                                 plotOutput("timevis"),
+                                 plotOutput("timevis_baseline"),
+                                 dataTableOutput("tab_inputs"),
                                  conditionalPanel("output.status_app_output == 'Ok Baseline' | output.status_app_output == 'Validated Baseline'",
                                                   br(), br(), br(), br(),
                                                   fluidRow(
@@ -133,9 +123,9 @@ ui <- function(request) {
                         ),
                         tabPanel("Model Predictions", value = "tab_modelpredictions",
                                  br(), br(),
+                                 div(class = "box_outputs", h4("Timeline")),
+                                 plotOutput("timevis_future"),
                                  conditionalPanel("output.status_app_output == 'Locked Baseline'",
-                                                  div(class = "box_outputs", h4("Timeline")),
-                                                  plotOutput("timevis_dup"),
                                                   conditionalPanel("output.status_app_output == 'Locked Baseline'",
                                                                    fluidRow(
                                                                      column(6,
@@ -212,12 +202,6 @@ ui <- function(request) {
 
 # Define server ----
 server <- function(input, output, session) {
-  # On deployment only:
-  # Stop the shiny app when the browser window is closed
-  # session$onSessionEnded(function() {
-  #   stopApp()
-  # })
-  
   # Hide tabs on app launch ----
   hideTab(inputId = "tabs", target = "tab_modelpredictions")
   
@@ -241,81 +225,55 @@ server <- function(input, output, session) {
   simul_interventions <- reactiveValues(results = NULL, interventions_available = FALSE)
   
   
-  
-  
   # START CODE V13 ----
-  mat_interventions <- reactiveVal()
-  method_input <- reactiveVal("manual")
-  nb_interventions <- reactiveVal(1)
-  mat_xlsx_interventions <- reactiveVal(NULL)
-  show_click_edit <- reactiveVal(FALSE)
+  interventions <- reactiveValues(baseline_nb = 1, baseline_mat = tibble(NULL), future_nb = 1, future_mat = tibble(NULL))
+  output$baseline_nb <- reactive(interventions$baseline_nb)
+  outputOptions(output, "baseline_nb", suspendWhenHidden = FALSE)
+  output$future_nb <- reactive(interventions$future_nb)
+  outputOptions(output, "future_nb", suspendWhenHidden = FALSE)
   
-  observeEvent(input$unlock, {
-    show_click_edit(FALSE)
-    method_input("manual")
-  })
+  observeEvent(input$add_intervention_baseline, 
+               interventions$baseline_nb <- min(interventions$baseline_nb + 1, nb_interventions_max))
+  observeEvent(input$remove_intervention_baseline, 
+               interventions$baseline_nb <- max(interventions$baseline_nb - 1, nb_interventions_min))
+  observeEvent(input$add_intervention_future, 
+               interventions$future_nb <- min(interventions$future_nb + 1, nb_interventions_max))
+  observeEvent(input$remove_intervention_future, 
+               interventions$future_nb <- max(interventions$future_nb - 1, nb_interventions_min))
   
-  observeEvent(input$appendInput, {
-    new_value <- nb_interventions() + 1
-    nb_interventions(new_value)
-    method_input("manual")
-  })
-  
-  observeEvent(input$removeInput, {
-    new_value <- max(1, nb_interventions() - 1)
-    nb_interventions(new_value)
-    method_input("manual")
-  })
-  
-  output$interventions_baseline <- renderUI({
-    # Initialize list of inputs
-    inputTagList <- tagList()
+  observe({
+    interventions$baseline_mat <- tibble(index = 1:5, 
+                                         intervention = c(input$baseline_intervention_1, input$baseline_intervention_2, 
+                                                          input$baseline_intervention_3, input$baseline_intervention_4,
+                                                          input$baseline_intervention_5),
+                                         date_start = c(input$baseline_daterange_1[1], input$baseline_daterange_2[1],
+                                                        input$baseline_daterange_3[1], input$baseline_daterange_4[1],
+                                                        input$baseline_daterange_5[1]),
+                                         date_end = c(input$baseline_daterange_1[2], input$baseline_daterange_2[2],
+                                                      input$baseline_daterange_3[2], input$baseline_daterange_4[2],
+                                                      input$baseline_daterange_5[2]),
+                                         coverage = c(input$baseline_coverage_1, input$baseline_coverage_2,
+                                                      input$baseline_coverage_3, input$baseline_coverage_4,
+                                                      input$baseline_coverage_5)
+    ) %>%
+      filter(index <= interventions$baseline_nb)
     
-    # Populate the list of inputs
-    lapply(1:nb_interventions(), function(i){
-      # Define unique input ids
-      new_intervention_id <- paste0("input_intervention_", i)
-      new_daterange_id <- paste0("input_daterange_", i)
-      new_coverage_id <- paste0("input_coverage_", i)
-      
-      # Defaultt values
-      new_intervention_value <- all_interventions[4]
-      new_daterange_value <- c(as.Date("2020-01-01"), as.Date("2020-12-31"))
-      new_coverage_value <- 0
-      
-      if (new_intervention_id %in% names(input)) {
-        new_intervention_value <- input[[new_intervention_id]]
-        new_daterange_value <-  input[[new_daterange_id]]
-        new_coverage_value <-  input[[new_coverage_id]]
-      }
-      
-      if (method_input() == "excel") {
-        new_intervention_value <- mat_xlsx_interventions()$intervention[i]
-        new_daterange_value <-  c(mat_xlsx_interventions()$date_start[i], mat_xlsx_interventions()$date_end[i])
-        new_coverage_value <-  mat_xlsx_interventions()$coverage[i]
-      }
-      
-      # Define new input
-      newInput <- fluidRow(
-        column(4, selectInput(new_intervention_id, NULL, all_interventions, selected = new_intervention_value)),
-        column(5, dateRangeInput(new_daterange_id, NULL, start = new_daterange_value[1], end = new_daterange_value[2])),
-        column(3, numericInput(new_coverage_id, NULL, min = 0, max = 100, value = new_coverage_value))
-      )
-      
-      # Append new input to list of existing inputs
-      inputTagList <<- tagAppendChild(inputTagList, newInput)
-    })
-    
-    return(inputTagList)
+    interventions$future_mat <- tibble(index = 1:5, 
+                                       intervention = c(input$future_intervention_1, input$future_intervention_2, 
+                                                        input$future_intervention_3, input$future_intervention_4,
+                                                        input$future_intervention_5),
+                                       date_start = c(input$future_daterange_1[1], input$future_daterange_2[1],
+                                                      input$future_daterange_3[1], input$future_daterange_4[1],
+                                                      input$future_daterange_5[1]),
+                                       date_end = c(input$future_daterange_1[2], input$future_daterange_2[2],
+                                                    input$future_daterange_3[2], input$future_daterange_4[2],
+                                                    input$future_daterange_5[2]),
+                                       coverage = c(input$future_coverage_1, input$future_coverage_2,
+                                                    input$future_coverage_3, input$future_coverage_4,
+                                                    input$future_coverage_5)
+    ) %>%
+      filter(index <= interventions$future_nb)
   })
-  
-  # To show the lock/unlock button
-  output$test_file_uploaded <- reactive(show_click_edit())
-  outputOptions(output, 'test_file_uploaded', suspendWhenHidden = FALSE)
-  
-  # To show the +/- buttons
-  output$test_edit_manual <- reactive(method_input() == "manual")
-  outputOptions(output, "test_edit_manual", suspendWhenHidden = FALSE)
   # END CODE V13 ----
   
   
@@ -414,17 +372,28 @@ server <- function(input, output, session) {
     # START CODE V13 ----
     interventions_excel <- read_excel(file_path, sheet = "Interventions")
     names(interventions_excel) <- c("intervention", "date_start", "date_end", "coverage", "apply_to")
+    interventions_excel <- interventions_excel %>%
+      mutate(date_start = as.Date(date_start), date_end = as.Date(date_end))
     
-    interventions_excel_baseline <- interventions_excel %>% filter(apply_to == "Baseline + Future Scenario")
-    interventions_excel_future <- interventions_excel %>% filter(apply_to == "Future Scenario")
     
-    # Interventions [Baseline + Future Scenario]
-    nb_interventions(nrow(interventions_excel_baseline))
-    mat_xlsx_interventions(interventions_excel_baseline)
-    method_input("excel")
-    show_click_edit(TRUE)
+    interventions_excel_baseline <- interventions_excel %>% 
+      filter(apply_to == "Baseline + Future Scenario")
+    interventions_excel_future <- interventions_excel %>% 
+      filter(apply_to == "Future Scenario")
     
-    # Interventions [Future Scenario]
+    interventions$baseline_nb <- min(interventions_excel_baseline %>% nrow(), 50)
+    interventions$future_nb <- min(interventions_excel_future %>% nrow(), 50)
+    
+    for (i in 1:interventions$baseline_nb) {
+      updateSelectInput(session, paste0("baseline_intervention_", i), selected = interventions_excel_baseline[[i, "intervention"]])
+      updateDateRangeInput(session, paste0("baseline_daterange_", i), start = interventions_excel_baseline[[i, "date_start"]], end = interventions_excel_baseline[[i, "date_end"]])
+      updateNumericInput(session, paste0("baseline_coverage_", i), value = interventions_excel_baseline[[i, "coverage"]])
+    }
+    for (i in 1:interventions$future_nb) {
+      updateSelectInput(session, paste0("future_intervention_", i), selected = interventions_excel_future[[i, "intervention"]])
+      updateDateRangeInput(session, paste0("future_daterange_", i), start = interventions_excel_future[[i, "date_start"]], end = interventions_excel_future[[i, "date_end"]])
+      updateNumericInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "coverage"]])
+    }
     # END CODE V13 ----
   })
   
@@ -443,50 +412,26 @@ server <- function(input, output, session) {
     showNotification(span(h4(icon("hourglass-half"), "Running the Baseline..."), "typically runs in 10 secs."),
                      duration = NULL, type = "message", id = "model_run_notif")
     
-    
-    # START CODE V13 ----
-    mat <- tibble(id = 1, 
-                  intervention = input[["input_intervention_1"]],
-                  start_date = input[["input_daterange_1"]][1],
-                  end_date = input[["input_daterange_1"]][2],
-                  coverage = input[["input_coverage_1"]])
-    
-    if(nb_interventions() > 1){
-      for (i in 2:nb_interventions()){ 
-        mat <- mat %>% bind_rows(tibble(
-          id = i, 
-          intervention = input[[paste0("input_intervention_", i)]],
-          start_date = input[[paste0("input_daterange_", i)]][1],
-          end_date = input[[paste0("input_daterange_", i)]][2],
-          coverage = input[[paste0("input_coverage_", i)]])
-        )
-      }
-    }
-    
-    mat_interventions(mat)
-    print(mat_interventions())
-    # END CODE V13 ----
-    
     # Reset simul_interventions and elements of the UI
     simul_interventions$results <- NULL
     
-    source("./www/model.R", local = TRUE)
-    if(! input$lockdown_low_switch) parameters["lockdown_low_on"] <- 10e5
-    if(! input$lockdown_mid_switch) parameters["lockdown_mid_on"] <- 10e5
-    if(! input$lockdown_high_switch) parameters["lockdown_high_on"] <- 10e5
-    if(! input$selfis_switch) parameters["selfis_on"] <- 10e5
-    if(! input$dist_switch) parameters["dist_on"] <- 10e5
-    if(! input$hand_switch) parameters["hand_on"] <- 10e5
-    if(! input$work_switch) parameters["work_on"] <- 10e5
-    if(! input$school_switch) parameters["school_on"] <- 10e5
-    if(! input$cocoon_switch) parameters["cocoon_on"] <- 10e5
-    if(! input$travelban_switch) parameters["travelban_on"] <-10e5
-    if(! input$screen_switch) parameters["screen_on"] <- 10e5
-    if(! input$quarantine_switch) parameters["quarantine_on"] <- 10e5
-    if(! input$vaccination_switch) parameters["vaccine_on"] <- 10e5
-    
-    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
-    simul_baseline$results <- process_ode_outcome(out)
+    # source("./www/model.R", local = TRUE)
+    # if(! input$lockdown_low_switch) parameters["lockdown_low_on"] <- 10e5
+    # if(! input$lockdown_mid_switch) parameters["lockdown_mid_on"] <- 10e5
+    # if(! input$lockdown_high_switch) parameters["lockdown_high_on"] <- 10e5
+    # if(! input$selfis_switch) parameters["selfis_on"] <- 10e5
+    # if(! input$dist_switch) parameters["dist_on"] <- 10e5
+    # if(! input$hand_switch) parameters["hand_on"] <- 10e5
+    # if(! input$work_switch) parameters["work_on"] <- 10e5
+    # if(! input$school_switch) parameters["school_on"] <- 10e5
+    # if(! input$cocoon_switch) parameters["cocoon_on"] <- 10e5
+    # if(! input$travelban_switch) parameters["travelban_on"] <-10e5
+    # if(! input$screen_switch) parameters["screen_on"] <- 10e5
+    # if(! input$quarantine_switch) parameters["quarantine_on"] <- 10e5
+    # if(! input$vaccination_switch) parameters["vaccine_on"] <- 10e5
+    # 
+    # out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
+    # simul_baseline$results <- process_ode_outcome(out)
     
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
@@ -506,23 +451,23 @@ server <- function(input, output, session) {
     showNotification(span(h4(icon("hourglass-half"), "Running Future Scenarios..."), "typically runs in 10 secs."),
                      duration = NULL, type = "message", id = "run_interventions_notif")
     
-    source("./www/model.R", local = TRUE)
-    if(! input$lockdown_low_switch) parameters["lockdown_low_on"]<-10e5
-    if(! input$lockdown_mid_switch) parameters["lockdown_mid_on"]<-10e5
-    if(! input$lockdown_high_switch) parameters["lockdown_high_on"]<-10e5
-    if(! input$selfis_switch) parameters["selfis_on"] <- 10e5
-    if(! input$dist_switch) parameters["dist_on"] <- 10e5
-    if(! input$hand_switch) parameters["hand_on"] <- 10e5
-    if(! input$work_switch) parameters["work_on"] <- 10e5
-    if(! input$school_switch) parameters["school_on"] <- 10e5
-    if(! input$cocoon_switch) parameters["cocoon_on"] <- 10e5
-    if(! input$travelban_switch) parameters["travelban_on"] <-10e5
-    if(! input$screen_switch) parameters["screen_on"] <- 10e5
-    if(! input$quarantine_switch) parameters["quarantine_on"] <- 10e5
-    if(! input$vaccination_switch) parameters["vaccine_on"] <- 10e5
-    
-    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
-    simul_interventions$results <- process_ode_outcome(out)
+    # source("./www/model.R", local = TRUE)
+    # if(! input$lockdown_low_switch) parameters["lockdown_low_on"]<-10e5
+    # if(! input$lockdown_mid_switch) parameters["lockdown_mid_on"]<-10e5
+    # if(! input$lockdown_high_switch) parameters["lockdown_high_on"]<-10e5
+    # if(! input$selfis_switch) parameters["selfis_on"] <- 10e5
+    # if(! input$dist_switch) parameters["dist_on"] <- 10e5
+    # if(! input$hand_switch) parameters["hand_on"] <- 10e5
+    # if(! input$work_switch) parameters["work_on"] <- 10e5
+    # if(! input$school_switch) parameters["school_on"] <- 10e5
+    # if(! input$cocoon_switch) parameters["cocoon_on"] <- 10e5
+    # if(! input$travelban_switch) parameters["travelban_on"] <-10e5
+    # if(! input$screen_switch) parameters["screen_on"] <- 10e5
+    # if(! input$quarantine_switch) parameters["quarantine_on"] <- 10e5
+    # if(! input$vaccination_switch) parameters["vaccine_on"] <- 10e5
+    # 
+    # out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
+    # simul_interventions$results <- process_ode_outcome(out)
     
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"

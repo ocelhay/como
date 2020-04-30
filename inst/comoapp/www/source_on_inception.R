@@ -40,3 +40,10 @@ all_interventions <- c("Lockdown, Low",
                        "Travel Ban",
                        "Voluntary home quarantine",
                        "Vaccination")
+
+# V13
+new_intervention_value <- all_interventions[4]
+new_daterange_value <- c(as.Date("2020-01-01"), as.Date("2020-12-31"))
+new_coverage_value <- 0
+nb_interventions_min <- 0
+nb_interventions_max <- 50
