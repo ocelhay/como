@@ -708,5 +708,25 @@ process_ode_outcome <- function(out){
     mutate(age_cat = factor(age_cat, levels = rev(c("≤ 30 y.o.", "30-40 y.o.",
                                                     "40-50 y.o.", "50-60 y.o.", "60-70 y.o.", "≥ 70 y.o."))))
   
+  mortality_lag <- data.frame(Age = popstruc$agefloor)
+  if(nrow(out) >= 30)  mortality_lag <- bind_cols(mortality_lag, 
+                                                  data.frame(day30 = out[30,CMindex+1]/out[30,Cindex+1]) %>%
+                                                    mutate(day30 = ifelse(is.infinite(day30), 0, day30)) %>%
+                                                    rename(`Day 30` = day30))
+  if(nrow(out) >= 60)  mortality_lag <- bind_cols(mortality_lag, 
+                                                  data.frame(day60 = out[60,CMindex+1]/out[60,Cindex+1]) %>%
+                                                    mutate(day60 = ifelse(is.infinite(day60), 0, day60)) %>%
+                                                    rename(`Day 60` = day60))
+  if(nrow(out) >= 90)  mortality_lag <- bind_cols(mortality_lag, 
+                                                  data.frame(day90 = out[90,CMindex+1]/out[90,Cindex+1]) %>%
+                                                    mutate(day90 = ifelse(is.infinite(day90), 0, day90)) %>%
+                                                    rename(`Day 90` = day90))
+  if(nrow(out) >= 120)  mortality_lag <- bind_cols(mortality_lag, 
+                                                   data.frame(day120 = out[120,CMindex+1]/out[120,Cindex+1]) %>%
+                                                     mutate(day120 = ifelse(is.infinite(day120), 0, day120)) %>%
+                                                     rename(`Day 120` = day120))
+  
+  results$mortality_lag <- mortality_lag
+  
   return(results)
 }

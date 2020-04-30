@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v12.8"
+version_app <- "v12.9"
 
 # Load packages and data
 source("./www/source_on_inception.R")
@@ -206,11 +206,13 @@ ui <- function(request) {
                                                                    fluidRow(
                                                                      column(6,
                                                                             highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                                                                            plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br()
+                                                                            plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br(),
+                                                                            plotOutput("plot_mortality_lag_baseline") %>% withSpinner(), br()
                                                                      ),
                                                                      column(6,
                                                                             highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                                                                            plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br()
+                                                                            plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br(),
+                                                                            plotOutput("plot_mortality_lag_interventions") %>% withSpinner(), br()
                                                                      )
                                                                    ),
                                                                    
