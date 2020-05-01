@@ -638,6 +638,7 @@ process_ode_outcome <- function(out){
   Rt <- NULL
   for (i in (ceiling(1/parameters["nui"])+1):length(times)){
     Rt[i] <- cumsum(sum(parameters["gamma"]*out[i,(Eindex+1)]))/cumsum(sum(parameters["gamma"]*out[(i-1/parameters["nui"]),(Eindex+1)]))
+    if(Rt[i] >= 7) Rt[i] <- NA
   }
   
   # Export in a cohesive format ----
