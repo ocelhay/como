@@ -142,7 +142,11 @@ ui <- function(request) {
                                           div(class = "box_outputs",
                                               h4("Important Disclaimer:")
                                           ),
-                                          includeMarkdown("./www/markdown/disclaimer.md")
+                                          includeMarkdown("./www/markdown/disclaimer.md"),
+                                          div(class = "box_outputs",
+                                              h4("License:")
+                                          ),
+                                          includeMarkdown("./www/markdown/readable_license.md")
                                    ),
                                    column(6,
                                           div(class = "box_outputs",
