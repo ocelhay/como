@@ -27,32 +27,27 @@ ui <- function(request) {
                               p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
                                 ", edit it and upload it."),
                               fileInput("own_data", label = span("Upload your ", span("v13", class = "red"), " template:"), accept = ".xlsx", multiple = FALSE),
-                              tabsetPanel(
-                                tabPanel("Global Parameters",
-                                         div(class = "baseline_left",
-                                             dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
-                                             bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "danger", type = "action", value = FALSE, 
-                                                      block = TRUE), br(),
-                                             bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                      block = TRUE), br(),
-                                             bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                      block = TRUE), br(), 
-                                             bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                      block = TRUE), br(), 
-                                             sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
-                                                         value = 0.049, ticks = FALSE),
-                                             sliderInput("report", label = span("Percentage of all", strong(" asymptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
-                                                         value = 2.5, post = "%", ticks = FALSE),
-                                             sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
-                                                         value = 5, post = "%", ticks = FALSE),
-                                             sliderInput("reporth", label = span("Percentage of all hospitalisations that are reported:"), min = 0, max = 100, step = 0.1,
-                                                         value = 100, post = "%", ticks = FALSE)
-                                         )
-                                ),
-                                # V13
-                                tabPanel("[Baseline + FS] Interventions",
-                                         source("./www/ui_interventions_baseline.R", local = TRUE)$value
-                                )
+                              div(class = "baseline_left",
+                                  dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
+                                  bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "danger", type = "action", value = FALSE, 
+                                           block = TRUE), br(),
+                                  # V13
+                                  source("./www/ui_interventions_baseline.R", local = TRUE)$value,
+                                  br(),
+                                  bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                           block = TRUE), br(),
+                                  bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                           block = TRUE), br(), 
+                                  bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                           block = TRUE), br(), 
+                                  sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
+                                              value = 0.049, ticks = FALSE),
+                                  sliderInput("report", label = span("Percentage of all", strong(" asymptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
+                                              value = 2.5, post = "%", ticks = FALSE),
+                                  sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
+                                              value = 5, post = "%", ticks = FALSE),
+                                  sliderInput("reporth", label = span("Percentage of all hospitalisations that are reported:"), min = 0, max = 100, step = 0.1,
+                                              value = 100, post = "%", ticks = FALSE)
                               )
              ),
              # V13
@@ -415,23 +410,9 @@ server <- function(input, output, session) {
     # Reset simul_interventions and elements of the UI
     simul_interventions$results <- NULL
     
-    # source("./www/model.R", local = TRUE)
-    # if(! input$lockdown_low_switch) parameters["lockdown_low_on"] <- 10e5
-    # if(! input$lockdown_mid_switch) parameters["lockdown_mid_on"] <- 10e5
-    # if(! input$lockdown_high_switch) parameters["lockdown_high_on"] <- 10e5
-    # if(! input$selfis_switch) parameters["selfis_on"] <- 10e5
-    # if(! input$dist_switch) parameters["dist_on"] <- 10e5
-    # if(! input$hand_switch) parameters["hand_on"] <- 10e5
-    # if(! input$work_switch) parameters["work_on"] <- 10e5
-    # if(! input$school_switch) parameters["school_on"] <- 10e5
-    # if(! input$cocoon_switch) parameters["cocoon_on"] <- 10e5
-    # if(! input$travelban_switch) parameters["travelban_on"] <-10e5
-    # if(! input$screen_switch) parameters["screen_on"] <- 10e5
-    # if(! input$quarantine_switch) parameters["quarantine_on"] <- 10e5
-    # if(! input$vaccination_switch) parameters["vaccine_on"] <- 10e5
-    # 
-    # out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
-    # simul_baseline$results <- process_ode_outcome(out)
+    source("./www/model.R", local = TRUE)
+    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
+    simul_baseline$results <- process_ode_outcome(out)
     
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
@@ -451,23 +432,9 @@ server <- function(input, output, session) {
     showNotification(span(h4(icon("hourglass-half"), "Running Future Scenarios..."), "typically runs in 10 secs."),
                      duration = NULL, type = "message", id = "run_interventions_notif")
     
-    # source("./www/model.R", local = TRUE)
-    # if(! input$lockdown_low_switch) parameters["lockdown_low_on"]<-10e5
-    # if(! input$lockdown_mid_switch) parameters["lockdown_mid_on"]<-10e5
-    # if(! input$lockdown_high_switch) parameters["lockdown_high_on"]<-10e5
-    # if(! input$selfis_switch) parameters["selfis_on"] <- 10e5
-    # if(! input$dist_switch) parameters["dist_on"] <- 10e5
-    # if(! input$hand_switch) parameters["hand_on"] <- 10e5
-    # if(! input$work_switch) parameters["work_on"] <- 10e5
-    # if(! input$school_switch) parameters["school_on"] <- 10e5
-    # if(! input$cocoon_switch) parameters["cocoon_on"] <- 10e5
-    # if(! input$travelban_switch) parameters["travelban_on"] <-10e5
-    # if(! input$screen_switch) parameters["screen_on"] <- 10e5
-    # if(! input$quarantine_switch) parameters["quarantine_on"] <- 10e5
-    # if(! input$vaccination_switch) parameters["vaccine_on"] <- 10e5
-    # 
-    # out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
-    # simul_interventions$results <- process_ode_outcome(out)
+    source("./www/model.R", local = TRUE)
+    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
+    simul_interventions$results <- process_ode_outcome(out)
     
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"

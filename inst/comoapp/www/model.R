@@ -19,21 +19,24 @@ ifr <- mort_sever_rv$data %>%
   select(age_category, ifr) %>% 
   as.data.frame()
 
-c_home <- contact_home[[input$country_contact]] %>% as.matrix()
-c_school <- contact_school[[input$country_contact]] %>% as.matrix()
-c_work <- contact_work[[input$country_contact]] %>% as.matrix()
-c_other <- contact_other[[input$country_contact]] %>% as.matrix()
+country_name <- input$country_contact
 # END Bridge ----
 
-# START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# START Placeholder for covidage_v13.2.R code (DO NOT EDIT) ----
+#########    POP AGEING
 # per year ageing matrix
-A <- length(age_categories)
-dd <- seq(1:A)/seq(1:A)
-ageing <- t(diff(diag(dd), lag = 1)/(5*365.25))
-ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
-# END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+A<-length(popstruc[,2])
+dd<-seq(1:A)/seq(1:A)
+ageing <- t(diff(diag(dd),lag=1)/(5*365.25))
+ageing<-cbind(ageing,0*seq(1:A)) # no ageing from last compartment
 
-# START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+###  CONTACT MATRICES
+c_home <- contact_home[[country_name]] %>% as.matrix()
+c_school <- contact_school[[country_name]] %>% as.matrix()
+c_work <- contact_work[[country_name]] %>% as.matrix()
+c_other <- contact_other[[country_name]] %>% as.matrix()
+
+# EDIT Placeholder: move definition of nce afterwards definition of c_home
 nce <-A-length(c_home[1,])
 
 contact_home<-matrix(0,nrow=A,ncol=A)
@@ -74,14 +77,14 @@ for (i in (A+1-nce):A){
     contact_other[i,j]<-c_other[(A-nce),(A-nce)]
   }
 }
-# END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# END Placeholder ----
 
 # START Bridge ----
 startdate <- input$date_range[1]
 stopdate <- input$date_range[2]
 # END Bridge ----
 
-# START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# START Placeholder for covidage_v13.2.R code (DO NOT EDIT) ----
 day_start <- as.numeric(startdate-startdate)
 day_stop <- as.numeric(stopdate-startdate)
 times <- seq(day_start, day_stop)
@@ -128,83 +131,42 @@ parameters <- c(
   
   # INTERVENTIONS
   # self isolation
-  selfis_on = as.numeric(input$date_selfis_on - startdate),
-  selfis_dur = input$selfis_dur,
-  selfis_cov = input$selfis_cov,
   selfis_eff = input$selfis_eff,
-  
   # social distancing
-  dist_on = as.numeric(input$date_dist_on - startdate),
-  dist_dur = input$dist_dur,
-  dist_cov = input$dist_cov,
   dist_eff = input$dist_eff,
-  
   # hand washing
-  hand_on = as.numeric(input$date_hand_on - startdate),
-  hand_dur = input$hand_dur,
   hand_eff = input$hand_eff,
-  
   # working at home
-  work_on = as.numeric(input$date_work_on - startdate),
-  work_dur = input$work_dur,
   work_eff = input$work_eff,
-  work_cov = input$work_cov,
   w2h = input$w2h,
-  
   # school closures
-  school_on = as.numeric(input$date_school_on - startdate),
-  school_dur = input$school_dur,
   school_eff = input$school_eff,
   s2h = input$s2h,
-  
   # cocooning the elderly
-  cocoon_on = as.numeric(input$date_cocoon_on - startdate),
-  cocoon_dur = input$cocoon_dur,
   cocoon_eff = input$cocoon_eff,
-  cocoon_cov = input$cocoon_cov,
   age_cocoon = input$age_cocoon,
-  
   # vaccination campaign
-  vaccine_on = as.numeric(input$date_vaccine_on - startdate),
   vaccine_eff = input$vaccine_eff,
-  vaccine_cov = input$vaccine_cov,
   vac_campaign = input$vac_campaign,
-  
   # travel ban
   mean_imports = input$mean_imports,
-  travelban_on = as.numeric(input$date_travelban_on - startdate),
-  travelban_dur = input$travelban_dur,
-  travelban_eff = input$travelban_eff,
-  
   # screening
-  screen_on = as.numeric(input$date_screen_on - startdate),
-  screen_dur = input$screen_dur,
   screen_cov = input$screen_cov,
   screen_overdispersion = input$screen_overdispersion,
   screen_contacts = input$screen_contacts,
   
   # voluntary home quarantine
-  quarantine_on = as.numeric(input$date_quarantine_on - startdate),
-  quarantine_cov = input$quarantine_cov,
-  quarantine_dur = input$quarantine_dur,
   quarantine_days = input$quarantine_days,
   quarantine_effort = input$quarantine_effort,
   quarantine_eff_home = input$quarantine_eff_home,
   quarantine_eff_other = input$quarantine_eff_other,
   
-  # lockdown
-  lockdown_low_on = as.numeric(input$date_lockdown_low_on - startdate),
-  lockdown_low_dur = input$lockdown_low_dur,
-  lockdown_mid_on = as.numeric(input$date_lockdown_mid_on - startdate),
-  lockdown_mid_dur = input$lockdown_mid_dur,
-  lockdown_high_on = as.numeric(input$date_lockdown_high_on - startdate),
-  lockdown_high_dur = input$lockdown_high_dur,
-  
   household_size = input$household_size
 )
 # END Bridge ----
 
-# START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# START Placeholder for covidage_v13.2.R code (DO NOT EDIT) ----
+# Scale parameters to percentages/ rates
 parameters["rho"]<-parameters["rho"]/100
 parameters["omega"]<-(1/(parameters["omega"]*365))
 parameters["gamma"]<-1/parameters["gamma"]
@@ -215,35 +177,19 @@ parameters["reporth"]<-parameters["reporth"]/100
 parameters["nus"]<-1/parameters["nus"]
 parameters["rhos"]<-parameters["rhos"]/100
 parameters["amp"]<-parameters["amp"]/100
-parameters["selfis_dur"]<-parameters["selfis_dur"]*7
-parameters["selfis_cov"]<-parameters["selfis_cov"]/100
 parameters["selfis_eff"]<-parameters["selfis_eff"]/100
-parameters["dist_dur"]<-parameters["dist_dur"]*7
-parameters["dist_cov"]<-parameters["dist_cov"]/100
 parameters["dist_eff"]<-parameters["dist_eff"]/100
-parameters["hand_dur"]<-parameters["hand_dur"]*7
 parameters["hand_eff"]<-parameters["hand_eff"]/100
-parameters["work_dur"]<-parameters["work_dur"]*7
-parameters["work_cov"]<-parameters["work_cov"]/100
 parameters["work_eff"]<-parameters["work_eff"]/100
 parameters["w2h"]<-parameters["w2h"]/100
-parameters["school_dur"]<-parameters["school_dur"]*7
-parameters["schoolcov"]<-parameters["schoolcov"]/100
 parameters["school_eff"]<-parameters["school_eff"]/100
 parameters["s2h"]<-parameters["s2h"]/100
-parameters["cocoon_dur"]<-parameters["cocoon_dur"]*7
-parameters["cocoon_cov"]<-parameters["cocoon_cov"]/100
 parameters["cocoon_eff"]<-parameters["cocoon_eff"]/100
 parameters["age_cocoon"]<-floor((parameters["age_cocoon"]/5)+1)
-parameters["travelban_eff"]<-parameters["travelban_eff"]/100
 parameters["vaccine_eff"]<-parameters["vaccine_eff"]/100
-parameters["vaccine_cov"]<-parameters["vaccine_cov"]/100
-parameters["vac_campaign"]<-parameters["vac_campaign"]*7
-parameters["travelban_dur"]<-parameters["travelban_dur"]*7
-parameters["screen_dur"]<-parameters["screen_dur"]*7
+# parameters["vaccine_cov"]<-parameters["vaccine_cov"]/100
+# parameters["vac_campaign"]<-parameters["vac_campaign"]*7
 parameters["screen_cov"]<-parameters["screen_cov"]/100
-parameters["quarantine_cov"]<-parameters["quarantine_cov"]/100
-parameters["quarantine_dur"]<-parameters["quarantine_dur"]*7
 parameters["quarantine_days"]<-parameters["quarantine_days"]
 parameters["quarantine_effort"]<-1/parameters["quarantine_effort"]
 parameters["quarantine_eff_home"]<-parameters["quarantine_eff_home"]/-100
@@ -263,13 +209,11 @@ parameters["nu_ventc"]<-1/parameters["nu_ventc"]
 parameters["pclin"]<-parameters["pclin"]/100
 parameters["prob_icu"]<-parameters["prob_icu"]/100
 parameters["prob_vent"]<-parameters["prob_vent"]/100
-parameters["lockdown_low_dur"]<-parameters["lockdown_low_dur"]*7
-parameters["lockdown_mid_dur"]<-parameters["lockdown_mid_dur"]*7
-parameters["lockdown_high_dur"]<-parameters["lockdown_high_dur"]*7
-# END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+
+parameters2<-parameters
 
 
-# START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+
 # Define the indices for each variable
 Sindex<-1:A
 Eindex<-(A+1):(2*A)
@@ -318,10 +262,375 @@ initVentC<-0*popstruc[,2] # icu vent crit
 initCMC<-0*popstruc[,2]   # Cumulative deaths (true)
 
 initS<-popstruc[,2]-initE-initI-initR-initX-initV-initH-initHC-initQS-initQE-initQI-initQR-initCL-initQC-initICU-initICUC-initVent-initVentC  # Susceptible (non-immune)
+# END Placeholder ----
+
+# START Bridge ----
+inp <- interventions$baseline_mat %>%
+  mutate(`Apply to` = "Baseline") %>%
+  bind_rows(interventions$future_mat) %>%
+  mutate(`Apply to` = "Baseline + Future Scenario") %>%
+  rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Coverage (%)` = coverage)
+# END Bridge ----
+
+# START Placeholder for covidage_v13.2.R code (DO NOT EDIT) ----
+inputs<-function(inp, run){
+  tb<-which(inp$`Apply to`==run)
+  # print(tb)
+  # 
+  ll<-intersect(which(inp$Intervention=="Lockdown, Low"),tb)
+  lm<-intersect(which(inp$Intervention=="Lockdown, Mid"),tb)
+  lh<-intersect(which(inp$Intervention=="Lockdown, High"),tb)
+  si<-intersect(which(inp$Intervention=="Self-isolation if Symptomatic"),tb)
+  scr<-intersect(which(inp$Intervention=="Screening"),tb)
+  sd<-intersect(which(inp$Intervention=="Social Distancing"),tb)
+  hw<-intersect(which(inp$Intervention=="Handwashing"),tb)
+  wah<-intersect(which(inp$Intervention=="Working at Home"),tb)
+  sc<-intersect(which(inp$Intervention=="School Closures"),tb)
+  cte<-intersect(which(inp$Intervention=="Shielding the Elderly"),tb)
+  q<-intersect(which(inp$Intervention=="Voluntary home quarantine"),tb)
+  tb<-intersect(which(inp$Intervention=="Travel Ban"),tb)
+  vc<-intersect(which(inp$Intervention=="Vaccine"),tb)
+  
+  v<-(format(as.POSIXct(inp$`Date Start`,format='%Y/%m/%d %H:%M:%S'),format="%d/%m/%y"))
+  v2<-as.Date(v,format="%d/%m/%y")
+  inp$`Date Start`<-v2
+  
+  v<-(format(as.POSIXct(inp$`Date End`,format='%Y/%m/%d %H:%M:%S'),format="%d/%m/%y"))
+  v2<-as.Date(v,format="%d/%m/%y")
+  inp$`Date End`<-v2
+  
+  ## lockdown low
+  f<-c()
+  ll_vector<-c()
+  lockdown_low<-c()
+  if (length(ll)>=1){
+    for (i in 1:length(ll)){
+      f<-c(f,as.numeric(inp$`Date Start`[ll[i]]-startdate),as.numeric(inp$`Date End`[ll[i]]-startdate))
+      print(f)
+      if(i==1){
+        lockdown_low<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        lockdown_low<-c(lockdown_low,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        lockdown_low<-c(lockdown_low,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(ll)){
+        lockdown_low<-c(lockdown_low,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{lockdown_low<-rep(0,tail(times,1)*20)}
+  ## lockdown mid
+  f<-c()
+  lm_vector<-c()
+  lockdown_mid<-c()
+  if (length(lm)>=1){
+    for (i in 1:length(lm)){
+      f<-c(f,as.numeric(inp$`Date Start`[lm[i]]-startdate),as.numeric(inp$`Date End`[lm[i]]-startdate))
+      if(i==1){
+        lockdown_mid<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        lockdown_mid<-c(lockdown_mid,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        lockdown_mid<-c(lockdown_mid,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(lm)){
+        lockdown_mid<-c(lockdown_mid,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{lockdown_mid<-rep(0,tail(times,1)*20)}
+  ## lockdown high
+  f<-c()
+  lh_vector<-c()
+  lockdown_high<-c()
+  if (length(lh)>=1){
+    for (i in 1:length(lh)){
+      f<-c(f,as.numeric(inp$`Date Start`[lh[i]]-startdate),as.numeric(inp$`Date End`[lh[i]]-startdate))
+      if(i==1){
+        lockdown_high<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        lockdown_high<-c(lockdown_high,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        lockdown_high<-c(lockdown_high,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(lh)){
+        lockdown_high<-c(lockdown_high,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{lockdown_high<-rep(0,tail(times,1)*20)}
+  ##  self isolation
+  f<-c()
+  si_vector<-c()
+  isolation<-c()
+  if (length(si)>=1){
+    for (i in 1:length(si)){
+      f<-c(f,as.numeric(inp$`Date Start`[si[i]]-startdate),as.numeric(inp$`Date End`[si[i]]-startdate))
+      if(i==1){
+        si_vector<-c(rep(0,f[i]*20),rep(inp$`Coverage (%)`[si[i]],(f[i+1]-f[i])*20))
+        isolation<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        si_vector<-c(si_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        si_vector<-c(si_vector,rep(inp$`Coverage (%)`[si[i]],(f[i*2]-f[i*2-1])*20))
+        isolation<-c(isolation,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        isolation<-c(isolation,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(si)){
+        si_vector<-c(si_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        isolation<-c(isolation,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    si_vector<-rep(0,tail(times,1)*20)
+    isolation<-rep(0,tail(times,1)*20)
+  }
+  ## social distancing
+  f<-c()
+  sd_vector<-c()
+  distancing<-c()
+  if (length(sd)>=1){
+    for (i in 1:length(sd)){
+      f<-c(f,as.numeric(inp$`Date Start`[sd[i]]-startdate),as.numeric(inp$`Date End`[sd[i]]-startdate))
+      if(i==1){
+        sd_vector<-c(rep(0,f[i]*20),rep(inp$`Coverage (%)`[sd[i]],(f[i+1]-f[i])*20))
+        distancing<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        sd_vector<-c(sd_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        sd_vector<-c(sd_vector,rep(inp$`Coverage (%)`[sd[i]],(f[i*2]-f[i*2-1])*20))
+        distancing<-c(distancing,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        distancing<-c(distancing,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(sd)){
+        sd_vector<-c(sd_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        distancing<-c(distancing,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    sd_vector<-rep(0,tail(times,1)*20)
+    distancing<-rep(0,tail(times,1)*20)
+  }
+  ## screening
+  f<-c()
+  scr_vector<-c()
+  screen<-c()
+  if (length(scr)>=1){
+    for (i in 1:length(scr)){
+      f<-c(f,as.numeric(inp$`Date Start`[scr[i]]-startdate),as.numeric(inp$`Date End`[scr[i]]-startdate))
+      if(i==1){
+        scr_vector<-c(rep(0,f[i]*20),rep(inp$`Coverage (%)`[scr[i]],(f[i+1]-f[i])*20))
+        screen<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        scr_vector<-c(scr_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        scr_vector<-c(scr_vector,rep(inp$`Coverage (%)`[scr[i]],(f[i*2]-f[i*2-1])*20))
+        screen<-c(screen,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        screen<-c(screen,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(scr)){
+        scr_vector<-c(scr_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        screen<-c(screen,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    scr_vector<-rep(0,tail(times,1)*20)
+    screen<-rep(0,tail(times,1)*20)
+  }
+  ## handwashing
+  f<-c()
+  hw_vector<-c()
+  handwash<-c()
+  if (length(hw)>=1){
+    for (i in 1:length(hw)){
+      f<-c(f,as.numeric(inp$`Date Start`[hw[i]]-startdate),as.numeric(inp$`Date End`[hw[i]]-startdate))
+      if(i==1){
+        hw_vector<-c(rep(0,f[i]*20),rep(inp$`Coverage (%)`[hw[i]],(f[i+1]-f[i])*20))
+        handwash<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        hw_vector<-c(hw_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        hw_vector<-c(hw_vector,rep(inp$`Coverage (%)`[hw[i]],(f[i*2]-f[i*2-1])*20))
+        handwash<-c(handwash,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        handwash<-c(handwash,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(hw)){
+        hw_vector<-c(hw_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        handwash<-c(handwash,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    hw_vector<-rep(0,tail(times,1)*20)
+    handwash<-rep(0,tail(times,1)*20)
+  }
+  ## working at home
+  f<-c()
+  wah_vector<-c()
+  workhome<-c()
+  if (length(wah)>=1){
+    for (i in 1:length(wah)){
+      f<-c(f,as.numeric(inp$`Date Start`[wah[i]]-startdate),as.numeric(inp$`Date End`[wah[i]]-startdate))
+      if(i==1){
+        wah_vector<-c(rep(0,f[i]*20),rep(inp$`Coverage (%)`[wah[i]],(f[i+1]-f[i])*20))
+        workhome<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        wah_vector<-c(wah_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        wah_vector<-c(wah_vector,rep(inp$`Coverage (%)`[wah[i]],(f[i*2]-f[i*2-1])*20))
+        workhome<-c(workhome,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        workhome<-c(workhome,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(wah)){
+        wah_vector<-c(wah_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        workhome<-c(workhome,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    wah_vector<-rep(0,tail(times,1)*20)
+    workhome<-rep(0,tail(times,1)*20)
+  }
+  ## school closure
+  f<-c()
+  sc_vector<-c()
+  schoolclose<-c()
+  if (length(sc)>=1){
+    for (i in 1:length(sc)){
+      f<-c(f,as.numeric(inp$`Date Start`[sc[i]]-startdate),as.numeric(inp$`Date End`[sc[i]]-startdate))
+      if(i==1){
+        sc_vector<-c(rep(0,f[i]*20),rep(inp$`Coverage (%)`[sc[i]],(f[i+1]-f[i])*20))
+        schoolclose<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        sc_vector<-c(sc_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        sc_vector<-c(sc_vector,rep(inp$`Coverage (%)`[sc[i]],(f[i*2]-f[i*2-1])*20))
+        schoolclose<-c(schoolclose,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        schoolclose<-c(schoolclose,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(sc)){
+        sc_vector<-c(sc_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        schoolclose<-c(schoolclose,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    sc_vector<-rep(0,tail(times,1)*20)
+    schoolclose<-rep(0,tail(times,1)*20)
+  }
+  ## cocooning the elderly
+  f<-c()
+  cte_vector<-c()
+  cocoon<-c()
+  if (length(cte)>=1){
+    for (i in 1:length(cte)){
+      f<-c(f,as.numeric(inp$`Date Start`[cte[i]]-startdate),as.numeric(inp$`Date End`[cte[i]]-startdate))
+      if(i==1){
+        cte_vector<-c(rep(0,f[i]*20),rep(inp$`Coverage (%)`[cte[i]],(f[i+1]-f[i])*20))
+        cocoon<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        cte_vector<-c(cte_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        cte_vector<-c(cte_vector,rep(inp$`Coverage (%)`[cte[i]],(f[i*2]-f[i*2-1])*20))
+        cocoon<-c(cocoon,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        cocoon<-c(cocoon,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(cte)){
+        cte_vector<-c(cte_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        cocoon<-c(cocoon,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    cte_vector<-rep(0,tail(times,1)*20)
+    cocoon<-rep(0,tail(times,1)*20)
+  }
+  ## quarantine
+  f<-c()
+  q_vector<-c()
+  quarantine<-c()
+  if (length(q)>=1){
+    for (i in 1:length(q)){
+      f<-c(f,as.numeric(inp$`Date Start`[q[i]]-startdate),as.numeric(inp$`Date End`[q[i]]-startdate))
+      if(i==1){
+        q_vector<-c(rep(0,f[i]*20),rep(inp$`Coverage (%)`[q[i]],(f[i+1]-f[i])*20))
+        quarantine<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        q_vector<-c(q_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        q_vector<-c(q_vector,rep(inp$`Coverage (%)`[q[i]],(f[i*2]-f[i*2-1])*20))
+        quarantine<-c(quarantine,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        quarantine<-c(quarantine,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(q)){
+        q_vector<-c(q_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        quarantine<-c(quarantine,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    q_vector<-rep(0,tail(times,1)*20)
+    quarantine<-rep(0,tail(times,1)*20)
+  }
+  ## travel ban
+  f<-c()
+  tb_vector<-c()
+  travelban<-c()
+  if (length(tb)>=1){
+    for (i in 1:length(tb)){
+      f<-c(f,as.numeric(inp$`Date Start`[tb[i]]-startdate),as.numeric(inp$`Date End`[tb[i]]-startdate))
+      if(i==1){
+        tb_vector<-c(rep(0,f[i]*20),rep(inp$`Coverage (%)`[tb[i]],(f[i+1]-f[i])*20))
+        travelban<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        tb_vector<-c(tb_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        tb_vector<-c(tb_vector,rep(inp$`Coverage (%)`[tb[i]],(f[i*2]-f[i*2-1])*20))
+        travelban<-c(travelban,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        travelban<-c(travelban,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(tb)){
+        tb_vector<-c(tb_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        travelban<-c(travelban,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    tb_vector<-rep(0,tail(times,1)*20)
+    travelban<-rep(0,tail(times,1)*20)
+  }
+  ## vaccine
+  f<-c()
+  vc_vector<-c()
+  vaccine<-c()
+  if (length(vc)>=1){
+    for (i in 1:length(vc)){
+      f<-c(f,as.numeric(inp$`Date Start`[vc[i]]-startdate),as.numeric(inp$`Date End`[vc[i]]-startdate))
+      if(i==1){
+        vc_vector<-c(rep(0,f[i]*20),rep(inp$`Coverage (%)`[vc[i]],(f[i+1]-f[i])*20))
+        vaccine<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        vc_vector<-c(vc_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        vc_vector<-c(vc_vector,rep(inp$`Coverage (%)`[vc[i]],(f[i*2]-f[i*2-1])*20))
+        vaccine<-c(vaccine,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        vaccine<-c(vaccine,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(vc)){
+        vc_vector<-c(vc_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        vaccine<-c(vaccine,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    vc_vector<-rep(0,tail(times,1)*20)
+    vaccine<-rep(0,tail(times,1)*20)
+  }
+  
+  return(list(si_vector=si_vector,sd_vector=sd_vector,scr_vector=scr_vector,hw_vector=hw_vector,wah_vector=wah_vector,
+              sc_vector=sc_vector,tb_vector=tb_vector,cte_vector=cte_vector,q_vector=q_vector,vc_vector=vc_vector,
+              lockdown_low=lockdown_low,lockdown_mid=lockdown_mid,lockdown_high=lockdown_high,isolation=isolation,
+              screen=screen,cocoon=cocoon,schoolclose=schoolclose,workhome=workhome,handwash=handwash,
+              quarantine=quarantine,vaccine=vaccine,travelban=travelban,distancing=distancing))
+}
+
+vectors<-inputs(inp,'Baseline + Future Scenario')
+vectors0<-inputs(inp,'Baseline')
 
 
 # set up a function to solve the equations
-covid<-function(t, Y, parameters) 
+covid<-function(t, Y, parameters,input) 
 {
   with(as.list(c(Y, parameters)),
        {
@@ -368,20 +677,19 @@ covid<-function(t, Y, parameters)
          # print(fH(sum(H)))
          
          # interventions
-         isolation<-(t>=selfis_on)*(t<=selfis_on+selfis_dur)
-         distancing<-(t>=dist_on)*(t<=(dist_on+dist_dur))
-         handwash<-(t>=hand_on)*(t<=(hand_on+hand_dur))
-         workhome<-(t>=work_on)*(t<=(work_on+work_dur))
-         schoolclose<-(t>=school_on)*(t<=(school_on+school_dur))
-         cocoon<-(t>=cocoon_on)*(t<=(cocoon_on+cocoon_dur))*cocoon_cov
-         vaccine<-(t>=(vaccine_on))*(t<=vaccine_on+vac_campaign)
-         travelban<-(t>=travelban_on)*(t<=(travelban_on+travelban_dur))
-         screen<-(t>=screen_on)*(t<=(screen_on+screen_dur))
-         quarantine<-(t>=quarantine_on)*(t<=(quarantine_on+quarantine_dur))
-         lockdown_low<-(t>=lockdown_low_on)*(t<=(lockdown_low_on+lockdown_low_dur))
-         lockdown_mid<-(t>=lockdown_mid_on)*(t<=(lockdown_mid_on+lockdown_mid_dur))
-         lockdown_high<-(t>=lockdown_high_on)*(t<=(lockdown_high_on+lockdown_high_dur))
-         
+         isolation<-input$isolation[t*20+1]
+         distancing<-input$distancing[t*20+1]
+         handwash<-input$handwash[t*20+1]
+         workhome<-input$workhome[t*20+1]
+         schoolclose<-input$schoolclose[t*20+1]
+         cocoon<-input$cocoon[t*20+1]
+         vaccine<-input$vaccine[t*20+1]
+         travelban<-input$travelban[t*20+1]
+         screen<-input$screen[t*20+1]
+         quarantine<-input$quarantine[t*20+1]
+         lockdown_low<-input$lockdown_low[t*20+1]
+         lockdown_mid<-input$lockdown_mid[t*20+1]
+         lockdown_high<-input$lockdown_high[t*20+1]
          
          screen_eff<-0
          selfis<-0
@@ -392,7 +700,16 @@ covid<-function(t, Y, parameters)
          trvban_eff<-0
          quarantine_rate<-0
          
-         
+         selfis_cov<-(input$si_vector[t*20+1])/100
+         screen_cov<-(input$scr_vector[t*20+1])/100
+         school_eff<-(input$sc_vector[t*20+1])/100
+         dist_cov<-(input$sd_vector[t*20+1])/100
+         hand_eff<-(input$hw_vector[t*20+1])/100
+         cocoon_eff<-(input$cte_vector[t*20+1])/100
+         work_cov<-(input$wah_vector[t*20+1])/100
+         travelban_eff<-(input$tb_vector[t*20+1])/100
+         vaccine_cov<-(input$vc_vector[t*20+1])/100
+         quarantine_cov<-(input$q_vector[t*20+1])/100
          
          
          if (lockdown_low || lockdown_mid || lockdown_high){
@@ -461,7 +778,7 @@ covid<-function(t, Y, parameters)
              quarantine_rate<-min(((I+CL+H+ICU+Vent+HC+ICUC+VentC)*household_size/P),1)*quarantine_cov*quarantine_effort
            }
          }
-         
+         print(paste("time: ",t, " hand:", hand ))
          
          # print(quarantine_rate)
          # cocooning the elderly
@@ -512,10 +829,10 @@ covid<-function(t, Y, parameters)
          dHCdt <- gamma*ihr[,2]*(1-prob_icu)*critH*E + gamma*ihr[,2]*(1-prob_icu)*critH*QE - nusc*HC + ageing%*%HC-mort*HC 
          dICUdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-prob_vent)*QE - nu_icu*ICU +ageing%*%ICU - mort*ICU 
          dICUCdt <- gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*QE - nu_icuc*ICUC +ageing%*%ICUC - mort*ICUC 
-         dVentdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*QE + (1-critV)*VentC*1/2 - nu_vent*Vent +ageing%*%Vent - mort*Vent
+         dVentdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*QE + (1-critV)*VentC*1/2 - nu_vent*Vent +ageing%*%Vent - mort*Vent 
          dVentCdt <- gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*E +gamma*ihr[,2]*prob_icu*prob_vent*crit*E+
-           gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*QE + gamma*ihr[,2]*prob_icu*prob_vent*crit*QE -
-           (1-critV)*VentC*1/2-nu_ventc*VentC +ageing%*%VentC - mort*VentC
+           gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*QE + gamma*ihr[,2]*prob_icu*prob_vent*crit*QE - 
+           (1-critV)*VentC*1/2-nu_ventc*VentC +ageing%*%VentC - mort*VentC 
          
          dCdt <- report*gamma*(1-pclin)*(1-ihr[,2])*(E+QE)+reportc*gamma*pclin*(1-ihr[,2])*(E+QE)+ 
            gamma*ihr[,2]*(1-critH)*(1-prob_icu)*(E+QE)+gamma*ihr[,2]*critH*reporth*(1-prob_icu)*(E+QE)+
@@ -534,7 +851,7 @@ covid<-function(t, Y, parameters)
 ###########    RUN BASELINE MODEL - start time for interventions is set to day 1e5, i.e. interventions are always off
 
 Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, initICUC, initVent, initVentC, initCMC) # initial conditions for the main solution vector
-# END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# END Placeholder ----
 
 
 process_ode_outcome <- function(out){
