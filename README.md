@@ -9,10 +9,10 @@
 
 ## Authors
 
-- Olivier Celhay <a href="https://orcid.org/0000-0002-2971-9110" width="16" height="16" target="_blank"><img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" border="0"></a>, ORCID
-- Ricardo Aguas <a href="https://orcid.org/0000-0002-6507-6597" width="16" height="16" target="_blank"><img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" border="0"></a>, ORCID
-- [Sai Thein Than Tun](https://www.researchgate.net/profile/Sai_Thein_Than_Tun) ResearchGate
-- Lisa White <a href="https://orcid.org/0000-0002-6523-185X" width="16" height="16" target="_blank"><img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" border="0"></a>, ORCID
+- <a href="https://orcid.org/0000-0002-2971-9110" width="16" height="16" target="_blank">Olivier Celhay<img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" border="0"></a>, ORCID
+- <a href="https://orcid.org/0000-0002-6507-6597" width="16" height="16" target="_blank">Ricardo Aguas<img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" border="0"></a>, ORCID
+- [Sai Thein Than Tun](https://www.researchgate.net/profile/Sai_Thein_Than_Tun), ResearchGate 
+- <a href="https://orcid.org/0000-0002-6523-185X" width="16" height="16" target="_blank">Lisa J. White<img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" border="0"></a>, ORCID
 - CoMo Consortium
 
 ## Important Disclaimer
