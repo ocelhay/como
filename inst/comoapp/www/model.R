@@ -108,7 +108,7 @@ parameters <- c(
   beds_available = input$beds_available,
   icu_beds_available = input$icu_beds_available,
   ventilators_available = input$ventilators_available,
-  give = 85,
+  give = 95,
   pdeath_h = input$pdeath_h,
   pdeath_hc = input$pdeath_hc,
   pdeath_icu = input$pdeath_icu,
