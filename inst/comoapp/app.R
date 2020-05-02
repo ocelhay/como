@@ -33,6 +33,7 @@ ui <- function(request) {
                                            block = TRUE), br(),
                                   # V13
                                   source("./www/ui_interventions_baseline.R", local = TRUE)$value,
+                                  htmlOutput("text_nb_interventions_baseline"),
                                   br(),
                                   bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                            block = TRUE), br(),
@@ -52,7 +53,8 @@ ui <- function(request) {
              ),
              # V13
              conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_modelpredictions'",
-                              source("./www/ui_interventions_future.R", local = TRUE)$value
+                              source("./www/ui_interventions_future.R", local = TRUE)$value,
+                              htmlOutput("text_nb_interventions_future"),
              ),
              br(), br(), br(), br(), br(), br(), br(), br(),
              conditionalPanel("input.tabs != 'tab_welcome'",
@@ -221,7 +223,7 @@ server <- function(input, output, session) {
   
   
   # START CODE V13 ----
-  interventions <- reactiveValues(baseline_nb = 1, baseline_mat = tibble(NULL), future_nb = 1, future_mat = tibble(NULL))
+  interventions <- reactiveValues(baseline_nb = 0, baseline_mat = tibble(NULL), future_nb = 0, future_mat = tibble(NULL))
   output$baseline_nb <- reactive(interventions$baseline_nb)
   outputOptions(output, "baseline_nb", suspendWhenHidden = FALSE)
   output$future_nb <- reactive(interventions$future_nb)
@@ -384,6 +386,9 @@ server <- function(input, output, session) {
                                                     input$future_coverage_27, input$future_coverage_28,
                                                     input$future_coverage_29, input$future_coverage_30)) %>% 
       filter(index <= interventions$future_nb)
+    
+    shiny_interventions_baseline_mat <<- interventions$baseline_mat
+    shiny_interventions_future_mat <<- interventions$future_mat
   })
   # END CODE V13 ----
   
