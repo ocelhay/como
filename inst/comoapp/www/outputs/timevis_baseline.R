@@ -3,6 +3,7 @@ output$timevis_baseline <- renderPlot({
   
   mid_date <- input$date_range[1] + floor((input$date_range[2] - input$date_range[1])/2)
   range <- paste0("Range of Simulation: ", input$date_range[1], " to ", input$date_range[2])
+  n_different_interventions <- unique(interventions$baseline_mat$intervention)
   
   interventions$baseline_mat %>% 
     mutate(label_coverage = paste0(coverage, "%"),
@@ -11,9 +12,10 @@ output$timevis_baseline <- renderPlot({
     ggplot(aes(x = date_start, xend = date_end, y = intervention, yend = intervention)) + 
     geom_segment(aes(color = coverage), size = 12) + 
     geom_text(aes(x  = date_mid, label = label_coverage), size = 4.5) +
-    # geom_vline(xintercept = Sys.Date(), lty = 2) + 
+    geom_vline(xintercept = Sys.Date(), lty = 2) +
     geom_segment(x = input$date_range[1], xend = input$date_range[2], size = 2,
-                 y = 0.6, yend = 0.6, arrow = arrow(length = unit(0.30, "cm") , ends = "both", type = "closed")) +
+                 y = n_different_interventions + 0.4, yend = n_different_interventions + 0.4, 
+                 arrow = arrow(length = unit(0.30, "cm") , ends = "both", type = "closed")) +
     geom_label(x = mid_date, y = 0.6, label = range, size = 4.5) +
     labs(title = "Baseline + Future Scenario Interventions", 
          color = "Coverage (%)", x = NULL, y = NULL) +
@@ -25,6 +27,5 @@ output$timevis_baseline <- renderPlot({
           panel.border = element_blank(),
           panel.grid.major.y = element_blank(),  panel.grid.minor = element_blank(),
           panel.grid.major.x = element_line(size = 0.5, colour="grey80"),
-          axis.line = element_blank(), axis.ticks = element_blank(),
-          axis.text.x=element_text(angle = 45, hjust = 1))
+          axis.line = element_blank(), axis.ticks = element_blank())
 })

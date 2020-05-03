@@ -11,7 +11,7 @@ ui <- function(request) {
     includeCSS("./www/styles.css"),
     pushbar_deps(),
     chooseSliderSkin('HTML5'),
-    title = "CoMo COVID-19 App",
+    title = "COVID-19 App | CoMo Consortium",
     
     source("./www/pushbar_parameters_interventions.R", local = TRUE)[1],
     source("./www/pushbar_parameters_country.R", local = TRUE)[1],
@@ -24,23 +24,27 @@ ui <- function(request) {
              div(id = "css_feedback_process", htmlOutput("feedback_process")),
              br(), 
              conditionalPanel("input.tabs != 'tab_welcome' && output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
-                              p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
-                                ", edit it and upload it."),
-                              fileInput("own_data", label = span("Upload your ", span("v13", class = "red"), " template:"), accept = ".xlsx", multiple = FALSE),
                               div(class = "baseline_left",
+                                  p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
+                                    ", edit it and upload it:"),
+                                  fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE),
                                   dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
-                                  bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "danger", type = "action", value = FALSE, 
+                                  bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                            block = TRUE), br(),
                                   # V13
-                                  source("./www/ui_interventions_baseline.R", local = TRUE)$value,
                                   htmlOutput("text_nb_interventions_baseline"),
+                                  source("./www/ui_interventions_baseline.R", local = TRUE)$value,
                                   br(),
-                                  bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                           block = TRUE), br(),
-                                  bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                           block = TRUE), br(), 
-                                  bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                           block = TRUE), br(), 
+                                  splitLayout(
+                                    bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                             block = FALSE), 
+                                    bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                             block = FALSE), 
+                                    bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                             block = FALSE)
+                                  ), 
+                                  br(),
+                                  flowLayout(
                                   sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
                                               value = 0.049, ticks = FALSE),
                                   sliderInput("report", label = span("Percentage of all", strong(" asymptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
@@ -49,12 +53,13 @@ ui <- function(request) {
                                               value = 5, post = "%", ticks = FALSE),
                                   sliderInput("reporth", label = span("Percentage of all hospitalisations that are reported:"), min = 0, max = 100, step = 0.1,
                                               value = 100, post = "%", ticks = FALSE)
+                                  )
                               )
              ),
              # V13
              conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_modelpredictions'",
-                              source("./www/ui_interventions_future.R", local = TRUE)$value,
                               htmlOutput("text_nb_interventions_future"),
+                              source("./www/ui_interventions_future.R", local = TRUE)$value
              ),
              br(), br(), br(), br(), br(), br(), br(), br(),
              conditionalPanel("input.tabs != 'tab_welcome'",
@@ -64,7 +69,7 @@ ui <- function(request) {
                                   ),
                                   fluidRow(
                                     column(6, 
-                                           conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
+                                           conditionalPanel("(output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline') && output.validation_baseline_interventions",
                                                             div(class = "front_btn", actionButton("run_baseline", "Run Baseline", class="btn btn-success"))
                                            )
                                     ),
@@ -77,7 +82,7 @@ ui <- function(request) {
                                   conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline')  && input.tabs == 'tab_visualfit'", 
                                                    actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success")
                                   ),
-                                  conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_modelpredictions'",
+                                  conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_modelpredictions' && output.validation_all_interventions",
                                                    actionButton("run_interventions", "Run Future Scenarios", class="btn btn-success")
                                   ),
                               )
@@ -223,20 +228,19 @@ server <- function(input, output, session) {
   
   
   # START CODE V13 ----
-  interventions <- reactiveValues(baseline_nb = 0, baseline_mat = tibble(NULL), future_nb = 0, future_mat = tibble(NULL))
-  output$baseline_nb <- reactive(interventions$baseline_nb)
-  outputOptions(output, "baseline_nb", suspendWhenHidden = FALSE)
-  output$future_nb <- reactive(interventions$future_nb)
-  outputOptions(output, "future_nb", suspendWhenHidden = FALSE)
+  interventions <- reactiveValues(baseline_nb = 0, baseline_mat = tibble(NULL), 
+                                  future_nb = 0, future_mat = tibble(NULL),
+                                  validation_baseline_interventions = FALSE, message_baseline_interventions = NULL,
+                                  validation_all_interventions = FALSE, message_all_interventions = NULL)
   
   observeEvent(input$add_intervention_baseline, 
                interventions$baseline_nb <- min(interventions$baseline_nb + 1, nb_interventions_max))
   observeEvent(input$remove_intervention_baseline, 
-               interventions$baseline_nb <- max(interventions$baseline_nb - 1, nb_interventions_min))
+               interventions$baseline_nb <- max(interventions$baseline_nb - 1, 0))
   observeEvent(input$add_intervention_future, 
                interventions$future_nb <- min(interventions$future_nb + 1, nb_interventions_max))
   observeEvent(input$remove_intervention_future, 
-               interventions$future_nb <- max(interventions$future_nb - 1, nb_interventions_min))
+               interventions$future_nb <- max(interventions$future_nb - 1, 0))
   
   observe({
     interventions$baseline_mat <- tibble(index = 1:30,
@@ -386,10 +390,33 @@ server <- function(input, output, session) {
                                                     input$future_coverage_27, input$future_coverage_28,
                                                     input$future_coverage_29, input$future_coverage_30)) %>% 
       filter(index <= interventions$future_nb)
-    
-    shiny_interventions_baseline_mat <<- interventions$baseline_mat
-    shiny_interventions_future_mat <<- interventions$future_mat
   })
+  
+  # Validation of interventions, {Baseline + Future Scenario}
+  observe({
+    validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat)
+    interventions$validation_baseline_interventions <- validation_baseline$validation_interventions
+    interventions$message_baseline_interventions <- validation_baseline$message_interventions
+  })
+  
+  # Validation of interventions, {Baseline + Future Scenario} & Future Scenario
+  observe({
+    validation_all <- fun_validation_interventions(dta = bind_rows(interventions$baseline_mat, interventions$future_mat))
+    interventions$validation_all_interventions <- validation_all$validation_interventions
+    interventions$message_all_interventions <- validation_all$message_interventions
+  })
+  
+  # To show/hide elements of the App depending on the validation of the interventions (overlap etc.) ----
+  output$baseline_nb <- reactive(interventions$baseline_nb) 
+  outputOptions(output, "baseline_nb", suspendWhenHidden = FALSE)
+  output$future_nb <- reactive(interventions$future_nb)
+  outputOptions(output, "future_nb", suspendWhenHidden = FALSE)
+  
+  
+  output$validation_baseline_interventions <- reactive(interventions$validation_baseline_interventions)
+  outputOptions(output, "validation_baseline_interventions", suspendWhenHidden = FALSE)
+  output$validation_all_interventions <- reactive(interventions$validation_all_interventions)
+  outputOptions(output, "validation_all_interventions", suspendWhenHidden = FALSE)
   # END CODE V13 ----
   
   
@@ -531,9 +558,9 @@ server <- function(input, output, session) {
     # Reset simul_interventions and elements of the UI
     simul_interventions$results <- NULL
     
-    source("./www/model.R", local = TRUE)
-    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
-    simul_baseline$results <- process_ode_outcome(out)
+    # source("./www/model.R", local = TRUE)
+    # out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
+    # simul_baseline$results <- process_ode_outcome(out)
     
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
@@ -553,9 +580,9 @@ server <- function(input, output, session) {
     showNotification(span(h4(icon("hourglass-half"), "Running Future Scenarios..."), "typically runs in 10 secs."),
                      duration = NULL, type = "message", id = "run_interventions_notif")
     
-    source("./www/model.R", local = TRUE)
-    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
-    simul_interventions$results <- process_ode_outcome(out)
+    # source("./www/model.R", local = TRUE)
+    # out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
+    # simul_interventions$results <- process_ode_outcome(out)
     
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"
