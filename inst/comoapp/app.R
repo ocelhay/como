@@ -25,24 +25,22 @@ ui <- function(request) {
              br(), 
              conditionalPanel("input.tabs != 'tab_welcome' && output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
                               div(class = "baseline_left",
+                                  div(class = "box_outputs", h4("Template:")),
                                   p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
                                     ", edit it and upload it:"),
-                                  fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE),
-                                  dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
-                                  bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                           block = TRUE), br(),
-                                  # V13
-                                  htmlOutput("text_nb_interventions_baseline"),
-                                  source("./www/ui_interventions_baseline.R", local = TRUE)$value,
+                                  fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE, width = "100%"),
                                   br(),
-                                  splitLayout(
-                                    bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                             block = FALSE), 
-                                    bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                             block = FALSE), 
-                                    bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                             block = FALSE)
-                                  ), 
+                                  div(class = "box_outputs", h4("Global Simulations Parameters:")),
+                                  dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
+                                  fluidRow(column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                              block = TRUE),), 
+                                           column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                              block = TRUE))),
+                                  br(),
+                                  fluidRow(column(6, bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                              block = TRUE)), 
+                                           column(6, bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                              block = TRUE))),
                                   br(),
                                   flowLayout(
                                   sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
@@ -58,8 +56,7 @@ ui <- function(request) {
              ),
              # V13
              conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_modelpredictions'",
-                              htmlOutput("text_nb_interventions_future"),
-                              source("./www/ui_interventions_future.R", local = TRUE)$value
+                              
              ),
              br(), br(), br(), br(), br(), br(), br(), br(),
              conditionalPanel("input.tabs != 'tab_welcome'",
@@ -93,7 +90,7 @@ ui <- function(request) {
       column(8,
              navbarPage(NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
                         tabPanel("Welcome", value = "tab_welcome",
-                                 h3("CoMo COVID-19 App"),
+                                 h3("COVID-19 App | CoMo Consortium"),
                                  h4(version_app),
                                  br(),
                                  fluidRow(
@@ -109,6 +106,10 @@ ui <- function(request) {
                                  )
                         ),
                         tabPanel("Visual Calibration", value = "tab_visualfit",
+                                 # V13
+                                 div(class = "box_outputs", h4("Interventions for Baseline + Future:")),
+                                 htmlOutput("text_nb_interventions_baseline"),
+                                 source("./www/ui_interventions_baseline.R", local = TRUE)$value,
                                  div(class = "box_outputs", h4("Timeline")),
                                  plotOutput("timevis_baseline"),
                                  dataTableOutput("tab_inputs"),
@@ -125,6 +126,9 @@ ui <- function(request) {
                         ),
                         tabPanel("Model Predictions", value = "tab_modelpredictions",
                                  br(), br(),
+                                 div(class = "box_outputs", h4("Interventions for Future:")),
+                                 htmlOutput("text_nb_interventions_future"),
+                                 source("./www/ui_interventions_future.R", local = TRUE)$value,
                                  div(class = "box_outputs", h4("Timeline")),
                                  plotOutput("timevis_future"),
                                  conditionalPanel("output.status_app_output == 'Locked Baseline'",

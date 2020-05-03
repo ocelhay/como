@@ -3,7 +3,10 @@ output$timevis_baseline <- renderPlot({
   
   mid_date <- input$date_range[1] + floor((input$date_range[2] - input$date_range[1])/2)
   range <- paste0("Range of Simulation: ", input$date_range[1], " to ", input$date_range[2])
-  n_different_interventions <- unique(interventions$baseline_mat$intervention)
+  # n_different_interventions <- unique(interventions$baseline_mat$intervention) + 0.4
+  
+  shiny_interventions_baseline_mat <<- interventions$baseline_mat$intervention
+  n_different_interventions <- 4
   
   interventions$baseline_mat %>% 
     mutate(label_coverage = paste0(coverage, "%"),
@@ -14,7 +17,7 @@ output$timevis_baseline <- renderPlot({
     geom_text(aes(x  = date_mid, label = label_coverage), size = 4.5) +
     geom_vline(xintercept = Sys.Date(), lty = 2) +
     geom_segment(x = input$date_range[1], xend = input$date_range[2], size = 2,
-                 y = n_different_interventions + 0.4, yend = n_different_interventions + 0.4, 
+                 y = n_different_interventions, yend = n_different_interventions, 
                  arrow = arrow(length = unit(0.30, "cm") , ends = "both", type = "closed")) +
     geom_label(x = mid_date, y = 0.6, label = range, size = 4.5) +
     labs(title = "Baseline + Future Scenario Interventions", 
