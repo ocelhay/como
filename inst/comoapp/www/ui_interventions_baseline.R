@@ -157,7 +157,8 @@ div(
     column(5, dateRangeInput("baseline_daterange_30", NULL, start = new_daterange_value[1], end = new_daterange_value[2])),
     column(3, numericInput("baseline_coverage_30", NULL, min = 0, max = 100, value = new_coverage_value))
   )),
-  br(),
-  actionButton("add_intervention_baseline", icon("plus")),
-  actionButton("remove_intervention_baseline", icon("minus")),
+  div(class = "buttons_interventions",
+      actionBttn("add_intervention_baseline", icon("plus"), size = "sm", color = "danger", style = "jelly"),
+      actionBttn("remove_intervention_baseline", icon("minus"), size = "sm", color = "danger", style = "jelly")
+  )
 )

@@ -157,7 +157,8 @@ div(
     column(5, dateRangeInput("future_daterange_30", NULL, start = new_daterange_value[1], end = new_daterange_value[2])),
     column(3, numericInput("future_coverage_30", NULL, min = 0, max = 100, value = new_coverage_value))
   )),
-  br(),
-  actionButton("add_intervention_future", icon("plus")),
-  actionButton("remove_intervention_future", icon("minus")),
+  div(class = "buttons_interventions",
+      actionBttn("add_intervention_future", icon("plus"), size = "sm", color = "danger", style = "jelly"),
+      actionBttn("remove_intervention_future", icon("minus"), size = "sm", color = "danger", style = "jelly")
+  )
 )

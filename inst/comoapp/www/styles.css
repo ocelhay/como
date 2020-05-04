@@ -28,7 +28,7 @@
   margin-left: 12px;
 }
 
-#float_action{
+.float_action{
   bottom: calc(2%);;
   left: calc(2%);;
   border-radius: 5px;
@@ -45,8 +45,12 @@
 }
 
 .redbold {
-  color: red;
+  color: #EC6568;
   font-weight: bold;
+}
+
+.buttons_interventions {
+  text-align: right;
 }
 
 #margin_month_slider {

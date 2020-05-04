@@ -5,7 +5,6 @@ output$timevis_baseline <- renderPlot({
   range <- paste0("Range of Simulation: ", input$date_range[1], " to ", input$date_range[2])
   # n_different_interventions <- unique(interventions$baseline_mat$intervention) + 0.4
   
-  shiny_interventions_baseline_mat <<- interventions$baseline_mat$intervention
   n_different_interventions <- 4
   
   interventions$baseline_mat %>% 

@@ -37,74 +37,80 @@ ui <- function(request) {
                ),
                tabPanel("Visual Calibration", value = "tab_visualfit",
                         fluidRow(
-                          column(4,
-                                 
+                          column(2,
                                  div(id = "css_feedback_process", htmlOutput("feedback_process")),
                                  br(), 
-                                 conditionalPanel("input.tabs != 'tab_welcome' && output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
+                                 conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
+                                                  br(),
                                                   div(class = "baseline_left",
-                                                      div(class = "box_outputs", h4("Template:")),
-                                                      p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
-                                                        ", edit it and upload it:"),
-                                                      fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE, width = "100%"),
-                                                      br(),
-                                                      div(class = "box_outputs", h4("Global Simulations Parameters:")),
-                                                      dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
-                                                      fluidRow(column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                                  block = TRUE),), 
-                                                               column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                                  block = TRUE))),
-                                                      br(),
-                                                      fluidRow(column(6, bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                                  block = TRUE)), 
-                                                               column(6, bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                                  block = TRUE))),
-                                                      br(),
                                                       flowLayout(
                                                         sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
-                                                                    value = 0.049, ticks = FALSE),
+                                                                    value = 0.049, ticks = FALSE, width = "75%"),
                                                         sliderInput("report", label = span("Percentage of all", strong(" asymptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
-                                                                    value = 2.5, post = "%", ticks = FALSE),
+                                                                    value = 2.5, post = "%", ticks = FALSE, width = "75%"),
                                                         sliderInput("reportc", label = span("Percentage of all", strong(" symptomatic infections "), "that are reported:"), min = 0, max = 100, step = 0.1,
-                                                                    value = 5, post = "%", ticks = FALSE),
+                                                                    value = 5, post = "%", ticks = FALSE, width = "75%"),
                                                         sliderInput("reporth", label = span("Percentage of all hospitalisations that are reported:"), min = 0, max = 100, step = 0.1,
-                                                                    value = 100, post = "%", ticks = FALSE)
+                                                                    value = 100, post = "%", ticks = FALSE, width = "75%")
                                                       )
                                                   )
                                  ),
-                                 conditionalPanel("input.tabs != 'tab_welcome'",
-                                                  div(id = "float_action",
-                                                      conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
-                                                                       htmlOutput("feedback_choices")
-                                                      ),
-                                                      fluidRow(
-                                                        column(6, 
-                                                               conditionalPanel("(output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline') && output.validation_baseline_interventions",
-                                                                                div(class = "front_btn", actionButton("run_baseline", "Run Baseline", class="btn btn-success"))
-                                                               )
-                                                        ),
-                                                        column(6, 
-                                                               conditionalPanel("output.status_app_output == 'Ok Baseline'",
-                                                                                actionButton("validate_baseline", span(icon("thumbs-up"), " Validate Baseline"), class="btn btn-success"),
-                                                               )
-                                                        )
-                                                      ),
-                                                      conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline')  && input.tabs == 'tab_visualfit'", 
-                                                                       actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success")
-                                                      ),
-                                                      conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && input.tabs == 'tab_modelpredictions' && output.validation_all_interventions",
-                                                                       actionButton("run_interventions", "Run Future Scenarios", class="btn btn-success")
-                                                      ),
-                                                  )
-                                 )
+                                 # div(class = "float_action",
+                                     conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
+                                                      htmlOutput("feedback_choices")
+                                     ),
+                                     fluidRow(
+                                       column(6, 
+                                              conditionalPanel("(output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline') && output.validation_baseline_interventions",
+                                                               div(class = "front_btn", actionButton("run_baseline", "Run Baseline", class="btn btn-success"))
+                                              )
+                                       ),
+                                       column(6, 
+                                              conditionalPanel("output.status_app_output == 'Ok Baseline'",
+                                                               actionButton("validate_baseline", span(icon("thumbs-up"), " Validate Baseline"), class="btn btn-success"),
+                                              )
+                                       )
+                                     ),
+                                     conditionalPanel("output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline'", 
+                                                      actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success")
+                                     )
+                                 # ),
                           ),
-                          column(8,
+                          column(10,
+                                 fluidRow(
+                                   div(class = "box_outputs", h4("Global Simulations Parameters:")),
+                                   column(5,
+                                          p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
+                                            ", edit it and upload it:"),
+                                          fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE, width = "100%"),
+                                   ),
+                                   column(7,
+                                          dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
+                                          fluidRow(column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                      block = TRUE),), 
+                                                   column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                      block = TRUE))),
+                                          br(),
+                                          fluidRow(column(6, bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                      block = TRUE)), 
+                                                   column(6, bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                      block = TRUE)))
+                                   )
+                                 ),
+                                 br(),
+                                 
                                  # V13
-                                 div(class = "box_outputs", h4("Interventions for Baseline + Future:")),
-                                 htmlOutput("text_nb_interventions_baseline"),
-                                 source("./www/ui_interventions_baseline.R", local = TRUE)$value,
-                                 div(class = "box_outputs", h4("Timeline")),
-                                 plotOutput("timevis_baseline"),
+                                 fluidRow(
+                                   column(5,
+                                          div(class = "box_outputs", h4("Interventions for Baseline + Future:")),
+                                          htmlOutput("text_nb_interventions_baseline"),
+                                          source("./www/ui_interventions_baseline.R", local = TRUE)$value
+                                   ),
+                                   column(7,
+                                          div(class = "box_outputs", h4("Timeline")),
+                                          plotOutput("timevis_baseline")
+                                   )
+                                 ),
                                  dataTableOutput("tab_inputs"),
                                  conditionalPanel("output.status_app_output == 'Ok Baseline' | output.status_app_output == 'Validated Baseline'",
                                                   br(), br(), br(), br(),
@@ -120,12 +126,22 @@ ui <- function(request) {
                         )
                ),
                tabPanel("Model Predictions", value = "tab_modelpredictions",
-                        br(), br(),
-                        div(class = "box_outputs", h4("Interventions for Future:")),
-                        htmlOutput("text_nb_interventions_future"),
-                        source("./www/ui_interventions_future.R", local = TRUE)$value,
-                        div(class = "box_outputs", h4("Timeline")),
-                        plotOutput("timevis_future"),
+                        div(class = "float_action",
+                            conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && output.validation_all_interventions",
+                                             actionButton("run_interventions", "Run Future Scenarios", class="btn btn-success")
+                            )
+                        ),
+                        fluidRow(
+                          column(5,
+                                 div(class = "box_outputs", h4("Interventions for Future:")),
+                                 htmlOutput("text_nb_interventions_future"),
+                                 source("./www/ui_interventions_future.R", local = TRUE)$value
+                          ),
+                          column(7,
+                                 div(class = "box_outputs", h4("Timeline")),
+                                 plotOutput("timevis_future")
+                          )
+                        ),
                         conditionalPanel("output.status_app_output == 'Locked Baseline'",
                                          conditionalPanel("output.status_app_output == 'Locked Baseline'",
                                                           fluidRow(
@@ -387,6 +403,9 @@ server <- function(input, output, session) {
                                                     input$future_coverage_27, input$future_coverage_28,
                                                     input$future_coverage_29, input$future_coverage_30)) %>% 
       filter(index <= interventions$future_nb)
+    
+    shiny_interventions_baseline_mat <<- interventions$baseline_mat
+    shiny_interventions_future_mat <<- interventions$future_mat
   })
   
   # Validation of interventions, {Baseline + Future Scenario}
