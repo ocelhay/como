@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v12.10"
+version_app <- "v12.11"
 
 # Load packages and data
 source("./www/source_on_inception.R")
@@ -473,6 +473,8 @@ server <- function(input, output, session) {
       baseline_hospital_surge_beds = simul_baseline$results$hospital_surge_beds,
       baseline_icu_beds = simul_baseline$results$icu_beds,
       baseline_ventilators = simul_baseline$results$ventilators,
+      baseline_death_natural_non_exposed = simul_baseline$results$death_natural_non_exposed,
+      baseline_death_natural_exposed = simul_baseline$results$death_natural_exposed,
       baseline_death_treated_hospital = simul_baseline$results$death_treated_hospital,
       baseline_death_treated_icu = simul_baseline$results$death_treated_icu,
       baseline_death_treated_ventilator = simul_baseline$results$death_treated_ventilator,
@@ -496,6 +498,8 @@ server <- function(input, output, session) {
         future_scenario_hospital_surge_beds = simul_interventions$results$hospital_surge_beds,
         future_scenario_icu_beds = simul_interventions$results$icu_beds,
         future_scenario_ventilators = simul_interventions$results$ventilators,
+        future_scenario_death_natural_non_exposed = simul_interventions$results$death_natural_non_exposed,
+        future_scenario_death_natural_exposed = simul_interventions$results$death_natural_exposed,
         future_scenario_death_treated_hospital = simul_interventions$results$death_treated_hospital,
         future_scenario_death_treated_icu = simul_interventions$results$death_treated_icu,
         future_scenario_death_treated_ventilator = simul_interventions$results$death_treated_ventilator,

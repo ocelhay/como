@@ -25,3 +25,6 @@ load(file = "./www/data/mort_sever_default.Rda")
 countries_cases <- sort(unique(cases$country))
 countries_contact <- names(contact_home)
 countries_demographic <- sort(unique(population$country))
+
+# options for exporting highchart
+hc_export_items <- c("downloadPNG", "downloadCSV", "downloadXLS")
