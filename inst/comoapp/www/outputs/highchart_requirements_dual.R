@@ -28,7 +28,7 @@ output$highchart_requirements_dual_baseline <- renderHighchart({
       hc_add_series(dta, type = "line", name = "Max Ventilators", color = "#5e4fa2", hcaes(x = time, y = max_ventilators)) %>%
       hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
              {point.y:,.0f}<br/>",shared = TRUE) %>%
-      hc_title(text = "Baseline Hospital Requirements") %>%
+      hc_title(text = "Baseline Hospital Occupancy") %>%
       hc_yAxis(max = max_y, title = "") %>%
       hc_xAxis(title = "")
   )
@@ -123,7 +123,7 @@ output$highchart_requirements_dual_interventions <- renderHighchart({
       hc_add_series(dta, type = "line", name = "Max Ventilators", color = "#5e4fa2", hcaes(x = time, y = max_ventilators)) %>%
       hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
              {point.y:,.0f}<br/>",shared = TRUE) %>%
-      hc_title(text = "Future Scenarios Hospital Requirements") %>%
+      hc_title(text = "Future Scenarios Hospital Occupancy") %>%
       hc_yAxis(max = max_y, title = "") %>%
       hc_xAxis(title = "")
   )
