@@ -55,7 +55,6 @@ ui <- function(request) {
                                                       )
                                                   )
                                  ),
-                                 # div(class = "float_action",
                                      conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
                                                       htmlOutput("feedback_choices")
                                      ),
@@ -74,7 +73,6 @@ ui <- function(request) {
                                      conditionalPanel("output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline'", 
                                                       actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success")
                                      )
-                                 # ),
                           ),
                           column(10,
                                  fluidRow(
@@ -82,19 +80,19 @@ ui <- function(request) {
                                    column(5,
                                           p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
                                             ", edit it and upload it:"),
-                                          fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE, width = "100%"),
+                                          fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE, width = "75%")
                                    ),
                                    column(7,
                                           dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
                                           fluidRow(column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      block = TRUE),), 
+                                                                      width = "70%")), 
                                                    column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      block = TRUE))),
+                                                                      width = "70%"))),
                                           br(),
                                           fluidRow(column(6, bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      block = TRUE)), 
+                                                                      width = "70%")), 
                                                    column(6, bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      block = TRUE)))
+                                                                      width = "70%")))
                                    )
                                  ),
                                  br(),
@@ -107,8 +105,8 @@ ui <- function(request) {
                                           source("./www/ui_interventions_baseline.R", local = TRUE)$value
                                    ),
                                    column(7,
-                                          div(class = "box_outputs", h4("Timeline")),
-                                          plotOutput("timevis_baseline")
+                                          div(class = "box_outputs", h4("Timeline for Baseline + Future:")),
+                                          plotOutput("timevis_baseline", height = "600px")
                                    )
                                  ),
                                  dataTableOutput("tab_inputs"),

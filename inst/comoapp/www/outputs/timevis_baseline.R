@@ -1,33 +1,36 @@
-output$timevis_baseline <- renderPlot({
+output$timevis_baseline <- renderPlot(execOnResize = TRUE, {
   req(interventions$baseline_nb >= 1)
+  # input <- list()
+  # input$date_range <- c(as.Date("2020-01-01"), as.Date("2020-01-12"))
+  # interventions <- list()
+  # interventions$baseline_mat <- shiny_interventions_baseline_mat
   
-  mid_date <- input$date_range[1] + floor((input$date_range[2] - input$date_range[1])/2)
-  range <- paste0("Range of Simulation: ", input$date_range[1], " to ", input$date_range[2])
+  range <- paste0("Simulation Range: ", input$date_range[1], " to ", input$date_range[2])
   # n_different_interventions <- unique(interventions$baseline_mat$intervention) + 0.4
   
-  n_different_interventions <- 4
   
-  interventions$baseline_mat %>% 
-    mutate(label_coverage = paste0(coverage, "%"),
-           date_mid = date_start + floor((date_end - date_start)/2)) %>%
-    
-    ggplot(aes(x = date_start, xend = date_end, y = intervention, yend = intervention)) + 
-    geom_segment(aes(color = coverage), size = 12) + 
-    geom_text(aes(x  = date_mid, label = label_coverage), size = 4.5) +
-    geom_vline(xintercept = Sys.Date(), lty = 2) +
-    geom_segment(x = input$date_range[1], xend = input$date_range[2], size = 2,
-                 y = n_different_interventions, yend = n_different_interventions, 
-                 arrow = arrow(length = unit(0.30, "cm") , ends = "both", type = "closed")) +
-    geom_label(x = mid_date, y = 0.6, label = range, size = 4.5) +
-    labs(title = "Baseline + Future Scenario Interventions", 
-         color = "Coverage (%)", x = NULL, y = NULL) +
-    scale_x_date(date_breaks = "1 month", labels = date_format("%b %y")) +
-    scale_colour_distiller(palette = "RdYlBu", limits = c(0, 100), breaks = c(0, 40, 60, 80, 100)) +
-    guides(size = FALSE, color = guide_colourbar(barwidth = 15, barheight = 1)) + 
-    theme_bw(base_size = 17) +
+  dta <- interventions$baseline_mat %>%
+    mutate(date_end = date_end + 1,
+           label = paste0(coverage, "% for ", difftime(date_end, date_start, units = "days") - 1, " days."),
+           apply_to = "Baseline + Future Scenario")
+  
+  ggplot(dta, aes(fill = apply_to)) + 
+    geom_rect(aes(xmin = date_start , xmax = date_end, ymin = 0, ymax = coverage), alpha = 0.2) +
+    geom_point(aes(x = date_start, y = coverage)) +
+    geom_segment(aes(x = date_start, xend = date_end, y = coverage, yend = coverage),
+                 arrow = arrow(length = unit(0.3, "cm") , ends = "last", type = "closed")) +
+    geom_text(aes(x = date_start, y = coverage, label = label), nudge_x = -0.1, nudge_y = -0.1, 
+              hjust = -0.1, vjust = 1.8, inherit.aes = FALSE) + 
+    geom_vline(xintercept = Sys.Date(), lty = 2, alpha = 0.7) +
+    labs(title = range,
+         x = NULL, y = "Coverage (%)") +
+    scale_x_date(date_breaks = "2 months", labels = date_format("%b %y")) +
+    # ylim(c(0, 100)) +
+    theme_bw(base_size = 19) +
     theme(legend.position = "bottom", legend.title = element_text(),
           panel.border = element_blank(),
           panel.grid.major.y = element_blank(),  panel.grid.minor = element_blank(),
           panel.grid.major.x = element_line(size = 0.5, colour="grey80"),
-          axis.line = element_blank(), axis.ticks = element_blank())
+          axis.line = element_blank(), axis.ticks = element_blank()) +
+    facet_wrap(~ intervention, ncol = 2, strip.position = "top", scales = "free_y")
 })
