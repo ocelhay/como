@@ -39,7 +39,8 @@ output$highchart_deaths_dual_baseline <- renderHighchart({
     hc_plotOptions(area = list(stacking = "normal")) %>%
     hc_title(text = "Baseline Cumulative Deaths") %>%
     hc_yAxis(max = max_y, title = "Deaths") %>%
-    hc_xAxis(title = "")
+    hc_xAxis(title = "") %>%
+    hc_exporting(enabled = TRUE, buttons = list(contextButton = list(menuItems = hc_export_items)))
 })
 
 output$highchart_deaths_dual_interventions <- renderHighchart({
@@ -83,5 +84,6 @@ output$highchart_deaths_dual_interventions <- renderHighchart({
     hc_plotOptions(area = list(stacking = "normal")) %>%
     hc_title(text = "Future Scenarios Cumulative Deaths") %>%
     hc_yAxis(max = max_y, title = "Deaths") %>%
-    hc_xAxis(title = "")
+    hc_xAxis(title = "") %>%
+    hc_exporting(enabled = TRUE, buttons = list(contextButton = list(menuItems = hc_export_items)))
 })
