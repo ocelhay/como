@@ -10,7 +10,8 @@
   position: fixed;
 }
 
-/* Floating feedback  */
+/* feedback  
+/*
 #css_feedback_process {
   padding: 10px 10px 5px 5px;
   margin: 5px 5px 5px 5px;
@@ -24,10 +25,15 @@
 /* Sidebar */
 
 .baseline_left{
-  width: 95%;
-  margin-left: 12px;
+  width: 17%;  # 2/12
+  margin-left: 2px;
+  bottom: calc(2%);;
+  left: calc(2%);;
+  z-index: 999;
+  position: fixed;
 }
 
+/*
 .float_action{
   bottom: calc(2%);;
   left: calc(2%);;
@@ -39,14 +45,12 @@
   z-index: 999;
   position: fixed;
 }
-
-.front_btn{
-  z-index: 9999;
-}
+*/
 
 .redbold {
   color: #EC6568;
   font-weight: bold;
+  text-decoration: underline;
 }
 
 .buttons_interventions {
