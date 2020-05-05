@@ -2,7 +2,7 @@ fun_validation_interventions <- function(dta, all_possible_interventions = all_i
   # dta should have the following columns: intervention, date_start, date_end, coverage
   
   validation <- list(validation_interventions = TRUE, 
-                     message_interventions = "Intervention(s) can be run.")
+                     message_interventions = NULL)
   
   # Check input
   if(!all(dta$intervention %in% all_possible_interventions)) {

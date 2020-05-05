@@ -66,13 +66,13 @@ ui <- function(request) {
                                  conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
                                                   fluidRow(
                                                     div(class = "box_outputs", h4("Global Simulations Parameters:")),
-                                                    column(5,
+                                                    column(6,
                                                            p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
                                                              ", edit it and upload it:"),
                                                            fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE, width = "75%"),
                                                            htmlOutput("feedback_choices")
                                                     ),
-                                                    column(7,
+                                                    column(6,
                                                            dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
                                                            fluidRow(column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                                                        width = "70%")), 
@@ -89,12 +89,12 @@ ui <- function(request) {
                                                   
                                                   # V13
                                                   fluidRow(
-                                                    column(5,
+                                                    column(6,
                                                            div(class = "box_outputs", h4("Interventions for Baseline + Future:")),
                                                            htmlOutput("text_nb_interventions_baseline"),
                                                            source("./www/ui_interventions_baseline.R", local = TRUE)$value
                                                     ),
-                                                    column(7,
+                                                    column(6,
                                                            div(class = "box_outputs", h4("Timeline:")),
                                                            plotOutput("timevis_baseline", height = "600px")
                                                     )
@@ -114,11 +114,6 @@ ui <- function(request) {
                         )
                ),
                tabPanel("Model Predictions", value = "tab_modelpredictions",
-                        # div(class = "float_action",
-                        #     conditionalPanel("(output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline') && output.validation_all_interventions",
-                        #                      actionButton("run_interventions", "Run Future Scenarios", class="btn btn-success")
-                        #     )
-                        # ),
                         fluidRow(
                           column(5,
                                  div(class = "box_outputs", h4("Interventions for Future:")),
@@ -535,12 +530,12 @@ server <- function(input, output, session) {
     for (i in 1:interventions$baseline_nb) {
       updateSelectInput(session, paste0("baseline_intervention_", i), selected = interventions_excel_baseline[[i, "intervention"]])
       updateDateRangeInput(session, paste0("baseline_daterange_", i), start = interventions_excel_baseline[[i, "date_start"]], end = interventions_excel_baseline[[i, "date_end"]])
-      updateNumericInput(session, paste0("baseline_coverage_", i), value = interventions_excel_baseline[[i, "coverage"]])
+      updateSliderInput(session, paste0("baseline_coverage_", i), value = interventions_excel_baseline[[i, "coverage"]])
     }
     for (i in 1:interventions$future_nb) {
       updateSelectInput(session, paste0("future_intervention_", i), selected = interventions_excel_future[[i, "intervention"]])
       updateDateRangeInput(session, paste0("future_daterange_", i), start = interventions_excel_future[[i, "date_start"]], end = interventions_excel_future[[i, "date_end"]])
-      updateNumericInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "coverage"]])
+      updateSliderInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "coverage"]])
     }
     # END CODE V13 ----
   })
