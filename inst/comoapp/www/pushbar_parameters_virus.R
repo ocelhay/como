@@ -1,5 +1,5 @@
 list(
-  pushbar(id = "pushbar_parameters_virus", from = "right", class = "pushbarcomp",
+  pushbar(id = "pushbar_parameters_virus", from = "right",
           br(), br(), br(),
           fluidRow(
             column(4,
@@ -31,6 +31,6 @@ list(
                                value = 75, min = 0, max = 100, step = 1)
             )
           ),
-          div(class = "closebutton", bsButton("close_virus_param", "Close", icon("times"), style = "danger", size = "small"))
+          div(class = "closebutton", bsButton("close_virus_param", "Close (Esc.)", icon("times"), style = "danger", size = "small"))
   )
 )

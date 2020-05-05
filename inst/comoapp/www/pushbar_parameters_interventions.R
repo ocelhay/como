@@ -1,5 +1,5 @@
 list(
-  pushbar(id = "pushbar_parameters_interventions", from = "right", class = "pushbarcomp",
+  pushbar(id = "pushbar_parameters_interventions", from = "right",
           br(),
           fluidRow(
             column(3, 
@@ -58,6 +58,6 @@ list(
                                step = 1, post = "%", ticks = FALSE)
             )
           ),
-          div(class = "closebutton", bsButton("close_interventions_param", "Close", icon("times"), style = "danger", size = "small"))
+          div(class = "closebutton", bsButton("close_interventions_param", "Close (Esc.)", icon("times"), style = "danger", size = "small"))
   )
 )

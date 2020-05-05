@@ -1,5 +1,5 @@
 list(
-  pushbar(id = "pushbar_parameters_country", from = "right", class = "pushbarcomp",
+  pushbar(id = "pushbar_parameters_country", from = "right",
           br(), br(), br(),
           fluidRow(
             column(4, includeMarkdown("./www/markdown/about_country_data.md"), includeMarkdown("./www/markdown/about_data.md")),
@@ -18,6 +18,6 @@ list(
                                 width = "50%")
             )
           ),
-          div(class = "closebutton", bsButton("close_country_param", "Close", icon("times"), style = "danger", size = "small"))
+          div(class = "closebutton", bsButton("close_country_param", "Close (Esc.)", icon("times"), style = "danger", size = "small"))
   )
 )
