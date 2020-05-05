@@ -105,7 +105,7 @@ ui <- function(request) {
                                           source("./www/ui_interventions_baseline.R", local = TRUE)$value
                                    ),
                                    column(7,
-                                          div(class = "box_outputs", h4("Timeline for Baseline + Future:")),
+                                          div(class = "box_outputs", h4("Timeline:")),
                                           plotOutput("timevis_baseline", height = "600px")
                                    )
                                  ),
