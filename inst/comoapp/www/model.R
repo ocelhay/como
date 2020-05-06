@@ -266,9 +266,9 @@ initS<-popstruc[,2]-initE-initI-initR-initX-initV-initH-initHC-initQS-initQE-ini
 
 # START Bridge ----
 inp <- interventions$baseline_mat %>%
-  mutate(`Apply to` = "Baseline") %>%
-  bind_rows(interventions$future_mat) %>%
   mutate(`Apply to` = "Baseline + Future Scenario") %>%
+  bind_rows(interventions$future_mat) %>%
+  mutate(`Apply to` = "Future Scenario") %>%
   rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Coverage (%)` = coverage)
 # END Bridge ----
 
@@ -281,7 +281,7 @@ inputs<-function(inp, run){
   lm<-intersect(which(inp$Intervention=="Lockdown, Mid"),tb)
   lh<-intersect(which(inp$Intervention=="Lockdown, High"),tb)
   si<-intersect(which(inp$Intervention=="Self-isolation if Symptomatic"),tb)
-  scr<-intersect(which(inp$Intervention=="Screening"),tb)
+  scr<-intersect(which(inp$Intervention=="Screening (when Self-isolation)"),tb)
   sd<-intersect(which(inp$Intervention=="Social Distancing"),tb)
   hw<-intersect(which(inp$Intervention=="Handwashing"),tb)
   wah<-intersect(which(inp$Intervention=="Working at Home"),tb)
@@ -625,8 +625,8 @@ inputs<-function(inp, run){
               quarantine=quarantine,vaccine=vaccine,travelban=travelban,distancing=distancing))
 }
 
-vectors<-inputs(inp,'Baseline + Future Scenario')
-vectors0<-inputs(inp,'Baseline')
+vectors<-inputs(inp,'Future Scenario')
+vectors0<-inputs(inp,'Baseline + Future Scenario')
 
 
 # set up a function to solve the equations

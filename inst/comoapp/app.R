@@ -558,9 +558,10 @@ server <- function(input, output, session) {
     # Reset simul_interventions and elements of the UI
     simul_interventions$results <- NULL
     
-    # source("./www/model.R", local = TRUE)
-    # out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
-    # simul_baseline$results <- process_ode_outcome(out)
+    source("./www/model.R", local = TRUE)
+    # browser()
+    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters, input=vectors0)
+    simul_baseline$results <- process_ode_outcome(out)
     
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
@@ -580,9 +581,9 @@ server <- function(input, output, session) {
     showNotification(span(h4(icon("hourglass-half"), "Running Future Scenarios..."), "typically runs in 10 secs."),
                      duration = NULL, type = "message", id = "run_interventions_notif")
     
-    # source("./www/model.R", local = TRUE)
-    # out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters)
-    # simul_interventions$results <- process_ode_outcome(out)
+    source("./www/model.R", local = TRUE)
+    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters2,input=vectors)
+    simul_interventions$results <- process_ode_outcome(out)
     
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"
