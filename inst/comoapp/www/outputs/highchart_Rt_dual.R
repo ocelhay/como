@@ -17,7 +17,8 @@ output$highchart_Rt_dual_baseline <- renderHighchart({
              {point.y:,.2f}<br/>", shared = TRUE) %>%
       hc_title(text = "Baseline Rt") %>%
       hc_yAxis(max = max_y, title = "Rt") %>%
-      hc_xAxis(title = "")
+      hc_xAxis(title = "") %>%
+      hc_exporting(enabled = TRUE, buttons = list(contextButton = list(menuItems = hc_export_items)))
   )
 })
 
@@ -40,6 +41,7 @@ output$highchart_Rt_dual_interventions <- renderHighchart({
              {point.y:,.2f}<br/>", shared = TRUE) %>%
       hc_title(text = "Future Scenarios Rt") %>%
       hc_yAxis(max = max_y, title = "Rt") %>%
-      hc_xAxis(title = "")
+      hc_xAxis(title = "") %>%
+      hc_exporting(enabled = TRUE, buttons = list(contextButton = list(menuItems = hc_export_items)))
   )
 })

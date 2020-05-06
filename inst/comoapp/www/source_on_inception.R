@@ -26,6 +26,7 @@ countries_cases <- sort(unique(cases$country))
 countries_contact <- names(contact_home)
 countries_demographic <- sort(unique(population$country))
 
+hc_export_items <- c("downloadPNG", "downloadCSV", "downloadXLS")
 
 all_interventions <- c("Lockdown, Low",
                        "Lockdown, Mid",

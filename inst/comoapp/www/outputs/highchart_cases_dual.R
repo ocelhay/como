@@ -36,7 +36,8 @@ output$highchart_cases_dual_baseline <- renderHighchart({
              {point.y:,.0f}<br/>", shared = TRUE) %>%
       hc_title(text = "Baseline Cases") %>%
       hc_yAxis(max = max_y, title = "Cases") %>%
-      hc_xAxis(title = "")
+      hc_xAxis(title = "") %>%
+      hc_exporting(enabled = TRUE, buttons = list(contextButton = list(menuItems = hc_export_items)))
   )
 })
   
@@ -78,6 +79,7 @@ output$highchart_cases_dual_interventions <- renderHighchart({
              {point.y:,.0f}<br/>", shared = TRUE) %>%
       hc_title(text = "Future Scenarios Cases") %>%
       hc_yAxis(max = max_y, title = "Cases") %>%
-      hc_xAxis(title = "")
+      hc_xAxis(title = "") %>%
+      hc_exporting(enabled = TRUE, buttons = list(contextButton = list(menuItems = hc_export_items)))
   )
 })

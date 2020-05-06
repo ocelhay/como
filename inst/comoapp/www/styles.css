@@ -20,12 +20,16 @@
   text-align: center;
   background-color: #18bc9c;
 }
+*/
 
+.logo { 
+  margin-top: 40px;
+  width: 30%;
+}
 
 /* Sidebar */
-
 .baseline_left{
-  width: 17%;  # 2/12
+  width: 17%;
   margin-left: 2px;
   bottom: calc(2%);;
   left: calc(2%);;

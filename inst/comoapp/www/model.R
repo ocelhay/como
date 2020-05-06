@@ -270,7 +270,11 @@ inp <- interventions$baseline_mat %>%
   bind_rows(interventions$future_mat) %>%
   mutate(`Apply to` = "Future Scenario") %>%
   rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Coverage (%)` = coverage)
+
+print(inp)
+shiny_inp <<- inp
 # END Bridge ----
+
 
 # START Placeholder for covidage_v13.2.R code (DO NOT EDIT) ----
 inputs<-function(inp, run){
@@ -778,7 +782,7 @@ covid<-function(t, Y, parameters,input)
              quarantine_rate<-min(((I+CL+H+ICU+Vent+HC+ICUC+VentC)*household_size/P),1)*quarantine_cov*quarantine_effort
            }
          }
-         print(paste("time: ",t, " hand:", hand ))
+         # print(paste("time: ",t, " hand:", hand ))
          
          # print(quarantine_rate)
          # cocooning the elderly
@@ -955,6 +959,7 @@ process_ode_outcome <- function(out){
   Rt <- NULL
   for (i in (ceiling(1/parameters["nui"])+1):length(times)){
     Rt[i] <- cumsum(sum(parameters["gamma"]*out[i,(Eindex+1)]))/cumsum(sum(parameters["gamma"]*out[(i-1/parameters["nui"]),(Eindex+1)]))
+    if(Rt[i] >= 7) Rt[i] <- NA
   }
   
   # Export in a cohesive format ----
