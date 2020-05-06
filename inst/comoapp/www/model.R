@@ -265,13 +265,10 @@ initS<-popstruc[,2]-initE-initI-initR-initX-initV-initH-initHC-initQS-initQE-ini
 # END Placeholder ----
 
 # START Bridge ----
-inp <- interventions$baseline_mat %>%
-  mutate(`Apply to` = "Baseline + Future Scenario") %>%
-  bind_rows(interventions$future_mat) %>%
-  mutate(`Apply to` = "Future Scenario") %>%
+inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline + Future Scenario"),
+                 interventions$future_mat %>% mutate(`Apply to` = "Future Scenario")) %>%
   rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Coverage (%)` = coverage)
 
-print(inp)
 shiny_inp <<- inp
 # END Bridge ----
 
