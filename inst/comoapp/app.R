@@ -47,7 +47,6 @@ ui <- function(request) {
                tabPanel("Visual Calibration", value = "tab_visualfit",
                         fluidRow(
                           column(2,
-                                 # div(id = "css_feedback_process", htmlOutput("feedback_process")),
                                  div(class = "baseline_left",
                                      conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
                                                       sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
@@ -99,7 +98,7 @@ ui <- function(request) {
                                                   # V13
                                                   fluidRow(
                                                     column(6,
-                                                           div(class = "box_outputs", h4("Interventions for Baseline + Future:")),
+                                                           div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
                                                            htmlOutput("text_nb_interventions_baseline"),
                                                            source("./www/ui_interventions_baseline.R", local = TRUE)$value
                                                     ),
@@ -125,11 +124,11 @@ ui <- function(request) {
                tabPanel("Model Predictions", value = "tab_modelpredictions",
                         fluidRow(
                           column(5,
-                                 div(class = "box_outputs", h4("Interventions for Future:")),
+                                 div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
                                  htmlOutput("text_nb_interventions_future"),
                                  source("./www/ui_interventions_future.R", local = TRUE)$value,
                                  conditionalPanel("output.validation_all_interventions",
-                                                  actionButton("run_interventions", "Run Future Scenarios", class="btn btn-success")
+                                                  actionButton("run_interventions", "Run Hypothetical Scenario", class="btn btn-success")
                                  )
                           ),
                           column(7,
@@ -146,7 +145,7 @@ ui <- function(request) {
                                                   htmlOutput("text_total_death_baseline") %>% withSpinner(),
                                            ),
                                            column(5,
-                                                  div(class = "box_outputs", h4("Future Scenarios")),
+                                                  div(class = "box_outputs", h4("Hypothetical Scenario")),
                                                   htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
                                                   htmlOutput("text_total_death_interventions") %>% withSpinner()
                                            ),
@@ -416,14 +415,14 @@ server <- function(input, output, session) {
     shiny_interventions_future_mat <<- interventions$future_mat
   })
   
-  # Validation of interventions, {Baseline + Future Scenario}
+  # Validation of interventions, Baseline (Calibration)
   observe({
     validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat)
     interventions$validation_baseline_interventions <- validation_baseline$validation_interventions
     interventions$message_baseline_interventions <- validation_baseline$message_interventions
   })
   
-  # Validation of interventions, {Baseline + Future Scenario} & Future Scenario
+  # Validation of interventions, Baseline (Calibration) & Hypothetical Scenario
   observe({
     validation_all <- fun_validation_interventions(dta = bind_rows(interventions$baseline_mat, interventions$future_mat))
     interventions$validation_all_interventions <- validation_all$validation_interventions
@@ -544,9 +543,9 @@ server <- function(input, output, session) {
     
     
     interventions_excel_baseline <- interventions_excel %>% 
-      filter(apply_to == "Baseline + Future Scenario")
+      filter(apply_to == "Baseline (Calibration)")
     interventions_excel_future <- interventions_excel %>% 
-      filter(apply_to == "Future Scenario")
+      filter(apply_to == "Hypothetical Scenario")
     
     interventions$baseline_nb <- min(interventions_excel_baseline %>% nrow(), 30)
     interventions$future_nb <- min(interventions_excel_future %>% nrow(), 30)
@@ -576,15 +575,15 @@ server <- function(input, output, session) {
   
   # Process on "run_baseline" ----
   observeEvent(input$run_baseline, {
-    showNotification(span(h4(icon("hourglass-half"), "Running the Baseline..."), "typically runs in 10 to 30 secs."),
+    showNotification(span(h4(icon("hourglass-half"), "Running Baseline (Calibration)..."), "typically runs in 10 to 30 secs."),
                      duration = NULL, type = "message", id = "model_run_notif")
     
     # Reset simul_interventions and elements of the UI
     simul_interventions$results <- NULL
     
-    source("./www/model.R", local = TRUE)
-    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters, input=vectors0)
-    simul_baseline$results <- process_ode_outcome(out)
+    # source("./www/model.R", local = TRUE)
+    # out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters, input=vectors0)
+    # simul_baseline$results <- process_ode_outcome(out)
     
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
@@ -601,7 +600,7 @@ server <- function(input, output, session) {
   
   # Process on "run_interventions" ----
   observeEvent(input$run_interventions, {
-    showNotification(span(h4(icon("hourglass-half"), "Running Future Scenarios..."), "typically runs in 10 to 30 secs."),
+    showNotification(span(h4(icon("hourglass-half"), "Running Hypothetical Scenario..."), "typically runs in 10 to 30 secs."),
                      duration = NULL, type = "message", id = "run_interventions_notif")
     
     source("./www/model.R", local = TRUE)

@@ -1,11 +1,11 @@
 list(
-  pushbar(id = "pushbar_parameters_hospitalisation",
+  pushbar(id = "pushbar_parameters_hospitalisation", from = "right",
           br(), br(), br(),
           fluidRow(
             column(4, 
-                   numericInput("beds_available", label = "Maximum number of hospital beds:", value = 80000, min = 1),
-                   numericInput("icu_beds_available", label = "Maximum number of ICU beds:", value = 8000, min = 1),
-                   numericInput("ventilators_available", label = "Maximum number of ventilators:", value = 6000, min = 1),
+                   numericInput("beds_available", label = "Maximum number of hospital surge beds:", value = 80000, min = 1),
+                   numericInput("icu_beds_available", label = "Maximum number of ICU beds without ventilators:", value = 8000, min = 1),
+                   numericInput("ventilators_available", label = "Maximum number of ICU beds with ventilators:", value = 6000, min = 1),
                    sliderInput("rhos", label = "Relative percentage of regular daily contacts when hospitalised:", post = "%", ticks = FALSE,
                                value = 15, min = 0, max = 100, step = 1),
                    sliderInput("ihr_scaling", label = "Scaling factor for infection hospitalisation rate: (NOT USED IN CURRENT VERSION)", ticks = FALSE,

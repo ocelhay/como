@@ -28,18 +28,15 @@ countries_demographic <- sort(unique(population$country))
 
 hc_export_items <- c("downloadPNG", "downloadCSV", "downloadXLS")
 
-all_interventions <- c("Lockdown, Low",
-                       "Lockdown, Mid",
-                       "Lockdown, High",
-                       "Self-isolation if Symptomatic",
-                       "Screening (when Self-isolation)",
+all_interventions <- c("Self-isolation if Symptomatic",
+                       "Screening (when S.I.)",
+                       "Household Isolation (when S.I.)",
                        "Social Distancing",
                        "Handwashing",
                        "Working at Home",
                        "School Closures",
                        "Shielding the Elderly",
-                       "Travel Ban",
-                       "Voluntary home quarantine",
+                       "International Travel Ban",
                        "Vaccination")
 
 # V13

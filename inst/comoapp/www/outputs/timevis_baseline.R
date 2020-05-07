@@ -4,17 +4,7 @@ output$timevis_baseline <- renderPlot(execOnResize = TRUE, {
   dta <- interventions$baseline_mat %>%
     mutate(date_end = date_end + 1,
            label = paste0(coverage, "%\n", difftime(date_end, date_start, units = "days") - 1, " days"),
-           apply_to = "Baseline + Future")
-  
-  
-  # dta <- bind_rows(interventions$baseline_mat %>%
-  #                    mutate(date_end = date_end + 1,
-  #                           label = paste0(coverage, "%\n", difftime(date_end, date_start, units = "days") - 1, " days."),
-  #                           apply_to = "Baseline + Future"),
-  #                  interventions$future_mat %>%
-  #                    mutate(date_end = date_end + 1,
-  #                           label = paste0(coverage, "%\n", difftime(date_end, date_start, units = "days") - 1, " days."),
-  #                           apply_to = "Future"))
+           apply_to = "Baseline (Calibration)")
     
   
   ggplot(dta) + 
