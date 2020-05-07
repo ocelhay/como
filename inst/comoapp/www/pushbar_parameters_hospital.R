@@ -21,11 +21,8 @@ list(
             ),
             column(4,
                    sliderInput("nus", label = "Duration of hospitalised infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
-                   sliderInput("nusc", label = "Duration of denied hospitalisation infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
                    sliderInput("nu_icu", label = "Duration of ICU infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
-                   sliderInput("nu_icuc", label = "Duration of denied ICU infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
                    sliderInput("nu_vent", label = "Duration of ventilated infection:", value = 25, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
-                   sliderInput("nu_ventc", label = "Duration of denied ventilation infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
             )
           ),
           div(class = "closebutton", bsButton("close_hospital_param", "Close (Esc.)", icon("times"), style = "danger", size = "small"))
