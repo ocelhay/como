@@ -11,6 +11,7 @@ ui <- function(request) {
     includeCSS("./www/styles.css"),
     pushbar_deps(),
     chooseSliderSkin('HTML5'),
+    
     title = "COVID-19 App | CoMo Consortium",
     
     source("./www/pushbar_parameters_interventions.R", local = TRUE)[1],
@@ -99,7 +100,7 @@ ui <- function(request) {
                                                   fluidRow(
                                                     column(6,
                                                            div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
-                                                           htmlOutput("text_nb_interventions_baseline"),
+                                                           swivel_vertical(htmlOutput("text_nb_interventions_baseline")),
                                                            source("./www/ui_interventions_baseline.R", local = TRUE)$value
                                                     ),
                                                     column(6,
@@ -143,7 +144,7 @@ ui <- function(request) {
                         conditionalPanel("output.status_app_output == 'Locked Baseline'",
                                          fluidRow(
                                            column(2, br(), br(), materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
-                                                                    status = "danger", right = TRUE, inline = FALSE, width = "100%")),
+                                                                                status = "danger", right = TRUE, inline = FALSE, width = "100%")),
                                            column(5,
                                                   div(class = "box_outputs", a(id = "anchor_box", h4("Baseline"))),
                                                   htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),

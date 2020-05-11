@@ -14,6 +14,7 @@ library(shinyhelper)
 library(shinythemes)
 library(shinyWidgets)
 library(tidyverse)
+library(vov)
 
 
 load(file = "./www/data/cases.Rda")
