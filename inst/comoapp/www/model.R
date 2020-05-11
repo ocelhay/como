@@ -540,7 +540,7 @@ process_ode_outcome <- function(out){
   fVent<- splinefun(x.Vent, f, method = "hyman")
   for (i in 1:length(times)){
     critH[i]<-min(1-fH(sum(out[i,(Hindex+1)]))+sum(out[i,(ICUCindex+1)])+sum(out[i,(ICUCVindex+1)])+(1-parameters["reporth"]),1)
-    crit[i]<-min(1-fICU((sum(out[i,(ICUindex+1)]))+(sum(out0[i,(Ventindex+1)]))+(sum(out[i,(VentCindex+1)]))))
+    crit[i]<-min(1-fICU((sum(out[i,(ICUindex+1)]))+(sum(out[i,(Ventindex+1)]))+(sum(out[i,(VentCindex+1)]))))
     critV[i]<-min(1-fVent((sum(out[i,(Ventindex+1)]))),1)
   }
   
