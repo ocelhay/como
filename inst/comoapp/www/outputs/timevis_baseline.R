@@ -23,7 +23,7 @@ output$timevis_baseline <- renderPlot(execOnResize = TRUE, {
     labs(x = NULL, y = NULL) +
     guides(fill = guide_legend(title = NULL), colour = guide_legend(title = NULL)) +
     scale_x_date(labels = date_format("%b' %y")) +
-    scale_y_continuous(labels = label_percent(scale = 1)) + 
+    scale_y_continuous(labels = label_percent(scale = 1), limits = c(0, 100)) + 
     theme_bw(base_size = 19) +
     theme(legend.position = "top", legend.title = element_text(), legend.text = element_text(size = 13),
           panel.border = element_blank(),

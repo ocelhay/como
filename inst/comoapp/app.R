@@ -126,23 +126,24 @@ ui <- function(request) {
                           column(5,
                                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
                                  htmlOutput("text_nb_interventions_future"),
-                                 source("./www/ui_interventions_future.R", local = TRUE)$value,
-                                 conditionalPanel("output.validation_all_interventions",
-                                                  actionButton("run_interventions", "Run Hypothetical Scenario", class="btn btn-success")
-                                 ),
-                                 conditionalPanel("output.status_app_output == 'Locked Baseline'",
-                                                  a("Go to Results", href = '#anchor_box')
-                                 ),
-                                 br(), br(),
+                                 source("./www/ui_interventions_future.R", local = TRUE)$value
                           ),
                           column(7,
                                  div(class = "box_outputs", h4("Timeline")),
                                  plotOutput("timevis_future", height = "600px")
                           )
                         ),
+                        conditionalPanel("output.validation_all_interventions",
+                                         actionButton("run_interventions", "Run Hypothetical Scenario", class="btn btn-success")
+                        ),
+                        conditionalPanel("output.status_app_output == 'Locked Baseline'",
+                                         a(span(icon("arrow-down"), "Go to Results"), href = '#anchor_box')
+                        ),
+                        br(), br(), br(),
                         conditionalPanel("output.status_app_output == 'Locked Baseline'",
                                          fluidRow(
-                                           column(2, p()),
+                                           column(2, br(), br(), materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
+                                                                    status = "danger", right = TRUE, inline = FALSE, width = "100%")),
                                            column(5,
                                                   div(class = "box_outputs", a(id = "anchor_box", h4("Baseline"))),
                                                   htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
@@ -155,10 +156,6 @@ ui <- function(request) {
                                            ),
                                          ),
                                          br(),
-                                         materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
-                                                        status = "danger", right = TRUE, inline = FALSE, width = "100%"),
-                                         br(),
-                                         
                                          fluidRow(
                                            column(2,
                                                   prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
