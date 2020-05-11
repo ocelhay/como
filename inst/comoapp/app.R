@@ -81,7 +81,7 @@ ui <- function(request) {
                                                            htmlOutput("feedback_choices")
                                                     ),
                                                     column(6,
-                                                           dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01"),
+                                                           dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year"),
                                                            fluidRow(column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                                                        width = "70%")), 
                                                                     column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
