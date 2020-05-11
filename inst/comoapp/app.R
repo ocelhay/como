@@ -129,7 +129,11 @@ ui <- function(request) {
                                  source("./www/ui_interventions_future.R", local = TRUE)$value,
                                  conditionalPanel("output.validation_all_interventions",
                                                   actionButton("run_interventions", "Run Hypothetical Scenario", class="btn btn-success")
-                                 )
+                                 ),
+                                 conditionalPanel("output.status_app_output == 'Locked Baseline'",
+                                                  a("Go to Results", href = '#anchor_box')
+                                 ),
+                                 br(), br(),
                           ),
                           column(7,
                                  div(class = "box_outputs", h4("Timeline")),
@@ -140,7 +144,7 @@ ui <- function(request) {
                                          fluidRow(
                                            column(2, p()),
                                            column(5,
-                                                  div(class = "box_outputs", h4("Baseline")),
+                                                  div(class = "box_outputs", a(id = "anchor_box", h4("Baseline"))),
                                                   htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
                                                   htmlOutput("text_total_death_baseline") %>% withSpinner(),
                                            ),
@@ -424,7 +428,7 @@ server <- function(input, output, session) {
   
   # Validation of interventions, Baseline (Calibration) & Hypothetical Scenario
   observe({
-    validation_all <- fun_validation_interventions(dta = bind_rows(interventions$baseline_mat, interventions$future_mat))
+    validation_all <- fun_validation_interventions(dta = interventions$future_mat)
     interventions$validation_all_interventions <- validation_all$validation_interventions
     interventions$message_all_interventions <- validation_all$message_interventions
   })
@@ -603,9 +607,9 @@ server <- function(input, output, session) {
     showNotification(span(h4(icon("hourglass-half"), "Running Hypothetical Scenario..."), "typically runs in 10 to 30 secs."),
                      duration = NULL, type = "message", id = "run_interventions_notif")
     
-    source("./www/model.R", local = TRUE)
-    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters2,input=vectors)
-    simul_interventions$results <- process_ode_outcome(out)
+    # source("./www/model.R", local = TRUE)
+    # out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters2,input=vectors)
+    # simul_interventions$results <- process_ode_outcome(out)
     
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"
