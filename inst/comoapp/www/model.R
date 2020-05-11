@@ -321,11 +321,10 @@ initS<-popstruc[,2]-initE-initI-initR-initX-initV-initH-initHC-initQS-initQE-ini
 
 
 # set up a function to solve the equations
-covid<-function(t, Y, parameters) 
+covid<-function(t, Y, parameters)
 {
   with(as.list(c(Y, parameters)),
        {
-         # write.table(t,"times.txt",row.names = F,col.names = F,append = T)
          S <- Y[Sindex]
          E <- Y[Eindex]
          I <- Y[Iindex]
@@ -344,17 +343,16 @@ covid<-function(t, Y, parameters)
          QC <- Y[QCindex]
          ICU <- Y[ICUindex]
          ICUC <- Y[ICUCindex]
+         ICUCV <-Y[ICUCVindex]
          Vent <- Y[Ventindex]
          VentC <- Y[VentCindex]
          CMC <- Y[CMCindex]
-         
-         P <- (S+E+I+R+X+V+H+HC+QS+QE+QI+QR+CL+QC+ICU+ICUC+Vent+VentC)
+         P <- (S+E+I+R+X+V+H+HC+QS+QE+QI+QR+CL+QC+ICU+ICUC+ICUCV+Vent+VentC)
          # print(sum(P))
-         
          # health system performance
          f <- c(1,(1+give)/2,(1-give)/2,0)
          KH<-beds_available
-         KICU<- icu_beds_available
+         KICU<- icu_beds_available+ventilators_available
          Kvent<- ventilators_available
          x.H <- c(0,(1+give)*KH/2,(3-give)*KH/2,2*KH)
          x.ICU <- c(0,(1+give)*KICU/2,(3-give)*KICU/2,2*KICU)
@@ -362,11 +360,10 @@ covid<-function(t, Y, parameters)
          fH <- splinefun(x.H, f, method = "hyman")
          fICU <- splinefun(x.ICU, f, method = "hyman")
          fVent<- splinefun(x.Vent, f, method = "hyman")
-         critH<-min(1-fH(sum(H)+sum(ICUC))+(1-reporth),1)
+         critH<-min(1-fH(sum(H)+sum(ICUC)+sum(ICUCV))+(1-reporth),1)
          crit<-min(1-fICU(sum(ICU)+sum(Vent)+sum(VentC)),1)
          critV<-min(1-fVent(sum(Vent)),1)
          # print(fH(sum(H)))
-         
          # interventions
          isolation<-(t>=selfis_on)*(t<=selfis_on+selfis_dur)
          distancing<-(t>=dist_on)*(t<=(dist_on+dist_dur))
@@ -381,8 +378,6 @@ covid<-function(t, Y, parameters)
          lockdown_low<-(t>=lockdown_low_on)*(t<=(lockdown_low_on+lockdown_low_dur))
          lockdown_mid<-(t>=lockdown_mid_on)*(t<=(lockdown_mid_on+lockdown_mid_dur))
          lockdown_high<-(t>=lockdown_high_on)*(t<=(lockdown_high_on+lockdown_high_dur))
-         
-         
          screen_eff<-0
          selfis<-0
          school<-1
@@ -391,10 +386,6 @@ covid<-function(t, Y, parameters)
          vaccinate<-0
          trvban_eff<-0
          quarantine_rate<-0
-         
-         
-         
-         
          if (lockdown_low || lockdown_mid || lockdown_high){
            if(lockdown_low){
              selfis<-0.5
@@ -436,9 +427,8 @@ covid<-function(t, Y, parameters)
            }else{work<-1}
            if (isolation){
              selfis<-selfis_cov
-             # if(screen){selfis<-min(selfis_cov/(1-screen_sens),1)}
              if(screen){
-               screen_eff<-min((report*I+reportc*(CL)+H+ICU+Vent+reporth*HC+ICUC+VentC)*screen_contacts*(screen_overdispersion*I/P)*screen_cov/P,1) 
+               screen_eff<-min((report*I+reportc*(CL)+H+ICU+Vent+reporth*HC+ICUC+VentC)*screen_contacts*(screen_overdispersion*I/P)*screen_cov/P,1)
              }
            }
            if (schoolclose){
@@ -458,16 +448,12 @@ covid<-function(t, Y, parameters)
              trvban_eff<-travelban_eff
            }
            if(quarantine){
-             quarantine_rate<-min(((I+CL+H+ICU+Vent+HC+ICUC+VentC)*household_size/P),1)*quarantine_cov*quarantine_effort
+             quarantine_rate<-min(((I+CL+H+ICU+Vent+HC+ICUC+VentC)*(household_size-1)/P),1)*quarantine_cov*quarantine_effort
            }
          }
-         
-         
-         # print(quarantine_rate)
          # cocooning the elderly
          cocoon_mat<-matrix((1-cocoon_eff),nrow = length(popstruc$pop),ncol = length(popstruc$pop))
          cocoon_mat[1:(age_cocoon-1),1:(age_cocoon-1)]<-1
-         
          # contact matrices
          cts<-(contact_home+distancing*(1-dist)*contact_other+(1-distancing)*contact_other
                +(1-schoolclose)*contact_school # school on
@@ -477,7 +463,6 @@ covid<-function(t, Y, parameters)
                +workhome*(1-work)*contact_work # people not working from home when homework is active
                +contact_home*workhome*work*w2h # inflating contacts at home when working from home
          )
-         
          # Final transmission related parameters
          contacts <- (1-cocoon)*cts+cocoon*cts*cocoon_mat+cocoon*(1+school*(1-school_eff)+work*(1-work_eff))*contact_home*(1-cocoon_mat)
          seas <- 1+amp*cos(2*3.14*(t-(phi*365.25/12))/365.25)
@@ -487,48 +472,43 @@ covid<-function(t, Y, parameters)
          lam <- (1-hand)*p*seas*(contacts%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*(X+HHC)+rhos*(HH))/P))
          # contacts under home quarantine
          lamq<-(1-hand)*p*seas*((1-quarantine_eff_home)*contact_home%*%(((1-selfis_eff)*(X+HHC))/P))+(1-hand)*p*seas*(1-quarantine_eff_other)*(contact_other%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*(X+HHC)+rhos*(HH))/P))
-         
          # birth/death
          b1<-sum(popbirth[,2]*popstruc[,2])
          birth<-0*popbirth[,2]
          birth[1]<-b1
-         
          # ODE system
          dSdt <- -S*lam-S*vaccinate+omega*R+ageing%*%S-mort*S+birth-quarantine_rate*S +(1/quarantine_days)*QS
          dEdt <- S*lam-gamma*E+ageing%*%E-mort*E + (1-vaccine_eff)*lam*V-quarantine_rate*E+(1/quarantine_days)*QE
          dIdt <- gamma*(1-pclin)*(1-screen_eff)*(1-ihr[,2])*E-nui*I+ageing%*%I-mort*I + (1/quarantine_days)*QI - quarantine_rate*I
          dCLdt<- gamma*pclin*(1-selfis)*(1-ihr[,2])*E-nui*CL+ageing%*%CL-mort*CL + (1/quarantine_days)*QC
-         dRdt <- nui*I-omega*R+nui*X+nui*CL+ageing%*%R-mort*R + (1/quarantine_days)*QR + nus*(1-pdeath_h*ifr[,2])*H + (1-pdeath_icu*ifr[,2])*nu_icu*ICU + (1-pdeath_icuc*ifr[,2])*nu_icuc*ICUC + (1-pdeath_hc*ifr[,2])*nusc*HC + (1-pdeath_vent*ifr[,2])*nu_vent*Vent+ (1-pdeath_ventc*ifr[,2])*nu_ventc*VentC
-         dXdt <- gamma*selfis*pclin*(1-ihr[,2])*E+gamma*(1-pclin)*screen_eff*(1-ihr[,2])*E-nui*X+ageing%*%X-mort*X 
+         dRdt <- nui*I-omega*R+nui*X+nui*CL+ageing%*%R-mort*R + (1/quarantine_days)*QR + nus*(1-pdeath_h*ifr[,2])*H + (1-pdeath_icu*ifr[,2])*nu_icu*ICU + (1-pdeath_icuc*ifr[,2])*nu_icuc*ICUC + (1-pdeath_ventc*ifr[,2])*nu_ventc*ICUCV + (1-pdeath_hc*ifr[,2])*nusc*HC + (1-pdeath_vent*ifr[,2])*nu_vent*Vent+ (1-pdeath_ventc*ifr[,2])*nu_ventc*VentC
+         dXdt <- gamma*selfis*pclin*(1-ihr[,2])*E+gamma*(1-pclin)*screen_eff*(1-ihr[,2])*E-nui*X+ageing%*%X-mort*X
          dVdt <- vaccinate*S -(1-vaccine_eff)*lam*V +ageing%*%V - mort*V
-         
          dQSdt <- quarantine_rate*S+ ageing%*%QS-mort*QS - (1/quarantine_days)*QS - lamq*QS
-         dQEdt <- quarantine_rate*E - gamma*QE + ageing%*%QE-mort*QE - (1/quarantine_days)*QE + lamq*QS 
+         dQEdt <- quarantine_rate*E - gamma*QE + ageing%*%QE-mort*QE - (1/quarantine_days)*QE + lamq*QS
          dQIdt <- quarantine_rate*I + gamma*(1-ihr[,2])*(1-pclin)*QE-nui*QI+ageing%*%QI-mort*QI - (1/quarantine_days)*QI
          dQCdt <- gamma*(1-ihr[,2])*pclin*QE-nui*QC+ageing%*%QC-mort*QC - (1/quarantine_days)*QC
          dQRdt <- nui*QI+nui*QC+ageing%*%QR-mort*QR - (1/quarantine_days)*QR
-         
          dHdt <- gamma*ihr[,2]*(1-prob_icu)*(1-critH)*E + gamma*ihr[,2]*(1-prob_icu)*(1-critH)*QE - nus*H + ageing%*%H-mort*H  # all pdeath have to be lower than
-         dHCdt <- gamma*ihr[,2]*(1-prob_icu)*critH*E + gamma*ihr[,2]*(1-prob_icu)*critH*QE - nusc*HC + ageing%*%HC-mort*HC 
-         dICUdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-prob_vent)*QE - nu_icu*ICU +ageing%*%ICU - mort*ICU 
-         dICUCdt <- gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*QE - nu_icuc*ICUC +ageing%*%ICUC - mort*ICUC 
-         dVentdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*QE + (1-critV)*VentC*1/2 - nu_vent*Vent +ageing%*%Vent - mort*Vent
-         dVentCdt <- gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*E +gamma*ihr[,2]*prob_icu*prob_vent*crit*E+
-           gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*QE + gamma*ihr[,2]*prob_icu*prob_vent*crit*QE -
-           (1-critV)*VentC*1/2-nu_ventc*VentC +ageing%*%VentC - mort*VentC
-         
-         dCdt <- report*gamma*(1-pclin)*(1-ihr[,2])*(E+QE)+reportc*gamma*pclin*(1-ihr[,2])*(E+QE)+ 
+         dHCdt <- gamma*ihr[,2]*(1-prob_icu)*critH*E + gamma*ihr[,2]*(1-prob_icu)*critH*QE - nusc*HC + ageing%*%HC-mort*HC
+         dICUdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-prob_vent)*QE - nu_icu*ICU +ageing%*%ICU - mort*ICU +(1-crit)*ICUC*1/2
+         dICUCdt <- gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*QE -
+           nu_icuc*ICUC -(1-crit)*ICUC*1/2 +ageing%*%ICUC - mort*ICUC
+         dICUCVdt <- gamma*ihr[,2]*prob_icu*prob_vent*crit*E +gamma*ihr[,2]*prob_icu*prob_vent*crit*QE -nu_ventc*ICUCV +ageing%*%ICUCV - mort*ICUCV - (1-critV)*ICUCV*1/2
+         dVentdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*QE +(1-critV)*VentC*1/2 +(1-critV)*ICUCV*1/2 -nu_vent*Vent +ageing%*%Vent - mort*Vent
+         dVentCdt <- gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*E +gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*QE -
+           (1-critV)*VentC*1/2 -nu_ventc*VentC +ageing%*%VentC - mort*VentC
+         dCdt <- report*gamma*(1-pclin)*(1-ihr[,2])*(E+QE)+reportc*gamma*pclin*(1-ihr[,2])*(E+QE)+
            gamma*ihr[,2]*(1-critH)*(1-prob_icu)*(E+QE)+gamma*ihr[,2]*critH*reporth*(1-prob_icu)*(E+QE)+
            gamma*ihr[,2]*prob_icu*(E+QE)
-         dCMdt<- nus*pdeath_h*ifr[,2]*H + nusc*pdeath_hc*ifr[,2]*HC + nu_icu*pdeath_icu*ifr[,2]*ICU + nu_icuc*pdeath_icuc*ifr[,2]*ICUC + nu_vent*pdeath_vent*ifr[,2]*Vent + nu_ventc*pdeath_ventc*ifr[,2]*VentC +
+         dCMdt<- nus*pdeath_h*ifr[,2]*H + nusc*pdeath_hc*ifr[,2]*HC + nu_icu*pdeath_icu*ifr[,2]*ICU +nu_icuc*pdeath_icuc*ifr[,2]*ICUC +nu_vent*pdeath_vent*ifr[,2]*Vent +nu_ventc*pdeath_ventc*ifr[,2]*VentC +nu_ventc*pdeath_ventc*ifr[,2]*ICUCV+
            mort*H + mort*HC + mort*ICU + mort*ICUC + mort*Vent + mort*VentC
-         dCMCdt <- nusc*pdeath_hc*ifr[,2]*HC+nu_icuc*pdeath_icuc*ifr[,2]*ICUC + nu_ventc*pdeath_ventc*ifr[,2]*VentC + 
+         dCMCdt <- nusc*pdeath_hc*ifr[,2]*HC+nu_icuc*pdeath_icuc*ifr[,2]*ICUC + nu_ventc*pdeath_ventc*ifr[,2]*VentC +
            mort*HC + mort*ICUC + mort*VentC
-         
          # return the rate of change
-         list(c(dSdt,dEdt,dIdt,dRdt,dXdt,dHdt,dHCdt,dCdt,dCMdt,dVdt,dQSdt,dQEdt,dQIdt,dQRdt,dCLdt,dQCdt,dICUdt,dICUCdt,dVentdt,dVentCdt,dCMCdt))
+         list(c(dSdt,dEdt,dIdt,dRdt,dXdt,dHdt,dHCdt,dCdt,dCMdt,dVdt,dQSdt,dQEdt,dQIdt,dQRdt,dCLdt,dQCdt,dICUdt,dICUCdt,dICUCVdt,dVentdt,dVentCdt,dCMCdt))
        }
-  ) 
+  )
 }
 
 ###########    RUN BASELINE MODEL - start time for interventions is set to day 1e5, i.e. interventions are always off
@@ -545,19 +525,19 @@ process_ode_outcome <- function(out){
   # End Bridge ----
   
   # START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
-  f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0) 
+  f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0)
   KH<-parameters["beds_available"]
-  KICU<- parameters["icu_beds_available"]
+  KICU<- parameters["icu_beds_available"]+parameters["ventilators_available"]
   Kvent<- parameters["ventilators_available"]
-  x.H <- c(0,(1+parameters["give"])*KH/2,(3-parameters["give"])*KH/2,2*KH) 
-  x.ICU <- c(0,(1+parameters["give"])*KICU/2,(3-parameters["give"])*KICU/2,2*KICU) 
-  x.Vent <- c(0,(1+parameters["give"])*Kvent/2,(3-parameters["give"])*Kvent/2,2*Kvent) 
-  fH <- splinefun(x.H, f, method = "hyman") 
-  fICU <- splinefun(x.ICU, f, method = "hyman") 
-  fVent<- splinefun(x.Vent, f, method = "hyman") 
+  x.H <- c(0,(1+parameters["give"])*KH/2,(3-parameters["give"])*KH/2,2*KH)
+  x.ICU <- c(0,(1+parameters["give"])*KICU/2,(3-parameters["give"])*KICU/2,2*KICU)
+  x.Vent <- c(0,(1+parameters["give"])*Kvent/2,(3-parameters["give"])*Kvent/2,2*Kvent)
+  fH <- splinefun(x.H, f, method = "hyman")
+  fICU <- splinefun(x.ICU, f, method = "hyman")
+  fVent<- splinefun(x.Vent, f, method = "hyman")
   for (i in 1:length(times)){
-    critH[i]<-min(1-fH(sum(out[i,(Hindex+1)]))+(1-parameters["reporth"]),1)
-    crit[i]<-min(1-fICU((sum(out[i,(ICUindex+1)]))+(sum(out[i,(Ventindex+1)]))+(sum(out[i,(VentCindex+1)]))))
+    critH[i]<-min(1-fH(sum(out[i,(Hindex+1)]))+sum(out[i,(ICUCindex+1)])+sum(out[i,(ICUCVindex+1)])+(1-parameters["reporth"]),1)
+    crit[i]<-min(1-fICU((sum(out[i,(ICUindex+1)]))+(sum(out0[i,(Ventindex+1)]))+(sum(out[i,(VentCindex+1)]))))
     critV[i]<-min(1-fVent((sum(out[i,(Ventindex+1)]))),1)
   }
   
