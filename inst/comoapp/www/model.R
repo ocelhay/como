@@ -289,9 +289,10 @@ CLindex<-(14*A+1):(15*A)
 QCindex<-(15*A+1):(16*A)
 ICUindex<-(16*A+1):(17*A)
 ICUCindex<-(17*A+1):(18*A)
-Ventindex<-(18*A+1):(19*A)
-VentCindex<-(19*A+1):(20*A)
-CMCindex<-(20*A+1):(21*A)
+ICUCVindex<-(18*A+1):(19*A)
+Ventindex<-(19*A+1):(20*A)
+VentCindex<-(20*A+1):(21*A)
+CMCindex<-(21*A+1):(22*A)
 
 
 # MODEL INITIAL CONDITIONS
@@ -299,23 +300,25 @@ initI<-0*popstruc[,2]  # Infected and symptomatic
 initE<-0*popstruc[,2]  # Incubating
 initE[aci]<-1          # place random index case in E compartment
 initR<-0*popstruc[,2]  # Immune
-initX<-0*popstruc[,2]  # Isolated 
-initV<-0*popstruc[,2]  # Vaccinated 
-initQS<-0*popstruc[,2] # quarantined S 
-initQE<-0*popstruc[,2] # quarantined E  
-initQI<-0*popstruc[,2] # quarantined I  
-initQR<-0*popstruc[,2] # quarantined R  
-initH<-0*popstruc[,2]  # hospitalised 
-initHC<-0*popstruc[,2] # hospital critical 
+initX<-0*popstruc[,2]  # Isolated
+initV<-0*popstruc[,2]  # Vaccinated
+initQS<-0*popstruc[,2] # quarantined S
+initQE<-0*popstruc[,2] # quarantined E
+initQI<-0*popstruc[,2] # quarantined I
+initQR<-0*popstruc[,2] # quarantined R
+initH<-0*popstruc[,2]  # hospitalised
+initHC<-0*popstruc[,2] # hospital critical
 initC<-0*popstruc[,2]  # Cumulative cases (true)
 initCM<-0*popstruc[,2] # Cumulative deaths (true)
 initCL<-0*popstruc[,2] # symptomatic cases
-initQC<-0*popstruc[,2] # quarantined C 
+initQC<-0*popstruc[,2] # quarantined C
 initICU<-0*popstruc[,2]   # icu
 initICUC<-0*popstruc[,2]  # icu critical
+initICUCV<-0*popstruc[,2]  # icu critical
 initVent<-0*popstruc[,2]  # icu vent
 initVentC<-0*popstruc[,2] # icu vent crit
 initCMC<-0*popstruc[,2]   # Cumulative deaths (true)
+initS<-popstruc[,2]-initE-initI-initR-initX-initV-initH-initHC-initQS-initQE-initQI-initQR-initCL-initQC-initICU-initICUC-initICUCV-initVent-initVentC  # Susceptible (non-immune)
 
 initS<-popstruc[,2]-initE-initI-initR-initX-initV-initH-initHC-initQS-initQE-initQI-initQR-initCL-initQC-initICU-initICUC-initVent-initVentC  # Susceptible (non-immune)
 
@@ -513,7 +516,7 @@ covid<-function(t, Y, parameters)
 
 ###########    RUN BASELINE MODEL - start time for interventions is set to day 1e5, i.e. interventions are always off
 
-Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, initICUC, initVent, initVentC, initCMC) # initial conditions for the main solution vector
+Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, initICUC, initICUCV, initVent, initVentC, initCMC) # initial conditions for the main solution vector
 # END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
 
 
