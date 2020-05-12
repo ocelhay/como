@@ -144,8 +144,10 @@ ui <- function(request) {
                         conditionalPanel("output.status_app_output == 'Locked Baseline'",
                                          fluidRow(
                                            column(2, 
-                                                  downloadButton("report", label = "Generate Report"),
-                                                  tags$small("Report in the .docx format based on a snapshot of results."),
+                                                  downloadButton("report", label = "Generate Report"), br(),
+                                                  tags$small("Report in the .docx format based on a snapshot of results."), br(),
+                                                  downloadButton("download_data", "Download Data"),
+                                                  tags$small("Download a .csv file of results. A detailled explanantion of all elements of the file can be downloaded at TODO: LINK TO Results_Legend_CoMoCOVID-19App.xlsx"),
                                                   br(), br(),
                                                   materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
                                                                                 status = "danger", right = TRUE, inline = FALSE, width = "100%")),
@@ -695,6 +697,13 @@ server <- function(input, output, session) {
     }
   )
   
+  # Downloadable csv of selected dataset ----
+  output$download_data <- downloadHandler(
+    filename = "COVID19_App_Data.csv",
+    content = function(file) {
+      write.csv(results_aggregated(), file, row.names = FALSE)
+    }
+  )
   
 }
 
