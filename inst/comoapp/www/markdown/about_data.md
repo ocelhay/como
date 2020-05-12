@@ -1,7 +1,7 @@
 
 **Cases/Deaths Data:**
 
-<a href="https://www.ecdc.europa.eu/" target="_blank">European Centre for Disease Prevention and Control.</a><span style="color:red;"> Updated 2020-04-29</span>
+<a href="https://www.ecdc.europa.eu/" target="_blank">European Centre for Disease Prevention and Control.</a><span style="color:red;"> Updated 2020-05-12</span>
 
 
 **Severity/Mortality by Age Category:**
