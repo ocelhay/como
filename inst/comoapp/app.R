@@ -14,10 +14,10 @@ ui <- function(request) {
     
     title = "COVID-19 App | CoMo Consortium",
     
-    source("./www/pushbar_parameters_interventions.R", local = TRUE)[1],
-    source("./www/pushbar_parameters_country.R", local = TRUE)[1],
-    source("./www/pushbar_parameters_virus.R", local = TRUE)[1],
-    source("./www/pushbar_parameters_hospital.R", local = TRUE)[1],
+    source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
+    source("./www/ui/pushbar_parameters_country.R", local = TRUE)[1],
+    source("./www/ui/pushbar_parameters_virus.R", local = TRUE)[1],
+    source("./www/ui/pushbar_parameters_hospital.R", local = TRUE)[1],
     
     navbarPage(NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
                tabPanel(span("COVID-19 App | CoMo Consortium ", version_app), value = "tab_welcome",
@@ -25,7 +25,7 @@ ui <- function(request) {
                           column(4, 
                                  h3("COVID-19 App | CoMo Consortium"),
                                  h4(version_app),
-                                 tags$img(src = "./images/como_logo.png", id = "logo"),
+                                 tags$img(src = "./como_logo.png", id = "logo"),
                                  p("The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level.")
                           ),
                           column(4,
@@ -100,8 +100,8 @@ ui <- function(request) {
                                                   fluidRow(
                                                     column(6,
                                                            div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
-                                                           swivel_vertical(htmlOutput("text_nb_interventions_baseline")),
-                                                           source("./www/ui_interventions_baseline.R", local = TRUE)$value
+                                                           htmlOutput("text_nb_interventions_baseline"),
+                                                           source("./www/ui/interventions_baseline.R", local = TRUE)$value
                                                     ),
                                                     column(6,
                                                            div(class = "box_outputs", h4("Timeline:")),
@@ -127,7 +127,7 @@ ui <- function(request) {
                           column(5,
                                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
                                  htmlOutput("text_nb_interventions_future"),
-                                 source("./www/ui_interventions_future.R", local = TRUE)$value
+                                 source("./www/ui/interventions_future.R", local = TRUE)$value
                           ),
                           column(7,
                                  div(class = "box_outputs", h4("Timeline")),
@@ -143,7 +143,11 @@ ui <- function(request) {
                         br(), br(), br(),
                         conditionalPanel("output.status_app_output == 'Locked Baseline'",
                                          fluidRow(
-                                           column(2, br(), br(), materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
+                                           column(2, 
+                                                  downloadButton("report", label = "Generate Report"),
+                                                  tags$small("Report in the .docx format based on a snapshot of results."),
+                                                  br(), br(),
+                                                  materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
                                                                                 status = "danger", right = TRUE, inline = FALSE, width = "100%")),
                                            column(5,
                                                   div(class = "box_outputs", a(id = "anchor_box", h4("Baseline"))),
@@ -668,6 +672,30 @@ server <- function(input, output, session) {
     
     return(dta)
   })
+  
+  # Generated Report
+  feedback_download <- reactiveValues(download_flag = 0)
+  
+  output$report <- downloadHandler(
+    filename = "CoMo Report.docx",
+    content = function(file) {
+      feedback_download$download_flag <- feedback_download$download_flag + 1
+      if(feedback_download$download_flag > 0) {
+        showNotification(HTML("Generation of the report typically takes 5 to 30 seconds"), duration = NULL, type = "message", id = "report_generation", session = session)
+      }
+      
+      tempReport <- file.path(tempdir(), "report.Rmd")
+      tempLogo <- file.path(tempdir(), "como_logo.png")
+      file.copy("./www/report.Rmd", tempReport, overwrite = TRUE)
+      file.copy("./www/como_logo.png", tempLogo, overwrite = TRUE)
+      
+      rmarkdown::render(tempReport, output_file = file)
+      removeNotification(id = "report_generation", session = session)
+      showNotification(HTML("Report Generated"), duration = 4, type = "message", id = "report_generated", session = session)
+    }
+  )
+  
+  
 }
 
 # Run the App ----

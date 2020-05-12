@@ -1,6 +1,7 @@
 library(bsplus)
 library(deSolve)
 library(DT)
+library(knitr)
 library(highcharter)
 library(lubridate)
 library(pushbar)
@@ -46,3 +47,9 @@ new_coverage_value <- 0
 
 nb_interventions_max <- 30
 source("./www/fun_validation_interventions.R")
+
+# Open anchor
+
+getPage<-function() {
+  return((HTML(readLines('http://www.google.com'))))
+}
