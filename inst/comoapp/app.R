@@ -105,15 +105,17 @@ ui <- function(request) {
                                                     ),
                                                     column(6,
                                                            div(class = "box_outputs", h4("Timeline:")),
-                                                           plotOutput("timevis_baseline", height = "600px")
+                                                           # plotOutput("timevis_baseline", height = "600px")
+                                                           uiOutput("ui_timevis_baseline")
                                                     )
                                                   ),
                                                   conditionalPanel("output.status_app_output == 'Ok Baseline' | output.status_app_output == 'Validated Baseline'",
                                                                    br(), br(), br(), br(),
                                                                    fluidRow(
-                                                                     column(8, br(), prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
+                                                                     column(6, br(), prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
                                                                                                         selected = "Observed", inline = TRUE)),
-                                                                     column(3, offset = 1, htmlOutput("text_doubling_time"))
+                                                                     column(3, htmlOutput("text_total_death_baseline_dup") %>% withSpinner()),
+                                                                     column(3, htmlOutput("text_doubling_time") %>% withSpinner())
                                                                    ),
                                                                    highchartOutput("highchart_cases", height = "350px") %>% withSpinner(), 
                                                                    highchartOutput("highchart_deaths", height = "350px") %>% withSpinner()
@@ -255,7 +257,6 @@ server <- function(input, output, session) {
   simul_interventions <- reactiveValues(results = NULL, interventions_available = FALSE)
   
   
-  # START CODE V13 ----
   interventions <- reactiveValues(baseline_nb = 0, baseline_mat = tibble(NULL), 
                                   future_nb = 0, future_mat = tibble(NULL),
                                   validation_baseline_interventions = FALSE, message_baseline_interventions = NULL,
@@ -448,7 +449,9 @@ server <- function(input, output, session) {
   outputOptions(output, "validation_baseline_interventions", suspendWhenHidden = FALSE)
   output$validation_all_interventions <- reactive(interventions$validation_all_interventions)
   outputOptions(output, "validation_all_interventions", suspendWhenHidden = FALSE)
-  # END CODE V13 ----
+  
+  # To dynamically set the height of the timeline interventions plot
+  # output$ui_timevis_baseline <- 
   
   
   

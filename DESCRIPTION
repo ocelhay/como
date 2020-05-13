@@ -12,7 +12,7 @@ Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 3.6),
-    bsplus, deSolve, DT, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
+    bsplus, deSolve, DT, knitr, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
     reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinythemes, 
     shinyWidgets, tidyverse
 RoxygenNote: 7.1.0

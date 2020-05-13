@@ -3,7 +3,7 @@ div(
   conditionalPanel("output.future_nb >= 1", 
                    fluidRow(
                      column(4, h5("Interventions:")),
-                     column(5, h5("Date Range:")),
+                     column(5, h5("Date Range (YY-MM-DD):")),
                      column(3, h5("Coverage:"))
                    )
   ),

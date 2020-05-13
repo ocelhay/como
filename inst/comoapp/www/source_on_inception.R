@@ -40,16 +40,10 @@ all_interventions <- c("Self-isolation if Symptomatic",
                        "International Travel Ban",
                        "Vaccination")
 
-# V13
+# Default values for interventions
 new_intervention_value <- all_interventions[4]
 new_daterange_value <- c(as.Date("2020-01-01"), as.Date("2020-12-31"))
 new_coverage_value <- 0
 
 nb_interventions_max <- 30
 source("./www/fun_validation_interventions.R")
-
-# Open anchor
-
-getPage<-function() {
-  return((HTML(readLines('http://www.google.com'))))
-}
