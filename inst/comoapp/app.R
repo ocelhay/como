@@ -162,9 +162,10 @@ ui <- function(request) {
                                  conditionalPanel("output.status_app_output == 'Ok Baseline' | output.status_app_output == 'Validated Baseline'",
                                                   br(), br(), br(), br(),
                                                   fluidRow(
-                                                    column(8, br(), prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
+                                                    column(6, br(), prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
                                                                                        selected = "Observed", inline = TRUE)),
-                                                    column(3, offset = 1, htmlOutput("text_doubling_time"))
+                                                    column(3, htmlOutput("text_total_death_baseline_dup") %>% withSpinner()),
+                                                    column(3, htmlOutput("text_doubling_time") %>% withSpinner())
                                                   ),
                                                   highchartOutput("highchart_cases", height = "350px") %>% withSpinner(), 
                                                   highchartOutput("highchart_deaths", height = "350px") %>% withSpinner()
