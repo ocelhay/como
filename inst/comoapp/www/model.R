@@ -651,6 +651,7 @@ process_ode_outcome <- function(out){
   results$total_deaths <- results$death_treated_hospital + results$death_treated_icu + results$death_treated_ventilator +
     results$death_untreated_hospital + results$death_untreated_icu + results$death_untreated_ventilator
   results$total_deaths_end <- last(results$total_deaths)
+  results$total_reported_deaths_end <- last(results$cum_mortality)
   
   
   # !!!! code re-using of variable names but with different str() !!! - request some cleaning

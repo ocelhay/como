@@ -164,7 +164,10 @@ ui <- function(request) {
                                                   fluidRow(
                                                     column(6, br(), prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
                                                                                        selected = "Observed", inline = TRUE)),
-                                                    column(3, htmlOutput("text_total_death_baseline_dup") %>% withSpinner()),
+                                                    column(3, 
+                                                           htmlOutput("text_total_death_baseline_dup") %>% withSpinner(),
+                                                           br(),
+                                                           htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()),
                                                     column(3, htmlOutput("text_doubling_time") %>% withSpinner())
                                                   ),
                                                   highchartOutput("highchart_cases", height = "350px") %>% withSpinner(), 
@@ -183,12 +186,14 @@ ui <- function(request) {
                                                                      column(6,
                                                                             div(class = "box_outputs", h4("Baseline")),
                                                                             htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
-                                                                            htmlOutput("text_total_death_baseline") %>% withSpinner(),
+                                                                            htmlOutput("text_total_death_baseline") %>% withSpinner(), br(),
+                                                                            htmlOutput("text_reported_death_baseline") %>% withSpinner()
                                                                      ),
                                                                      column(6,
                                                                             div(class = "box_outputs", h4("Future Scenarios")),
                                                                             htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
-                                                                            htmlOutput("text_total_death_interventions") %>% withSpinner()
+                                                                            htmlOutput("text_total_death_interventions") %>% withSpinner(), br(),
+                                                                            htmlOutput("text_reported_death_interventions") %>% withSpinner()
                                                                      ),
                                                                    ),
                                                                    br(),
