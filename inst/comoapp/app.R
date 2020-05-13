@@ -105,7 +105,6 @@ ui <- function(request) {
                                                     ),
                                                     column(6,
                                                            div(class = "box_outputs", h4("Timeline:")),
-                                                           # plotOutput("timevis_baseline", height = "600px")
                                                            uiOutput("ui_timevis_baseline")
                                                     )
                                                   ),
@@ -138,7 +137,7 @@ ui <- function(request) {
                           ),
                           column(7,
                                  div(class = "box_outputs", h4("Timeline")),
-                                 plotOutput("timevis_future", height = "600px")
+                                 uiOutput("ui_timevis_future")
                           )
                         ),
                         conditionalPanel("output.validation_all_interventions",
@@ -458,7 +457,10 @@ server <- function(input, output, session) {
   outputOptions(output, "validation_all_interventions", suspendWhenHidden = FALSE)
   
   # To dynamically set the height of the timeline interventions plot
-  # output$ui_timevis_baseline <- 
+  output$ui_timevis_baseline <- renderUI(plotOutput("timevis_baseline", 
+                                                    height = max(100, 180 * (0.5 + (1 + length(unique(interventions$baseline_mat$intervention))) %/% 2))))
+  output$ui_timevis_future <- renderUI(plotOutput("timevis_future", 
+                                                    height = max(100, 180 * (0.5 + (1 + length(unique(interventions$future_mat$intervention))) %/% 2))))
   
   
   
@@ -553,12 +555,11 @@ server <- function(input, output, session) {
       updatePickerInput(session, inputId = "country_contact", selected = param$Value_Country[param$Parameter == "country_contact"])
     }
     
-    # START CODE V13 ----
+    # Update interventions
     interventions_excel <- read_excel(file_path, sheet = "Interventions")
     names(interventions_excel) <- c("intervention", "date_start", "date_end", "coverage", "apply_to")
     interventions_excel <- interventions_excel %>%
       mutate(date_start = as.Date(date_start), date_end = as.Date(date_end))
-    
     
     interventions_excel_baseline <- interventions_excel %>% 
       filter(apply_to == "Baseline (Calibration)")
@@ -578,7 +579,6 @@ server <- function(input, output, session) {
       updateDateRangeInput(session, paste0("future_daterange_", i), start = interventions_excel_future[[i, "date_start"]], end = interventions_excel_future[[i, "date_end"]])
       updateSliderInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "coverage"]])
     }
-    # END CODE V13 ----
   })
   
   # Process on "reset_baseline" ----

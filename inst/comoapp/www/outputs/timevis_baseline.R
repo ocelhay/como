@@ -1,7 +1,5 @@
 output$timevis_baseline <- renderPlot(execOnResize = TRUE, {
   req(interventions$baseline_nb >= 1)
-  
-  nb_type_interventions_baseline <- 200 * (length(unique(interventions$baseline_mat$intervention)) %/% 2)
 
   dta <- interventions$baseline_mat %>%
     mutate(date_end = date_end + 1,
