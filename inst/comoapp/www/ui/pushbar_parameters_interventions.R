@@ -42,6 +42,8 @@ list(
                    div(class = "box_interventions", h4("Screening (when Self-isolation)")),
                    sliderInput("screen_overdispersion", label = "Overdispersion of cases around index case. If  1 likelihood same as general population:", value = 4, min = 1, max = 5,
                                step = 0.2, ticks = FALSE),
+                   sliderInput("screen_test_sens", label = "Test Sensitivity:", value = 80, min = 0, max = 100,
+                               step = 1, post = "%", ticks = FALSE),
                    sliderInput("screen_contacts", label = "Number of contacts screened per index case:", value = 4, min = 1, max = 10,
                                step = 1, post = " contacts", ticks = FALSE)
                    ),
