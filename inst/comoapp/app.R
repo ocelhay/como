@@ -151,9 +151,16 @@ ui <- function(request) {
                                          fluidRow(
                                            column(2, 
                                                   div(class = "float_bottom_left",
-                                                      h4("Go to:"),
-                                                      a(span(icon("arrow-right"), "Interventions"), href = '#anchor_interventions'), br(),
-                                                      a(span(icon("arrow-right"), "Summary Results"), href = '#anchor_summary'),
+                                                      p("Go to:"),
+                                                      tags$ul(
+                                                        tags$li(a("Interventions", href = '#anchor_interventions')),
+                                                        tags$li(a("Summary Predictions", href = '#anchor_summary')),
+                                                        tags$li(a("Cases", href = '#anchor_cases')),
+                                                        tags$li(a("Deaths", href = '#anchor_deaths')),
+                                                        tags$li(a("Hospital Occupancy", href = '#anchor_occupancy')),
+                                                        tags$li(a("Rt", href = '#anchor_rt')),
+                                                        tags$li(a("Model Output Table", href = '#anchor_table'))
+                                                      ),
                                                       br(), br(),
                                                       downloadButton("report", label = "Generate Report"), br(),
                                                       tags$small("Report in .docx format based on current simulation."), br(), br(),
@@ -165,18 +172,14 @@ ui <- function(request) {
                                            column(5,
                                                   div(class = "box_outputs", h4("Baseline")),
                                                   htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
-                                                  splitLayout(
-                                                    htmlOutput("text_total_death_baseline") %>% withSpinner(),
-                                                    htmlOutput("text_reported_death_baseline") %>% withSpinner()
-                                                  )
+                                                  htmlOutput("text_total_death_baseline") %>% withSpinner(), br(),
+                                                  htmlOutput("text_reported_death_baseline") %>% withSpinner()
                                            ),
                                            column(5,
                                                   div(class = "box_outputs", h4("Hypothetical Scenario")),
                                                   htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
-                                                  splitLayout(
-                                                    htmlOutput("text_total_death_interventions") %>% withSpinner(), 
-                                                    htmlOutput("text_reported_death_interventions") %>% withSpinner()
-                                                  )
+                                                  htmlOutput("text_total_death_interventions") %>% withSpinner(), br(), 
+                                                  htmlOutput("text_reported_death_interventions") %>% withSpinner()
                                            )
                                          ),
                                          
@@ -186,6 +189,7 @@ ui <- function(request) {
                                                   materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
                                                                  status = "danger", right = TRUE, inline = FALSE, width = "100%"),
                                                   br(),
+                                                  a(id = "anchor_cases", style="visibility: hidden", ""),
                                                   prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
                                                                      selected = "Predicted Reported + Unreported", inline = TRUE)
                                            )
@@ -201,6 +205,7 @@ ui <- function(request) {
                                          
                                          fluidRow(
                                            column(10, offset = 2,
+                                                  a(id = "anchor_deaths", style="visibility: hidden", ""),
                                                   prettyRadioButtons("focus_natural_death", label = "Focus on:", 
                                                                      choices = c("No Focus", "COVID-19 Deaths"), 
                                                                      selected = "No Focus", inline = TRUE)
@@ -220,6 +225,7 @@ ui <- function(request) {
                                          ),
                                          fluidRow(
                                            column(10, offset = 2,
+                                                  a(id = "anchor_occupancy", style="visibility: hidden", ""),
                                                   prettyRadioButtons("focus_requirements", label = "Focus on:", 
                                                                      choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
                                                                      selected = "No Focus", inline = TRUE)
@@ -235,6 +241,7 @@ ui <- function(request) {
                                          ),
                                          fluidRow(
                                            column(5, offset = 2,
+                                                  a(id = "anchor_rt", style="visibility: hidden", ""),
                                                   highchartOutput("highchart_Rt_dual_baseline", height = "350px") %>% withSpinner(), br(),
                                            ),
                                            column(5, 
@@ -243,6 +250,7 @@ ui <- function(request) {
                                          ),
                                          fluidRow(
                                            column(10, offset = 2,
+                                                  a(id = "anchor_table", style="visibility: hidden", ""),
                                                   div(class = "box_outputs", h4("Model Output Table")),
                                                   DTOutput("table_results")
                                            )
