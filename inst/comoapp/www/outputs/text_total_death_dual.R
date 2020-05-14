@@ -8,7 +8,7 @@ output$text_total_death_baseline <- renderText({
       as.character(
         div(class = "n_box_baseline",
             h3(paste0(format(n, big.mark = ","))),
-            span("Covid-19",  strong("attributable"), "deaths during the range of simulation.")
+            span("Covid-19",  strong("attributable"), "deaths", br(), "during the range of simulation.")
         ))))
 })
 
@@ -22,7 +22,7 @@ output$text_total_death_baseline_dup <- renderText({
       as.character(
         div(class = "n_box_baseline",
             h3(paste0(format(n, big.mark = ","))),
-            span("Covid-19",  strong("attributable"), "deaths during the range of simulation.")
+            span("Covid-19",  strong("attributable"), "deaths", br(), "during the range of simulation.")
         ))))
 })
 
@@ -36,7 +36,7 @@ output$text_reported_death_baseline <- renderText({
       as.character(
         div(class = "n_box_baseline",
             h3(paste0(format(n, big.mark = ","))),
-            span("Covid-19",  strong("reported"), "deaths during the range of simulation.")
+            span("Covid-19",  strong("reported"), "deaths", br(), "during the range of simulation.")
         ))))
 })
 
@@ -50,7 +50,7 @@ output$text_reported_death_baseline_dup <- renderText({
       as.character(
         div(class = "n_box_baseline",
             h3(paste0(format(n, big.mark = ","))),
-            span("Covid-19",  strong("reported"), "deaths during the range of simulation.")
+            span("Covid-19",  strong("reported"), "deaths", br(), "during the range of simulation.")
         ))))
 })
 
@@ -67,7 +67,7 @@ output$text_total_death_interventions <- renderText({
         div(class = "n_box_interventions",
             div(class = "icon_box", h3(paste0("(", format(reduction, big.mark = ","), ")"))),
             h3(paste0(format(n, big.mark = ","))),
-            span("Covid-19",  strong("attributable"), "deaths during the range of simulation.")
+            span("Covid-19",  strong("attributable"), "deaths", br(), "during the range of simulation.")
         ))))
 })
 
@@ -83,6 +83,6 @@ output$text_reported_death_interventions <- renderText({
         div(class = "n_box_interventions",
             div(class = "icon_box", h3(paste0("(", format(reduction, big.mark = ","), ")"))),
             h3(paste0(format(n, big.mark = ","))),
-            span("Covid-19",  strong("reported"), "deaths during the range of simulation.")
+            span("Covid-19",  strong("reported"), "deaths", br(), "during the range of simulation.")
         ))))
 })
