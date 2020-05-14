@@ -3,8 +3,9 @@ list(
           br(),
           fluidRow(
             column(3, 
-                   # div(class = "box_interventions", h4(icon("hand-paper"), " Handwashing")),
-                   # p("There is no parameter for this intervention to edit here."),
+                   div(class = "box_interventions", h4(icon("hand-paper"), " Handwashing")),
+                   sliderInput("hand_eff", label = "Efficacy of handwashing:", value = 85, min = 0, max = 100,
+                               step = 1, post = "%", ticks = FALSE),
                    div(class = "box_interventions", h4(icon("house-user"), "Working at Home")),
                    sliderInput("work_eff", label = "Efficacy of working from home:", value = 85, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),
