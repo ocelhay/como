@@ -49,6 +49,7 @@ ui <- function(request) {
                         fluidRow(
                           column(2,
                                  div(class = "float_bottom_left",
+                                     hr(),
                                      conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
                                                       sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
                                                                   value = 0.049, ticks = FALSE, width = "75%"),
@@ -68,7 +69,8 @@ ui <- function(request) {
                                      ),
                                      conditionalPanel("output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline'", 
                                                       actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success")
-                                     )
+                                     ),
+                                     hr()
                                  )
                           ),
                           column(10,
@@ -151,6 +153,7 @@ ui <- function(request) {
                                          fluidRow(
                                            column(2, 
                                                   div(class = "float_bottom_left",
+                                                      hr(),
                                                       p("Go to:"),
                                                       tags$ul(
                                                         tags$li(a("Interventions", href = '#anchor_interventions')),
@@ -166,6 +169,7 @@ ui <- function(request) {
                                                       tags$small("Report in .docx format based on current simulation."), br(), br(),
                                                       downloadButton("download_data", "Download Data"), br(),
                                                       tags$small("Simulation results in .csv format. ",  a("Download the legend.", href = "https://github.com/ocelhay/como/blob/master/Results_Legend_CoMoCOVID-19App.xlsx", target = "_blank")),
+                                                      hr(),
                                                   ),
                                                   a(id = "anchor_summary", style="visibility: hidden", "")
                                            ),
