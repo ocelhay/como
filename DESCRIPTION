@@ -10,8 +10,7 @@ Description: Developed by the Covid-19 International Modelling Consortium (CoMo 
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends:
-    R (>= 3.6),
+Imports:
     bsplus, deSolve, DT, knitr, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
     reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinyjs, shinythemes, 
     shinyWidgets, tidyverse
