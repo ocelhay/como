@@ -31,7 +31,7 @@
 .float_bottom_left{
   width: 15%;
   margin-left: 2px;
-  bottom: calc(2%);;
+  bottom: calc(1%);;
   left: calc(2%);;
   z-index: 999;
   position: fixed;

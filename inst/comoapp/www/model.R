@@ -1,5 +1,3 @@
-browser()
-
 # START Bridge ----
 popstruc <- population_rv$data %>% 
   select(age_category, pop) %>% 
@@ -118,11 +116,11 @@ parameters <- c(
   pdeath_ventc = input$pdeath_ventc,
   ihr_scaling = input$ihr_scaling,
   nus = input$nus,
-  nusc = input$nusc,
+  nusc = input$nus, # nusc = nus
   nu_icu = input$nu_icu,
-  nu_icuc = input$nu_icuc,
+  nu_icuc = input$nu_icu, # nu_icuc = nu_icu
   nu_vent = input$nu_vent,
-  nu_ventc = input$nu_ventc,
+  nu_ventc = input$nu_vent, # nu_ventc = nu_vent
   rhos = input$rhos,
   amp = input$amp,
   phi = which(month.name == input$phi),
@@ -558,8 +556,7 @@ inputs<-function(inp, run){
   }
   
   return(list(si_vector=si_vector,sd_vector=sd_vector,scr_vector=scr_vector,hw_vector=hw_vector,wah_vector=wah_vector,
-              sc_vector=sc_vector,tb_vector=tb_vector,cte_vector=cte_vector,q_vector=q_vector,vc_vector=vc_vector,
-              lockdown_low=lockdown_low,lockdown_mid=lockdown_mid,lockdown_high=lockdown_high,isolation=isolation,
+              sc_vector=sc_vector,tb_vector=tb_vector,cte_vector=cte_vector,q_vector=q_vector,vc_vector=vc_vector,isolation=isolation,
               screen=screen,cocoon=cocoon,schoolclose=schoolclose,workhome=workhome,handwash=handwash,
               quarantine=quarantine,vaccine=vaccine,travelban=travelban,distancing=distancing))
 }
@@ -751,7 +748,6 @@ Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, init
 
 # START Placeholder for covidage_v13.3.R code (DO NOT EDIT)
 process_ode_outcome <- function(out){
-  
   critH<-c()
   crit<-c()
   critV<-c()

@@ -1,4 +1,4 @@
-fun_validation_interventions <- function(dta, all_possible_interventions = all_interventions) {
+fun_validation_interventions <- function(dta, all_possible_interventions = all_interventions, simul_start_date, simul_end_date) {
   # dta should have the following columns: intervention, date_start, date_end, coverage
   
   validation <- list(validation_interventions = TRUE, 
@@ -15,6 +15,12 @@ fun_validation_interventions <- function(dta, all_possible_interventions = all_i
     validation$validation_interventions <- FALSE
     validation$message_interventions <- paste0(validation$message_interventions, 
                                                "Coverage value(s) not in-between 0 and 100. Needs resolution. ")
+  }
+  
+  if(any(dta$date_start < simul_start_date | dta$date_end > simul_end_date)) {
+    validation$validation_interventions <- FALSE
+    validation$message_interventions <- paste0(validation$message_interventions, 
+                                               "Some intervention(s) are outside the date range of simulation. Needs resolution. ")
   }
   
   # Test if screening/quarantaine is selected outsdide of a period of self-isolation

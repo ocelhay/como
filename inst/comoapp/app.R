@@ -11,6 +11,7 @@ ui <- function(request) {
     includeCSS("./www/styles.css"),
     pushbar_deps(),
     chooseSliderSkin('HTML5'),
+    useShinyjs(),
     
     title = "COVID-19 App | CoMo Consortium",
     
@@ -60,8 +61,10 @@ ui <- function(request) {
                                                       sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
                                                                   value = 100, post = "%", ticks = FALSE, width = "75%")
                                      ),
-                                     conditionalPanel("(output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline') && output.validation_baseline_interventions",
-                                                      actionButton("run_baseline", "Run Baseline", class="btn btn-success")
+                                     conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
+                                                      conditionalPanel("output.validation_baseline_interventions",
+                                                                       actionButton("run_baseline", "Run Baseline", class="btn btn-success")
+                                                      )
                                      ),
                                      conditionalPanel("output.status_app_output == 'Ok Baseline'",
                                                       br(),
@@ -112,6 +115,8 @@ ui <- function(request) {
                                                   ),
                                                   conditionalPanel("output.status_app_output == 'Ok Baseline' | output.status_app_output == 'Validated Baseline'",
                                                                    br(), br(), br(), br(),
+                                                                   # a(id = "anchor_baseline_results", style = "visibility: hidden", ""),
+                                                                   div(id = "anchor_baseline_results", ""),
                                                                    fluidRow(
                                                                      column(6, br(), prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
                                                                                                         selected = "Observed", inline = TRUE)),
@@ -164,9 +169,9 @@ ui <- function(request) {
                                                         tags$li(a("Rt", href = '#anchor_rt')),
                                                         tags$li(a("Model Output Table", href = '#anchor_table'))
                                                       ),
-                                                      br(), br(),
+                                                      br(), 
                                                       downloadButton("report", label = "Generate Report"), br(),
-                                                      tags$small("Report in .docx format based on current simulation."), br(), br(),
+                                                      tags$small("Report in .docx format based on current simulation."), br(),
                                                       downloadButton("download_data", "Download Data"), br(),
                                                       tags$small("Simulation results in .csv format. ",  a("Download the legend.", href = "https://github.com/ocelhay/como/blob/master/Results_Legend_CoMoCOVID-19App.xlsx", target = "_blank")),
                                                       hr(),
@@ -459,14 +464,14 @@ server <- function(input, output, session) {
   
   # Validation of interventions, Baseline (Calibration)
   observe({
-    validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat)
+    validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, simul_start_date = input$date_range[1], simul_end_date= input$date_range[2])
     interventions$validation_baseline_interventions <- validation_baseline$validation_interventions
     interventions$message_baseline_interventions <- validation_baseline$message_interventions
   })
   
   # Validation of interventions, Baseline (Calibration) & Hypothetical Scenario
   observe({
-    validation_all <- fun_validation_interventions(dta = interventions$future_mat)
+    validation_all <- fun_validation_interventions(dta = interventions$future_mat, simul_start_date = input$date_range[1], simul_end_date= input$date_range[2])
     interventions$validation_all_interventions <- validation_all$validation_interventions
     interventions$message_all_interventions <- validation_all$message_interventions
   })
@@ -633,6 +638,7 @@ server <- function(input, output, session) {
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
     simul_baseline$baseline_available <- TRUE
+    runjs('document.getElementById("anchor_baseline_results").scrollIntoView();')
     shiny_simul_baseline <<- simul_baseline$results  # for development only
   })
   
@@ -655,6 +661,7 @@ server <- function(input, output, session) {
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"
     simul_interventions$interventions_available <- TRUE
+    runjs('document.getElementById("anchor_summary").scrollIntoView();')
     shiny_simul_interventions <<- simul_interventions$results  # for development only
   })
   

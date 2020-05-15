@@ -13,6 +13,6 @@ LazyData: true
 Depends:
     R (>= 3.6),
     bsplus, deSolve, DT, knitr, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
-    reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinythemes, 
+    reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinyjs, shinythemes, 
     shinyWidgets, tidyverse
 RoxygenNote: 7.1.0
