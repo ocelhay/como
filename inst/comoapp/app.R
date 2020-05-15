@@ -11,7 +11,7 @@ ui <- function(request) {
     includeCSS("./www/styles.css"),
     pushbar_deps(),
     chooseSliderSkin('HTML5'),
-    useShinyjs(),
+    # useShinyjs(),
     
     title = "COVID-19 App | CoMo Consortium",
     
@@ -632,9 +632,9 @@ server <- function(input, output, session) {
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
     simul_baseline$baseline_available <- TRUE
-    runjs('
-          document.getElementById("anchor_baseline_results").scrollIntoView();
-          ')
+    # runjs('
+    #       document.getElementById("anchor_baseline_results").scrollIntoView();
+    #       ')
     shiny_simul_baseline <<- simul_baseline$results  # for development only
   })
   
@@ -657,9 +657,9 @@ server <- function(input, output, session) {
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"
     simul_interventions$interventions_available <- TRUE
-    runjs('
-          document.getElementById("anchor_summary").scrollIntoView();
-          ')
+    # runjs('
+    #       document.getElementById("anchor_summary").scrollIntoView();
+    #       ')
     shiny_simul_interventions <<- simul_interventions$results  # for development only
   })
   
