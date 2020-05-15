@@ -70,6 +70,7 @@ ui <- function(request) {
                                                       br(),
                                                       actionButton("validate_baseline", span(icon("thumbs-up"), " Validate the Baseline"), class="btn btn-success"),
                                      ),
+                                     a(id = "anchor_baseline_results", style = "visibility: hidden", ""),
                                      conditionalPanel("output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline'", 
                                                       actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success")
                                      ),
@@ -100,8 +101,6 @@ ui <- function(request) {
                                                     )
                                                   ),
                                                   br(),
-                                                  
-                                                  # V13
                                                   fluidRow(
                                                     column(6,
                                                            div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
@@ -114,20 +113,15 @@ ui <- function(request) {
                                                     )
                                                   ),
                                                   conditionalPanel("output.status_app_output == 'Ok Baseline' | output.status_app_output == 'Validated Baseline'",
-                                                                   br(), br(), br(), br(),
-                                                                   # a(id = "anchor_baseline_results", style = "visibility: hidden", ""),
-                                                                   div(id = "anchor_baseline_results", ""),
+                                                                   br(), br(), 
                                                                    fluidRow(
-                                                                     column(6, br(), prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
-                                                                                                        selected = "Observed", inline = TRUE)),
-                                                                     column(3, 
-                                                                            htmlOutput("text_total_death_baseline_dup") %>% withSpinner(),
-                                                                            br(),
-                                                                            htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()),
+                                                                     column(3, htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner()),
+                                                                     column(3, htmlOutput("text_total_death_baseline_dup") %>% withSpinner()),
+                                                                     column(3, htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()),
                                                                      column(3, htmlOutput("text_doubling_time") %>% withSpinner())
-                                                                     
-                                                                     
                                                                    ),
+                                                                   prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
+                                                                                      selected = "Observed", inline = TRUE), br(),
                                                                    highchartOutput("highchart_cases", height = "350px") %>% withSpinner(), 
                                                                    highchartOutput("highchart_deaths", height = "350px") %>% withSpinner()
                                                   )
@@ -638,7 +632,9 @@ server <- function(input, output, session) {
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
     simul_baseline$baseline_available <- TRUE
-    runjs('document.getElementById("anchor_baseline_results").scrollIntoView();')
+    runjs('
+          document.getElementById("anchor_baseline_results").scrollIntoView();
+          ')
     shiny_simul_baseline <<- simul_baseline$results  # for development only
   })
   
@@ -661,7 +657,9 @@ server <- function(input, output, session) {
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"
     simul_interventions$interventions_available <- TRUE
-    runjs('document.getElementById("anchor_summary").scrollIntoView();')
+    runjs('
+          document.getElementById("anchor_summary").scrollIntoView();
+          ')
     shiny_simul_interventions <<- simul_interventions$results  # for development only
   })
   
