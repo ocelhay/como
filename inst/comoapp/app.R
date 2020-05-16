@@ -289,10 +289,14 @@ server <- function(input, output, session) {
   simul_interventions <- reactiveValues(results = NULL, interventions_available = FALSE)
   
   
-  interventions <- reactiveValues(baseline_nb = 0, baseline_mat = tibble(NULL), 
-                                  future_nb = 0, future_mat = tibble(NULL),
-                                  validation_baseline_interventions = FALSE, message_baseline_interventions = NULL,
-                                  validation_all_interventions = FALSE, message_all_interventions = NULL)
+  interventions <- reactiveValues(baseline_nb = 0, 
+                                  baseline_mat = tibble(NULL), 
+                                  future_nb = 0, 
+                                  future_mat = tibble(NULL),
+                                  validation_baseline_interventions = FALSE, 
+                                  message_baseline_interventions = NULL,
+                                  validation_all_interventions = FALSE, 
+                                  message_all_interventions = NULL)
   
   observeEvent(input$add_intervention_baseline, 
                interventions$baseline_nb <- min(interventions$baseline_nb + 1, nb_interventions_max))

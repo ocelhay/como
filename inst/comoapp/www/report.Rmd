@@ -10,10 +10,11 @@ editor_options:
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-
+<!--
 ```{r out.width = "30%"}
-include_graphics("como_logo.png")
+# include_graphics("como_logo.png")
 ```
+-->
 
 **Version `r version_app`**
 

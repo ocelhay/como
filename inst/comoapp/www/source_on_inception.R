@@ -1,7 +1,7 @@
 library(bsplus)
 library(deSolve)
 library(DT)
-library(knitr)
+# library(knitr)
 library(highcharter)
 library(lubridate)
 library(pushbar)
