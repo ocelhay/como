@@ -698,21 +698,21 @@ server <- function(input, output, session) {
       
       dta_interventions <- tibble(
         date = simul_interventions$results$time,
-        hypothetical_scenario_daily_incidence = simul_interventions$results$daily_incidence,
-        hypothetical_scenario_daily_total_cases = simul_interventions$results$daily_total_cases,
-        hypothetical_scenario_normal_bed_occupancy = simul_interventions$results$required_beds,
-        hypothetical_scenario_icu_bed_occupancy = simul_interventions$results$icu_beds,
-        hypothetical_scenario_icu_ventilator_occupancy = simul_interventions$results$ventilators,
-        hypothetical_scenario_death_natural_non_exposed = simul_interventions$results$death_natural_non_exposed,
-        hypothetical_scenario_death_natural_exposed = simul_interventions$results$death_natural_exposed,
-        hypothetical_scenario_death_treated_hospital = simul_interventions$results$death_treated_hospital,
-        hypothetical_scenario_death_treated_icu = simul_interventions$results$death_treated_icu,
-        hypothetical_scenario_death_treated_ventilator = simul_interventions$results$death_treated_ventilator,
-        hypothetical_scenario_death_untreated_hospital = simul_interventions$results$death_untreated_hospital,
-        hypothetical_scenario_death_untreated_icu = simul_interventions$results$death_untreated_icu,
-        hypothetical_scenario_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator,
+        hypothetical_daily_incidence = simul_interventions$results$daily_incidence,
+        hypothetical_daily_total_cases = simul_interventions$results$daily_total_cases,
+        hypothetical_normal_bed_occupancy = simul_interventions$results$required_beds,
+        hypothetical_icu_bed_occupancy = simul_interventions$results$icu_beds,
+        hypothetical_icu_ventilator_occupancy = simul_interventions$results$ventilators,
+        hypothetical_death_natural_non_exposed = simul_interventions$results$death_natural_non_exposed,
+        hypothetical_death_natural_exposed = simul_interventions$results$death_natural_exposed,
+        hypothetical_death_treated_hospital = simul_interventions$results$death_treated_hospital,
+        hypothetical_death_treated_icu = simul_interventions$results$death_treated_icu,
+        hypothetical_death_treated_ventilator = simul_interventions$results$death_treated_ventilator,
+        hypothetical_death_untreated_hospital = simul_interventions$results$death_untreated_hospital,
+        hypothetical_death_untreated_icu = simul_interventions$results$death_untreated_icu,
+        hypothetical_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator,
         hypothetical_death_untreated_ventilator_surge = simul_interventions$results$death_untreated_ventilator_surge,
-        hypothetical_scenario_cum_mortality = simul_interventions$results$cum_mortality)
+        hypothetical_cum_mortality = simul_interventions$results$cum_mortality)
       
       dta <- left_join(dta, dta_interventions, by = "date") }
     vectors0_cbind <- do.call(cbind, vectors0)
