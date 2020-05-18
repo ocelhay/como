@@ -686,6 +686,7 @@ server <- function(input, output, session) {
       baseline_death_untreated_hospital = simul_baseline$results$death_untreated_hospital,
       baseline_death_untreated_icu = simul_baseline$results$death_untreated_icu,
       baseline_death_untreated_ventilator = simul_baseline$results$death_untreated_ventilator,
+      baseline_death_untreated_ventilator_surge = simul_baseline$results$death_untreated_ventilator_surge,
       baseline_cum_mortality = simul_baseline$results$cum_mortality)
     
     dta <- left_join(dta_baseline, 
@@ -710,6 +711,7 @@ server <- function(input, output, session) {
         future_scenario_death_untreated_hospital = simul_interventions$results$death_untreated_hospital,
         future_scenario_death_untreated_icu = simul_interventions$results$death_untreated_icu,
         future_scenario_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator,
+        baseline_death_untreated_ventilator_surge = simul_interventions$results$death_untreated_ventilator_surge,
         future_scenario_cum_mortality = simul_interventions$results$cum_mortality)
       
       dta <- left_join(dta, dta_interventions, by = "date") }
