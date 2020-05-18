@@ -715,6 +715,21 @@ server <- function(input, output, session) {
         future_scenario_cum_mortality = simul_interventions$results$cum_mortality)
       
       dta <- left_join(dta, dta_interventions, by = "date") }
+    vectors0_cbind <- do.call(cbind, vectors0)
+    vectors0_reduced <- vectors0_cbind[seq(from=0,to=nrow(vectors0_cbind),by=20),]
+    vectors0_reduced <- as.data.frame(rbind(rep(0,ncol(vectors0_reduced)),vectors0_reduced))
+    vectors0_reduced <- vectors0_reduced[,1:10] #subsetting only the coverages
+    names(vectors0_reduced) <- paste0("baseline_",names(vectors0_reduced))
+    
+    vectors_cbind <- do.call(cbind, vectors)
+    vectors_reduced <- vectors_cbind[seq(from=0,to=nrow(vectors_cbind),by=20),]
+    vectors_reduced <- as.data.frame(rbind(rep(0,ncol(vectors_reduced)),vectors_reduced))
+    vectors_reduced <- vectors_reduced[,1:10] #subsetting only the coverages
+    names(vectors_reduced) <- paste0("future_",names(vectors_reduced))
+    
+    intv_vectors <- as_tibble(cbind(date=simul_baseline$results$time, vectors0_reduced, vectors_reduced))
+    intv_vectors$date <- as.Date(intv_vectors$date)
+    dta <- left_join(dta,intv_vectors, by="date")
     
     if (!input$show_all_days) dta <- dta %>% filter(wday(date) == 2)
     

@@ -560,8 +560,8 @@ inputs<-function(inp, run){
               screen=screen,cocoon=cocoon,schoolclose=schoolclose,workhome=workhome,handwash=handwash,
               quarantine=quarantine,vaccine=vaccine,travelban=travelban,distancing=distancing))
 }
-vectors<-inputs(inp,'Hypothetical Scenario')
-vectors0<-inputs(inp,'Baseline (Calibration)')
+vectors<<-inputs(inp,'Hypothetical Scenario')
+vectors0<<-inputs(inp,'Baseline (Calibration)')
 
 
 # set up a function to solve the equations
