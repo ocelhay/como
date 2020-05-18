@@ -61,9 +61,9 @@ ui <- function(request) {
                                                                   value = 100, post = "%", ticks = FALSE, width = "75%")
                                      ),
                                      conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
-                                                      conditionalPanel("output.validation_baseline_interventions",
+                                                      # conditionalPanel("output.validation_baseline_interventions",
                                                                        actionButton("run_baseline", "Run Baseline", class="btn btn-success")
-                                                      )
+                                                      # )
                                      ),
                                      conditionalPanel("output.status_app_output == 'Ok Baseline'",
                                                       br(),
@@ -133,9 +133,9 @@ ui <- function(request) {
                         a(id = "anchor_interventions", style = "visibility: hidden", ""),
                         fluidRow(
                           column(2, style = "margin-top: 200px;",
-                                 conditionalPanel("output.validation_all_interventions",
+                                 # conditionalPanel("output.validation_all_interventions",
                                                   actionButton("run_interventions", "Run Hypothetical Scenario", class="btn btn-success")
-                                 ),
+                                 # ),
                           ),
                           column(5,
                                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
