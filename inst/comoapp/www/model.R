@@ -560,8 +560,8 @@ inputs<-function(inp, run){
               screen=screen,cocoon=cocoon,schoolclose=schoolclose,workhome=workhome,handwash=handwash,
               quarantine=quarantine,vaccine=vaccine,travelban=travelban,distancing=distancing))
 }
-vectors<-inputs(inp,'Hypothetical Scenario')
-vectors0<-inputs(inp,'Baseline (Calibration)')
+vectors<<-inputs(inp,'Hypothetical Scenario')
+vectors0<<-inputs(inp,'Baseline (Calibration)')
 
 
 # set up a function to solve the equations
@@ -820,6 +820,7 @@ process_ode_outcome <- function(out){
   cinc_mort_ICUC1 <- cumsum(rowSums(parameters["nu_icuc"]*parameters["pdeath_icuc"]*out[,(ICUCindex+1)]%*%ifr[,2]))
   cinc_mort_Vent1 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*out[,(Ventindex+1)]%*%ifr[,2]))
   cinc_mort_VentC1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out[,(VentCindex+1)]%*%ifr[,2]))
+  cinc_mort_ICUCV1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out[,(ICUCVindex+1)]%*%ifr[,2]))
   base_mort_H1 <- cumsum(rowSums(out[,(Hindex+1)]%*%mort))
   base_mort_HC1 <- cumsum(rowSums(out[,(HCindex+1)]%*%mort))
   base_mort_ICU1 <- cumsum(rowSums(out[,(ICUindex+1)]%*%mort))
@@ -868,6 +869,7 @@ process_ode_outcome <- function(out){
   results$death_untreated_hospital <- round(cinc_mort_HC1)
   results$death_untreated_icu <- round(cinc_mort_ICUC1)
   results$death_untreated_ventilator <- round(cinc_mort_VentC1)
+  results$death_untreated_ventilator_surge <- round(cinc_mort_ICUCV1)
   results$total_deaths <- results$death_treated_hospital + results$death_treated_icu + results$death_treated_ventilator +
     results$death_untreated_hospital + results$death_untreated_icu + results$death_untreated_ventilator
   results$total_deaths_end <- last(results$total_deaths)
