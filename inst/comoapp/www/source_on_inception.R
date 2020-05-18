@@ -30,7 +30,8 @@ countries_demographic <- sort(unique(population$country))
 
 hc_export_items <- c("downloadPNG", "downloadCSV", "downloadXLS")
 
-all_interventions <- c("Self-isolation if Symptomatic",
+all_interventions <- c("_",
+                       "Self-isolation if Symptomatic",
                        "Screening (when S.I.)",
                        "Household Isolation (when S.I.)",
                        "Social Distancing",
@@ -42,7 +43,7 @@ all_interventions <- c("Self-isolation if Symptomatic",
                        "Vaccination")
 
 # Default values for interventions
-new_intervention_value <- all_interventions[4]
+new_intervention_value <- all_interventions[1]
 new_daterange_value <- c(as.Date("2020-01-01"), as.Date("2020-12-31"))
 new_coverage_value <- 0
 

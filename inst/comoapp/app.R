@@ -11,7 +11,6 @@ ui <- function(request) {
     includeCSS("./www/styles.css"),
     pushbar_deps(),
     chooseSliderSkin('HTML5'),
-    # useShinyjs(),
     title = "COVID-19 App | CoMo Consortium",
     
     source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
@@ -50,7 +49,7 @@ ui <- function(request) {
                           column(2,
                                  div(class = "float_bottom_left",
                                      hr(),
-                                     conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
+                                     conditionalPanel("output.status_app_output == 'No Baseline' || output.status_app_output == 'Ok Baseline'", 
                                                       sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
                                                                   value = 0.049, ticks = FALSE, width = "75%"),
                                                       sliderInput("report", label = span("Percentage of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
@@ -60,24 +59,22 @@ ui <- function(request) {
                                                       sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
                                                                   value = 100, post = "%", ticks = FALSE, width = "75%")
                                      ),
-                                     conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'",
-                                                      conditionalPanel("output.validation_baseline_interventions",
-                                                                       actionButton("run_baseline", "Run Baseline", class="btn btn-success")
-                                                      )
+                                     conditionalPanel("(output.status_app_output == 'No Baseline' || output.status_app_output == 'Ok Baseline') && output.validation_baseline_interventions == 'okay'",
+                                                      actionButton("run_baseline", "Run Baseline", class="btn btn-success")
                                      ),
                                      conditionalPanel("output.status_app_output == 'Ok Baseline'",
                                                       br(),
                                                       actionButton("validate_baseline", span(icon("thumbs-up"), " Validate the Baseline"), class="btn btn-success"),
                                      ),
                                      a(id = "anchor_baseline_results", style = "visibility: hidden", ""),
-                                     conditionalPanel("output.status_app_output == 'Validated Baseline' | output.status_app_output == 'Locked Baseline'", 
+                                     conditionalPanel("output.status_app_output == 'Validated Baseline' || output.status_app_output == 'Locked Baseline'", 
                                                       actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success")
                                      ),
                                      hr()
                                  )
                           ),
                           column(10,
-                                 conditionalPanel("output.status_app_output == 'No Baseline' | output.status_app_output == 'Ok Baseline'", 
+                                 conditionalPanel("output.status_app_output == 'No Baseline' || output.status_app_output == 'Ok Baseline'", 
                                                   fluidRow(
                                                     div(class = "box_outputs", h4("Global Simulations Parameters:")),
                                                     column(6,
@@ -103,15 +100,16 @@ ui <- function(request) {
                                                   fluidRow(
                                                     column(6,
                                                            div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
-                                                           htmlOutput("text_nb_interventions_baseline"),
+                                                           sliderInput("nb_interventions_baseline", label = "Number of Interventions", min = 0, max = 30, value = 0, step = 1),
+                                                           htmlOutput("text_feedback_interventions_baseline"),
                                                            source("./www/ui/interventions_baseline.R", local = TRUE)$value
                                                     ),
                                                     column(6,
                                                            div(class = "box_outputs", h4("Timeline:")),
-                                                           uiOutput("ui_timevis_baseline")
+                                                           plotOutput("timevis_baseline", height = 700)
                                                     )
                                                   ),
-                                                  conditionalPanel("output.status_app_output == 'Ok Baseline' | output.status_app_output == 'Validated Baseline'",
+                                                  conditionalPanel("output.status_app_output == 'Ok Baseline' || output.status_app_output == 'Validated Baseline'",
                                                                    br(), br(), 
                                                                    fluidRow(
                                                                      column(3, htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner()),
@@ -132,18 +130,19 @@ ui <- function(request) {
                         a(id = "anchor_interventions", style = "visibility: hidden", ""),
                         fluidRow(
                           column(2, style = "margin-top: 200px;",
-                                 conditionalPanel("output.validation_all_interventions",
+                                 conditionalPanel("output.validation_all_interventions == 'okay'",
                                                   actionButton("run_interventions", "Run Hypothetical Scenario", class="btn btn-success")
                                  ),
                           ),
                           column(5,
                                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
-                                 htmlOutput("text_nb_interventions_future"),
+                                 sliderInput("nb_interventions_future", label = "Number of Interventions", min = 0, max = 30,  value = 0, step = 1),
+                                 htmlOutput("text_feedback_interventions_future"),
                                  source("./www/ui/interventions_future.R", local = TRUE)$value
                           ),
                           column(5,
                                  div(class = "box_outputs", h4("Timeline")),
-                                 uiOutput("ui_timevis_future")
+                                 plotOutput("timevis_future", height = 700)
                           )
                         ),
                         br(), br(), 
@@ -159,8 +158,8 @@ ui <- function(request) {
                                                         tags$li(a("Cases", href = '#anchor_cases')),
                                                         tags$li(a("Deaths", href = '#anchor_deaths')),
                                                         tags$li(a("Hospital Occupancy", href = '#anchor_occupancy')),
-                                                        tags$li(a("Rt", href = '#anchor_rt')),
-                                                        tags$li(a("Model Output Table", href = '#anchor_table'))
+                                                        tags$li(a("Rt", href = '#anchor_rt'))
+                                                        # tags$li(a("Model Output Table", href = '#anchor_table'))
                                                       ),
                                                       br(), 
                                                       downloadButton("report", label = "Generate Report"), br(),
@@ -249,13 +248,6 @@ ui <- function(request) {
                                            column(5, 
                                                   highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
                                            )
-                                         ),
-                                         fluidRow(
-                                           column(10, offset = 2,
-                                                  a(id = "anchor_table", style="visibility: hidden", ""),
-                                                  div(class = "box_outputs", h4("Model Output Table")),
-                                                  DTOutput("table_results")
-                                           )
                                          )
                         )                
                )
@@ -288,23 +280,13 @@ server <- function(input, output, session) {
   simul_interventions <- reactiveValues(results = NULL, interventions_available = FALSE)
   
   
-  interventions <- reactiveValues(baseline_nb = 0, 
-                                  baseline_mat = tibble(NULL), 
-                                  future_nb = 0, 
+  # Management of interventions ----
+  interventions <- reactiveValues(baseline_mat = tibble(NULL), 
                                   future_mat = tibble(NULL),
-                                  validation_baseline_interventions = FALSE, 
+                                  validation_baseline_interventions = "okay", 
                                   message_baseline_interventions = NULL,
-                                  validation_all_interventions = FALSE, 
+                                  validation_all_interventions = "okay", 
                                   message_all_interventions = NULL)
-  
-  observeEvent(input$add_intervention_baseline, 
-               interventions$baseline_nb <- min(interventions$baseline_nb + 1, nb_interventions_max))
-  observeEvent(input$remove_intervention_baseline, 
-               interventions$baseline_nb <- max(interventions$baseline_nb - 1, 0))
-  observeEvent(input$add_intervention_future, 
-               interventions$future_nb <- min(interventions$future_nb + 1, nb_interventions_max))
-  observeEvent(input$remove_intervention_future, 
-               interventions$future_nb <- max(interventions$future_nb - 1, 0))
   
   observe({
     # Create interventions tibble
@@ -380,7 +362,7 @@ server <- function(input, output, session) {
                                                       input$baseline_coverage_25, input$baseline_coverage_26,
                                                       input$baseline_coverage_27, input$baseline_coverage_28,
                                                       input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
-      filter(index <= interventions$baseline_nb)
+      filter(index <= input$nb_interventions_baseline, intervention != "_")
     
     interventions$future_mat <- tibble(index = 1:30,
                                        intervention = c(input$future_intervention_1, input$future_intervention_2,
@@ -454,37 +436,20 @@ server <- function(input, output, session) {
                                                     input$future_coverage_25, input$future_coverage_26,
                                                     input$future_coverage_27, input$future_coverage_28,
                                                     input$future_coverage_29, input$future_coverage_30)) %>% 
-      filter(index <= interventions$future_nb)
+      filter(index <= input$nb_interventions_future, intervention != "_")
     
     # Validation of interventions, Baseline (Calibration)
-    validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, simul_start_date = input$date_range[1], simul_end_date= input$date_range[2])
+    validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, simul_start_date = input$date_range[1], 
+                                                        simul_end_date= input$date_range[2])
     interventions$validation_baseline_interventions <- validation_baseline$validation_interventions
     interventions$message_baseline_interventions <- validation_baseline$message_interventions
     
     # Validation of interventions, Hypothetical Scenario
-    validation_all <- fun_validation_interventions(dta = interventions$future_mat, simul_start_date = input$date_range[1], simul_end_date= input$date_range[2])
+    validation_all <- fun_validation_interventions(dta = interventions$future_mat, simul_start_date = input$date_range[1], 
+                                                   simul_end_date= input$date_range[2])
     interventions$validation_all_interventions <- validation_all$validation_interventions
     interventions$message_all_interventions <- validation_all$message_interventions
   })
-  
-  # To show/hide elements of the App depending on the validation of the interventions (overlap etc.) ----
-  output$baseline_nb <- reactive(interventions$baseline_nb) 
-  outputOptions(output, "baseline_nb", suspendWhenHidden = FALSE)
-  output$future_nb <- reactive(interventions$future_nb)
-  outputOptions(output, "future_nb", suspendWhenHidden = FALSE)
-  
-  
-  output$validation_baseline_interventions <- reactive(interventions$validation_baseline_interventions)
-  outputOptions(output, "validation_baseline_interventions", suspendWhenHidden = FALSE)
-  output$validation_all_interventions <- reactive(interventions$validation_all_interventions)
-  outputOptions(output, "validation_all_interventions", suspendWhenHidden = FALSE)
-  
-  # To dynamically set the height of the timeline interventions plot
-  output$ui_timevis_baseline <- renderUI(plotOutput("timevis_baseline", 
-                                                    height = max(100, 180 * (0.5 + (1 + length(unique(interventions$baseline_mat$intervention))) %/% 2))))
-  output$ui_timevis_future <- renderUI(plotOutput("timevis_future", 
-                                                  height = max(100, 180 * (0.5 + (1 + length(unique(interventions$future_mat$intervention))) %/% 2))))
-  
   
   
   # Manage population and cases data reactive values ----
@@ -502,12 +467,14 @@ server <- function(input, output, session) {
   for (file in file_list) source(paste0("./www/outputs/", file), local = TRUE)$value
   
   # To show/hide elements of the App depending on the status ----
-  output$status_app_output <- reactive({
-    return(status_app$status)
-  })
-  outputOptions(output, "status_app_output", suspendWhenHidden = FALSE)
+  output$status_app_output <- reactive(status_app$status)
+  outputOptions(output, "status_app_output", suspendWhenHidden = FALSE, priority = 10)
+  output$validation_baseline_interventions <- reactive(interventions$validation_baseline_interventions)
+  outputOptions(output, "validation_baseline_interventions", suspendWhenHidden = FALSE, priority = 1)
+  output$validation_all_interventions <- reactive(interventions$validation_all_interventions)
+  outputOptions(output, "validation_all_interventions", suspendWhenHidden = FALSE, priority = 1)
   
-  # Process on uploading a file of data/parameters
+  # Process on uploading a template ----
   observeEvent(input$own_data, {
     file_path <- input$own_data$datapath
     
@@ -528,7 +495,7 @@ server <- function(input, output, session) {
     names(dta) <- c("age_category",	"ifr",	"ihr")
     
     mort_sever_rv$data <- dta %>%
-      mutate(ihr = ihr/100) %>% # starting unit should be % - scaling to a value between 0 and 1
+      mutate(ihr = ihr/100) %>%  # starting unit should be % - scaling to a value between 0 and 1
       mutate(ifr = ifr/max(ifr))  # starting unit should be % - scaling to a value between 0 and 1
     
     # Population
@@ -590,15 +557,19 @@ server <- function(input, output, session) {
     interventions_excel_future <- interventions_excel %>% 
       filter(apply_to == "Hypothetical Scenario")
     
-    interventions$baseline_nb <- min(interventions_excel_baseline %>% nrow(), 30)
-    interventions$future_nb <- min(interventions_excel_future %>% nrow(), 30)
+    nb_interventions_baseline <- interventions_excel_baseline %>% nrow()
+    nb_interventions_future <- interventions_excel_future %>% nrow()
     
-    for (i in 1:interventions$baseline_nb) {
+    updateSliderInput(session, inputId = "nb_interventions_baseline", value = nb_interventions_baseline)
+    updateSliderInput(session, inputId = "nb_interventions_future", value = nb_interventions_future)
+    
+    
+    for (i in 1:nb_interventions_baseline) {
       updateSelectInput(session, paste0("baseline_intervention_", i), selected = interventions_excel_baseline[[i, "intervention"]])
       updateDateRangeInput(session, paste0("baseline_daterange_", i), start = interventions_excel_baseline[[i, "date_start"]], end = interventions_excel_baseline[[i, "date_end"]])
       updateSliderInput(session, paste0("baseline_coverage_", i), value = interventions_excel_baseline[[i, "coverage"]])
     }
-    for (i in 1:interventions$future_nb) {
+    for (i in 1:nb_interventions_future) {
       updateSelectInput(session, paste0("future_intervention_", i), selected = interventions_excel_future[[i, "intervention"]])
       updateDateRangeInput(session, paste0("future_daterange_", i), start = interventions_excel_future[[i, "date_start"]], end = interventions_excel_future[[i, "date_end"]])
       updateSliderInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "coverage"]])
@@ -630,10 +601,6 @@ server <- function(input, output, session) {
     removeNotification(id = "model_run_notif", session = session)
     status_app$status <- "Ok Baseline"
     simul_baseline$baseline_available <- TRUE
-    # runjs('
-    #       document.getElementById("anchor_baseline_results").scrollIntoView();
-    #       ')
-    shiny_simul_baseline <<- simul_baseline$results  # for development only
   })
   
   # Process on "Validate Baseline" ----
@@ -655,14 +622,27 @@ server <- function(input, output, session) {
     removeNotification(id = "run_interventions_notif", session = session)
     status_app$status <- "Locked Baseline"
     simul_interventions$interventions_available <- TRUE
-    # runjs('
-    #       document.getElementById("anchor_summary").scrollIntoView();
-    #       ')
-    shiny_simul_interventions <<- simul_interventions$results  # for development only
   })
   
   
-  # Export Data ----
+  # Generate Report ----
+  output$report <- downloadHandler(
+    filename = "CoMo Report.docx",
+    content = function(file) {
+      showNotification(HTML("Generation of the report typically takes 5 to 30 seconds"), duration = NULL, type = "message", id = "report_generation", session = session)
+      
+      tempReport <- file.path(tempdir(), "report.Rmd")
+      tempLogo <- file.path(tempdir(), "como_logo.png")
+      file.copy("./www/report.Rmd", tempReport, overwrite = TRUE)
+      file.copy("./www/como_logo.png", tempLogo, overwrite = TRUE)
+      
+      rmarkdown::render(tempReport, output_file = file)
+      removeNotification(id = "report_generation", session = session)
+      showNotification(HTML("Report Generated"), duration = 4, type = "message", id = "report_generated", session = session)
+    }
+  )
+  
+  # Downloadable csv ----
   results_aggregated <- reactive({
     
     dta_baseline <- tibble(
@@ -725,34 +705,12 @@ server <- function(input, output, session) {
     intv_vectors$date <- as.Date(intv_vectors$date)
     dta <- left_join(dta,intv_vectors, by="date")
     
-    if (!input$show_all_days) dta <- dta %>% filter(wday(date) == 2)
+    # we should always have all days exported => next lined commented
+    # if (!input$show_all_days) dta <- dta %>% filter(wday(date) == 2)
     
     return(dta)
   })
   
-  # Generated Report
-  feedback_download <- reactiveValues(download_flag = 0)
-  
-  output$report <- downloadHandler(
-    filename = "CoMo Report.docx",
-    content = function(file) {
-      feedback_download$download_flag <- feedback_download$download_flag + 1
-      if(feedback_download$download_flag > 0) {
-        showNotification(HTML("Generation of the report typically takes 5 to 30 seconds"), duration = NULL, type = "message", id = "report_generation", session = session)
-      }
-      
-      tempReport <- file.path(tempdir(), "report.Rmd")
-      tempLogo <- file.path(tempdir(), "como_logo.png")
-      file.copy("./www/report.Rmd", tempReport, overwrite = TRUE)
-      file.copy("./www/como_logo.png", tempLogo, overwrite = TRUE)
-      
-      rmarkdown::render(tempReport, output_file = file)
-      removeNotification(id = "report_generation", session = session)
-      showNotification(HTML("Report Generated"), duration = 4, type = "message", id = "report_generated", session = session)
-    }
-  )
-  
-  # Downloadable csv of selected dataset ----
   output$download_data <- downloadHandler(
     filename = "COVID19_App_Data.csv",
     content = function(file) {
