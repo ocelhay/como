@@ -675,11 +675,9 @@ server <- function(input, output, session) {
       date = simul_baseline$results$time,
       baseline_daily_incidence = simul_baseline$results$daily_incidence,
       baseline_daily_total_cases = simul_baseline$results$daily_total_cases,
-      baseline_required_beds = simul_baseline$results$required_beds,
-      baseline_cum_mortality = simul_baseline$results$cum_mortality,
-      baseline_hospital_surge_beds = simul_baseline$results$hospital_surge_beds,
-      baseline_icu_beds = simul_baseline$results$icu_beds,
-      baseline_ventilators = simul_baseline$results$ventilators,
+      baseline_normal_bed_occupancy = simul_baseline$results$required_beds,
+      baseline_icu_bed_occupancy = simul_baseline$results$icu_beds,
+      baseline_icu_ventilator_occupancy = simul_baseline$results$ventilators,
       baseline_death_natural_non_exposed = simul_baseline$results$death_natural_non_exposed,
       baseline_death_natural_exposed = simul_baseline$results$death_natural_exposed,
       baseline_death_treated_hospital = simul_baseline$results$death_treated_hospital,
@@ -687,7 +685,8 @@ server <- function(input, output, session) {
       baseline_death_treated_ventilator = simul_baseline$results$death_treated_ventilator,
       baseline_death_untreated_hospital = simul_baseline$results$death_untreated_hospital,
       baseline_death_untreated_icu = simul_baseline$results$death_untreated_icu,
-      baseline_death_untreated_ventilator = simul_baseline$results$death_untreated_ventilator)
+      baseline_death_untreated_ventilator = simul_baseline$results$death_untreated_ventilator,
+      baseline_cum_mortality = simul_baseline$results$cum_mortality)
     
     dta <- left_join(dta_baseline, 
                      cases_rv$data %>% rename(input_cases = cases,
@@ -700,11 +699,9 @@ server <- function(input, output, session) {
         date = simul_interventions$results$time,
         future_scenario_daily_incidence = simul_interventions$results$daily_incidence,
         future_scenario_daily_total_cases = simul_interventions$results$daily_total_cases,
-        future_scenario_required_beds = simul_interventions$results$required_beds,
-        future_scenario_cum_mortality = simul_interventions$results$cum_mortality,
-        future_scenario_hospital_surge_beds = simul_interventions$results$hospital_surge_beds,
-        future_scenario_icu_beds = simul_interventions$results$icu_beds,
-        future_scenario_ventilators = simul_interventions$results$ventilators,
+        future_scenario_normal_bed_occupancy = simul_interventions$results$required_beds,
+        future_scenario_icu_bed_occupancy = simul_interventions$results$icu_beds,
+        future_scenario_icu_ventilator_occupancy = simul_interventions$results$ventilators,
         future_scenario_death_natural_non_exposed = simul_interventions$results$death_natural_non_exposed,
         future_scenario_death_natural_exposed = simul_interventions$results$death_natural_exposed,
         future_scenario_death_treated_hospital = simul_interventions$results$death_treated_hospital,
@@ -712,7 +709,8 @@ server <- function(input, output, session) {
         future_scenario_death_treated_ventilator = simul_interventions$results$death_treated_ventilator,
         future_scenario_death_untreated_hospital = simul_interventions$results$death_untreated_hospital,
         future_scenario_death_untreated_icu = simul_interventions$results$death_untreated_icu,
-        future_scenario_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator)
+        future_scenario_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator,
+        future_scenario_cum_mortality = simul_interventions$results$cum_mortality)
       
       dta <- left_join(dta, dta_interventions, by = "date") }
     
