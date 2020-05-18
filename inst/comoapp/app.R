@@ -12,7 +12,6 @@ ui <- function(request) {
     pushbar_deps(),
     chooseSliderSkin('HTML5'),
     # useShinyjs(),
-    
     title = "COVID-19 App | CoMo Consortium",
     
     source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
@@ -308,6 +307,7 @@ server <- function(input, output, session) {
                interventions$future_nb <- max(interventions$future_nb - 1, 0))
   
   observe({
+    # Create interventions tibble
     interventions$baseline_mat <- tibble(index = 1:30,
                                          intervention = c(input$baseline_intervention_1, input$baseline_intervention_2,
                                                           input$baseline_intervention_3, input$baseline_intervention_4,
@@ -456,19 +456,12 @@ server <- function(input, output, session) {
                                                     input$future_coverage_29, input$future_coverage_30)) %>% 
       filter(index <= interventions$future_nb)
     
-    shiny_interventions_baseline_mat <<- interventions$baseline_mat
-    shiny_interventions_future_mat <<- interventions$future_mat
-  })
-  
-  # Validation of interventions, Baseline (Calibration)
-  observe({
+    # Validation of interventions, Baseline (Calibration)
     validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, simul_start_date = input$date_range[1], simul_end_date= input$date_range[2])
     interventions$validation_baseline_interventions <- validation_baseline$validation_interventions
     interventions$message_baseline_interventions <- validation_baseline$message_interventions
-  })
-  
-  # Validation of interventions, Baseline (Calibration) & Hypothetical Scenario
-  observe({
+    
+    # Validation of interventions, Hypothetical Scenario
     validation_all <- fun_validation_interventions(dta = interventions$future_mat, simul_start_date = input$date_range[1], simul_end_date= input$date_range[2])
     interventions$validation_all_interventions <- validation_all$validation_interventions
     interventions$message_all_interventions <- validation_all$message_interventions
@@ -586,10 +579,11 @@ server <- function(input, output, session) {
     }
     
     # Update interventions
-    interventions_excel <- read_excel(file_path, sheet = "Interventions")
+    interventions_excel <- read_excel(file_path, sheet = "Interventions") %>%
+      mutate(`Date Start` = as.Date(`Date Start`),
+             `Date End` = as.Date(`Date End`))
+    
     names(interventions_excel) <- c("intervention", "date_start", "date_end", "coverage", "apply_to")
-    interventions_excel <- interventions_excel %>%
-      mutate(date_start = as.Date(date_start), date_end = as.Date(date_end))
     
     interventions_excel_baseline <- interventions_excel %>% 
       filter(apply_to == "Baseline (Calibration)")
@@ -642,12 +636,12 @@ server <- function(input, output, session) {
     shiny_simul_baseline <<- simul_baseline$results  # for development only
   })
   
+  # Process on "Validate Baseline" ----
   observeEvent(input$validate_baseline, {
     status_app$status <- "Validated Baseline"
     showTab(inputId = "tabs", target = "tab_modelpredictions")
     updateNavbarPage(session, "tabs",selected = "tab_modelpredictions")
-  }
-  )
+  })
   
   # Process on "run_interventions" ----
   observeEvent(input$run_interventions, {
