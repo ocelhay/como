@@ -47,7 +47,7 @@ fun_validation_interventions <- function(dta, all_possible_interventions = all_i
   }
   if(!all(dates_addition %in% dates_ref)) {
     validation$message_interventions <- paste0(validation$message_interventions,
-                                               "Household Isolation has no effect if Self Isolation isn’t selected.")
+                                               "Household Isolation has no effect if Self Isolation isn’t selected. ")
   }
   
   

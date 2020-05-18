@@ -59,6 +59,7 @@ ui <- function(request) {
                                                       sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
                                                                   value = 100, post = "%", ticks = FALSE, width = "75%")
                                      ),
+                                     htmlOutput("text_feedback_interventions_baseline"),
                                      conditionalPanel("(output.status_app_output == 'No Baseline' || output.status_app_output == 'Ok Baseline') && output.validation_baseline_interventions == 'okay'",
                                                       actionButton("run_baseline", "Run Baseline", class="btn btn-success")
                                      ),
@@ -100,8 +101,7 @@ ui <- function(request) {
                                                   fluidRow(
                                                     column(6,
                                                            div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
-                                                           sliderInput("nb_interventions_baseline", label = "Number of Interventions", min = 0, max = 30, value = 0, step = 1),
-                                                           htmlOutput("text_feedback_interventions_baseline"),
+                                                           sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 30, value = 0, step = 1),
                                                            source("./www/ui/interventions_baseline.R", local = TRUE)$value
                                                     ),
                                                     column(6,
@@ -130,14 +130,14 @@ ui <- function(request) {
                         a(id = "anchor_interventions", style = "visibility: hidden", ""),
                         fluidRow(
                           column(2, style = "margin-top: 200px;",
+                                 htmlOutput("text_feedback_interventions_future"),
                                  conditionalPanel("output.validation_all_interventions == 'okay'",
                                                   actionButton("run_interventions", "Run Hypothetical Scenario", class="btn btn-success")
                                  ),
                           ),
                           column(5,
                                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
-                                 sliderInput("nb_interventions_future", label = "Number of Interventions", min = 0, max = 30,  value = 0, step = 1),
-                                 htmlOutput("text_feedback_interventions_future"),
+                                 sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 30,  value = 0, step = 1),
                                  source("./www/ui/interventions_future.R", local = TRUE)$value
                           ),
                           column(5,
