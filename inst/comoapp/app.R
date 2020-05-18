@@ -161,8 +161,8 @@ ui <- function(request) {
                                                         tags$li(a("Cases", href = '#anchor_cases')),
                                                         tags$li(a("Deaths", href = '#anchor_deaths')),
                                                         tags$li(a("Hospital Occupancy", href = '#anchor_occupancy')),
-                                                        tags$li(a("Rt", href = '#anchor_rt')),
-                                                        tags$li(a("Model Output Table", href = '#anchor_table'))
+                                                        tags$li(a("Rt", href = '#anchor_rt'))
+                                                        # tags$li(a("Model Output Table", href = '#anchor_table'))
                                                       ),
                                                       br(), 
                                                       downloadButton("report", label = "Generate Report"), br(),
@@ -251,14 +251,14 @@ ui <- function(request) {
                                            column(5, 
                                                   highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
                                            )
-                                         ),
-                                         fluidRow(
-                                           column(10, offset = 2,
-                                                  a(id = "anchor_table", style="visibility: hidden", ""),
-                                                  div(class = "box_outputs", h4("Model Output Table")),
-                                                  DTOutput("table_results")
-                                           )
                                          )
+                                         # fluidRow(
+                                         #   column(10, offset = 2,
+                                         #          a(id = "anchor_table", style="visibility: hidden", ""),
+                                         #          div(class = "box_outputs", h4("Model Output Table")),
+                                         #          DTOutput("table_results")
+                                         #   )
+                                         # )
                         )                
                )
     )
