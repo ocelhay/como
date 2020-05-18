@@ -103,6 +103,7 @@ ui <- function(request) {
                                                   fluidRow(
                                                     column(6,
                                                            div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
+                                                           sliderInput("nb_interventions_baseline", label = "Number of Interventions", min = 0, max = 30, value = 0, step = 1),
                                                            htmlOutput("text_nb_interventions_baseline"),
                                                            source("./www/ui/interventions_baseline.R", local = TRUE)$value
                                                     ),
@@ -138,6 +139,7 @@ ui <- function(request) {
                           ),
                           column(5,
                                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
+                                 sliderInput("nb_interventions_future", label = "Number of Interventions", min = 0, max = 30,  value = 0, step = 1),
                                  htmlOutput("text_nb_interventions_future"),
                                  source("./www/ui/interventions_future.R", local = TRUE)$value
                           ),
@@ -288,23 +290,23 @@ server <- function(input, output, session) {
   simul_interventions <- reactiveValues(results = NULL, interventions_available = FALSE)
   
   
-  interventions <- reactiveValues(baseline_nb = 0, 
+  interventions <- reactiveValues(# baseline_nb = 0, 
                                   baseline_mat = tibble(NULL), 
-                                  future_nb = 0, 
+                                  # future_nb = 0, 
                                   future_mat = tibble(NULL),
                                   validation_baseline_interventions = FALSE, 
                                   message_baseline_interventions = NULL,
                                   validation_all_interventions = FALSE, 
                                   message_all_interventions = NULL)
   
-  observeEvent(input$add_intervention_baseline, 
-               interventions$baseline_nb <- min(interventions$baseline_nb + 1, nb_interventions_max))
-  observeEvent(input$remove_intervention_baseline, 
-               interventions$baseline_nb <- max(interventions$baseline_nb - 1, 0))
-  observeEvent(input$add_intervention_future, 
-               interventions$future_nb <- min(interventions$future_nb + 1, nb_interventions_max))
-  observeEvent(input$remove_intervention_future, 
-               interventions$future_nb <- max(interventions$future_nb - 1, 0))
+  # observeEvent(input$add_intervention_baseline, 
+  #              interventions$baseline_nb <- min(interventions$baseline_nb + 1, nb_interventions_max))
+  # observeEvent(input$remove_intervention_baseline, 
+  #              interventions$baseline_nb <- max(interventions$baseline_nb - 1, 0))
+  # observeEvent(input$add_intervention_future, 
+  #              interventions$future_nb <- min(interventions$future_nb + 1, nb_interventions_max))
+  # observeEvent(input$remove_intervention_future, 
+  #              interventions$future_nb <- max(interventions$future_nb - 1, 0))
   
   observe({
     # Create interventions tibble
@@ -380,7 +382,7 @@ server <- function(input, output, session) {
                                                       input$baseline_coverage_25, input$baseline_coverage_26,
                                                       input$baseline_coverage_27, input$baseline_coverage_28,
                                                       input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
-      filter(index <= interventions$baseline_nb)
+      filter(index <= input$nb_interventions_baseline)
     
     interventions$future_mat <- tibble(index = 1:30,
                                        intervention = c(input$future_intervention_1, input$future_intervention_2,
@@ -454,24 +456,26 @@ server <- function(input, output, session) {
                                                     input$future_coverage_25, input$future_coverage_26,
                                                     input$future_coverage_27, input$future_coverage_28,
                                                     input$future_coverage_29, input$future_coverage_30)) %>% 
-      filter(index <= interventions$future_nb)
+      filter(index <= input$nb_interventions_baseline)
     
     # Validation of interventions, Baseline (Calibration)
-    validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, simul_start_date = input$date_range[1], simul_end_date= input$date_range[2])
+    validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, simul_start_date = input$date_range[1], 
+                                                        simul_end_date= input$date_range[2])
     interventions$validation_baseline_interventions <- validation_baseline$validation_interventions
     interventions$message_baseline_interventions <- validation_baseline$message_interventions
     
     # Validation of interventions, Hypothetical Scenario
-    validation_all <- fun_validation_interventions(dta = interventions$future_mat, simul_start_date = input$date_range[1], simul_end_date= input$date_range[2])
+    validation_all <- fun_validation_interventions(dta = interventions$future_mat, simul_start_date = input$date_range[1], 
+                                                   simul_end_date= input$date_range[2])
     interventions$validation_all_interventions <- validation_all$validation_interventions
     interventions$message_all_interventions <- validation_all$message_interventions
   })
   
   # To show/hide elements of the App depending on the validation of the interventions (overlap etc.) ----
-  output$baseline_nb <- reactive(interventions$baseline_nb) 
-  outputOptions(output, "baseline_nb", suspendWhenHidden = FALSE)
-  output$future_nb <- reactive(interventions$future_nb)
-  outputOptions(output, "future_nb", suspendWhenHidden = FALSE)
+  # output$baseline_nb <- reactive(interventions$baseline_nb) 
+  # outputOptions(output, "baseline_nb", suspendWhenHidden = FALSE)
+  # output$future_nb <- reactive(interventions$future_nb)
+  # outputOptions(output, "future_nb", suspendWhenHidden = FALSE)
   
   
   output$validation_baseline_interventions <- reactive(interventions$validation_baseline_interventions)
@@ -507,7 +511,7 @@ server <- function(input, output, session) {
   })
   outputOptions(output, "status_app_output", suspendWhenHidden = FALSE)
   
-  # Process on uploading a file of data/parameters
+  # Process on uploading a template
   observeEvent(input$own_data, {
     file_path <- input$own_data$datapath
     
@@ -590,15 +594,22 @@ server <- function(input, output, session) {
     interventions_excel_future <- interventions_excel %>% 
       filter(apply_to == "Hypothetical Scenario")
     
-    interventions$baseline_nb <- min(interventions_excel_baseline %>% nrow(), 30)
-    interventions$future_nb <- min(interventions_excel_future %>% nrow(), 30)
+    # interventions$baseline_nb <- min(interventions_excel_baseline %>% nrow(), 30)
+    # interventions$future_nb <- min(interventions_excel_future %>% nrow(), 30)
     
-    for (i in 1:interventions$baseline_nb) {
+    nb_interventions_baseline <- interventions_excel_baseline %>% nrow()
+    nb_interventions_future <- interventions_excel_future %>% nrow()
+    
+    updateSliderInput(session, inputId = "nb_interventions_baseline", value = nb_interventions_baseline)
+    updateSliderInput(session, inputId = "nb_interventions_future", value = nb_interventions_future)
+    
+    
+    for (i in 1:nb_interventions_baseline) {
       updateSelectInput(session, paste0("baseline_intervention_", i), selected = interventions_excel_baseline[[i, "intervention"]])
       updateDateRangeInput(session, paste0("baseline_daterange_", i), start = interventions_excel_baseline[[i, "date_start"]], end = interventions_excel_baseline[[i, "date_end"]])
       updateSliderInput(session, paste0("baseline_coverage_", i), value = interventions_excel_baseline[[i, "coverage"]])
     }
-    for (i in 1:interventions$future_nb) {
+    for (i in 1:nb_interventions_future) {
       updateSelectInput(session, paste0("future_intervention_", i), selected = interventions_excel_future[[i, "intervention"]])
       updateDateRangeInput(session, paste0("future_daterange_", i), start = interventions_excel_future[[i, "date_start"]], end = interventions_excel_future[[i, "date_end"]])
       updateSliderInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "coverage"]])

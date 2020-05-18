@@ -1,5 +1,5 @@
 output$timevis_future <- renderPlot(execOnResize = TRUE, {
-  req(interventions$future_nb >= 1)
+  req(input$nb_interventions_future >= 1)
   
   dta <- interventions$future_mat %>%
     mutate(date_end = date_end + 1,
