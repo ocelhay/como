@@ -104,7 +104,7 @@ ui <- function(request) {
                                                     column(6,
                                                            div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
                                                            sliderInput("nb_interventions_baseline", label = "Number of Interventions", min = 0, max = 30, value = 0, step = 1),
-                                                           htmlOutput("text_nb_interventions_baseline"),
+                                                           htmlOutput("text_feedback_interventions_baseline"),
                                                            source("./www/ui/interventions_baseline.R", local = TRUE)$value
                                                     ),
                                                     column(6,
@@ -140,7 +140,7 @@ ui <- function(request) {
                           column(5,
                                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
                                  sliderInput("nb_interventions_future", label = "Number of Interventions", min = 0, max = 30,  value = 0, step = 1),
-                                 htmlOutput("text_nb_interventions_future"),
+                                 htmlOutput("text_feedback_interventions_future"),
                                  source("./www/ui/interventions_future.R", local = TRUE)$value
                           ),
                           column(5,
@@ -382,7 +382,7 @@ server <- function(input, output, session) {
                                                       input$baseline_coverage_25, input$baseline_coverage_26,
                                                       input$baseline_coverage_27, input$baseline_coverage_28,
                                                       input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
-      filter(index <= input$nb_interventions_baseline)
+      filter(index <= input$nb_interventions_baseline, intervention != "_")
     
     interventions$future_mat <- tibble(index = 1:30,
                                        intervention = c(input$future_intervention_1, input$future_intervention_2,
@@ -456,7 +456,7 @@ server <- function(input, output, session) {
                                                     input$future_coverage_25, input$future_coverage_26,
                                                     input$future_coverage_27, input$future_coverage_28,
                                                     input$future_coverage_29, input$future_coverage_30)) %>% 
-      filter(index <= input$nb_interventions_baseline)
+      filter(index <= input$nb_interventions_future, intervention != "_")
     
     # Validation of interventions, Baseline (Calibration)
     validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, simul_start_date = input$date_range[1], 
