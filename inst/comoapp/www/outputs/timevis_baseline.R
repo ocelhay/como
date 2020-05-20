@@ -1,9 +1,9 @@
 output$timevis_baseline <- renderPlot(execOnResize = TRUE, {
   req(interventions$baseline_mat %>% nrow() >= 1)
-
+  
   dta <- interventions$baseline_mat %>%
     mutate(date_end = date_end + 1,
-           label = paste0(coverage, "% ", difftime(date_end, date_start, units = "days") - 1, "d."))
+           label = paste0(coverage, unit, " ", difftime(date_end, date_start, units = "days") - 1, "d."))
     
   
   ggplot(dta) + 

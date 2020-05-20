@@ -1,6 +1,6 @@
 <!-- badges: start -->
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-[![](https://img.shields.io/badge/devel%20version-13.1-blue.svg)](https://github.com/ocelhay/como)
+[![](https://img.shields.io/badge/devel%20version-13.2-blue.svg)](https://github.com/ocelhay/como)
 [![Build Status](https://travis-ci.org/ocelhay/como.svg?branch=master)](https://travis-ci.org/ocelhay/como)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/ocelhay/como?branch=master&svg=true)](https://ci.appveyor.com/project/ocelhay/como)
 <!-- badges: end -->
@@ -40,12 +40,13 @@ The [App is online](https://comomodel.net) but can also be run locally. Follow t
 ### Install Offline App
 
 - [Download and install R](https://cran.r-project.org) (any version above 3.6.1)
-- Open R and run in the console: `remotes::install_github("ocelhay/como", upgrade = "never")`
+- Open R and run in the console: `install.packages("remotes")`
+- Run: `remotes::install_github("ocelhay/como", upgrade = "never")`
 - Close and reopen R.
-- Run in the console: `remotes::install_github("ocelhay/como", upgrade = "never")`
 
 
-To launch the CoMo App, open R and run in the console: `como::comomodel()`
+To launch the CoMo App, open R and run in the console: `como::comomodel()`.
+
 To update to the latest version, run: `remotes::install_github("ocelhay/como", upgrade = "never")`
 
 

@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v13.1"
+version_app <- "v13.2"
 
 # Load packages and data
 source("./www/source_on_inception.R")
@@ -257,6 +257,9 @@ ui <- function(request) {
 
 # Define server ----
 server <- function(input, output, session) {
+  # triggers the modal dialogs when the user clicks an icon
+  observe_helpers(help_dir = "./www/markdown")
+  
   # Hide tabs on app launch ----
   hideTab(inputId = "tabs", target = "tab_modelpredictions")
   
@@ -362,6 +365,7 @@ server <- function(input, output, session) {
                                                       input$baseline_coverage_25, input$baseline_coverage_26,
                                                       input$baseline_coverage_27, input$baseline_coverage_28,
                                                       input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
+      mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ "contacts", TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_baseline, intervention != "_")
     
     interventions$future_mat <- tibble(index = 1:30,
@@ -436,6 +440,7 @@ server <- function(input, output, session) {
                                                     input$future_coverage_25, input$future_coverage_26,
                                                     input$future_coverage_27, input$future_coverage_28,
                                                     input$future_coverage_29, input$future_coverage_30)) %>% 
+      mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ "contacts", TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_future, intervention != "_")
     
     # Validation of interventions, Baseline (Calibration)
@@ -550,7 +555,7 @@ server <- function(input, output, session) {
       mutate(`Date Start` = as.Date(`Date Start`),
              `Date End` = as.Date(`Date End`))
     
-    names(interventions_excel) <- c("intervention", "date_start", "date_end", "coverage", "apply_to")
+    names(interventions_excel) <- c("intervention", "date_start", "date_end", "coverage", "unit", "apply_to")
     
     interventions_excel_baseline <- interventions_excel %>% 
       filter(apply_to == "Baseline (Calibration)")
