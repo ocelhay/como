@@ -4,5 +4,5 @@ output$text_feedback_interventions_baseline <- renderText({
 })
 
 output$text_feedback_interventions_future <- renderText({
-  return(paste0("", span(class = "redbold", interventions$message_all_interventions)))
+  return(paste0("", span(class = "redbold", interventions$message_future_interventions)))
 })
