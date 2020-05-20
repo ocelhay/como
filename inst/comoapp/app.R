@@ -57,11 +57,12 @@ ui <- function(request) {
                                                       sliderInput("reportc", label = span("Percentage of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
                                                                   value = 5, post = "%", ticks = FALSE, width = "75%"),
                                                       sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
-                                                                  value = 100, post = "%", ticks = FALSE, width = "75%")
+                                                                  value = 100, post = "%", ticks = FALSE, width = "75%"),
+                                                      actionButton("run_baseline", "Run Baseline", class="btn btn-success")
                                      ),
                                      htmlOutput("text_feedback_interventions_baseline"),
                                      conditionalPanel("(output.status_app_output == 'No Baseline' || output.status_app_output == 'Ok Baseline') && output.validation_baseline_interventions == 'okay'",
-                                                      actionButton("run_baseline", "Run Baseline", class="btn btn-success")
+                                                      HTML("Hello World")
                                      ),
                                      conditionalPanel("output.status_app_output == 'Ok Baseline'",
                                                       br(),
