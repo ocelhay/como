@@ -1,4 +1,9 @@
-| Column name                        | Description                                                                                                                                                          |
+[Download this table in Excel format.](https://github.com/ocelhay/como/blob/master/Results_Legend_CoMoCOVID-19App.xlsx)
+
+`*_`: either for baseline or hypothetical scenario.
+
+
+| Variable                        | Description                                                                                                                                                          |
 |------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | *_daily_incidence                  | Daily reported incidence (i.e. newly reported cases on each day). "Predicted Reported" line on the graph.                                                            |
 | *_daily_total_cases                | Sum of daily reported and unreported incidence. "Predicted Reported + Unreported" line on the graph.                                                                 |

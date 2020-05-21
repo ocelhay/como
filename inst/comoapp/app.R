@@ -59,9 +59,6 @@ ui <- function(request) {
                                                       sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
                                                                   value = 100, post = "%", ticks = FALSE, width = "75%"),
                                                       htmlOutput("text_feedback_interventions_baseline"),
-                                                      # conditionalPanel("output.valid_baseline_interventions",
-                                                      #                  actionButton("run_baseline", "Run Baseline", class = "btn btn-success")
-                                                      # ),
                                                       uiOutput("conditional_run_baseline")
                                      ),
                                      
@@ -133,9 +130,6 @@ ui <- function(request) {
                           column(2, style = "margin-top: 200px;",
                                  htmlOutput("text_feedback_interventions_future"),
                                  uiOutput("conditional_run_future")
-                                 # conditionalPanel("output.valid_future_interventions",
-                                 #                  actionButton("run_interventions", "Run Hypothetical Scenario", class = "btn btn-success")
-                                 # ),
                           ),
                           column(5,
                                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
@@ -155,7 +149,7 @@ ui <- function(request) {
                                                       hr(),
                                                       p("Go to:"),
                                                       tags$ul(
-                                                        tags$li(a("Interventions", href = '#anchor_interventions')),
+                                                        tags$li(a("Building Interventions", href = '#anchor_interventions')),
                                                         tags$li(a("Summary Predictions", href = '#anchor_summary')),
                                                         tags$li(a("Cases", href = '#anchor_cases')),
                                                         tags$li(a("Deaths", href = '#anchor_deaths')),
@@ -165,8 +159,8 @@ ui <- function(request) {
                                                       br(), 
                                                       downloadButton("report", label = "Generate Report"), br(),
                                                       tags$small("Report in .docx format based on current simulation."), br(),
-                                                      downloadButton("download_data", "Download Data"), br(),
-                                                      tags$small("Simulation results in .csv format. ",  a("Download the legend.", href = "https://github.com/ocelhay/como/blob/master/Results_Legend_CoMoCOVID-19App.xlsx", target = "_blank")),
+                                                      downloadButton("download_data", "Download Data") %>% helper(type = "markdown", content = "help_legend_csv", colour = "red", size = "l"), 
+                                                      tags$small("Simulation results in .csv format."),
                                                       hr(),
                                                   ),
                                                   a(id = "anchor_summary", style="visibility: hidden", "")
