@@ -59,9 +59,10 @@ ui <- function(request) {
                                                       sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
                                                                   value = 100, post = "%", ticks = FALSE, width = "75%"),
                                                       htmlOutput("text_feedback_interventions_baseline"),
-                                                      conditionalPanel("output.valid_baseline_interventions",
-                                                                       actionButton("run_baseline", "Run Baseline", class = "btn btn-success")
-                                                      ),
+                                                      # conditionalPanel("output.valid_baseline_interventions",
+                                                      #                  actionButton("run_baseline", "Run Baseline", class = "btn btn-success")
+                                                      # ),
+                                                      uiOutput("conditional_run_baseline")
                                      ),
                                      
                                      conditionalPanel("output.status_app_output == 'Ok Baseline'",
@@ -131,9 +132,10 @@ ui <- function(request) {
                         fluidRow(
                           column(2, style = "margin-top: 200px;",
                                  htmlOutput("text_feedback_interventions_future"),
-                                 conditionalPanel("output.valid_future_interventions",
-                                                  actionButton("run_interventions", "Run Hypothetical Scenario", class = "btn btn-success")
-                                 ),
+                                 uiOutput("conditional_run_future")
+                                 # conditionalPanel("output.valid_future_interventions",
+                                 #                  actionButton("run_interventions", "Run Hypothetical Scenario", class = "btn btn-success")
+                                 # ),
                           ),
                           column(5,
                                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
@@ -290,7 +292,7 @@ server <- function(input, output, session) {
                                   valid_future_interventions = TRUE, 
                                   message_future_interventions = NULL)
   
-  
+
   observe({
     # Create interventions tibble
     interventions$baseline_mat <- tibble(index = 1:30,
@@ -450,6 +452,8 @@ server <- function(input, output, session) {
     interventions$valid_baseline_interventions <- validation_baseline$validation_interventions
     interventions$message_baseline_interventions <- validation_baseline$message_interventions
     
+    
+    
     # Validation of interventions, Hypothetical Scenario
     validation_future <- fun_validation_interventions(dta = interventions$future_mat, 
                                                       simul_start_date = input$date_range[1], 
@@ -457,6 +461,24 @@ server <- function(input, output, session) {
     interventions$valid_future_interventions <- validation_future$validation_interventions
     interventions$message_future_interventions <- validation_future$message_interventions
   })
+  
+  
+  # To show/hide elements of the App depending on the status ----
+  output$conditional_run_baseline <- renderUI({
+    if(interventions$valid_baseline_interventions) {
+      actionButton("run_baseline", "Run Baseline", class = "btn btn-success")
+    }
+  })
+  
+  output$conditional_run_future <- renderUI({
+    if(interventions$valid_future_interventions) {
+      actionButton("run_interventions", "Run Hypothetical Scenario", class = "btn btn-success")
+    }
+  })
+  
+  output$status_app_output <- reactive(status_app$status)
+  outputOptions(output, "status_app_output", suspendWhenHidden = FALSE)
+  
   
   
   # Manage population and cases data reactive values ----
@@ -473,14 +495,6 @@ server <- function(input, output, session) {
   file_list <- list.files(path = "./www/outputs", pattern = "*.R")
   for (file in file_list) source(paste0("./www/outputs/", file), local = TRUE)$value
   
-  # To show/hide elements of the App depending on the status ----
-  output$status_app_output <- reactive(status_app$status)
-  outputOptions(output, "status_app_output", suspendWhenHidden = FALSE)
-  output$valid_baseline_interventions <- reactive(interventions$valid_baseline_interventions)
-  outputOptions(output, "valid_baseline_interventions", suspendWhenHidden = FALSE)
-  
-  output$valid_future_interventions <- reactive(interventions$valid_future_interventions)
-  outputOptions(output, "valid_future_interventions", suspendWhenHidden = FALSE)
   
   # Process on uploading a template ----
   observeEvent(input$own_data, {
