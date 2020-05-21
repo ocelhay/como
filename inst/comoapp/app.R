@@ -475,12 +475,12 @@ server <- function(input, output, session) {
   
   # To show/hide elements of the App depending on the status ----
   output$status_app_output <- reactive(status_app$status)
-  outputOptions(output, "status_app_output", suspendWhenHidden = FALSE, priority = 10)
+  outputOptions(output, "status_app_output", suspendWhenHidden = FALSE)
   output$valid_baseline_interventions <- reactive(interventions$valid_baseline_interventions)
-  outputOptions(output, "valid_baseline_interventions", suspendWhenHidden = FALSE, priority = 1)
+  outputOptions(output, "valid_baseline_interventions", suspendWhenHidden = FALSE)
   
   output$valid_future_interventions <- reactive(interventions$valid_future_interventions)
-  outputOptions(output, "valid_future_interventions", suspendWhenHidden = FALSE, priority = 1)
+  outputOptions(output, "valid_future_interventions", suspendWhenHidden = FALSE)
   
   # Process on uploading a template ----
   observeEvent(input$own_data, {
