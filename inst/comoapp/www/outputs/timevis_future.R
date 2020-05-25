@@ -3,19 +3,19 @@ output$timevis_future <- renderPlot(execOnResize = TRUE, {
   
   dta <- interventions$future_mat %>%
     mutate(date_end = date_end + 1,
-           label = paste0(coverage, unit, " ", difftime(date_end, date_start, units = "days") - 1, "d."))
+           label = paste0(value, unit, " ", difftime(date_end, date_start, units = "days") - 1, "d."))
   
   
   ggplot(dta) + 
-    geom_rect(aes(xmin = date_start , xmax = date_end, ymin = 0, ymax = coverage), fill = "#e74c3c", alpha = 0.2) +
-    geom_point(aes(x = date_start, y = coverage)) +
-    geom_segment(aes(x = date_start, xend = date_end, y = coverage, yend = coverage),
+    geom_rect(aes(xmin = date_start , xmax = date_end, ymin = 0, ymax = value), fill = "#e74c3c", alpha = 0.2) +
+    geom_point(aes(x = date_start, y = value)) +
+    geom_segment(aes(x = date_start, xend = date_end, y = value, yend = value),
                  arrow = arrow(length = unit(0.3, "cm") , ends = "last", type = "closed")) +
     geom_segment(aes(colour = "Today", x = Sys.Date(), xend = Sys.Date(), y = 0, yend = 100), lty = 2, alpha = 1, lwd = 1.3) +
     geom_segment(aes(colour = "Simulation Range", x = input$date_range[1], xend = input$date_range[1], y = 0, yend = 100), lty = 2, alpha = 1, lwd = 1.3) +
     geom_segment(aes(colour = "Simulation Range", x = input$date_range[2], xend = input$date_range[2], y = 0, yend = 100), lty = 2, alpha = 1, lwd = 1.3) +
     scale_colour_manual(name="Line Color", values = c(`Today` = "#c0392b", `Simulation Range` = "#2980b9")) +
-    geom_label(aes(x = date_start, y = coverage, label = label), 
+    geom_label(aes(x = date_start, y = value, label = label), 
                hjust = -0.1, vjust = 1.2, inherit.aes = FALSE, fill = "grey80", alpha = 1, size = 4) + 
     
     labs(x = NULL, y = NULL) +

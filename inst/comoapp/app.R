@@ -286,7 +286,7 @@ server <- function(input, output, session) {
                                   valid_future_interventions = TRUE, 
                                   message_future_interventions = NULL)
   
-
+  
   observe({
     # Create interventions tibble
     interventions$baseline_mat <- tibble(index = 1:30,
@@ -344,23 +344,23 @@ server <- function(input, output, session) {
                                                       input$baseline_daterange_27[2], input$baseline_daterange_28[2],
                                                       input$baseline_daterange_29[2], input$baseline_daterange_30[2]),
                                          
-                                         coverage = c(input$baseline_coverage_1, input$baseline_coverage_2,
-                                                      input$baseline_coverage_3, input$baseline_coverage_4,
-                                                      input$baseline_coverage_5, input$baseline_coverage_6,
-                                                      input$baseline_coverage_7, input$baseline_coverage_8,
-                                                      input$baseline_coverage_9, input$baseline_coverage_10,
-                                                      
-                                                      input$baseline_coverage_11, input$baseline_coverage_12,
-                                                      input$baseline_coverage_13, input$baseline_coverage_14,
-                                                      input$baseline_coverage_15, input$baseline_coverage_16,
-                                                      input$baseline_coverage_17, input$baseline_coverage_18,
-                                                      input$baseline_coverage_19, input$baseline_coverage_20,
-                                                      
-                                                      input$baseline_coverage_21, input$baseline_coverage_22,
-                                                      input$baseline_coverage_23, input$baseline_coverage_24,
-                                                      input$baseline_coverage_25, input$baseline_coverage_26,
-                                                      input$baseline_coverage_27, input$baseline_coverage_28,
-                                                      input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
+                                         value = c(input$baseline_coverage_1, input$baseline_coverage_2,
+                                                   input$baseline_coverage_3, input$baseline_coverage_4,
+                                                   input$baseline_coverage_5, input$baseline_coverage_6,
+                                                   input$baseline_coverage_7, input$baseline_coverage_8,
+                                                   input$baseline_coverage_9, input$baseline_coverage_10,
+                                                   
+                                                   input$baseline_coverage_11, input$baseline_coverage_12,
+                                                   input$baseline_coverage_13, input$baseline_coverage_14,
+                                                   input$baseline_coverage_15, input$baseline_coverage_16,
+                                                   input$baseline_coverage_17, input$baseline_coverage_18,
+                                                   input$baseline_coverage_19, input$baseline_coverage_20,
+                                                   
+                                                   input$baseline_coverage_21, input$baseline_coverage_22,
+                                                   input$baseline_coverage_23, input$baseline_coverage_24,
+                                                   input$baseline_coverage_25, input$baseline_coverage_26,
+                                                   input$baseline_coverage_27, input$baseline_coverage_28,
+                                                   input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
       mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ "contacts", TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_baseline, intervention != "_")
     
@@ -419,23 +419,23 @@ server <- function(input, output, session) {
                                                     input$future_daterange_27[2], input$future_daterange_28[2],
                                                     input$future_daterange_29[2], input$future_daterange_30[2]),
                                        
-                                       coverage = c(input$future_coverage_1, input$future_coverage_2,
-                                                    input$future_coverage_3, input$future_coverage_4,
-                                                    input$future_coverage_5, input$future_coverage_6,
-                                                    input$future_coverage_7, input$future_coverage_8,
-                                                    input$future_coverage_9, input$future_coverage_10,
-                                                    
-                                                    input$future_coverage_11, input$future_coverage_12,
-                                                    input$future_coverage_13, input$future_coverage_14,
-                                                    input$future_coverage_15, input$future_coverage_16,
-                                                    input$future_coverage_17, input$future_coverage_18,
-                                                    input$future_coverage_19, input$future_coverage_20,
-                                                    
-                                                    input$future_coverage_21, input$future_coverage_22,
-                                                    input$future_coverage_23, input$future_coverage_24,
-                                                    input$future_coverage_25, input$future_coverage_26,
-                                                    input$future_coverage_27, input$future_coverage_28,
-                                                    input$future_coverage_29, input$future_coverage_30)) %>% 
+                                       value = c(input$future_coverage_1, input$future_coverage_2,
+                                                 input$future_coverage_3, input$future_coverage_4,
+                                                 input$future_coverage_5, input$future_coverage_6,
+                                                 input$future_coverage_7, input$future_coverage_8,
+                                                 input$future_coverage_9, input$future_coverage_10,
+                                                 
+                                                 input$future_coverage_11, input$future_coverage_12,
+                                                 input$future_coverage_13, input$future_coverage_14,
+                                                 input$future_coverage_15, input$future_coverage_16,
+                                                 input$future_coverage_17, input$future_coverage_18,
+                                                 input$future_coverage_19, input$future_coverage_20,
+                                                 
+                                                 input$future_coverage_21, input$future_coverage_22,
+                                                 input$future_coverage_23, input$future_coverage_24,
+                                                 input$future_coverage_25, input$future_coverage_26,
+                                                 input$future_coverage_27, input$future_coverage_28,
+                                                 input$future_coverage_29, input$future_coverage_30)) %>% 
       mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ "contacts", TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_future, intervention != "_")
     
@@ -451,7 +451,7 @@ server <- function(input, output, session) {
     # Validation of interventions, Hypothetical Scenario
     validation_future <- fun_validation_interventions(dta = interventions$future_mat, 
                                                       simul_start_date = input$date_range[1], 
-                                                   simul_end_date= input$date_range[2])
+                                                      simul_end_date= input$date_range[2])
     interventions$valid_future_interventions <- validation_future$validation_interventions
     interventions$message_future_interventions <- validation_future$message_interventions
   })
@@ -566,7 +566,7 @@ server <- function(input, output, session) {
       mutate(`Date Start` = as.Date(`Date Start`),
              `Date End` = as.Date(`Date End`))
     
-    names(interventions_excel) <- c("intervention", "date_start", "date_end", "coverage", "unit", "apply_to")
+    names(interventions_excel) <- c("intervention", "date_start", "date_end", "value", "unit", "apply_to")
     
     interventions_excel_baseline <- interventions_excel %>% 
       filter(apply_to == "Baseline (Calibration)")
@@ -583,12 +583,12 @@ server <- function(input, output, session) {
     for (i in 1:nb_interventions_baseline) {
       updateSelectInput(session, paste0("baseline_intervention_", i), selected = interventions_excel_baseline[[i, "intervention"]])
       updateDateRangeInput(session, paste0("baseline_daterange_", i), start = interventions_excel_baseline[[i, "date_start"]], end = interventions_excel_baseline[[i, "date_end"]])
-      updateSliderInput(session, paste0("baseline_coverage_", i), value = interventions_excel_baseline[[i, "coverage"]])
+      updateSliderInput(session, paste0("baseline_coverage_", i), value = interventions_excel_baseline[[i, "value"]])
     }
     for (i in 1:nb_interventions_future) {
       updateSelectInput(session, paste0("future_intervention_", i), selected = interventions_excel_future[[i, "intervention"]])
       updateDateRangeInput(session, paste0("future_daterange_", i), start = interventions_excel_future[[i, "date_start"]], end = interventions_excel_future[[i, "date_end"]])
-      updateSliderInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "coverage"]])
+      updateSliderInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "value"]])
     }
   })
   
@@ -660,7 +660,6 @@ server <- function(input, output, session) {
   
   # Downloadable csv ----
   results_aggregated <- reactive({
-    
     dta_baseline <- tibble(
       date = simul_baseline$results$time,
       baseline_daily_incidence = simul_baseline$results$daily_incidence,
@@ -676,7 +675,6 @@ server <- function(input, output, session) {
       baseline_death_untreated_hospital = simul_baseline$results$death_untreated_hospital,
       baseline_death_untreated_icu = simul_baseline$results$death_untreated_icu,
       baseline_death_untreated_ventilator = simul_baseline$results$death_untreated_ventilator,
-      baseline_death_untreated_ventilator_surge = simul_baseline$results$death_untreated_ventilator_surge,
       baseline_cum_mortality = simul_baseline$results$cum_mortality)
     
     dta <- left_join(dta_baseline, 
@@ -684,27 +682,26 @@ server <- function(input, output, session) {
                                               input_deaths = deaths,
                                               input_cumulative_death = cumulative_death), by = "date")
     
-    if(simul_interventions$interventions_available){ 
-      
-      dta_interventions <- tibble(
-        date = simul_interventions$results$time,
-        hypothetical_daily_incidence = simul_interventions$results$daily_incidence,
-        hypothetical_daily_total_cases = simul_interventions$results$daily_total_cases,
-        hypothetical_normal_bed_occupancy = simul_interventions$results$required_beds,
-        hypothetical_icu_bed_occupancy = simul_interventions$results$icu_beds,
-        hypothetical_icu_ventilator_occupancy = simul_interventions$results$ventilators,
-        hypothetical_death_natural_non_exposed = simul_interventions$results$death_natural_non_exposed,
-        hypothetical_death_natural_exposed = simul_interventions$results$death_natural_exposed,
-        hypothetical_death_treated_hospital = simul_interventions$results$death_treated_hospital,
-        hypothetical_death_treated_icu = simul_interventions$results$death_treated_icu,
-        hypothetical_death_treated_ventilator = simul_interventions$results$death_treated_ventilator,
-        hypothetical_death_untreated_hospital = simul_interventions$results$death_untreated_hospital,
-        hypothetical_death_untreated_icu = simul_interventions$results$death_untreated_icu,
-        hypothetical_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator,
-        hypothetical_death_untreated_ventilator_surge = simul_interventions$results$death_untreated_ventilator_surge,
-        hypothetical_cum_mortality = simul_interventions$results$cum_mortality)
-      
-      dta <- left_join(dta, dta_interventions, by = "date") }
+    
+    dta_interventions <- tibble(
+      date = simul_interventions$results$time,
+      hypothetical_daily_incidence = simul_interventions$results$daily_incidence,
+      hypothetical_daily_total_cases = simul_interventions$results$daily_total_cases,
+      hypothetical_normal_bed_occupancy = simul_interventions$results$required_beds,
+      hypothetical_icu_bed_occupancy = simul_interventions$results$icu_beds,
+      hypothetical_icu_ventilator_occupancy = simul_interventions$results$ventilators,
+      hypothetical_death_natural_non_exposed = simul_interventions$results$death_natural_non_exposed,
+      hypothetical_death_natural_exposed = simul_interventions$results$death_natural_exposed,
+      hypothetical_death_treated_hospital = simul_interventions$results$death_treated_hospital,
+      hypothetical_death_treated_icu = simul_interventions$results$death_treated_icu,
+      hypothetical_death_treated_ventilator = simul_interventions$results$death_treated_ventilator,
+      hypothetical_death_untreated_hospital = simul_interventions$results$death_untreated_hospital,
+      hypothetical_death_untreated_icu = simul_interventions$results$death_untreated_icu,
+      hypothetical_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator,
+      hypothetical_cum_mortality = simul_interventions$results$cum_mortality)
+    
+    dta <- left_join(dta, dta_interventions, by = "date")
+    
     vectors0_cbind <- do.call(cbind, vectors0)
     vectors0_reduced <- vectors0_cbind[seq(from=0,to=nrow(vectors0_cbind),by=20),]
     vectors0_reduced <- as.data.frame(rbind(rep(0,ncol(vectors0_reduced)),vectors0_reduced))
@@ -721,8 +718,8 @@ server <- function(input, output, session) {
     intv_vectors$date <- as.Date(intv_vectors$date)
     dta <- left_join(dta,intv_vectors, by="date")
     
-    # we should always have all days exported => next lined commented
-    # if (!input$show_all_days) dta <- dta %>% filter(wday(date) == 2)
+    print(dta)
+    shiny_dta <<- dta
     
     return(dta)
   })

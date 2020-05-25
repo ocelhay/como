@@ -1,6 +1,4 @@
 fun_validation_interventions <- function(dta, all_possible_interventions = all_interventions, simul_start_date, simul_end_date) {
-  # dta should have the following columns: intervention, date_start, date_end, coverage
-  
   validation <- list(validation_interventions = TRUE, 
                      message_interventions = NULL)
   
@@ -11,7 +9,7 @@ fun_validation_interventions <- function(dta, all_possible_interventions = all_i
                                                "Some intervention(s) are unrecognised. Needs resolution. ")
   }
   
-  if(any(dta$coverage < 0 | dta$coverage > 100)) {
+  if(any(dta$value < 0 | dta$value > 100)) {
     validation$validation_interventions <- FALSE
     validation$message_interventions <- paste0(validation$message_interventions, 
                                                "Coverage value(s) not in-between 0 and 100. Needs resolution. ")

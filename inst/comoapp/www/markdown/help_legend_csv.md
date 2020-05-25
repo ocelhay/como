@@ -18,7 +18,6 @@
 | *_death_untreated_hospital         | Cumulative COVID-19 deaths in patients who should have been in the hospital on inpatient beds up to time t                                                           |
 | *_death_untreated_icu              | Cumulative COVID-19 deaths in patients who require ICU bed, but placed on normal beds up to time t                                                                   |
 | *_death_untreated_ventilator       | Cumulative COVID-19 deaths in patients who require ventilators, but only get ICU beds up to time t                                                                   |
-| *_death_untreated_ventilator_surge | Cumulative COVID-19 deaths in patients who ventilators, but placed on normal beds up to time t                                                                       |
 | *_cum_mortality                    | Cumulative COVID-19 deaths + natural deaths from hospitalized, ICU, ventilator (and their overflown) compartments up to time t                                       |
 | input_cases                        | Observed daily incidence (based on user input or from European Centre for Disease Prevention and Control)                                                            |
 | input_deaths                       | Observed daily deaths (based on user input or from European Centre for Disease Prevention and Control)                                                               |
