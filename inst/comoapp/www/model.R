@@ -19,21 +19,23 @@ ifr <- mort_sever_rv$data %>%
   select(age_category, ifr) %>% 
   as.data.frame()
 
-c_home <- contact_home[[input$country_contact]] %>% as.matrix()
-c_school <- contact_school[[input$country_contact]] %>% as.matrix()
-c_work <- contact_work[[input$country_contact]] %>% as.matrix()
-c_other <- contact_other[[input$country_contact]] %>% as.matrix()
+country_name <- input$country_contact
 # END Bridge ----
 
-# START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# START Placeholder for covidage_v13.6.R code (DO NOT EDIT) ----
 # per year ageing matrix
-A <- length(age_categories)
-dd <- seq(1:A)/seq(1:A)
-ageing <- t(diff(diag(dd), lag = 1)/(5*365.25))
-ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
-# END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+A<-length(popstruc[,2])
+dd<-seq(1:A)/seq(1:A)
+ageing <- t(diff(diag(dd),lag=1)/(5*365.25))
+ageing<-cbind(ageing,0*seq(1:A)) # no ageing from last compartment
+# END Placeholder ----
 
-# START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# START Placeholder for covidage_v13.6.R code (DO NOT EDIT) ----
+###  CONTACT MATRICES
+c_home <- contact_home[[country_name]] %>% as.matrix()
+c_school <- contact_school[[country_name]] %>% as.matrix()
+c_work <- contact_work[[country_name]] %>% as.matrix()
+c_other <- contact_other[[country_name]] %>% as.matrix()
 nce <-A-length(c_home[1,])
 
 contact_home<-matrix(0,nrow=A,ncol=A)
@@ -74,14 +76,14 @@ for (i in (A+1-nce):A){
     contact_other[i,j]<-c_other[(A-nce),(A-nce)]
   }
 }
-# END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# END Placeholder ----
 
 # START Bridge ----
 startdate <- input$date_range[1]
 stopdate <- input$date_range[2]
 # END Bridge ----
 
-# START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# START Placeholder for covidage_v13.6.R code (DO NOT EDIT) ----
 day_start <- as.numeric(startdate-startdate)
 day_stop <- as.numeric(stopdate-startdate)
 times <- seq(day_start, day_stop)
@@ -90,7 +92,7 @@ tin<-as.numeric(startdate-as.Date("2020-01-01"))/365.25
 initP<-sum(popstruc[,2])       # population size 
 ageindcase<-20                 # age of index case (years)
 aci <- floor((ageindcase/5)+1) # age class of index case
-# END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# END Placeholder ----
 
 # START Bridge ----
 parameters <- c(
@@ -105,7 +107,7 @@ parameters <- c(
   beds_available = input$beds_available,
   icu_beds_available = input$icu_beds_available,
   ventilators_available = input$ventilators_available,
-  give = 85,
+  give = 95,
   pdeath_h = input$pdeath_h,
   pdeath_hc = input$pdeath_hc,
   pdeath_icu = input$pdeath_icu,
@@ -114,11 +116,11 @@ parameters <- c(
   pdeath_ventc = input$pdeath_ventc,
   ihr_scaling = input$ihr_scaling,
   nus = input$nus,
-  nusc = input$nusc,
+  nusc = input$nus, # nusc = nus
   nu_icu = input$nu_icu,
-  nu_icuc = input$nu_icuc,
+  nu_icuc = input$nu_icu, # nu_icuc = nu_icu
   nu_vent = input$nu_vent,
-  nu_ventc = input$nu_ventc,
+  nu_ventc = input$nu_vent, # nu_ventc = nu_vent
   rhos = input$rhos,
   amp = input$amp,
   phi = which(month.name == input$phi),
@@ -128,83 +130,44 @@ parameters <- c(
   
   # INTERVENTIONS
   # self isolation
-  selfis_on = as.numeric(input$date_selfis_on - startdate),
-  selfis_dur = input$selfis_dur,
-  selfis_cov = input$selfis_cov,
   selfis_eff = input$selfis_eff,
-  
   # social distancing
-  dist_on = as.numeric(input$date_dist_on - startdate),
-  dist_dur = input$dist_dur,
-  dist_cov = input$dist_cov,
   dist_eff = input$dist_eff,
-  
   # hand washing
-  hand_on = as.numeric(input$date_hand_on - startdate),
-  hand_dur = input$hand_dur,
   hand_eff = input$hand_eff,
-  
   # working at home
-  work_on = as.numeric(input$date_work_on - startdate),
-  work_dur = input$work_dur,
   work_eff = input$work_eff,
-  work_cov = input$work_cov,
   w2h = input$w2h,
-  
   # school closures
-  school_on = as.numeric(input$date_school_on - startdate),
-  school_dur = input$school_dur,
   school_eff = input$school_eff,
   s2h = input$s2h,
-  
   # cocooning the elderly
-  cocoon_on = as.numeric(input$date_cocoon_on - startdate),
-  cocoon_dur = input$cocoon_dur,
   cocoon_eff = input$cocoon_eff,
-  cocoon_cov = input$cocoon_cov,
   age_cocoon = input$age_cocoon,
-  
   # vaccination campaign
-  vaccine_on = as.numeric(input$date_vaccine_on - startdate),
   vaccine_eff = input$vaccine_eff,
-  vaccine_cov = input$vaccine_cov,
   vac_campaign = input$vac_campaign,
-  
   # travel ban
   mean_imports = input$mean_imports,
-  travelban_on = as.numeric(input$date_travelban_on - startdate),
-  travelban_dur = input$travelban_dur,
-  travelban_eff = input$travelban_eff,
-  
   # screening
-  screen_on = as.numeric(input$date_screen_on - startdate),
-  screen_dur = input$screen_dur,
-  screen_cov = input$screen_cov,
+  screen_test_sens = input$screen_test_sens,
   screen_overdispersion = input$screen_overdispersion,
   screen_contacts = input$screen_contacts,
   
   # voluntary home quarantine
-  quarantine_on = as.numeric(input$date_quarantine_on - startdate),
-  quarantine_cov = input$quarantine_cov,
-  quarantine_dur = input$quarantine_dur,
   quarantine_days = input$quarantine_days,
   quarantine_effort = input$quarantine_effort,
   quarantine_eff_home = input$quarantine_eff_home,
   quarantine_eff_other = input$quarantine_eff_other,
   
-  # lockdown
-  lockdown_low_on = as.numeric(input$date_lockdown_low_on - startdate),
-  lockdown_low_dur = input$lockdown_low_dur,
-  lockdown_mid_on = as.numeric(input$date_lockdown_mid_on - startdate),
-  lockdown_mid_dur = input$lockdown_mid_dur,
-  lockdown_high_on = as.numeric(input$date_lockdown_high_on - startdate),
-  lockdown_high_dur = input$lockdown_high_dur,
-  
   household_size = input$household_size
 )
+
+ihr[,2] <- parameters["ihr_scaling"]*ihr[,2]
 # END Bridge ----
 
-# START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# START Placeholder for covidage_v13.6.R code (DO NOT EDIT) ----
+# Scale parameters to percentages/ rates
 parameters["rho"]<-parameters["rho"]/100
 parameters["omega"]<-(1/(parameters["omega"]*365))
 parameters["gamma"]<-1/parameters["gamma"]
@@ -215,35 +178,19 @@ parameters["reporth"]<-parameters["reporth"]/100
 parameters["nus"]<-1/parameters["nus"]
 parameters["rhos"]<-parameters["rhos"]/100
 parameters["amp"]<-parameters["amp"]/100
-parameters["selfis_dur"]<-parameters["selfis_dur"]*7
-parameters["selfis_cov"]<-parameters["selfis_cov"]/100
 parameters["selfis_eff"]<-parameters["selfis_eff"]/100
-parameters["dist_dur"]<-parameters["dist_dur"]*7
-parameters["dist_cov"]<-parameters["dist_cov"]/100
 parameters["dist_eff"]<-parameters["dist_eff"]/100
-parameters["hand_dur"]<-parameters["hand_dur"]*7
 parameters["hand_eff"]<-parameters["hand_eff"]/100
-parameters["work_dur"]<-parameters["work_dur"]*7
-parameters["work_cov"]<-parameters["work_cov"]/100
 parameters["work_eff"]<-parameters["work_eff"]/100
 parameters["w2h"]<-parameters["w2h"]/100
-parameters["school_dur"]<-parameters["school_dur"]*7
-parameters["schoolcov"]<-parameters["schoolcov"]/100
 parameters["school_eff"]<-parameters["school_eff"]/100
 parameters["s2h"]<-parameters["s2h"]/100
-parameters["cocoon_dur"]<-parameters["cocoon_dur"]*7
-parameters["cocoon_cov"]<-parameters["cocoon_cov"]/100
 parameters["cocoon_eff"]<-parameters["cocoon_eff"]/100
 parameters["age_cocoon"]<-floor((parameters["age_cocoon"]/5)+1)
-parameters["travelban_eff"]<-parameters["travelban_eff"]/100
 parameters["vaccine_eff"]<-parameters["vaccine_eff"]/100
-parameters["vaccine_cov"]<-parameters["vaccine_cov"]/100
-parameters["vac_campaign"]<-parameters["vac_campaign"]*7
-parameters["travelban_dur"]<-parameters["travelban_dur"]*7
-parameters["screen_dur"]<-parameters["screen_dur"]*7
-parameters["screen_cov"]<-parameters["screen_cov"]/100
-parameters["quarantine_cov"]<-parameters["quarantine_cov"]/100
-parameters["quarantine_dur"]<-parameters["quarantine_dur"]*7
+# parameters["vaccine_cov"]<-parameters["vaccine_cov"]/100
+# parameters["vac_campaign"]<-parameters["vac_campaign"]*7
+parameters["screen_test_sens"]<-parameters["screen_test_sens"]/100
 parameters["quarantine_days"]<-parameters["quarantine_days"]
 parameters["quarantine_effort"]<-1/parameters["quarantine_effort"]
 parameters["quarantine_eff_home"]<-parameters["quarantine_eff_home"]/-100
@@ -263,13 +210,9 @@ parameters["nu_ventc"]<-1/parameters["nu_ventc"]
 parameters["pclin"]<-parameters["pclin"]/100
 parameters["prob_icu"]<-parameters["prob_icu"]/100
 parameters["prob_vent"]<-parameters["prob_vent"]/100
-parameters["lockdown_low_dur"]<-parameters["lockdown_low_dur"]*7
-parameters["lockdown_mid_dur"]<-parameters["lockdown_mid_dur"]*7
-parameters["lockdown_high_dur"]<-parameters["lockdown_high_dur"]*7
-# END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+parameters2<-parameters
 
 
-# START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
 # Define the indices for each variable
 Sindex<-1:A
 Eindex<-(A+1):(2*A)
@@ -300,18 +243,18 @@ initI<-0*popstruc[,2]  # Infected and symptomatic
 initE<-0*popstruc[,2]  # Incubating
 initE[aci]<-1          # place random index case in E compartment
 initR<-0*popstruc[,2]  # Immune
-initX<-0*popstruc[,2]  # Isolated
-initV<-0*popstruc[,2]  # Vaccinated
-initQS<-0*popstruc[,2] # quarantined S
-initQE<-0*popstruc[,2] # quarantined E
-initQI<-0*popstruc[,2] # quarantined I
-initQR<-0*popstruc[,2] # quarantined R
-initH<-0*popstruc[,2]  # hospitalised
-initHC<-0*popstruc[,2] # hospital critical
+initX<-0*popstruc[,2]  # Isolated 
+initV<-0*popstruc[,2]  # Vaccinated 
+initQS<-0*popstruc[,2] # quarantined S 
+initQE<-0*popstruc[,2] # quarantined E  
+initQI<-0*popstruc[,2] # quarantined I  
+initQR<-0*popstruc[,2] # quarantined R  
+initH<-0*popstruc[,2]  # hospitalised 
+initHC<-0*popstruc[,2] # hospital critical 
 initC<-0*popstruc[,2]  # Cumulative cases (true)
 initCM<-0*popstruc[,2] # Cumulative deaths (true)
 initCL<-0*popstruc[,2] # symptomatic cases
-initQC<-0*popstruc[,2] # quarantined C
+initQC<-0*popstruc[,2] # quarantined C 
 initICU<-0*popstruc[,2]   # icu
 initICUC<-0*popstruc[,2]  # icu critical
 initICUCV<-0*popstruc[,2]  # icu critical
@@ -319,12 +262,310 @@ initVent<-0*popstruc[,2]  # icu vent
 initVentC<-0*popstruc[,2] # icu vent crit
 initCMC<-0*popstruc[,2]   # Cumulative deaths (true)
 initS<-popstruc[,2]-initE-initI-initR-initX-initV-initH-initHC-initQS-initQE-initQI-initQR-initCL-initQC-initICU-initICUC-initICUCV-initVent-initVentC  # Susceptible (non-immune)
+# END Placeholder ----
 
-initS<-popstruc[,2]-initE-initI-initR-initX-initV-initH-initHC-initQS-initQE-initQI-initQR-initCL-initQC-initICU-initICUC-initVent-initVentC  # Susceptible (non-immune)
+
+# START Bridge ----
+inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (Calibration)"),
+                 interventions$future_mat %>% mutate(`Apply to` = "Hypothetical Scenario")) %>%
+  rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
+# END Bridge ----
+
+# START Placeholder for covidage_v13.6.R code (DO NOT EDIT) ----
+inputs<-function(inp, run){
+  tb<-which(inp$`Apply to`==run)
+  # 
+  si<-intersect(which(inp$Intervention=="Self-isolation if Symptomatic"),tb)
+  scr<-intersect(which(inp$Intervention=="Screening (when S.I.)"),tb)
+  sd<-intersect(which(inp$Intervention=="Social Distancing"),tb)
+  hw<-intersect(which(inp$Intervention=="Handwashing"),tb)
+  wah<-intersect(which(inp$Intervention=="Working at Home"),tb)
+  sc<-intersect(which(inp$Intervention=="School Closures"),tb)
+  cte<-intersect(which(inp$Intervention=="Shielding the Elderly"),tb)
+  q<-intersect(which(inp$Intervention=="Household Isolation (when S.I.)"),tb)
+  tb<-intersect(which(inp$Intervention=="International Travel Ban"),tb)
+  vc<-intersect(which(inp$Intervention=="Vaccination"),tb)
+  
+  v<-(format(as.POSIXct(inp$`Date Start`,format='%Y/%m/%d %H:%M:%S'),format="%d/%m/%y"))
+  v2<-as.Date(v,format="%d/%m/%y")
+  inp$`Date Start`<-v2
+  
+  v<-(format(as.POSIXct(inp$`Date End`,format='%Y/%m/%d %H:%M:%S'),format="%d/%m/%y"))
+  v2<-as.Date(v,format="%d/%m/%y")
+  inp$`Date End`<-v2
+  
+  ##  self isolation
+  f<-c()
+  si_vector<-c()
+  isolation<-c()
+  if (length(si)>=1){
+    for (i in 1:length(si)){
+      f<-c(f,as.numeric(inp$`Date Start`[si[i]]-startdate),as.numeric(inp$`Date End`[si[i]]-startdate))
+      if(i==1){
+        si_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[si[i]],(f[i+1]-f[i])*20))
+        isolation<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        si_vector<-c(si_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        si_vector<-c(si_vector,rep(inp$`Value`[si[i]],(f[i*2]-f[i*2-1])*20))
+        isolation<-c(isolation,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        isolation<-c(isolation,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(si)){
+        si_vector<-c(si_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        isolation<-c(isolation,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    si_vector<-rep(0,tail(times,1)*20)
+    isolation<-rep(0,tail(times,1)*20)
+  }
+  ## social distancing
+  f<-c()
+  sd_vector<-c()
+  distancing<-c()
+  if (length(sd)>=1){
+    for (i in 1:length(sd)){
+      f<-c(f,as.numeric(inp$`Date Start`[sd[i]]-startdate),as.numeric(inp$`Date End`[sd[i]]-startdate))
+      if(i==1){
+        sd_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[sd[i]],(f[i+1]-f[i])*20))
+        distancing<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        sd_vector<-c(sd_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        sd_vector<-c(sd_vector,rep(inp$`Value`[sd[i]],(f[i*2]-f[i*2-1])*20))
+        distancing<-c(distancing,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        distancing<-c(distancing,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(sd)){
+        sd_vector<-c(sd_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        distancing<-c(distancing,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    sd_vector<-rep(0,tail(times,1)*20)
+    distancing<-rep(0,tail(times,1)*20)
+  }
+  ## screening
+  f<-c()
+  scr_vector<-c()
+  screen<-c()
+  if (length(scr)>=1){
+    for (i in 1:length(scr)){
+      f<-c(f,as.numeric(inp$`Date Start`[scr[i]]-startdate),as.numeric(inp$`Date End`[scr[i]]-startdate))
+      if(i==1){
+        scr_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[scr[i]],(f[i+1]-f[i])*20))
+        screen<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        scr_vector<-c(scr_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        scr_vector<-c(scr_vector,rep(inp$`Value`[scr[i]],(f[i*2]-f[i*2-1])*20))
+        screen<-c(screen,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        screen<-c(screen,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(scr)){
+        scr_vector<-c(scr_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        screen<-c(screen,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    scr_vector<-rep(0,tail(times,1)*20)
+    screen<-rep(0,tail(times,1)*20)
+  }
+  ## handwashing
+  f<-c()
+  hw_vector<-c()
+  handwash<-c()
+  if (length(hw)>=1){
+    for (i in 1:length(hw)){
+      f<-c(f,as.numeric(inp$`Date Start`[hw[i]]-startdate),as.numeric(inp$`Date End`[hw[i]]-startdate))
+      if(i==1){
+        hw_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[hw[i]],(f[i+1]-f[i])*20))
+        handwash<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        hw_vector<-c(hw_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        hw_vector<-c(hw_vector,rep(inp$`Value`[hw[i]],(f[i*2]-f[i*2-1])*20))
+        handwash<-c(handwash,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        handwash<-c(handwash,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(hw)){
+        hw_vector<-c(hw_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        handwash<-c(handwash,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    hw_vector<-rep(0,tail(times,1)*20)
+    handwash<-rep(0,tail(times,1)*20)
+  }
+  ## working at home
+  f<-c()
+  wah_vector<-c()
+  workhome<-c()
+  if (length(wah)>=1){
+    for (i in 1:length(wah)){
+      f<-c(f,as.numeric(inp$`Date Start`[wah[i]]-startdate),as.numeric(inp$`Date End`[wah[i]]-startdate))
+      if(i==1){
+        wah_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[wah[i]],(f[i+1]-f[i])*20))
+        workhome<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        wah_vector<-c(wah_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        wah_vector<-c(wah_vector,rep(inp$`Value`[wah[i]],(f[i*2]-f[i*2-1])*20))
+        workhome<-c(workhome,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        workhome<-c(workhome,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(wah)){
+        wah_vector<-c(wah_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        workhome<-c(workhome,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    wah_vector<-rep(0,tail(times,1)*20)
+    workhome<-rep(0,tail(times,1)*20)
+  }
+  ## school closure
+  f<-c()
+  sc_vector<-c()
+  schoolclose<-c()
+  if (length(sc)>=1){
+    for (i in 1:length(sc)){
+      f<-c(f,as.numeric(inp$`Date Start`[sc[i]]-startdate),as.numeric(inp$`Date End`[sc[i]]-startdate))
+      if(i==1){
+        sc_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[sc[i]],(f[i+1]-f[i])*20))
+        schoolclose<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        sc_vector<-c(sc_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        sc_vector<-c(sc_vector,rep(inp$`Value`[sc[i]],(f[i*2]-f[i*2-1])*20))
+        schoolclose<-c(schoolclose,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        schoolclose<-c(schoolclose,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(sc)){
+        sc_vector<-c(sc_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        schoolclose<-c(schoolclose,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    sc_vector<-rep(0,tail(times,1)*20)
+    schoolclose<-rep(0,tail(times,1)*20)
+  }
+  ## cocooning the elderly
+  f<-c()
+  cte_vector<-c()
+  cocoon<-c()
+  if (length(cte)>=1){
+    for (i in 1:length(cte)){
+      f<-c(f,as.numeric(inp$`Date Start`[cte[i]]-startdate),as.numeric(inp$`Date End`[cte[i]]-startdate))
+      if(i==1){
+        cte_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[cte[i]],(f[i+1]-f[i])*20))
+        cocoon<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        cte_vector<-c(cte_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        cte_vector<-c(cte_vector,rep(inp$`Value`[cte[i]],(f[i*2]-f[i*2-1])*20))
+        cocoon<-c(cocoon,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        cocoon<-c(cocoon,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(cte)){
+        cte_vector<-c(cte_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        cocoon<-c(cocoon,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    cte_vector<-rep(0,tail(times,1)*20)
+    cocoon<-rep(0,tail(times,1)*20)
+  }
+  ## quarantine
+  f<-c()
+  q_vector<-c()
+  quarantine<-c()
+  if (length(q)>=1){
+    for (i in 1:length(q)){
+      f<-c(f,as.numeric(inp$`Date Start`[q[i]]-startdate),as.numeric(inp$`Date End`[q[i]]-startdate))
+      if(i==1){
+        q_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[q[i]],(f[i+1]-f[i])*20))
+        quarantine<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        q_vector<-c(q_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        q_vector<-c(q_vector,rep(inp$`Value`[q[i]],(f[i*2]-f[i*2-1])*20))
+        quarantine<-c(quarantine,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        quarantine<-c(quarantine,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(q)){
+        q_vector<-c(q_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        quarantine<-c(quarantine,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    q_vector<-rep(0,tail(times,1)*20)
+    quarantine<-rep(0,tail(times,1)*20)
+  }
+  ## travel ban
+  f<-c()
+  tb_vector<-c()
+  travelban<-c()
+  if (length(tb)>=1){
+    for (i in 1:length(tb)){
+      f<-c(f,as.numeric(inp$`Date Start`[tb[i]]-startdate),as.numeric(inp$`Date End`[tb[i]]-startdate))
+      if(i==1){
+        tb_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[tb[i]],(f[i+1]-f[i])*20))
+        travelban<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        tb_vector<-c(tb_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        tb_vector<-c(tb_vector,rep(inp$`Value`[tb[i]],(f[i*2]-f[i*2-1])*20))
+        travelban<-c(travelban,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        travelban<-c(travelban,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(tb)){
+        tb_vector<-c(tb_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        travelban<-c(travelban,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    tb_vector<-rep(0,tail(times,1)*20)
+    travelban<-rep(0,tail(times,1)*20)
+  }
+  ## vaccine
+  f<-c()
+  vc_vector<-c()
+  vaccine<-c()
+  if (length(vc)>=1){
+    for (i in 1:length(vc)){
+      f<-c(f,as.numeric(inp$`Date Start`[vc[i]]-startdate),as.numeric(inp$`Date End`[vc[i]]-startdate))
+      if(i==1){
+        vc_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[vc[i]],(f[i+1]-f[i])*20))
+        vaccine<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+      }
+      else{
+        vc_vector<-c(vc_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        vc_vector<-c(vc_vector,rep(inp$`Value`[vc[i]],(f[i*2]-f[i*2-1])*20))
+        vaccine<-c(vaccine,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        vaccine<-c(vaccine,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(vc)){
+        vc_vector<-c(vc_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        vaccine<-c(vaccine,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    vc_vector<-rep(0,tail(times,1)*20)
+    vaccine<-rep(0,tail(times,1)*20)
+  }
+  
+  return(list(si_vector=si_vector,sd_vector=sd_vector,scr_vector=scr_vector,hw_vector=hw_vector,wah_vector=wah_vector,
+              sc_vector=sc_vector,tb_vector=tb_vector,cte_vector=cte_vector,q_vector=q_vector,vc_vector=vc_vector,isolation=isolation,
+              screen=screen,cocoon=cocoon,schoolclose=schoolclose,workhome=workhome,handwash=handwash,
+              quarantine=quarantine,vaccine=vaccine,travelban=travelban,distancing=distancing))
+}
+vectors<<-inputs(inp,'Hypothetical Scenario')
+vectors0<<-inputs(inp,'Baseline (Calibration)')
 
 
 # set up a function to solve the equations
-covid<-function(t, Y, parameters)
+covid<-function(t, Y, parameters,input) 
 {
   with(as.list(c(Y, parameters)),
        {
@@ -351,7 +592,7 @@ covid<-function(t, Y, parameters)
          VentC <- Y[VentCindex]
          CMC <- Y[CMCindex]
          P <- (S+E+I+R+X+V+H+HC+QS+QE+QI+QR+CL+QC+ICU+ICUC+ICUCV+Vent+VentC)
-         # print(sum(P))
+         
          # health system performance
          f <- c(1,(1+give)/2,(1-give)/2,0)
          KH<-beds_available
@@ -363,24 +604,25 @@ covid<-function(t, Y, parameters)
          fH <- splinefun(x.H, f, method = "hyman")
          fICU <- splinefun(x.ICU, f, method = "hyman")
          fVent<- splinefun(x.Vent, f, method = "hyman")
-         critH<-min(1-fH(sum(H)+sum(ICUC)+sum(ICUCV))+(1-reporth),1)
+         critH<-min(1-fH(sum(H)+sum(ICUC)+sum(ICUCV)),1)
          crit<-min(1-fICU(sum(ICU)+sum(Vent)+sum(VentC)),1)
          critV<-min(1-fVent(sum(Vent)),1)
-         # print(fH(sum(H)))
+         
          # interventions
-         isolation<-(t>=selfis_on)*(t<=selfis_on+selfis_dur)
-         distancing<-(t>=dist_on)*(t<=(dist_on+dist_dur))
-         handwash<-(t>=hand_on)*(t<=(hand_on+hand_dur))
-         workhome<-(t>=work_on)*(t<=(work_on+work_dur))
-         schoolclose<-(t>=school_on)*(t<=(school_on+school_dur))
-         cocoon<-(t>=cocoon_on)*(t<=(cocoon_on+cocoon_dur))*cocoon_cov
-         vaccine<-(t>=(vaccine_on))*(t<=vaccine_on+vac_campaign)
-         travelban<-(t>=travelban_on)*(t<=(travelban_on+travelban_dur))
-         screen<-(t>=screen_on)*(t<=(screen_on+screen_dur))
-         quarantine<-(t>=quarantine_on)*(t<=(quarantine_on+quarantine_dur))
-         lockdown_low<-(t>=lockdown_low_on)*(t<=(lockdown_low_on+lockdown_low_dur))
-         lockdown_mid<-(t>=lockdown_mid_on)*(t<=(lockdown_mid_on+lockdown_mid_dur))
-         lockdown_high<-(t>=lockdown_high_on)*(t<=(lockdown_high_on+lockdown_high_dur))
+         isolation<-input$isolation[t*20+1]
+         distancing<-input$distancing[t*20+1]
+         handwash<-input$handwash[t*20+1]
+         workhome<-input$workhome[t*20+1]
+         schoolclose<-input$schoolclose[t*20+1]
+         cocoon<-input$cocoon[t*20+1]
+         vaccine<-input$vaccine[t*20+1]
+         travelban<-input$travelban[t*20+1]
+         screen<-input$screen[t*20+1]
+         quarantine<-input$quarantine[t*20+1]
+         lockdown_low<-input$lockdown_low[t*20+1]
+         lockdown_mid<-input$lockdown_mid[t*20+1]
+         lockdown_high<-input$lockdown_high[t*20+1]
+         
          screen_eff<-0
          selfis<-0
          school<-1
@@ -389,74 +631,52 @@ covid<-function(t, Y, parameters)
          vaccinate<-0
          trvban_eff<-0
          quarantine_rate<-0
-         if (lockdown_low || lockdown_mid || lockdown_high){
-           if(lockdown_low){
-             selfis<-0.5
-             dist<-0.25
-             school<-0
-             trvban_eff<-0
-             quarantine_rate<-0
-             work<-0
-             cocoon<-0.95
-             hand<-0.05
-             vaccinate<-0
-           }
-           if(lockdown_mid){
-             selfis<-0.5
-             dist<-0.35
-             school<-0.85
-             trvban_eff<-0
-             quarantine_rate<-0.05
-             work<-0.5
-             cocoon<-0.95
-             hand<-0.05
-             vaccinate<-0
-           }
-           if(lockdown_high){
-             selfis<-0.95
-             dist<-0.95
-             school<-0.85
-             trvban_eff<-0.95
-             quarantine_rate<-0.9
-             work<-0.75
-             cocoon<-0.95
-             hand<-0.075
-             vaccinate<-0
+         
+         selfis_cov<-(input$si_vector[t*20+1])/100
+         screen_contacts<-(input$scr_vector[t*20+1])/10
+         school_eff<-(input$sc_vector[t*20+1])/100
+         dist_cov<-(input$sd_vector[t*20+1])/100
+         hand_cov<-(input$hw_vector[t*20+1])/100
+         cocoon<-(input$cte_vector[t*20+1])/100
+         work_cov<-(input$wah_vector[t*20+1])/100
+         travelban_eff<-(input$tb_vector[t*20+1])/100
+         vaccine_cov<-(input$vc_vector[t*20+1])/100
+         quarantine_cov<-(input$q_vector[t*20+1])/100
+         
+         if (workhome){
+           work<-work_cov*work_eff
+         }else{work<-1}
+         if (isolation){
+           selfis<-selfis_cov
+           if(screen){
+             screen_eff<-min(sum(report*I+reportc*(CL)+H+ICU+Vent+reporth*(HC+ICUC+ICUCV+VentC))*screen_contacts*(screen_overdispersion*I/P)*screen_test_sens/P,1) 
            }
          }
-         else{
-           if (workhome){
-             work<-work_cov*work_eff
-           }else{work<-1}
-           if (isolation){
-             selfis<-selfis_cov
-             if(screen){
-               screen_eff<-min((report*I+reportc*(CL)+H+ICU+Vent+reporth*HC+ICUC+VentC)*screen_contacts*(screen_overdispersion*I/P)*screen_cov/P,1)
-             }
-           }
-           if (schoolclose){
-             school<-school_eff
-           }
-           if(distancing){
-             dist<-dist_cov*dist_eff
-           }
-           if(handwash){
-             hand<-hand_eff
-           }
-           if(vaccine){
-             vac_rate <- (-log(1-vaccine_cov)/vac_campaign)
-             vaccinate <- vac_rate
-           }
-           if(travelban){
-             trvban_eff<-travelban_eff
-           }
-           if(quarantine){
-             quarantine_rate<-min(((I+CL+H+ICU+Vent+HC+ICUC+VentC)*(household_size-1)/P),1)*quarantine_cov*quarantine_effort
-           }
+         if (schoolclose){
+           school<-school_eff
          }
+         if(distancing){
+           dist<-dist_cov*dist_eff
+         }
+         if(handwash){
+           hand<-hand_eff*hand_cov
+         }
+         if(vaccine){
+           vac_rate <- (-log(1-vaccine_cov)/vac_campaign)
+           vaccinate <- vac_rate
+         }
+         if(travelban){
+           trvban_eff<-travelban_eff
+         }
+         if(quarantine){
+           quarantine_rate<-min(sum((I+CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC)*(household_size-1)/P),1)*quarantine_cov*quarantine_effort
+         }
+         
+         
          # cocooning the elderly
          cocoon_mat<-matrix((1-cocoon_eff),nrow = length(popstruc$pop),ncol = length(popstruc$pop))
          cocoon_mat[1:(age_cocoon-1),1:(age_cocoon-1)]<-1
+         
          # contact matrices
          cts<-(contact_home+distancing*(1-dist)*contact_other+(1-distancing)*contact_other
                +(1-schoolclose)*contact_school # school on
@@ -466,68 +686,74 @@ covid<-function(t, Y, parameters)
                +workhome*(1-work)*contact_work # people not working from home when homework is active
                +contact_home*workhome*work*w2h # inflating contacts at home when working from home
          )
+         
          # Final transmission related parameters
          contacts <- (1-cocoon)*cts+cocoon*cts*cocoon_mat+cocoon*(1+schoolclose*(1-school_eff)+workhome*(1-work_eff))*contact_home*(1-cocoon_mat)
          seas <- 1+amp*cos(2*3.14*(t-(phi*365.25/12))/365.25)
          importation <- mean_imports*(1-trvban_eff)
-         HH<-H+ICU+Vent
-         HHC<-HC+ICUC+VentC
-         lam <- (1-hand)*p*seas*(contacts%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*(X+HHC)+rhos*(HH))/P))
+         HH<-H+ICU+Vent+ICUC+ICUCV+VentC
+         HHC<-HC
+         lam <- (1-hand)*p*seas*(contacts%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*(X+HHC)+rhos*(HH))/P))+
+           (1-hand)*p*seas*(1-quarantine*quarantine_eff_other)*(contact_other%*%((rho*QE+QI+QC)/P))
          # contacts under home quarantine
-         lamq<-(1-hand)*p*seas*((1-quarantine_eff_home)*contact_home%*%(((1-selfis_eff)*(X+HHC))/P))+(1-hand)*p*seas*(1-quarantine_eff_other)*(contact_other%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*(X+HHC)+rhos*(HH))/P))
+         lamq<-(1-hand)*p*seas*((1-quarantine_eff_home)*contact_home%*%(((1-selfis_eff)*(X+HHC+rho*QE+QI+QC))/P))+
+           (1-hand)*p*seas*(1-quarantine_eff_other)*(contact_other%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*(X+HHC+rho*QE+QI+QC)+rhos*(HH))/P))
+         
          # birth/death
          b1<-sum(popbirth[,2]*popstruc[,2])
          birth<-0*popbirth[,2]
          birth[1]<-b1
+         
          # ODE system
          dSdt <- -S*lam-S*vaccinate+omega*R+ageing%*%S-mort*S+birth-quarantine_rate*S +(1/quarantine_days)*QS
          dEdt <- S*lam-gamma*E+ageing%*%E-mort*E + (1-vaccine_eff)*lam*V-quarantine_rate*E+(1/quarantine_days)*QE
          dIdt <- gamma*(1-pclin)*(1-screen_eff)*(1-ihr[,2])*E-nui*I+ageing%*%I-mort*I + (1/quarantine_days)*QI - quarantine_rate*I
          dCLdt<- gamma*pclin*(1-selfis)*(1-ihr[,2])*E-nui*CL+ageing%*%CL-mort*CL + (1/quarantine_days)*QC
          dRdt <- nui*I-omega*R+nui*X+nui*CL+ageing%*%R-mort*R + (1/quarantine_days)*QR + nus*(1-pdeath_h*ifr[,2])*H + (1-pdeath_icu*ifr[,2])*nu_icu*ICU + (1-pdeath_icuc*ifr[,2])*nu_icuc*ICUC + (1-pdeath_ventc*ifr[,2])*nu_ventc*ICUCV + (1-pdeath_hc*ifr[,2])*nusc*HC + (1-pdeath_vent*ifr[,2])*nu_vent*Vent+ (1-pdeath_ventc*ifr[,2])*nu_ventc*VentC
-         dXdt <- gamma*selfis*pclin*(1-ihr[,2])*E+gamma*(1-pclin)*screen_eff*(1-ihr[,2])*E-nui*X+ageing%*%X-mort*X
+         dXdt <- gamma*selfis*pclin*(1-ihr[,2])*E+gamma*(1-pclin)*screen_eff*(1-ihr[,2])*E-nui*X+ageing%*%X-mort*X 
          dVdt <- vaccinate*S -(1-vaccine_eff)*lam*V +ageing%*%V - mort*V
+         
          dQSdt <- quarantine_rate*S+ ageing%*%QS-mort*QS - (1/quarantine_days)*QS - lamq*QS
-         dQEdt <- quarantine_rate*E - gamma*QE + ageing%*%QE-mort*QE - (1/quarantine_days)*QE + lamq*QS
+         dQEdt <- quarantine_rate*E - gamma*QE + ageing%*%QE-mort*QE - (1/quarantine_days)*QE + lamq*QS 
          dQIdt <- quarantine_rate*I + gamma*(1-ihr[,2])*(1-pclin)*QE-nui*QI+ageing%*%QI-mort*QI - (1/quarantine_days)*QI
          dQCdt <- gamma*(1-ihr[,2])*pclin*QE-nui*QC+ageing%*%QC-mort*QC - (1/quarantine_days)*QC
          dQRdt <- nui*QI+nui*QC+ageing%*%QR-mort*QR - (1/quarantine_days)*QR
-         dHdt <- gamma*ihr[,2]*(1-prob_icu)*(1-critH)*E + gamma*ihr[,2]*(1-prob_icu)*(1-critH)*QE - nus*H + ageing%*%H-mort*H  # all pdeath have to be lower than
-         dHCdt <- gamma*ihr[,2]*(1-prob_icu)*critH*E + gamma*ihr[,2]*(1-prob_icu)*critH*QE - nusc*HC + ageing%*%HC-mort*HC
+         
+         dHdt <- gamma*ihr[,2]*(1-prob_icu)*(1-critH)*reporth*E + gamma*ihr[,2]*(1-prob_icu)*(1-critH)*QE - nus*H + ageing%*%H-mort*H  
+         dHCdt <- gamma*ihr[,2]*(1-prob_icu)*(1-critH)*(1-reporth)*E+gamma*ihr[,2]*(1-prob_icu)*critH*E + gamma*ihr[,2]*(1-prob_icu)*critH*QE - nusc*HC + ageing%*%HC-mort*HC 
          dICUdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-prob_vent)*QE - nu_icu*ICU +ageing%*%ICU - mort*ICU +(1-crit)*ICUC*1/2
-         dICUCdt <- gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*QE -
-           nu_icuc*ICUC -(1-crit)*ICUC*1/2 +ageing%*%ICUC - mort*ICUC
+         dICUCdt <- gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*QE - 
+           nu_icuc*ICUC -(1-crit)*ICUC*1/2 +ageing%*%ICUC - mort*ICUC 
          dICUCVdt <- gamma*ihr[,2]*prob_icu*prob_vent*crit*E +gamma*ihr[,2]*prob_icu*prob_vent*crit*QE -nu_ventc*ICUCV +ageing%*%ICUCV - mort*ICUCV - (1-critV)*ICUCV*1/2
-         dVentdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*QE +(1-critV)*VentC*1/2 +(1-critV)*ICUCV*1/2 -nu_vent*Vent +ageing%*%Vent - mort*Vent
-         dVentCdt <- gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*E +gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*QE -
-           (1-critV)*VentC*1/2 -nu_ventc*VentC +ageing%*%VentC - mort*VentC
-         dCdt <- report*gamma*(1-pclin)*(1-ihr[,2])*(E+QE)+reportc*gamma*pclin*(1-ihr[,2])*(E+QE)+
+         dVentdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*QE +(1-critV)*VentC*1/2 +(1-critV)*ICUCV*1/2 -nu_vent*Vent +ageing%*%Vent - mort*Vent 
+         dVentCdt <- gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*E +gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*QE - 
+           (1-critV)*VentC*1/2 -nu_ventc*VentC +ageing%*%VentC - mort*VentC 
+         
+         dCdt <- report*gamma*(1-pclin)*(1-ihr[,2])*(E+QE)+reportc*gamma*pclin*(1-ihr[,2])*(E+QE)+ 
            gamma*ihr[,2]*(1-critH)*(1-prob_icu)*(E+QE)+gamma*ihr[,2]*critH*reporth*(1-prob_icu)*(E+QE)+
            gamma*ihr[,2]*prob_icu*(E+QE)
-         dCMdt<- nus*pdeath_h*ifr[,2]*H + nusc*pdeath_hc*ifr[,2]*HC + nu_icu*pdeath_icu*ifr[,2]*ICU +nu_icuc*pdeath_icuc*ifr[,2]*ICUC +nu_vent*pdeath_vent*ifr[,2]*Vent +nu_ventc*pdeath_ventc*ifr[,2]*VentC +nu_ventc*pdeath_ventc*ifr[,2]*ICUCV+
-           mort*H + mort*HC + mort*ICU + mort*ICUC + mort*ICUCV + mort*Vent + mort*VentC
+         dCMdt<- nus*pdeath_h*ifr[,2]*H + nusc*pdeath_hc*ifr[,2]*HC + nu_icu*pdeath_icu*ifr[,2]*ICU +nu_icuc*pdeath_icuc*ifr[,2]*ICUC +nu_vent*pdeath_vent*ifr[,2]*Vent +nu_ventc*pdeath_ventc*ifr[,2]*VentC +nu_ventc*pdeath_ventc*ifr[,2]*ICUCV+ 
+           mort*H + mort*HC + mort*ICU + mort*ICUC + mort*ICUCV + mort*Vent + mort*VentC 
          dCMCdt <- nusc*pdeath_hc*ifr[,2]*HC+nu_icuc*pdeath_icuc*ifr[,2]*ICUC + nu_ventc*pdeath_ventc*ifr[,2]*VentC + nu_ventc*pdeath_ventc*ifr[,2]*ICUCV
-         mort*HC + mort*ICUC + mort*VentC + mort*ICUCV
+         mort*HC + mort*ICUC + mort*VentC + mort*ICUCV 
+         
          # return the rate of change
          list(c(dSdt,dEdt,dIdt,dRdt,dXdt,dHdt,dHCdt,dCdt,dCMdt,dVdt,dQSdt,dQEdt,dQIdt,dQRdt,dCLdt,dQCdt,dICUdt,dICUCdt,dICUCVdt,dVentdt,dVentCdt,dCMCdt))
        }
-  )
+  ) 
 }
 
 ###########    RUN BASELINE MODEL - start time for interventions is set to day 1e5, i.e. interventions are always off
 
 Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, initICUC, initICUCV, initVent, initVentC, initCMC) # initial conditions for the main solution vector
-# END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+# END Placeholder ----
 
-
+# START Placeholder for covidage_v13.6.R code (DO NOT EDIT) ----
 process_ode_outcome <- function(out){
-  # Start Bridge ----
   critH<-c()
   crit<-c()
   critV<-c()
-  # End Bridge ----
   
-  # START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0)
   KH<-parameters["beds_available"]
   KICU<- parameters["icu_beds_available"]+parameters["ventilators_available"]
@@ -539,7 +765,7 @@ process_ode_outcome <- function(out){
   fICU <- splinefun(x.ICU, f, method = "hyman")
   fVent<- splinefun(x.Vent, f, method = "hyman")
   for (i in 1:length(times)){
-    critH[i]<-min(1-fH(sum(out[i,(Hindex+1)]))+sum(out[i,(ICUCindex+1)])+sum(out[i,(ICUCVindex+1)])+(1-parameters["reporth"]),1)
+    critH[i]<-min(1-fH((sum(out[i,(Hindex+1)]))+sum(out[i,(ICUCindex+1)])+sum(out[i,(ICUCVindex+1)])),1)
     crit[i]<-min(1-fICU((sum(out[i,(ICUindex+1)]))+(sum(out[i,(Ventindex+1)]))+(sum(out[i,(VentCindex+1)]))))
     critV[i]<-min(1-fVent((sum(out[i,(Ventindex+1)]))),1)
   }
@@ -556,7 +782,8 @@ process_ode_outcome <- function(out){
     parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out[,(QEindex+1)]%*%(1-ihr[,2])+
     parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out[,(QEindex+1)]%*%(1-ihr[,2])
   
-  inc1h<- parameters["gamma"]*out[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])+
+  inc1h<- parameters["gamma"]*out[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])*parameters["reporth"]+
+    parameters["gamma"]*out[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])*(1-parameters["reporth"])+
     parameters["gamma"]*out[,(QEindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])+
     parameters["gamma"]*out[,(Eindex+1)]%*%ihr[,2]*critH*parameters["reporth"]*(1-parameters["prob_icu"])+
     parameters["gamma"]*out[,(QEindex+1)]%*%ihr[,2]*critH*parameters["reporth"]*(1-parameters["prob_icu"])+
@@ -565,14 +792,18 @@ process_ode_outcome <- function(out){
   
   dailyinc1<-rowSums(inc1)+rowSums(inc1h)      # daily incidence
   cuminc1<-colSums(inc1)+colSums(inc1h)        # cumulative incidence
-  previcureq1<-rowSums(out[,(Hindex+1)])+ rowSums(out[,(ICUCindex+1)])      # requirement for beds
-  previcureq21<-rowSums(out[,(ICUindex+1)])+rowSums(out[,(VentCindex+1)])    # requirement for icu
-  previcureq31<-rowSums(out[,(Ventindex+1)])   # requirement for icu
+  previcureq1<-rowSums(out[,(Hindex+1)])+ rowSums(out[,(ICUCindex+1)])+rowSums(out[,(ICUCVindex+1)]) # surge beds occupancy
+  previcureq21<-rowSums(out[,(ICUindex+1)])+rowSums(out[,(VentCindex+1)])   # icu beds occupancy
+  previcureq31<-rowSums(out[,(Ventindex+1)])   # ventilator occupancy
   cmortality1<-rowSums(out[,(CMindex+1)])      # cumulative mortality
   overloadH1<-rowSums(out[,(HCindex+1)])       # requirement for beds
-  overloadICU1<-rowSums(out[,(ICUCindex+1)])   # requirement for beds
-  overloadVent1<-rowSums(out[,(VentCindex+1)]) # requirement for beds
+  overloadICU1<-rowSums(out[,(ICUCindex+1)])   # requirement for icu beds
+  overloadICUV1<-rowSums(out[,(ICUCVindex+1)]) # requirement for ventilators
+  overloadVent1<-rowSums(out[,(VentCindex+1)]) # requirement for ventilators
   ccases1<-rowSums(out[,(Cindex+1)])           # cumulative cases
+  reqsurge1<-rowSums(out[,(Hindex+1)])+overloadH1
+  reqicu1<-rowSums(out[,(ICUindex+1)])+overloadICU1
+  reqvent1<-rowSums(out[,(Ventindex+1)])+overloadICUV1+overloadVent1
   
   inc_overloadH1<-((parameters["gamma"]*(1-parameters["prob_icu"])*out[,(Eindex+1)]))
   inc_overloadICU1<-((parameters["gamma"]*parameters["prob_icu"]*(1-parameters["prob_vent"])*out[,(Eindex+1)]))
@@ -582,9 +813,7 @@ process_ode_outcome <- function(out){
   }
   inc_overloadH1<-cumsum(rowSums(inc_overloadH1))
   inc_overloadICU1<-cumsum(rowSums(inc_overloadICU1))
-  # END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   
-  # START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   ##########################    CALCULATE MORTALITY 
   pdeath_hc<-parameters["pdeath_hc"]
   prob_icu<-parameters["prob_icu"]
@@ -597,12 +826,14 @@ process_ode_outcome <- function(out){
   cinc_mort_HC1 <- cumsum(rowSums(parameters["nusc"]*parameters["pdeath_hc"]*(out[,(HCindex+1)]%*%ifr[,2])))
   cinc_mort_ICU1 <- cumsum(rowSums(parameters["nu_icu"]*parameters["pdeath_icu"]*out[,(ICUindex+1)]%*%ifr[,2]))
   cinc_mort_ICUC1 <- cumsum(rowSums(parameters["nu_icuc"]*parameters["pdeath_icuc"]*out[,(ICUCindex+1)]%*%ifr[,2]))
+  cinc_mort_ICUCV1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out[,(ICUCVindex+1)]%*%ifr[,2]))
   cinc_mort_Vent1 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*out[,(Ventindex+1)]%*%ifr[,2]))
   cinc_mort_VentC1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out[,(VentCindex+1)]%*%ifr[,2]))
   base_mort_H1 <- cumsum(rowSums(out[,(Hindex+1)]%*%mort))
   base_mort_HC1 <- cumsum(rowSums(out[,(HCindex+1)]%*%mort))
   base_mort_ICU1 <- cumsum(rowSums(out[,(ICUindex+1)]%*%mort))
   base_mort_ICUC1 <- cumsum(rowSums(out[,(ICUCindex+1)]%*%mort))
+  base_mort_ICUCV1 <- cumsum(rowSums(out[,(ICUCVindex+1)]%*%mort))
   base_mort_Vent1 <- cumsum(rowSums(out[,(Ventindex+1)]%*%mort))
   base_mort_VentC1 <- cumsum(rowSums(out[,(VentCindex+1)]%*%mort))
   base_mort_S1 <- cumsum(rowSums(out[,(Sindex+1)]%*%mort))
@@ -616,12 +847,11 @@ process_ode_outcome <- function(out){
   base_mort_QC1 <- cumsum(rowSums(out[,(QCindex+1)]%*%mort))
   base_mort_QR1 <- cumsum(rowSums(out[,(QRindex+1)]%*%mort))
   base_mort_R1 <- cumsum(rowSums(out[,(Rindex+1)]%*%mort))
-  # END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   
   Rt <- NULL
   for (i in (ceiling(1/parameters["nui"])+1):length(times)){
-    Rt[i] <- cumsum(sum(parameters["gamma"]*out[i,(Eindex+1)]))/cumsum(sum(parameters["gamma"]*out[(i-1/parameters["nui"]),(Eindex+1)]))
-    if(Rt[i] >= 7) Rt[i] <- NA
+    Rt[i]<-cumsum(sum(parameters["gamma"]*out[i,(Eindex+1)]))/cumsum(sum(parameters["gamma"]*out[(i-1/parameters["nui"]),(Eindex+1)]))
+    if(Rt[i] >= 7) {Rt[i] <- NA}
   }
   
   # Export in a cohesive format ----
@@ -641,38 +871,57 @@ process_ode_outcome <- function(out){
   
   results$death_natural_non_exposed <- round(base_mort_S1)
   results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 + base_mort_QS1 + 
-                                           base_mort_QE1 + base_mort_QI1 + base_mort_QC1 + base_mort_QR1 + base_mort_R1)
+                                           base_mort_QE1 + base_mort_QI1 + base_mort_QC1 + base_mort_QR1 + base_mort_R1+
+                                           base_mort_H1+base_mort_HC1+base_mort_ICU1+base_mort_ICUC1+base_mort_ICUCV1+
+                                           base_mort_Vent1+base_mort_VentC1)
   results$death_treated_hospital <- round(cinc_mort_H1)
   results$death_treated_icu <- round(cinc_mort_ICU1)
   results$death_treated_ventilator <- round(cinc_mort_Vent1)
   results$death_untreated_hospital <- round(cinc_mort_HC1)
   results$death_untreated_icu <- round(cinc_mort_ICUC1)
-  results$death_untreated_ventilator <- round(cinc_mort_VentC1)
+  results$death_untreated_ventilator <- round(cinc_mort_VentC1)+round(cinc_mort_ICUCV1)
   results$total_deaths <- results$death_treated_hospital + results$death_treated_icu + results$death_treated_ventilator +
-    results$death_untreated_hospital + results$death_untreated_icu + results$death_untreated_ventilator
+    results$death_untreated_hospital + results$death_untreated_icu + results$death_untreated_ventilator+results$death_natural_non_exposed+results$death_natural_exposed
   results$total_deaths_end <- last(results$total_deaths)
   results$total_reported_deaths_end <- last(results$cum_mortality)
+  results$base_mort_H <- base_mort_H1
+  results$base_mort_HC <- base_mort_HC1
+  results$base_mort_ICU <- base_mort_ICU1
+  results$base_mort_ICUC <- base_mort_ICUC1
+  results$base_mort_ICUCV <- base_mort_ICUCV1
+  results$base_mort_Vent <- base_mort_Vent1
+  results$base_mort_VentC <- base_mort_VentC1
+  results$base_mort_S <- base_mort_S1
+  results$base_mort_E <- base_mort_E1
+  results$base_mort_I <- base_mort_I1
+  results$base_mort_CL <- base_mort_CL1
+  results$base_mort_X <- base_mort_X1
+  results$base_mort_QS <- base_mort_QS1
+  results$base_mort_QE <- base_mort_QE1
+  results$base_mort_QI <- base_mort_QI1
+  results$base_mort_QC <- base_mort_QC1
+  results$base_mort_QR <- base_mort_QR1
+  results$base_mort_R <- base_mort_R1
   
-  
-  # !!!! code re-using of variable names but with different str() !!! - request some cleaning
-  # START Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
   ## AGE DEPENDENT MORTALITY
   cinc_mort_H1 <- parameters["nus"]*parameters["pdeath_h"]*(out[,(Hindex+1)])
   cinc_mort_HC1 <- parameters["nusc"]*parameters["pdeath_hc"]*(out[,(HCindex+1)])
   cinc_mort_ICU1 <- parameters["nu_icu"]*parameters["pdeath_icu"]*out[,(ICUindex+1)]
   cinc_mort_ICUC1 <- parameters["nu_icuc"]*parameters["pdeath_icuc"]*out[,(ICUCindex+1)] 
+  cinc_mort_ICUCV1 <- parameters["nu_ventc"]*parameters["pdeath_ventc"]*out[,(ICUCVindex+1)]
   cinc_mort_Vent1 <- parameters["nu_vent"]*parameters["pdeath_vent"]*out[,(Ventindex+1)] 
   cinc_mort_VentC1 <- parameters["nu_ventc"]*parameters["pdeath_ventc"]*out[,(VentCindex+1)] 
-  totage1<-as.data.frame(cinc_mort_H1+cinc_mort_HC1+cinc_mort_ICU1+cinc_mort_ICUC1+cinc_mort_Vent1+cinc_mort_VentC1)
+  totage1<-as.data.frame(cinc_mort_H1+cinc_mort_HC1+cinc_mort_ICU1+cinc_mort_ICUC1+cinc_mort_ICUCV1+cinc_mort_Vent1+cinc_mort_VentC1)
   basemort_H1<-(out[,(Hindex+1)])
   basemort_HC1<-(out[,(HCindex+1)])
   basemort_ICU1<-(out[,(ICUindex+1)])
   basemort_ICUC1<-(out[,(ICUCindex+1)])
+  basemort_ICUCV1<-(out[,(ICUCVindex+1)])
   basemort_Vent1<-(out[,(Ventindex+1)])
   basemort_VentC1<-(out[,(VentCindex+1)])
-  totbase1<-as.data.frame(basemort_H1+basemort_HC1+basemort_ICU1+basemort_ICUC1+basemort_Vent1+basemort_VentC1)
+  totbase1<-as.data.frame(basemort_H1+basemort_HC1+basemort_ICU1+basemort_ICUC1+basemort_ICUCV1+basemort_Vent1+basemort_VentC1)
   tc<-c()
-  # END Placeholder for Ricardo/Lisa code (DO NOT EDIT) ----
+  
   for (i in 1:dim(cinc_mort_H1)[1]) {
     for (j in 1:dim(cinc_mort_H1)[2]) {
       tc<-rbind(tc,c(i, j, totage1[i,j]*ifr[j,2]+totbase1[i,j]*mort[j])) 
@@ -682,7 +931,7 @@ process_ode_outcome <- function(out){
   colnames(tc)<-c("Day","Age","value")
   
   results$tc <- tc %>%
-    mutate(Date = input$date_range[1] + Day,
+    mutate(Date = startdate + Day,
            age_cat = case_when(
              Age >=  1 & Age <= 6   ~ "≤ 30 y.o.",
              Age >  6 & Age <= 8    ~ "30-40 y.o.",
@@ -713,5 +962,8 @@ process_ode_outcome <- function(out){
   
   results$mortality_lag <- mortality_lag
   
+  
+  shiny_results <<- results
   return(results)
 }
+# END Placeholder ----

@@ -1,8 +1,8 @@
 Package: como
 Type: Package
 Title: CoMo COVID-19 App
-Version: 12.14
-Author: Olivier Celhay, Ricardo Aguas, Sai Thein Than Tun, Lisa J. White & CoMo Consortium  
+Version: 13.0
+Author: Olivier Celhay, Ricardo Aguas, Sai Thein Than Tun, Lisa J. White & CoMo Consortium
 Maintainer: Olivier Celhay <olivier.celhay@gmail.com>
 Description: Developed by the Covid-19 International Modelling Consortium (CoMo Consortium).
     This app allows to perform a model fit to the available data and 
@@ -11,7 +11,6 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends:
-    R (>= 3.6),
     bsplus, deSolve, DT, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
     reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinythemes, 
     shinyWidgets, tidyverse
