@@ -718,9 +718,6 @@ server <- function(input, output, session) {
     intv_vectors$date <- as.Date(intv_vectors$date)
     dta <- left_join(dta,intv_vectors, by="date")
     
-    print(dta)
-    shiny_dta <<- dta
-    
     return(dta)
   })
   
