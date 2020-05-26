@@ -2,26 +2,20 @@ fun_validation_interventions <- function(dta, all_possible_interventions = all_i
   validation <- list(validation_interventions = TRUE, 
                      message_interventions = NULL)
   
-  # Check input
-  if(!all(dta$intervention %in% all_possible_interventions)) {
-    validation$validation_interventions <- FALSE
-    validation$message_interventions <- paste0(validation$message_interventions, 
-                                               "Some intervention(s) are unrecognised. Needs resolution. ")
-  }
-  
-  if(any(dta$value < 0 | dta$value > 100)) {
-    validation$validation_interventions <- FALSE
-    validation$message_interventions <- paste0(validation$message_interventions, 
-                                               "Coverage value(s) not in-between 0 and 100. Needs resolution. ")
-  }
-  
+  # Test interventions date versus 
   if(any(dta$date_start < simul_start_date | dta$date_end > simul_end_date)) {
     validation$validation_interventions <- FALSE
     validation$message_interventions <- paste0(validation$message_interventions, 
-                                               "Some intervention(s) are outside the date range of simulation. Needs resolution. ")
+                                               "Some intervention(s) dates are outside the date range of simulation. Needs resolution. ")
   }
   
-  # Test if screening/quarantaine is selected outsdide of a period of self-isolation
+  if(any(dta$date_start == simul_start_date)) {
+    validation$validation_interventions <- FALSE
+    validation$message_interventions <- paste0(validation$message_interventions, 
+                                               "All intervention start dates should be after the simulation start date. Needs resolution. ")
+  }
+  
+  # Test if screening/quarantaine is selected outside of a period of self-isolation
   ref <- dta %>% filter(intervention == "Self-isolation if Symptomatic")
   dates_ref <- NULL
   if(nrow(ref) >= 1) {
@@ -49,7 +43,7 @@ fun_validation_interventions <- function(dta, all_possible_interventions = all_i
   }
   
   
-  # Test period overlap
+  # Test interventions date overlap
   test <- dta  %>%
     arrange(intervention, date_start, date_end) %>% 
     group_by(intervention) %>%
