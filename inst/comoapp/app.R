@@ -583,7 +583,9 @@ server <- function(input, output, session) {
     if(nb_interventions_baseline > 0) {
       for (i in 1:nb_interventions_baseline) {
         updateSelectInput(session, paste0("baseline_intervention_", i), selected = interventions_excel_baseline[[i, "intervention"]])
-        updateDateRangeInput(session, paste0("baseline_daterange_", i), start = interventions_excel_baseline[[i, "date_start"]], end = interventions_excel_baseline[[i, "date_end"]])
+        updateDateRangeInput(session, paste0("baseline_daterange_", i), 
+                             start = interventions_excel_baseline[[i, "date_start"]], 
+                             end = interventions_excel_baseline[[i, "date_end"]])
         updateSliderInput(session, paste0("baseline_coverage_", i), value = interventions_excel_baseline[[i, "value"]])
       }
     }
@@ -591,7 +593,9 @@ server <- function(input, output, session) {
     if(nb_interventions_future > 0) {
       for (i in 1:nb_interventions_future) {
         updateSelectInput(session, paste0("future_intervention_", i), selected = interventions_excel_future[[i, "intervention"]])
-        updateDateRangeInput(session, paste0("future_daterange_", i), start = interventions_excel_future[[i, "date_start"]], end = interventions_excel_future[[i, "date_end"]])
+        updateDateRangeInput(session, paste0("future_daterange_", i), 
+                             start = interventions_excel_future[[i, "date_start"]], 
+                             end = interventions_excel_future[[i, "date_end"]])
         updateSliderInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "value"]])
       }
     }

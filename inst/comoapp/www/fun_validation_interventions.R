@@ -2,17 +2,17 @@ fun_validation_interventions <- function(dta, all_possible_interventions = all_i
   validation <- list(validation_interventions = TRUE, 
                      message_interventions = NULL)
   
-  # Test interventions date versus 
-  if(any(dta$date_start < simul_start_date | dta$date_end > simul_end_date)) {
-    validation$validation_interventions <- FALSE
-    validation$message_interventions <- paste0(validation$message_interventions, 
-                                               "Some intervention(s) dates are outside the date range of simulation. Needs resolution. ")
-  }
-  
+  # Test interventions date versus date range
   if(any(dta$date_start == simul_start_date)) {
     validation$validation_interventions <- FALSE
     validation$message_interventions <- paste0(validation$message_interventions, 
-                                               "All intervention start dates should be after the simulation start date. Needs resolution. ")
+                                               "All intervention start dates should be at least a day after the simulation start date. Needs Resolution. ")
+  }
+  
+  if(any(dta$date_start < simul_start_date | dta$date_end > simul_end_date)) {
+    validation$validation_interventions <- FALSE
+    validation$message_interventions <- paste0(validation$message_interventions, 
+                                               "Some intervention(s) dates are outside the date range of simulation. Needs Resolution. ")
   }
   
   # Test if screening/quarantaine is selected outside of a period of self-isolation
@@ -48,7 +48,7 @@ fun_validation_interventions <- function(dta, all_possible_interventions = all_i
     arrange(intervention, date_start, date_end) %>% 
     group_by(intervention) %>%
     summarise(overlapping = any(date_start <= lag(date_end, 
-                                                 default = first(date_end)) & row_number() != 1))
+                                                  default = first(date_end)) & row_number() != 1))
   
   if(any(test$overlapping)) {
     validation$validation_interventions <- FALSE
