@@ -10,8 +10,7 @@ fun_validation_interventions <- function(dta, all_possible_interventions = all_i
   
   if(any(dta$date_start < simul_start_date | dta$date_end > simul_end_date)) {
     validation$message_interventions <- paste0(validation$message_interventions, 
-                                               "Please note that some intervention(s) date range are outside the date range of simulation. 
-                                               Days outside of the date range of simulation are ignored.")
+                                               "Please note that some intervention(s) date range are outside the date range of simulation. ")
   }
   
   # Test if screening/quarantaine is selected outside of a period of self-isolation
