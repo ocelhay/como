@@ -271,10 +271,10 @@ inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (C
   rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
 # END Bridge ----
 
-# START Placeholder for covidage_v13.6.R code (DO NOT EDIT) ----
+# START Placeholder for covidage_v13.8.R code (DO NOT EDIT) ----
 inputs<-function(inp, run){
   tb<-which(inp$`Apply to`==run)
-  # 
+  
   si<-intersect(which(inp$Intervention=="Self-isolation if Symptomatic"),tb)
   scr<-intersect(which(inp$Intervention=="Screening (when S.I.)"),tb)
   sd<-intersect(which(inp$Intervention=="Social Distancing"),tb)
@@ -301,9 +301,16 @@ inputs<-function(inp, run){
   if (length(si)>=1){
     for (i in 1:length(si)){
       f<-c(f,as.numeric(inp$`Date Start`[si[i]]-startdate),as.numeric(inp$`Date End`[si[i]]-startdate))
+      
       if(i==1){
-        si_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[si[i]],(f[i+1]-f[i])*20))
-        isolation<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        if (inp$`Date Start`[si[i]]>startdate){
+          si_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[si[i]],(f[i+1]-f[i])*20))
+          isolation<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          si_vector<-c(rep(inp$`Value`[si[i]],(f[i+1])*20))
+          isolation<-c(rep(1,(f[i+1])*20))
+        }
       }
       else{
         si_vector<-c(si_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
@@ -311,7 +318,7 @@ inputs<-function(inp, run){
         isolation<-c(isolation,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
         isolation<-c(isolation,rep(1,(f[i*2]-f[i*2-1])*20))
       }
-      if(i==length(si)){
+      if(i==length(si) && f[i*2]<tail(times,1)){
         si_vector<-c(si_vector,rep(0,(tail(times,1)-f[i*2])*20))
         isolation<-c(isolation,rep(0,(tail(times,1)-f[i*2])*20))
       }
@@ -326,10 +333,18 @@ inputs<-function(inp, run){
   distancing<-c()
   if (length(sd)>=1){
     for (i in 1:length(sd)){
+      
       f<-c(f,as.numeric(inp$`Date Start`[sd[i]]-startdate),as.numeric(inp$`Date End`[sd[i]]-startdate))
+      
       if(i==1){
-        sd_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[sd[i]],(f[i+1]-f[i])*20))
-        distancing<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        if (inp$`Date Start`[sd[i]]>startdate){
+          sd_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[sd[i]],(f[i+1]-f[i])*20))
+          distancing<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          sd_vector<-c(rep(inp$`Value`[sd[i]],(f[i+1])*20))
+          distancing<-c(rep(1,(f[i+1])*20))
+        }
       }
       else{
         sd_vector<-c(sd_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
@@ -337,7 +352,7 @@ inputs<-function(inp, run){
         distancing<-c(distancing,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
         distancing<-c(distancing,rep(1,(f[i*2]-f[i*2-1])*20))
       }
-      if(i==length(sd)){
+      if(i==length(sd)&& f[i*2]<tail(times,1)){
         sd_vector<-c(sd_vector,rep(0,(tail(times,1)-f[i*2])*20))
         distancing<-c(distancing,rep(0,(tail(times,1)-f[i*2])*20))
       }
@@ -352,10 +367,18 @@ inputs<-function(inp, run){
   screen<-c()
   if (length(scr)>=1){
     for (i in 1:length(scr)){
+      
       f<-c(f,as.numeric(inp$`Date Start`[scr[i]]-startdate),as.numeric(inp$`Date End`[scr[i]]-startdate))
+      
       if(i==1){
-        scr_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[scr[i]],(f[i+1]-f[i])*20))
-        screen<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        if (inp$`Date Start`[scr[i]]>startdate){
+          scr_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[scr[i]],(f[i+1]-f[i])*20))
+          screen<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          scr_vector<-c(rep(inp$`Value`[scr[i]],(f[i+1])*20))
+          screen<-c(rep(1,(f[i+1])*20))
+        }
       }
       else{
         scr_vector<-c(scr_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
@@ -363,7 +386,7 @@ inputs<-function(inp, run){
         screen<-c(screen,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
         screen<-c(screen,rep(1,(f[i*2]-f[i*2-1])*20))
       }
-      if(i==length(scr)){
+      if(i==length(scr)&& f[i*2]<tail(times,1)){
         scr_vector<-c(scr_vector,rep(0,(tail(times,1)-f[i*2])*20))
         screen<-c(screen,rep(0,(tail(times,1)-f[i*2])*20))
       }
@@ -378,10 +401,18 @@ inputs<-function(inp, run){
   handwash<-c()
   if (length(hw)>=1){
     for (i in 1:length(hw)){
+      
       f<-c(f,as.numeric(inp$`Date Start`[hw[i]]-startdate),as.numeric(inp$`Date End`[hw[i]]-startdate))
+      
       if(i==1){
-        hw_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[hw[i]],(f[i+1]-f[i])*20))
-        handwash<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        if (inp$`Date Start`[hw[i]]>startdate){
+          hw_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[hw[i]],(f[i+1]-f[i])*20))
+          handwash<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          hw_vector<-c(rep(inp$`Value`[hw[i]],(f[i+1])*20))
+          handwash<-c(rep(1,(f[i+1])*20))
+        }
       }
       else{
         hw_vector<-c(hw_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
@@ -389,7 +420,7 @@ inputs<-function(inp, run){
         handwash<-c(handwash,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
         handwash<-c(handwash,rep(1,(f[i*2]-f[i*2-1])*20))
       }
-      if(i==length(hw)){
+      if(i==length(hw)&& f[i*2]<tail(times,1)){
         hw_vector<-c(hw_vector,rep(0,(tail(times,1)-f[i*2])*20))
         handwash<-c(handwash,rep(0,(tail(times,1)-f[i*2])*20))
       }
@@ -404,10 +435,18 @@ inputs<-function(inp, run){
   workhome<-c()
   if (length(wah)>=1){
     for (i in 1:length(wah)){
+      
       f<-c(f,as.numeric(inp$`Date Start`[wah[i]]-startdate),as.numeric(inp$`Date End`[wah[i]]-startdate))
+      
       if(i==1){
-        wah_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[wah[i]],(f[i+1]-f[i])*20))
-        workhome<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        if (inp$`Date Start`[wah[i]]>startdate){
+          wah_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[wah[i]],(f[i+1]-f[i])*20))
+          workhome<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          wah_vector<-c(rep(inp$`Value`[wah[i]],(f[i+1])*20))
+          workhome<-c(rep(1,(f[i+1])*20))
+        }
       }
       else{
         wah_vector<-c(wah_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
@@ -415,7 +454,7 @@ inputs<-function(inp, run){
         workhome<-c(workhome,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
         workhome<-c(workhome,rep(1,(f[i*2]-f[i*2-1])*20))
       }
-      if(i==length(wah)){
+      if(i==length(wah)&& f[i*2]<tail(times,1)){
         wah_vector<-c(wah_vector,rep(0,(tail(times,1)-f[i*2])*20))
         workhome<-c(workhome,rep(0,(tail(times,1)-f[i*2])*20))
       }
@@ -430,10 +469,18 @@ inputs<-function(inp, run){
   schoolclose<-c()
   if (length(sc)>=1){
     for (i in 1:length(sc)){
+      
       f<-c(f,as.numeric(inp$`Date Start`[sc[i]]-startdate),as.numeric(inp$`Date End`[sc[i]]-startdate))
+      
       if(i==1){
-        sc_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[sc[i]],(f[i+1]-f[i])*20))
-        schoolclose<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        if (inp$`Date Start`[sc[i]]>startdate){
+          sc_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[sc[i]],(f[i+1]-f[i])*20))
+          schoolclose<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          sc_vector<-c(rep(inp$`Value`[sc[i]],(f[i+1])*20))
+          schoolclose<-c(rep(1,(f[i+1])*20))
+        }
       }
       else{
         sc_vector<-c(sc_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
@@ -441,7 +488,7 @@ inputs<-function(inp, run){
         schoolclose<-c(schoolclose,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
         schoolclose<-c(schoolclose,rep(1,(f[i*2]-f[i*2-1])*20))
       }
-      if(i==length(sc)){
+      if(i==length(sc)&& f[i*2]<tail(times,1)){
         sc_vector<-c(sc_vector,rep(0,(tail(times,1)-f[i*2])*20))
         schoolclose<-c(schoolclose,rep(0,(tail(times,1)-f[i*2])*20))
       }
@@ -456,10 +503,18 @@ inputs<-function(inp, run){
   cocoon<-c()
   if (length(cte)>=1){
     for (i in 1:length(cte)){
+      
       f<-c(f,as.numeric(inp$`Date Start`[cte[i]]-startdate),as.numeric(inp$`Date End`[cte[i]]-startdate))
+      
       if(i==1){
-        cte_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[cte[i]],(f[i+1]-f[i])*20))
-        cocoon<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        if (inp$`Date Start`[cte[i]]>startdate){
+          cte_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[cte[i]],(f[i+1]-f[i])*20))
+          cocoon<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          cte_vector<-c(rep(inp$`Value`[cte[i]],(f[i+1])*20))
+          cocoon<-c(rep(1,(f[i+1])*20))
+        }
       }
       else{
         cte_vector<-c(cte_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
@@ -467,7 +522,7 @@ inputs<-function(inp, run){
         cocoon<-c(cocoon,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
         cocoon<-c(cocoon,rep(1,(f[i*2]-f[i*2-1])*20))
       }
-      if(i==length(cte)){
+      if(i==length(cte)&& f[i*2]<tail(times,1)){
         cte_vector<-c(cte_vector,rep(0,(tail(times,1)-f[i*2])*20))
         cocoon<-c(cocoon,rep(0,(tail(times,1)-f[i*2])*20))
       }
@@ -482,10 +537,18 @@ inputs<-function(inp, run){
   quarantine<-c()
   if (length(q)>=1){
     for (i in 1:length(q)){
+      
       f<-c(f,as.numeric(inp$`Date Start`[q[i]]-startdate),as.numeric(inp$`Date End`[q[i]]-startdate))
+      
       if(i==1){
-        q_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[q[i]],(f[i+1]-f[i])*20))
-        quarantine<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        if (inp$`Date Start`[q[i]]>startdate){
+          q_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[q[i]],(f[i+1]-f[i])*20))
+          quarantine<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          q_vector<-c(rep(inp$`Value`[q[i]],(f[i+1])*20))
+          quarantine<-c(rep(1,(f[i+1])*20))
+        }
       }
       else{
         q_vector<-c(q_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
@@ -493,7 +556,7 @@ inputs<-function(inp, run){
         quarantine<-c(quarantine,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
         quarantine<-c(quarantine,rep(1,(f[i*2]-f[i*2-1])*20))
       }
-      if(i==length(q)){
+      if(i==length(q)&& f[i*2]<tail(times,1)){
         q_vector<-c(q_vector,rep(0,(tail(times,1)-f[i*2])*20))
         quarantine<-c(quarantine,rep(0,(tail(times,1)-f[i*2])*20))
       }
@@ -508,10 +571,18 @@ inputs<-function(inp, run){
   travelban<-c()
   if (length(tb)>=1){
     for (i in 1:length(tb)){
+      
       f<-c(f,as.numeric(inp$`Date Start`[tb[i]]-startdate),as.numeric(inp$`Date End`[tb[i]]-startdate))
+      
       if(i==1){
-        tb_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[tb[i]],(f[i+1]-f[i])*20))
-        travelban<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        if (inp$`Date Start`[tb[i]]>startdate){
+          tb_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[tb[i]],(f[i+1]-f[i])*20))
+          travelban<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          tb_vector<-c(rep(inp$`Value`[tb[i]],(f[i+1])*20))
+          travelban<-c(rep(1,(f[i+1])*20))
+        }
       }
       else{
         tb_vector<-c(tb_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
@@ -519,7 +590,7 @@ inputs<-function(inp, run){
         travelban<-c(travelban,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
         travelban<-c(travelban,rep(1,(f[i*2]-f[i*2-1])*20))
       }
-      if(i==length(tb)){
+      if(i==length(tb)&& f[i*2]<tail(times,1)){
         tb_vector<-c(tb_vector,rep(0,(tail(times,1)-f[i*2])*20))
         travelban<-c(travelban,rep(0,(tail(times,1)-f[i*2])*20))
       }
@@ -534,10 +605,18 @@ inputs<-function(inp, run){
   vaccine<-c()
   if (length(vc)>=1){
     for (i in 1:length(vc)){
+      
       f<-c(f,as.numeric(inp$`Date Start`[vc[i]]-startdate),as.numeric(inp$`Date End`[vc[i]]-startdate))
+      
       if(i==1){
-        vc_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[vc[i]],(f[i+1]-f[i])*20))
-        vaccine<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        if (inp$`Date Start`[vc[i]]>startdate){
+          vc_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[vc[i]],(f[i+1]-f[i])*20))
+          vaccine<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          vc_vector<-c(rep(inp$`Value`[vc[i]],(f[i+1])*20))
+          vaccine<-c(rep(1,(f[i+1])*20))
+        }
       }
       else{
         vc_vector<-c(vc_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
@@ -545,7 +624,7 @@ inputs<-function(inp, run){
         vaccine<-c(vaccine,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
         vaccine<-c(vaccine,rep(1,(f[i*2]-f[i*2-1])*20))
       }
-      if(i==length(vc)){
+      if(i==length(vc)&& f[i*2]<tail(times,1)){
         vc_vector<-c(vc_vector,rep(0,(tail(times,1)-f[i*2])*20))
         vaccine<-c(vaccine,rep(0,(tail(times,1)-f[i*2])*20))
       }
