@@ -271,8 +271,11 @@ inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (C
   rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
 # END Bridge ----
 
-# START Placeholder for covidage_v13.8.R code (DO NOT EDIT) ----
+# START Placeholder for covidage_v13.9.R code (DO NOT EDIT) ----
 inputs<-function(inp, run){
+  # cap intervention end dates with simulation end date
+  inp$`Date End` = pmin(stopdate, inp$`Date End`)
+  
   tb<-which(inp$`Apply to`==run)
   
   si<-intersect(which(inp$Intervention=="Self-isolation if Symptomatic"),tb)
