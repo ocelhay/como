@@ -16,13 +16,19 @@ output$highchart_deaths_dual_baseline <- renderHighchart({
   if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
   if(input$focus_natural_death == "No Focus"){
-    max_y <- max(simul_baseline$results$total_deaths + simul_baseline$results$death_natural_non_exposed + simul_baseline$results$death_natural_exposed, 
-                 simul_interventions$results$total_deaths + simul_interventions$results$death_natural_non_exposed + simul_interventions$results$death_natural_exposed)
+    max_y <- max(simul_baseline$results$total_deaths, 
+                 simul_interventions$results$total_deaths)
   }
   
   if(input$focus_natural_death == "COVID-19 Deaths"){
-    max_y <- max(simul_baseline$results$total_deaths, 
-                 simul_interventions$results$total_deaths)
+    max_y <- max(simul_baseline$results$death_treated_icu + simul_baseline$results$death_treated_ventilator + 
+                   simul_baseline$results$death_treated_hospital +  simul_baseline$results$death_untreated_hospital + 
+                   simul_baseline$results$death_untreated_icu + simul_baseline$results$death_untreated_ventilator,
+                 
+                 
+                   simul_interventions$results$death_treated_icu + simul_interventions$results$death_treated_ventilator + 
+                   simul_interventions$results$death_treated_hospital +  simul_interventions$results$death_untreated_hospital + 
+                   simul_interventions$results$death_untreated_icu + simul_interventions$results$death_untreated_ventilator)
   }
   
   hchart(dta, type = "area", name = "Natural Death, Non Exposed", color = "#636363", hcaes(x = time, y = death_natural_non_exposed)) %>%
@@ -61,13 +67,19 @@ output$highchart_deaths_dual_interventions <- renderHighchart({
   if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
   if(input$focus_natural_death == "No Focus"){
-    max_y <- max(simul_baseline$results$total_deaths + simul_baseline$results$death_natural_non_exposed + simul_baseline$results$death_natural_exposed, 
-                 simul_interventions$results$total_deaths + simul_interventions$results$death_natural_non_exposed + simul_interventions$results$death_natural_exposed)
+    max_y <- max(simul_baseline$results$total_deaths, 
+                 simul_interventions$results$total_deaths)
   }
   
   if(input$focus_natural_death == "COVID-19 Deaths"){
-    max_y <- max(simul_baseline$results$total_deaths, 
-                 simul_interventions$results$total_deaths)
+    max_y <- max(simul_baseline$results$death_treated_icu + simul_baseline$results$death_treated_ventilator + 
+                   simul_baseline$results$death_treated_hospital +  simul_baseline$results$death_untreated_hospital + 
+                   simul_baseline$results$death_untreated_icu + simul_baseline$results$death_untreated_ventilator,
+                 
+                 
+                 simul_interventions$results$death_treated_icu + simul_interventions$results$death_treated_ventilator + 
+                   simul_interventions$results$death_treated_hospital +  simul_interventions$results$death_untreated_hospital + 
+                   simul_interventions$results$death_untreated_icu + simul_interventions$results$death_untreated_ventilator)
   }
   
   hchart(dta, type = "area", name = "Natural Death, Non Exposed", color = "#636363", hcaes(x = time, y = death_natural_non_exposed)) %>%
