@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v13.4"
+version_app <- "v13.5"
 
 # Load packages and data
 source("./www/source_on_inception.R")
@@ -673,11 +673,14 @@ server <- function(input, output, session) {
   results_aggregated <- reactive({
     dta_baseline <- tibble(
       date = simul_baseline$results$time,
-      baseline_daily_incidence = simul_baseline$results$daily_incidence,
-      baseline_daily_total_cases = simul_baseline$results$daily_total_cases,
+      baseline_predicted_reported = simul_baseline$results$daily_incidence,
+      baseline_predicted_reported_and_unreported = simul_baseline$results$daily_total_cases,
       baseline_normal_bed_occupancy = simul_baseline$results$required_beds,
       baseline_icu_bed_occupancy = simul_baseline$results$icu_beds,
       baseline_icu_ventilator_occupancy = simul_baseline$results$ventilators,
+      baseline_normal_bed_requirement = simul_baseline$results$normal_bed_requirement,
+      baseline_icu_bed_requirement = simul_baseline$results$icu_bed_requirement,
+      baseline_icu_ventilator_requirement = simul_baseline$results$icu_ventilator_requirement,
       baseline_death_natural_non_exposed = simul_baseline$results$death_natural_non_exposed,
       baseline_death_natural_exposed = simul_baseline$results$death_natural_exposed,
       baseline_death_treated_hospital = simul_baseline$results$death_treated_hospital,
@@ -696,11 +699,14 @@ server <- function(input, output, session) {
     
     dta_interventions <- tibble(
       date = simul_interventions$results$time,
-      hypothetical_daily_incidence = simul_interventions$results$daily_incidence,
-      hypothetical_daily_total_cases = simul_interventions$results$daily_total_cases,
+      hypothetical_predicted_reported = simul_interventions$results$daily_incidence,
+      hypothetical_predicted_reported_and_unreported = simul_interventions$results$daily_total_cases,
       hypothetical_normal_bed_occupancy = simul_interventions$results$required_beds,
       hypothetical_icu_bed_occupancy = simul_interventions$results$icu_beds,
       hypothetical_icu_ventilator_occupancy = simul_interventions$results$ventilators,
+      hypothetical_normal_bed_requirement = simul_interventions$results$normal_bed_requirement,
+      hypothetical_icu_bed_requirement = simul_interventions$results$icu_bed_requirement,
+      hypothetical_icu_ventilator_requirement = simul_interventions$results$icu_ventilator_requirement,
       hypothetical_death_natural_non_exposed = simul_interventions$results$death_natural_non_exposed,
       hypothetical_death_natural_exposed = simul_interventions$results$death_natural_exposed,
       hypothetical_death_treated_hospital = simul_interventions$results$death_treated_hospital,

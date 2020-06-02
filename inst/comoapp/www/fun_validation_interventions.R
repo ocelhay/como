@@ -3,11 +3,6 @@ fun_validation_interventions <- function(dta, all_possible_interventions = all_i
                      message_interventions = NULL)
   
   # Test interventions date versus date range
-  # if(any(dta$date_start == simul_start_date)) {
-  #   validation$message_interventions <- paste0(validation$message_interventions, 
-  #                                              "Please note that some intervention(s) start dates are on the same day as the simulation start date. ")
-  # }
-  
   if(any(dta$date_start < simul_start_date | dta$date_end > simul_end_date)) {
     validation$message_interventions <- paste0(validation$message_interventions, 
                                                "Please note that some intervention(s) date range are outside the date range of simulation. ")
