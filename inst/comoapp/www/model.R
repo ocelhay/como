@@ -950,6 +950,9 @@ process_ode_outcome <- function(out){
   results$hospital_surge_beds <- round(previcureq1)
   results$icu_beds <- round(previcureq21)
   results$ventilators <- round(previcureq31)
+  results$normal_bed_requirement <- round(reqsurge1) #real required beds. previcureq1 above is the occupancy
+  results$icu_bed_requirement <- round(reqicu1)
+  results$icu_ventilator_requirement <- round(reqvent1)
   
   results$death_natural_non_exposed <- round(base_mort_S1)
   results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 + base_mort_QS1 + 
