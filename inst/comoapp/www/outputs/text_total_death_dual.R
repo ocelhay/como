@@ -1,7 +1,7 @@
 output$text_total_death_baseline <- renderText({
   req(simul_baseline$baseline_available)
   
-  n <- simul_baseline$results$total_deaths_end
+  n <- simul_baseline$results$attributable_deaths_end
   
   return(
     paste0(
@@ -15,7 +15,7 @@ output$text_total_death_baseline <- renderText({
 output$text_total_death_baseline_dup <- renderText({
   req(simul_baseline$baseline_available)
   
-  n <- simul_baseline$results$total_deaths_end
+  n <- simul_baseline$results$attributable_deaths_end
   
   return(
     paste0(
@@ -58,8 +58,8 @@ output$text_reported_death_baseline_dup <- renderText({
 output$text_total_death_interventions <- renderText({
   req(simul_interventions$interventions_available)
   
-  n <- simul_interventions$results$total_deaths_end
-  reduction <- n - simul_baseline$results$total_deaths_end
+  n <- simul_interventions$results$attributable_deaths_end
+  reduction <- n - simul_baseline$results$attributable_deaths_end
   
   return(
     paste0(
