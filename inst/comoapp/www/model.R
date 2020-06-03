@@ -965,8 +965,10 @@ process_ode_outcome <- function(out){
   results$death_untreated_hospital <- round(cinc_mort_HC1)
   results$death_untreated_icu <- round(cinc_mort_ICUC1)
   results$death_untreated_ventilator <- round(cinc_mort_VentC1)+round(cinc_mort_ICUCV1)
-  results$total_deaths <- results$death_treated_hospital + results$death_treated_icu + results$death_treated_ventilator +
-    results$death_untreated_hospital + results$death_untreated_icu + results$death_untreated_ventilator+results$death_natural_non_exposed+results$death_natural_exposed
+  results$attributable_deaths <- results$death_treated_hospital + results$death_treated_icu + results$death_treated_ventilator +
+    results$death_untreated_hospital + results$death_untreated_icu + results$death_untreated_ventilator
+  results$attributable_deaths_end <- last(results$attributable_deaths)
+  results$total_deaths <- results$attributable_deaths + results$death_natural_non_exposed + results$death_natural_exposed
   results$total_deaths_end <- last(results$total_deaths)
   results$total_reported_deaths_end <- last(results$cum_mortality)
   results$base_mort_H <- base_mort_H1
