@@ -9,7 +9,7 @@ list(
                    sliderInput("rhos", label = "Relative percentage of regular daily contacts when hospitalised:", post = "%", ticks = FALSE,
                                value = 15, min = 0, max = 100, step = 1),
                    sliderInput("ihr_scaling", label = "Scaling factor for infection hospitalisation rate:", ticks = FALSE,
-                               value = 1, min = 0.5, max = 4, step = 0.5)
+                               value = 1, min = 0.5, max = 4, step = 0.1)
             ),
             column(4,
                    sliderInput("pdeath_h", label = "Probability of dying when hospitalised:", value = 35, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
