@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v13.5"
+version_app <- "v13.6"
 
 # Load packages and data
 source("./www/source_on_inception.R")
