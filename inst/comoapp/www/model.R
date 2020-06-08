@@ -832,22 +832,12 @@ covid<-function(t, Y, parameters,input)
 Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, initICUC, initICUCV, initVent, initVentC, initCMC) # initial conditions for the main solution vector
 # END Placeholder ----
 
-# START Placeholder for covidage_v13.6.R code (DO NOT EDIT) ----
+# START Placeholder for covidage_v13.13.R code (DO NOT EDIT) ----
 process_ode_outcome <- function(out){
   critH<-c()
   crit<-c()
   critV<-c()
   
-  f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0)
-  KH<-parameters["beds_available"]
-  KICU<- parameters["icu_beds_available"]+parameters["ventilators_available"]
-  Kvent<- parameters["ventilators_available"]
-  x.H <- c(0,(1+parameters["give"])*KH/2,(3-parameters["give"])*KH/2,2*KH)
-  x.ICU <- c(0,(1+parameters["give"])*KICU/2,(3-parameters["give"])*KICU/2,2*KICU)
-  x.Vent <- c(0,(1+parameters["give"])*Kvent/2,(3-parameters["give"])*Kvent/2,2*Kvent)
-  fH <- splinefun(x.H, f, method = "hyman")
-  fICU <- splinefun(x.ICU, f, method = "hyman")
-  fVent<- splinefun(x.Vent, f, method = "hyman")
   for (i in 1:length(times)){
     critH[i]<-min(1-fH((sum(out[i,(Hindex+1)]))+sum(out[i,(ICUCindex+1)])+sum(out[i,(ICUCVindex+1)])),1)
     crit[i]<-min(1-fICU((sum(out[i,(ICUindex+1)]))+(sum(out[i,(Ventindex+1)]))+(sum(out[i,(VentCindex+1)]))))
