@@ -271,7 +271,7 @@ inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (C
   rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
 # END Bridge ----
 
-# START Placeholder for covidage_v13.9.R code (DO NOT EDIT) ----
+# START Placeholder for covidage_v13.12.R code (DO NOT EDIT) ----
 inputs<-function(inp, run){
   # cap intervention end dates with simulation end date
   inp$`Date End` = pmin(stopdate, inp$`Date End`)
@@ -645,6 +645,16 @@ inputs<-function(inp, run){
 vectors<<-inputs(inp,'Hypothetical Scenario')
 vectors0<<-inputs(inp,'Baseline (Calibration)')
 
+f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0)
+KH<-parameters["beds_available"]
+KICU<- parameters["icu_beds_available"]+parameters["ventilators_available"]
+Kvent<- parameters["ventilators_available"]
+x.H <- c(0,(1+parameters["give"])*KH/2,(3-parameters["give"])*KH/2,2*KH)
+x.ICU <- c(0,(1+parameters["give"])*KICU/2,(3-parameters["give"])*KICU/2,2*KICU)
+x.Vent <- c(0,(1+parameters["give"])*Kvent/2,(3-parameters["give"])*Kvent/2,2*Kvent)
+fH <- splinefun(x.H, f, method = "hyman")
+fICU <- splinefun(x.ICU, f, method = "hyman")
+fVent<- splinefun(x.Vent, f, method = "hyman")
 
 # set up a function to solve the equations
 covid<-function(t, Y, parameters,input) 
@@ -674,18 +684,9 @@ covid<-function(t, Y, parameters,input)
          VentC <- Y[VentCindex]
          CMC <- Y[CMCindex]
          P <- (S+E+I+R+X+V+H+HC+QS+QE+QI+QR+CL+QC+ICU+ICUC+ICUCV+Vent+VentC)
+         Q <- (sum(QS)+sum(QE)+sum(QI)+sum(QC)+sum(QR))/sum(P)
          
          # health system performance
-         f <- c(1,(1+give)/2,(1-give)/2,0)
-         KH<-beds_available
-         KICU<- icu_beds_available+ventilators_available
-         Kvent<- ventilators_available
-         x.H <- c(0,(1+give)*KH/2,(3-give)*KH/2,2*KH)
-         x.ICU <- c(0,(1+give)*KICU/2,(3-give)*KICU/2,2*KICU)
-         x.Vent <- c(0,(1+give)*Kvent/2,(3-give)*Kvent/2,2*Kvent)
-         fH <- splinefun(x.H, f, method = "hyman")
-         fICU <- splinefun(x.ICU, f, method = "hyman")
-         fVent<- splinefun(x.Vent, f, method = "hyman")
          critH<-min(1-fH(sum(H)+sum(ICUC)+sum(ICUCV)),1)
          crit<-min(1-fICU(sum(ICU)+sum(Vent)+sum(VentC)),1)
          critV<-min(1-fVent(sum(Vent)),1)
@@ -751,7 +752,8 @@ covid<-function(t, Y, parameters,input)
            trvban_eff<-travelban_eff
          }
          if(quarantine){
-           quarantine_rate<-min(sum((I+CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC)*(household_size-1)/P),1)*quarantine_cov*quarantine_effort
+           rate_q<-min((min(sum((I+CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC))*(household_size-1)/sum(P),1)*quarantine_effort),quarantine_cov/2)
+           quarantine_rate<-rate_q/(1+exp(-10*(quarantine_cov/2-Q)))
          }
          
          
@@ -790,7 +792,7 @@ covid<-function(t, Y, parameters,input)
          dSdt <- -S*lam-S*vaccinate+omega*R+ageing%*%S-mort*S+birth-quarantine_rate*S +(1/quarantine_days)*QS
          dEdt <- S*lam-gamma*E+ageing%*%E-mort*E + (1-vaccine_eff)*lam*V-quarantine_rate*E+(1/quarantine_days)*QE
          dIdt <- gamma*(1-pclin)*(1-screen_eff)*(1-ihr[,2])*E-nui*I+ageing%*%I-mort*I + (1/quarantine_days)*QI - quarantine_rate*I
-         dCLdt<- gamma*pclin*(1-selfis)*(1-ihr[,2])*E-nui*CL+ageing%*%CL-mort*CL + (1/quarantine_days)*QC
+         dCLdt<- gamma*pclin*(1-selfis)*(1-ihr[,2])*(1-quarantine_rate)*E-nui*CL+ageing%*%CL-mort*CL + (1/quarantine_days)*QC
          dRdt <- nui*I-omega*R+nui*X+nui*CL+ageing%*%R-mort*R + (1/quarantine_days)*QR + nus*(1-pdeath_h*ifr[,2])*H + (1-pdeath_icu*ifr[,2])*nu_icu*ICU + (1-pdeath_icuc*ifr[,2])*nu_icuc*ICUC + (1-pdeath_ventc*ifr[,2])*nu_ventc*ICUCV + (1-pdeath_hc*ifr[,2])*nusc*HC + (1-pdeath_vent*ifr[,2])*nu_vent*Vent+ (1-pdeath_ventc*ifr[,2])*nu_ventc*VentC
          dXdt <- gamma*selfis*pclin*(1-ihr[,2])*E+gamma*(1-pclin)*screen_eff*(1-ihr[,2])*E-nui*X+ageing%*%X-mort*X 
          dVdt <- vaccinate*S -(1-vaccine_eff)*lam*V +ageing%*%V - mort*V
@@ -798,7 +800,7 @@ covid<-function(t, Y, parameters,input)
          dQSdt <- quarantine_rate*S+ ageing%*%QS-mort*QS - (1/quarantine_days)*QS - lamq*QS
          dQEdt <- quarantine_rate*E - gamma*QE + ageing%*%QE-mort*QE - (1/quarantine_days)*QE + lamq*QS 
          dQIdt <- quarantine_rate*I + gamma*(1-ihr[,2])*(1-pclin)*QE-nui*QI+ageing%*%QI-mort*QI - (1/quarantine_days)*QI
-         dQCdt <- gamma*(1-ihr[,2])*pclin*QE-nui*QC+ageing%*%QC-mort*QC - (1/quarantine_days)*QC
+         dQCdt <- gamma*pclin*(1-selfis)*(1-ihr[,2])*quarantine_rate*E+gamma*(1-ihr[,2])*pclin*QE-nui*QC+ageing%*%QC-mort*QC - (1/quarantine_days)*QC
          dQRdt <- nui*QI+nui*QC+ageing%*%QR-mort*QR - (1/quarantine_days)*QR
          
          dHdt <- gamma*ihr[,2]*(1-prob_icu)*(1-critH)*reporth*E + gamma*ihr[,2]*(1-prob_icu)*(1-critH)*QE - nus*H + ageing%*%H-mort*H  
@@ -814,7 +816,7 @@ covid<-function(t, Y, parameters,input)
          dCdt <- report*gamma*(1-pclin)*(1-ihr[,2])*(E+QE)+reportc*gamma*pclin*(1-ihr[,2])*(E+QE)+ 
            gamma*ihr[,2]*(1-critH)*(1-prob_icu)*(E+QE)+gamma*ihr[,2]*critH*reporth*(1-prob_icu)*(E+QE)+
            gamma*ihr[,2]*prob_icu*(E+QE)
-         dCMdt<- nus*pdeath_h*ifr[,2]*H + nusc*pdeath_hc*ifr[,2]*HC + nu_icu*pdeath_icu*ifr[,2]*ICU +nu_icuc*pdeath_icuc*ifr[,2]*ICUC +nu_vent*pdeath_vent*ifr[,2]*Vent +nu_ventc*pdeath_ventc*ifr[,2]*VentC +nu_ventc*pdeath_ventc*ifr[,2]*ICUCV+ 
+         dCMCdt <- nusc*pdeath_hc*ifr[,2]*HC+nu_icuc*pdeath_icuc*ifr[,2]*ICUC + nu_ventc*pdeath_ventc*ifr[,2]*VentC + nu_ventc*pdeath_ventc*ifr[,2]*ICUCV+
            mort*H + mort*HC + mort*ICU + mort*ICUC + mort*ICUCV + mort*Vent + mort*VentC 
          dCMCdt <- nusc*pdeath_hc*ifr[,2]*HC+nu_icuc*pdeath_icuc*ifr[,2]*ICUC + nu_ventc*pdeath_ventc*ifr[,2]*VentC + nu_ventc*pdeath_ventc*ifr[,2]*ICUCV
          mort*HC + mort*ICUC + mort*VentC + mort*ICUCV 
