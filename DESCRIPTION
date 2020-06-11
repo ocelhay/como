@@ -14,6 +14,5 @@ Depends:
     bsplus, comoOdeCpp, deSolve, DT, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
     reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinyjs,
     shinythemes, shinyWidgets, tidyverse
-Remotes: hadley/testthat,
-    ocelhay/comoOdeCpp
+Remotes: ocelhay/comoOdeCpp
 RoxygenNote: 7.1.0
