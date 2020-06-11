@@ -1,4 +1,5 @@
 library(bsplus)
+library(comoOdeCpp)
 library(deSolve)
 library(DT)
 library(highcharter)
