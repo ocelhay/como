@@ -11,7 +11,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends:
-    bsplus, deSolve, DT, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
+    bsplus, comoOdeCpp, deSolve, DT, highcharter, lubridate, pushbar, RColorBrewer, readxl, 
     reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinyjs,
     shinythemes, shinyWidgets, tidyverse
 Remotes: ocelhay/comoOdeCpp
