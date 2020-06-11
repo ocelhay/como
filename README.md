@@ -40,6 +40,8 @@ The [App is online](https://comomodel.net) but can also be run locally. Follow t
 ### Install Offline App
 
 - [Download and install R](https://cran.r-project.org) (any version above 3.6.1)
+- On macOS, follow [these instructions](https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/) to setup the macOS toolchain for compiling C++ code.
+- If prompted, install Rtools.
 - Open R and run in the console: `install.packages("remotes")`
 - Run: `remotes::install_github("ocelhay/como", upgrade = "never")`
 - Close and reopen R.
