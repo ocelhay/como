@@ -44,15 +44,13 @@ The App can also be run locally. Follow the instructions below to install, updat
 ### Installation
 
 - [Download and install R](https://cran.r-project.org) (any version above 3.6.1)
-- Install a C/C++ compiler
-
-In order for the C++ code to compile and this new version to work, one should have a C/C++ compiler. To install one follow these steps: 
+- Install a C/C++ compiler:
 
 (A) on Windows
 
 - check your version of by typing `R.Version()$version.string` in your console
-- if your R version is `3.6.x`, install [this version](https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe).
-- if your R version is `4.0` and up, install [this version](https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe)
+- if your R version is `3.6.x`, install [this version of Rtools.](https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe).
+- if your R version is `4.0` and up, install [this version of Rtools.](https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe)
 - Run the installer, you can accept the defaults throughout.
 - Restart your machine
 
@@ -62,7 +60,7 @@ In order for the C++ code to compile and this new version to work, one should ha
 - Install [XCode 11 from the Mac App Store.](https://developer.apple.com/xcode/resources/).
 - check your macOS version (From the Apple menu  in the corner of your screen, choose About This Mac. You'll see the macOS name, such as macOS Mojave, followed by its version number.)
 - Go to https://github.com/fxcoudert/gfortran-for-macOS/releases, identify your macOS version, click on the corresponding **> Assets** in the page and download the .dmg (e.g. gfortran-8.2-Mojave.dmg)
-- Install the .dmg and restart your machine
+- Run the installer and restart your machine
 
 Once the C/C++ compiler has been installed:
 
