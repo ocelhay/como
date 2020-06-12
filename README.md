@@ -59,8 +59,8 @@ In order for the C++ code to compile and this new version to work, one should ha
 - check your macOS version (From the Apple menu  in the corner of your screen, choose About This Mac. You'll see the macOS name, such as macOS Mojave, followed by its version number.)
 - Go to https://github.com/fxcoudert/gfortran-for-macOS/releases, identify your macOS version, click on the corresponding **> Assets** in the page and download the .dmg (e.g. gfortran-8.2-Mojave.dmg)
 - Install the .dmg and restart your machine
-- Follow the instructions to update the `como` package as per usual (see below)
 
+Once the C/C++ compiler has been installed:
 
 - Open R and run in the console: `install.packages("remotes")`
 - Run: `remotes::install_github("ocelhay/como", upgrade = "never")`
