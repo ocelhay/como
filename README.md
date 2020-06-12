@@ -1,6 +1,6 @@
 <!-- badges: start -->
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-[![](https://img.shields.io/badge/devel%20version-13.8-blue.svg)](https://github.com/ocelhay/como)
+[![](https://img.shields.io/badge/devel%20version-13.13.1-blue.svg)](https://github.com/ocelhay/como)
 [![Build Status](https://travis-ci.org/ocelhay/como.svg?branch=master)](https://travis-ci.org/ocelhay/como)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/ocelhay/como?branch=master&svg=true)](https://ci.appveyor.com/project/ocelhay/como)
 <!-- badges: end -->
@@ -33,19 +33,47 @@ Under the following terms:
 - ShareAlike — If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
 
 
-## Installation
+## Online App
 
-The [App is online](https://comomodel.net) but can also be run locally. Follow the instructions below to install, update or launch the offline App.
+The App can be used from https://comomodel.net. 
 
-### Install Offline App
+## Offline App
+
+The App can also be run locally. Follow the instructions below to install, update or launch the offline App.
+
+### Installation
 
 - [Download and install R](https://cran.r-project.org) (any version above 3.6.1)
+- Install a C/C++ compiler:
+
+(A) on Windows
+
+- check your version of by typing `R.Version()$version.string` in your console
+- if your R version is `3.6.x`, install [this version of Rtools.](https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe).
+- if your R version is `4.0` and up, install [this version of Rtools.](https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe)
+- Run the installer, you can accept the defaults throughout.
+- Restart your machine
+
+(B) on macOS
+
+- check if your R version is `4.0` and up. Otherwise update R.
+- Install [XCode 11 from the Mac App Store.](https://developer.apple.com/xcode/resources/).
+- check your macOS version (From the Apple menu  in the corner of your screen, choose About This Mac. You'll see the macOS name, such as macOS Mojave, followed by its version number.)
+- Go to https://github.com/fxcoudert/gfortran-for-macOS/releases, identify your macOS version, click on the corresponding **> Assets** in the page and download the .dmg (e.g. gfortran-8.2-Mojave.dmg)
+- Run the installer and restart your machine
+
+Once the C/C++ compiler has been installed:
+
 - Open R and run in the console: `install.packages("remotes")`
 - Run: `remotes::install_github("ocelhay/como", upgrade = "never")`
 - Close and reopen R.
 
 
+### Launch
+
 To launch the CoMo App, open R and run in the console: `como::comomodel()`.
+
+### Update
 
 To update to the latest version, run: `remotes::install_github("ocelhay/como", upgrade = "never")`
 

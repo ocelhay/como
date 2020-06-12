@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v13.8"
+version_app <- "v13.13.1"
 
 # Load packages and data
 source("./www/source_on_inception.R")
@@ -617,7 +617,12 @@ server <- function(input, output, session) {
     simul_interventions$results <- NULL
     
     source("./www/model.R", local = TRUE)
-    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters, input=vectors0)
+    covidOdeCpp_reset()
+    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, parms = parameters, input=vectors0, A=A,
+               contact_home=contact_home, contact_school=contact_school,
+               contact_work=contact_work, contact_other=contact_other,
+               popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
+               ageing=ageing, ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
     simul_baseline$results <- process_ode_outcome(out)
     
     removeNotification(id = "model_run_notif", session = session)
@@ -640,7 +645,11 @@ server <- function(input, output, session) {
                      duration = NULL, type = "message", id = "run_interventions_notif")
     
     source("./www/model.R", local = TRUE)
-    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters2,input=vectors)
+    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, parms = parameters2,input=vectors, A=A,
+               contact_home=contact_home, contact_school=contact_school,
+               contact_work=contact_work, contact_other=contact_other,
+               popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
+               ageing=ageing, ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
     simul_interventions$results <- process_ode_outcome(out)
     
     removeNotification(id = "run_interventions_notif", session = session)
