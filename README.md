@@ -33,11 +33,15 @@ Under the following terms:
 - ShareAlike — If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
 
 
-## Installation
+## Online App
 
-The [App is online](https://comomodel.net) but can also be run locally. Follow the instructions below to install, update or launch the offline App.
+The App can be used from https://comomodel.net. 
 
-### Install Offline App
+## Offline App
+
+The App can also be run locally. Follow the instructions below to install, update or launch the offline App.
+
+### Installation
 
 - [Download and install R](https://cran.r-project.org) (any version above 3.6.1)
 - Install a C/C++ compiler
@@ -67,7 +71,11 @@ Once the C/C++ compiler has been installed:
 - Close and reopen R.
 
 
+### Launch
+
 To launch the CoMo App, open R and run in the console: `como::comomodel()`.
+
+### Update
 
 To update to the latest version, run: `remotes::install_github("ocelhay/como", upgrade = "never")`
 
