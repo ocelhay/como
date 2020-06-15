@@ -70,26 +70,38 @@ ui <- function(request) {
                                           p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
                                             ", edit it and upload it:"),
                                           fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE, width = "75%"),
-                                          htmlOutput("feedback_choices")
+                                          p("Brief explanations to be added along the lines of: (a) running time is about 1 second per run, (b) results shown are for mediane unless stated otherwise"),
+                                          fluidRow(column(6,
+                                                          sliderInput("nb_runs_baseline", "Number of model runs:", value = 1, min = 1, max = 60, post = " runs", ticks = FALSE)
+                                          ),
+                                          column(6,
+                                                 conditionalPanel("input.nb_runs_baseline > 1", 
+                                                                  sliderInput("noise_baseline", "Noise:", value = 0, min = 0, max = 1, ticks = FALSE)
+                                                 )
+                                          )
+                                          )
                                    ),
                                    column(6,
                                           dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year"),
-                                          fluidRow(column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      width = "70%")), 
-                                                   column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      width = "70%"))),
-                                          br(),
-                                          fluidRow(column(6, bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      width = "70%")), 
-                                                   column(6, bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      width = "70%")))
+                                          hr(),
+                                          fluidRow(column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                      width = "70%"),
+                                                          htmlOutput("feedback_choices")),
+                                                   column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                      width = "70%"), br(), br(),
+                                                          bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                   width = "70%"), br(), br(),
+                                                          bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                                   width = "70%")
+                                                   )
+                                          )
                                    )
                                  ),
                                  br(),
                                  fluidRow(
                                    column(6,
                                           div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
-                                          sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 30, value = 0, step = 1),
+                                          sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 30, value = 0, step = 1, ticks = FALSE),
                                           source("./www/ui/interventions_baseline.R", local = TRUE)$value
                                    ),
                                    column(6,
@@ -122,7 +134,7 @@ ui <- function(request) {
                           ),
                           column(5,
                                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
-                                 sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 30,  value = 0, step = 1),
+                                 sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 30,  value = 0, step = 1, ticks = FALSE),
                                  source("./www/ui/interventions_future.R", local = TRUE)$value
                           ),
                           column(5,

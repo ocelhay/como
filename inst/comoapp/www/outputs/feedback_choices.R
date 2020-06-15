@@ -1,10 +1,10 @@
 output$feedback_choices <- renderText({
   return(
     paste0(
-      strong("Selected Inputs:"),
-      span("Cases/Deaths:", span(class = "redbold", input$country_cases),
-      ", demographics: ", span(class = "redbold", input$country_demographic), 
-      ", social contacts: ", span(class = "redbold", input$country_contact))
+      span("Selected Country Inputs:"), br(),
+      span("Cases/Deaths:", span(class = "redbold", input$country_cases), br(),
+      "Demographics: ", span(class = "redbold", input$country_demographic), br(), 
+      "Social contacts: ", span(class = "redbold", input$country_contact))
       )
     )
 })
