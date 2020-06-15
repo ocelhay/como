@@ -1,7 +1,7 @@
 Package: como
 Type: Package
 Title: CoMo COVID-19 App
-Version: 13.13.1
+Version: 13.13.2
 Author: Olivier Celhay, Ricardo Aguas, Sai Thein Than Tun, Lisa J. White & CoMo Consortium
 Maintainer: Olivier Celhay <olivier.celhay@gmail.com>
 Description: Developed by the Covid-19 International Modelling Consortium (CoMo Consortium).
