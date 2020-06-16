@@ -160,7 +160,10 @@ parameters <- c(
   quarantine_eff_home = input$quarantine_eff_home,
   quarantine_eff_other = input$quarantine_eff_other,
   
-  household_size = input$household_size
+  household_size = input$household_size,
+  noise = input$noise,
+  iterations = input$iterations,
+  confidence = input$confidence
 )
 
 ihr[,2] <- parameters["ihr_scaling"]*ihr[,2]
@@ -210,7 +213,10 @@ parameters["nu_ventc"]<-1/parameters["nu_ventc"]
 parameters["pclin"]<-parameters["pclin"]/100
 parameters["prob_icu"]<-parameters["prob_icu"]/100
 parameters["prob_vent"]<-parameters["prob_vent"]/100
-parameters2<-parameters
+parameters_noise<-c(1:5,19:26,32:39,43,45,47:49)
+iterations<-parameters["iterations"]
+noise<-parameters["noise"]
+confidence<-parameters["confidence"]/100
 
 
 # Define the indices for each variable
@@ -661,7 +667,11 @@ Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, init
 # END Placeholder ----
 
 # START Placeholder for covidage_v13.13.R code (DO NOT EDIT) ----
-process_ode_outcome <- function(out){
+process_ode_outcome <- function(out, iterations){
+  out_min<-out$min
+  out_max<-out$max
+  out<-out$mean
+  
   critH<-c()
   crit<-c()
   critV<-c()
@@ -869,6 +879,70 @@ process_ode_outcome <- function(out){
   
   results$mortality_lag <- mortality_lag
   
+  if(iterations>1){
+    # daily incidence
+    inc1_min <- parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out_min[,(Eindex+1)]%*%(1-ihr[,2])+
+      parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out_min[,(Eindex+1)]%*%(1-ihr[,2])+
+      parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out_min[,(QEindex+1)]%*%(1-ihr[,2])+
+      parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out_min[,(QEindex+1)]%*%(1-ihr[,2])
+    inc1_max <- parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out_max[,(Eindex+1)]%*%(1-ihr[,2])+
+      parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out_max[,(Eindex+1)]%*%(1-ihr[,2])+
+      parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out_max[,(QEindex+1)]%*%(1-ihr[,2])+
+      parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out_max[,(QEindex+1)]%*%(1-ihr[,2])
+    
+    inc1h_min<- parameters["gamma"]*out_min[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])*parameters["reporth"]+
+      parameters["gamma"]*out_min[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])*(1-parameters["reporth"])+
+      parameters["gamma"]*out_min[,(QEindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])+
+      parameters["gamma"]*out_min[,(Eindex+1)]%*%ihr[,2]*critH*parameters["reporth"]*(1-parameters["prob_icu"])+
+      parameters["gamma"]*out_min[,(QEindex+1)]%*%ihr[,2]*critH*parameters["reporth"]*(1-parameters["prob_icu"])+
+      parameters["gamma"]*out_min[,(Eindex+1)]%*%ihr[,2]*parameters["prob_icu"]+
+      parameters["gamma"]*out_min[,(QEindex+1)]%*%ihr[,2]*parameters["prob_icu"]
+    inc1h_max<- parameters["gamma"]*out_max[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])*parameters["reporth"]+
+      parameters["gamma"]*out_max[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])*(1-parameters["reporth"])+
+      parameters["gamma"]*out_max[,(QEindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])+
+      parameters["gamma"]*out_max[,(Eindex+1)]%*%ihr[,2]*critH*parameters["reporth"]*(1-parameters["prob_icu"])+
+      parameters["gamma"]*out_max[,(QEindex+1)]%*%ihr[,2]*critH*parameters["reporth"]*(1-parameters["prob_icu"])+
+      parameters["gamma"]*out_max[,(Eindex+1)]%*%ihr[,2]*parameters["prob_icu"]+
+      parameters["gamma"]*out_max[,(QEindex+1)]%*%ihr[,2]*parameters["prob_icu"]
+    
+    dailyinc1_min<-rowSums(inc1_min)+rowSums(inc1h_min)      # daily incidence
+    dailyinc1_max<-rowSums(inc1_max)+rowSums(inc1h_max)      # daily incidence
+    
+    cuminc1_min<-colSums(inc1_min)+colSums(inc1h_min)        # cumulative incidence
+    cuminc1_max<-colSums(inc1_max)+colSums(inc1h_max)        # cumulative incidence
+    
+    previcureq1_max<-rowSums(out_max[,(Hindex+1)])+ rowSums(out_max[,(ICUCindex+1)])+rowSums(out_max[,(ICUCVindex+1)]) # surge beds occupancy
+    previcureq21_max<-rowSums(out_max[,(ICUindex+1)])+rowSums(out_max[,(VentCindex+1)])   # icu beds occupancy
+    previcureq31_max<-rowSums(out_max[,(Ventindex+1)])   # ventilator occupancy
+    cmortality1_max<-rowSums(out_max[,(CMindex+1)])      # cumulative mortality
+    overloadH1_max<-rowSums(out_max[,(HCindex+1)])       # requirement for beds
+    overloadICU1_max<-rowSums(out_max[,(ICUCindex+1)])   # requirement for icu beds
+    overloadICUV1_max<-rowSums(out_max[,(ICUCVindex+1)]) # requirement for ventilators
+    overloadVent1_max<-rowSums(out_max[,(VentCindex+1)]) # requirement for ventilators
+    ccases1_max<-rowSums(out_max[,(Cindex+1)])           # cumulative cases
+    reqsurge1_max<-rowSums(out_max[,(Hindex+1)])+overloadH1  # surge beds total requirements
+    reqicu1_max<-rowSums(out_max[,(ICUindex+1)])+overloadICU1 # ICU beds total requirements
+    reqvent1_max<-rowSums(out_max[,(Ventindex+1)])+overloadICUV1+overloadVent1 # ventilator beds total requirements
+    
+    previcureq1_min<-rowSums(out_min[,(Hindex+1)])+ rowSums(out_min[,(ICUCindex+1)])+rowSums(out_min[,(ICUCVindex+1)]) # surge beds occupancy
+    previcureq21_min<-rowSums(out_min[,(ICUindex+1)])+rowSums(out_min[,(VentCindex+1)])   # icu beds occupancy
+    previcureq31_min<-rowSums(out_min[,(Ventindex+1)])   # ventilator occupancy
+    cmortality1_min<-rowSums(out_min[,(CMindex+1)])      # cumulative mortality
+    overloadH1_min<-rowSums(out_min[,(HCindex+1)])       # requirement for beds
+    overloadICU1_min<-rowSums(out_min[,(ICUCindex+1)])   # requirement for icu beds
+    overloadICUV1_min<-rowSums(out_min[,(ICUCVindex+1)]) # requirement for ventilators
+    overloadVent1_min<-rowSums(out_min[,(VentCindex+1)]) # requirement for ventilators
+    ccases1_min<-rowSums(out_min[,(Cindex+1)])           # cumulative cases
+    reqsurge1_min<-rowSums(out_min[,(Hindex+1)])+overloadH1  # surge beds total requirements
+    reqicu1_min<-rowSums(out_min[,(ICUindex+1)])+overloadICU1 # ICU beds total requirements
+    reqvent1_min<-rowSums(out_min[,(Ventindex+1)])+overloadICUV1+overloadVent1 # ventilator beds total requirements
+    
+    results$total_reported_deaths_end_min <- last(cmortality1_min)
+    results$total_reported_deaths_end_max <- last(cmortality1_max)
+    
+    results$pct_total_pop_infected_min <- round(100 * tail(cumsum(rowSums(parameters["gamma"]*out_min[,(Eindex+1)])),1)/sum(popstruc[,2]), 1)  # proportion of the  population that has been infected at the end of the simulation
+    results$pct_total_pop_infected_max <- round(100 * tail(cumsum(rowSums(parameters["gamma"]*out_max[,(Eindex+1)])),1)/sum(popstruc[,2]), 1)  # proportion of the  population that has been infected at the end of the simulation
+  }
   
   return(results)
 }

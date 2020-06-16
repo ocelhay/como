@@ -72,11 +72,12 @@ ui <- function(request) {
                                           fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE, width = "75%"),
                                           p("Brief explanations to be added along the lines of: (a) running time is about 1 second per run, (b) results shown are for mediane unless stated otherwise"),
                                           fluidRow(column(6,
-                                                          sliderInput("nb_runs_baseline", "Number of model runs:", value = 1, min = 1, max = 60, post = " runs", ticks = FALSE)
+                                                          sliderInput("iterations", "Number of model runs:", value = 1, min = 1, max = 500, post = " runs", ticks = FALSE)
                                           ),
                                           column(6,
-                                                 conditionalPanel("input.nb_runs_baseline > 1", 
-                                                                  sliderInput("noise_baseline", "Noise:", value = 0, min = 0, max = 1, ticks = FALSE)
+                                                 conditionalPanel("input.iterations > 1", 
+                                                                  sliderInput("noise", "Noise:", value = 0.1, min = 0.01, max = 0.2, ticks = FALSE),
+                                                                  sliderInput("confidence", "Confidence:", value = 1, min = 5, max = 25, post = "%", ticks = FALSE)
                                                  )
                                           )
                                           )
@@ -629,19 +630,13 @@ server <- function(input, output, session) {
     simul_interventions$results <- NULL
     
     source("./www/model.R", local = TRUE)
-    covidOdeCpp_reset()
-    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, parms = parameters, input=vectors0, A=A,
-               contact_home=contact_home, contact_school=contact_school,
-               contact_work=contact_work, contact_other=contact_other,
-               popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
-               ageing=ageing, ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
-    simul_baseline$results <- process_ode_outcome(out)
+    source("./www/fun_multi_runs.R", local = TRUE)
+    out <- multi_runs(Y, times, parameters, input = vectors, iterations, noise, confidence)
+    simul_baseline$results <- process_ode_outcome(out, iterations)
+    simul_baseline$baseline_available <- TRUE
     
     removeNotification(id = "model_run_notif", session = session)
-    simul_baseline$baseline_available <- TRUE
-    runjs('
-      document.getElementById("anchor_results_baseline").scrollIntoView();
-    ')
+    runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
   
   # Process on "Validate Baseline" ----
