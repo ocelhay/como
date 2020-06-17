@@ -631,7 +631,10 @@ server <- function(input, output, session) {
     
     source("./www/model.R", local = TRUE)
     source("./www/fun_multi_runs.R", local = TRUE)
+    
+    
     out <- multi_runs(Y, times, parameters, input = vectors, iterations, noise, confidence)
+    
     simul_baseline$results <- process_ode_outcome(out, iterations)
     simul_baseline$baseline_available <- TRUE
     
