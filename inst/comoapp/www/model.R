@@ -768,7 +768,7 @@ process_ode_outcome <- function(out, iterations){
   results$time <- startdate + times  # dates
   results$Rt <- Rt
   results$cum_mortality <- round(cmortality1)  # cumulative mortality
-  results$pct_total_pop_infected <- round(100 * tail(cumsum(rowSums(parameters["gamma"]*out[,(Eindex+1)])),1)/sum(popstruc[,2]), 1)  # proportion of the  population that has been infected at the end of the simulation
+  results$pct_total_pop_infected <- round(100 * tail(cumsum(rowSums(parameters["gamma"]*out[,(Eindex+1)])),1)/last(tpop1), 1)  # proportion of the  population that has been infected at the end of the simulation
   results$doubling_time <- round(log(2)*7 / (log(dailyinc1[2+7] / dailyinc1[2])), 2)  # (Baseline only) to double the number of infections at inception
   results$required_beds <- round(previcureq1)  # required beds
   results$saturation <- parameters["beds_available"]  # saturation

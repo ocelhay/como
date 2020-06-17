@@ -637,6 +637,9 @@ server <- function(input, output, session) {
     simul_baseline$results <- process_ode_outcome(out, iterations)
     simul_baseline$baseline_available <- TRUE
     
+    # TODO: remove on production
+    shiny_simul_baseline <<- simul_baseline$results
+    
     removeNotification(id = "model_run_notif", session = session)
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
