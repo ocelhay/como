@@ -632,9 +632,9 @@ server <- function(input, output, session) {
     source("./www/model.R", local = TRUE)
     source("./www/fun_multi_runs.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
     
-    vectors <- inputs(inp, 'Baseline (Calibration)')
-    out <- multi_runs(Y, times, parameters, input = vectors, iterations, noise, confidence)
-    simul_baseline$results <- process_ode_outcome(out, iterations)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times = times, stopdate = stopdate)
+    out <- multi_runs(Y, times, parameters, input = vectors, A = A, iterations, noise, confidence)
+    simul_baseline$results <- process_ode_outcome(out, iterations, parameters)
     simul_baseline$baseline_available <- TRUE
     
     # TODO: remove on production
@@ -658,9 +658,9 @@ server <- function(input, output, session) {
     
     source("./www/model.R", local = TRUE)
     source("./www/fun_multi_runs.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
-    vectors <- inputs(inp, 'Hypothetical Scenario')
-    out <- multi_runs(Y, times, parameters, input = vectors, iterations, noise, confidence)
-    simul_interventions$results <- process_ode_outcome(out, iterations)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times = times, stopdate = stopdate)
+    out <- multi_runs(Y, times, parameters, input = vectors, A = A, iterations, noise, confidence)
+    simul_interventions$results <- process_ode_outcome(out, iterations, parameters)
     simul_interventions$interventions_available <- TRUE
     
     removeNotification(id = "run_interventions_notif", session = session)

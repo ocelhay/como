@@ -21,6 +21,8 @@ library(tidyverse)
 load(file = "./www/data/cases.Rda")
 load(file = "./www/data/contacts.Rda")
 load(file = "./www/data/demog.Rda")
+A <- length(age_categories)
+
 load(file = "./www/data/mort_sever_default.Rda")
 
 # choices of countries for dropdown
@@ -43,9 +45,11 @@ all_interventions <- c("_",
                        "Vaccination")
 
 # Default values for interventions
+nb_interventions_max <- 30
 new_intervention_value <- all_interventions[1]
 new_daterange_value <- c(as.Date("2020-01-01"), as.Date("2020-12-31"))
 new_coverage_value <- 0
 
-nb_interventions_max <- 30
 source("./www/fun_validation_interventions.R")
+source("./www/fun_inputs.R")
+
