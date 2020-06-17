@@ -1,4 +1,4 @@
-# START Bridge ----
+# Definitions of several variables ----
 popstruc <- population_rv$data %>% 
   select(age_category, pop) %>% 
   rename(agefloor = age_category) %>% 
@@ -19,18 +19,13 @@ ifr <- mort_sever_rv$data %>%
   select(age_category, ifr) %>% 
   as.data.frame()
 
+# Define per year ageing matrix ----
+dd <- seq(1:A) / seq(1:A)
+ageing <- t(diff(diag(dd), lag = 1) / (5 * 365.25))
+ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
+
+# Contact Matrices ----
 country_name <- input$country_contact
-# END Bridge ----
-
-# START Placeholder for covidage_v13.6.R code (DO NOT EDIT) ----
-# per year ageing matrix
-dd<-seq(1:A)/seq(1:A)
-ageing <- t(diff(diag(dd),lag=1)/(5*365.25))
-ageing<-cbind(ageing,0*seq(1:A)) # no ageing from last compartment
-# END Placeholder ----
-
-# START Placeholder for covidage_v13.6.R code (DO NOT EDIT) ----
-###  CONTACT MATRICES
 c_home <- contact_home[[country_name]] %>% as.matrix()
 c_school <- contact_school[[country_name]] %>% as.matrix()
 c_work <- contact_work[[country_name]] %>% as.matrix()
@@ -75,25 +70,17 @@ for (i in (A+1-nce):A){
     contact_other[i,j]<-c_other[(A-nce),(A-nce)]
   }
 }
-# END Placeholder ----
 
-# START Bridge ----
+# Define time variables ----
 startdate <- input$date_range[1]
 stopdate <- input$date_range[2]
-# END Bridge ----
+times <- seq(0, as.numeric(stopdate - startdate))
 
-# START Placeholder for covidage_v13.6.R code (DO NOT EDIT) ----
-day_start <- as.numeric(startdate-startdate)
-day_stop <- as.numeric(stopdate-startdate)
-times <- seq(day_start, day_stop)
+# Define index case ----
+ageindcase <- 20
+aci <- floor((ageindcase / 5) + 1) # age class of index case
 
-tin<-as.numeric(startdate-as.Date("2020-01-01"))/365.25
-initP<-sum(popstruc[,2])       # population size 
-ageindcase<-20                 # age of index case (years)
-aci <- floor((ageindcase/5)+1) # age class of index case
-# END Placeholder ----
-
-# START Bridge ----
+# Define parameters vector ----
 parameters <- c(
   p = input$p,
   rho = input$rho,
@@ -166,9 +153,8 @@ parameters <- c(
 )
 
 ihr[,2] <- parameters["ihr_scaling"]*ihr[,2]
-# END Bridge ----
 
-# START Placeholder for covidage_v13.6.R code (DO NOT EDIT) ----
+
 # Scale parameters to percentages/ rates
 parameters["rho"]<-parameters["rho"]/100
 parameters["omega"]<-(1/(parameters["omega"]*365))
@@ -212,41 +198,47 @@ parameters["nu_ventc"]<-1/parameters["nu_ventc"]
 parameters["pclin"]<-parameters["pclin"]/100
 parameters["prob_icu"]<-parameters["prob_icu"]/100
 parameters["prob_vent"]<-parameters["prob_vent"]/100
+
+
+
+# Additions for several iterations ----
 parameters_noise<-c(1:5,19:26,32:39,43,45,47:49)
 iterations<-parameters["iterations"]
 noise<-parameters["noise"]
 confidence<-parameters["confidence"]/100
 
 
-# Define the indices for each variable
-Sindex<-1:A
-Eindex<-(A+1):(2*A)
-Iindex<-(2*A+1):(3*A)
-Rindex<-(3*A+1):(4*A)
-Xindex<-(4*A+1):(5*A)
-Hindex<-(5*A+1):(6*A)
-HCindex<-(6*A+1):(7*A)
-Cindex<-(7*A+1):(8*A)
-CMindex<-(8*A+1):(9*A)
-Vindex<-(9*A+1):(10*A)
-QSindex<-(10*A+1):(11*A)
-QEindex<-(11*A+1):(12*A)
-QIindex<-(12*A+1):(13*A)
-QRindex<-(13*A+1):(14*A)
-CLindex<-(14*A+1):(15*A)
-QCindex<-(15*A+1):(16*A)
-ICUindex<-(16*A+1):(17*A)
-ICUCindex<-(17*A+1):(18*A)
-ICUCVindex<-(18*A+1):(19*A)
-Ventindex<-(19*A+1):(20*A)
-VentCindex<-(20*A+1):(21*A)
-CMCindex<-(21*A+1):(22*A)
+# Define the indices for each variable ----
+Sindex <- 1:A
+Eindex <- (A + 1):(2 * A)
+Iindex <- (2 * A + 1):(3 * A)
+Rindex <- (3 * A + 1):(4 * A)
+Xindex <- (4 * A + 1):(5 * A)
+Hindex <- (5 * A + 1):(6 * A)
+HCindex <- (6 * A + 1):(7 * A)
+Cindex <- (7 * A + 1):(8 * A)
+CMindex <- (8 * A + 1):(9 * A)
+Vindex <- (9 * A + 1):(10 * A)
+QSindex <- (10 * A + 1):(11 * A)
+QEindex <- (11 * A + 1):(12 * A)
+QIindex <- (12 * A + 1):(13 * A)
+QRindex <- (13 * A + 1):(14 * A)
+CLindex <- (14 * A + 1):(15 * A)
+QCindex <- (15 * A + 1):(16 * A)
+ICUindex <- (16 * A + 1):(17 * A)
+ICUCindex <- (17 * A + 1):(18 * A)
+ICUCVindex <- (18 * A + 1):(19 * A)
+Ventindex <- (19 * A + 1):(20 * A)
+VentCindex <- (20 * A + 1):(21 * A)
+CMCindex <- (21 * A + 1):(22 * A)
 
 
-# MODEL INITIAL CONDITIONS
+# Set model initial conditions ----
 initI <- rep(0, A)  # Infected and symptomatic
 initE <- rep(0, A)  # Incubating
+
 initE[aci] <- 1     # Place random index case in E compartment
+
 initR <- rep(0, A)  # Immune
 initX <- rep(0, A)  # Isolated
 initV <- rep(0, A)  # Vaccinated
@@ -297,19 +289,22 @@ process_ode_outcome <- function(out, iterations, parameters){
   KH <- parameters["beds_available"]
   x.H <- c(0, (1 + parameters["give"]) * KH / 2, (3 - parameters["give"]) * KH / 2, 2 * KH)
   fH <- splinefun(x.H, f, method = "hyman")
+  
   KICU <- parameters["icu_beds_available"] + parameters["ventilators_available"]
   x.ICU <- c(0, (1 + parameters["give"]) * KICU / 2, (3 - parameters["give"]) * KICU / 2, 2 * KICU)
   fICU <- splinefun(x.ICU, f, method = "hyman")
-  Kvent <- parameters["ventilators_available"]
-  x.Vent <- c(0, (1 + parameters["give"]) * Kvent / 2, (3 - parameters["give"]) * Kvent / 2, 2 * Kvent)
-  fVent <- splinefun(x.Vent, f, method = "hyman")
+  # Kvent <- parameters["ventilators_available"]
+  # x.Vent <- c(0, (1 + parameters["give"]) * Kvent / 2, (3 - parameters["give"]) * Kvent / 2, 2 * Kvent)
+  # fVent <- splinefun(x.Vent, f, method = "hyman")
   
   critH <- NULL
   crit <- NULL
+  # critV <- NULL
   
   for (i in 1:length(times)) {
     critH[i] <- min(1 - fH((sum(out[i, (Hindex + 1)])) + sum(out[i, (ICUCindex + 1)]) + sum(out[i, (ICUCVindex + 1)])), 1)
     crit[i] <- min(1 - fICU((sum(out[i, (ICUindex + 1)])) + (sum(out[i, (Ventindex + 1)])) + (sum(out[i, (VentCindex + 1)]))))
+    # critV[i] <- min(1 - fVent((sum(out[i, (Ventindex + 1)]))), 1)
   }
   
   # total population
@@ -317,7 +312,7 @@ process_ode_outcome <- function(out, iterations, parameters){
     out[,(QSindex+1)]+out[,(QEindex+1)]+out[,(QIindex+1)]+out[,(QCindex+1)]+out[,(QRindex+1)]+
     out[,(Hindex+1)]+out[,(HCindex+1)]+out[,(ICUindex+1)]+out[,(ICUCindex+1)]+out[,(ICUCVindex+1)]+out[,(Ventindex+1)]+out[,(VentCindex+1)]
   tpop1<-rowSums(pop1)
-  time<-as.Date(out[,1]+startdate)
+  # time<-as.Date(out[,1]+startdate)
   # daily incidence
   inc1 <- parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out[,(Eindex+1)]%*%(1-ihr[,2])+
     parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out[,(Eindex+1)]%*%(1-ihr[,2])+
