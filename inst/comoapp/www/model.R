@@ -649,9 +649,6 @@ inputs<-function(inp, run){
               quarantine=quarantine,vaccine=vaccine,travelban=travelban,distancing=distancing))
 }
 
-vectors<<-inputs(inp,'Hypothetical Scenario')
-vectors0<<-inputs(inp,'Baseline (Calibration)')
-
 f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0)
 KH<-parameters["beds_available"]
 KICU<- parameters["icu_beds_available"]+parameters["ventilators_available"]

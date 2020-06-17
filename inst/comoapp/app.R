@@ -630,11 +630,10 @@ server <- function(input, output, session) {
     simul_interventions$results <- NULL
     
     source("./www/model.R", local = TRUE)
-    source("./www/fun_multi_runs.R", local = TRUE)
+    source("./www/fun_multi_runs.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
     
-    
+    vectors <- inputs(inp, 'Baseline (Calibration)')
     out <- multi_runs(Y, times, parameters, input = vectors, iterations, noise, confidence)
-    
     simul_baseline$results <- process_ode_outcome(out, iterations)
     simul_baseline$baseline_available <- TRUE
     
@@ -655,19 +654,14 @@ server <- function(input, output, session) {
                      duration = NULL, type = "message", id = "run_interventions_notif")
     
     source("./www/model.R", local = TRUE)
-    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, parms = parameters2,input=vectors, A=A,
-               contact_home=contact_home, contact_school=contact_school,
-               contact_work=contact_work, contact_other=contact_other,
-               popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
-               ageing=ageing, ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
-    simul_interventions$results <- process_ode_outcome(out)
-    
-    removeNotification(id = "run_interventions_notif", session = session)
+    source("./www/fun_multi_runs.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
+    vectors <- inputs(inp, 'Hypothetical Scenario')
+    out <- multi_runs(Y, times, parameters, input = vectors, iterations, noise, confidence)
+    simul_interventions$results <- process_ode_outcome(out, iterations)
     simul_interventions$interventions_available <- TRUE
     
-    runjs('
-      document.getElementById("anchor_summary").scrollIntoView();
-    ')
+    removeNotification(id = "run_interventions_notif", session = session)
+    runjs('document.getElementById("anchor_summary").scrollIntoView();')
   })
   
   
