@@ -630,18 +630,29 @@ server <- function(input, output, session) {
     simul_interventions$results <- NULL
     
     source("./www/model.R", local = TRUE)
+    source("./www/fun_single_run.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
     source("./www/fun_multi_runs.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
     
     vectors <- inputs(inp, 'Baseline (Calibration)', times = times, stopdate = stopdate)
     
     if(input$iterations == 1) {
-      simul_baseline$results <- multi_runs(Y, times, parameters, input = vectors, A = A)
+      simul_baseline$results <- single_run(Y, times, parameters, input = vectors, A = A)
     }
     
     if(input$iterations > 1) {
-      out <- multi_runs(Y, times, parameters, input = vectors, A = A)
-      simul_baseline$results <- process_ode_outcome(out, parameters, startdate, times, ihr, ifr, mort, popstruc, nature = "median")
-      # decide on what to do with those (naming...)
+      results <- multi_runs(Y, times, parameters, input = vectors, A = A)
+      # example where the criteria to sort runs is the value of "attributable_deaths_end"
+      
+      multi_attributable_deaths_end <- NULL
+      for (i in 1:input$iterations) {
+        multi_attributable_deaths_end <- c(multi_attributable_deaths_end, results[[i]]$attributable_deaths_end)
+      }
+      
+      index_min <- which.min(abs(multi_attributable_deaths_end - quantile(multi_attributable_deaths_end, parameters["confidence"])))
+      index_med <- which.min(abs(multi_attributable_deaths_end - quantile(multi_attributable_deaths_end, 0.5)))
+      index_max <- which.min(abs(multi_attributable_deaths_end - quantile(multi_attributable_deaths_end, (1 - parameters["confidence"]))))
+      
+      simul_baseline$results <- results[[index_med]]
     }
     simul_baseline$baseline_available <- TRUE
     
