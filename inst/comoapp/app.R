@@ -636,11 +636,11 @@ server <- function(input, output, session) {
     out <- multi_runs(Y, times, parameters, input = vectors, A = A)
     
     if(input$iterations == 1) {
-      simul_baseline$results <- process_ode_outcome(out, parameters, nature = "unique_iteration")
+      simul_baseline$results <- process_ode_outcome(out, parameters, startdate, times, ihr, ifr, mort, popstruc, nature = "unique_iteration")
     }
     
     if(input$iterations > 1) {
-      simul_baseline$results <- process_ode_outcome(out, parameters, nature = "median")
+      simul_baseline$results <- process_ode_outcome(out, parameters, startdate, times, ihr, ifr, mort, popstruc, nature = "median")
       # decide on what to do with those (naming...)
     }
     simul_baseline$baseline_available <- TRUE

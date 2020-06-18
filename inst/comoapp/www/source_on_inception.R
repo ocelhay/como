@@ -120,4 +120,5 @@ ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
 
 source("./www/fun_validation_interventions.R")
 source("./www/fun_inputs.R")
+source("./www/fun_process_ode_outcome.R")
 
