@@ -30,12 +30,12 @@ c_home <- contact_home[[country_name]] %>% as.matrix()
 c_school <- contact_school[[country_name]] %>% as.matrix()
 c_work <- contact_work[[country_name]] %>% as.matrix()
 c_other <- contact_other[[country_name]] %>% as.matrix()
-nce <-A-length(c_home[1,])
+nce <- A - length(c_home[1, ])
 
-contact_home<-matrix(0,nrow=A,ncol=A)
-contact_school<-matrix(0,nrow=A,ncol=A)
-contact_work<-matrix(0,nrow=A,ncol=A)
-contact_other<-matrix(0,nrow=A,ncol=A)
+contact_home <- matrix(0, nrow = A, ncol = A)
+contact_school <- matrix(0, nrow = A, ncol = A)
+contact_work <- matrix(0, nrow = A, ncol = A)
+contact_other <- matrix(0, nrow = A, ncol = A)
 
 for (i in 1:(A-nce)){
   for (j in 1:(A-nce)){
@@ -76,9 +76,6 @@ startdate <- input$date_range[1]
 stopdate <- input$date_range[2]
 times <- seq(0, as.numeric(stopdate - startdate))
 
-# Define index case ----
-ageindcase <- 20
-aci <- floor((ageindcase / 5) + 1) # age class of index case
 
 # Define parameters vector ----
 parameters <- c(
@@ -156,48 +153,46 @@ ihr[,2] <- parameters["ihr_scaling"]*ihr[,2]
 
 
 # Scale parameters to percentages/ rates
-parameters["rho"]<-parameters["rho"]/100
-parameters["omega"]<-(1/(parameters["omega"]*365))
-parameters["gamma"]<-1/parameters["gamma"]
-parameters["nui"]<-1/parameters["nui"]
-parameters["report"]<-parameters["report"]/100
-parameters["reportc"]<-parameters["reportc"]/100
-parameters["reporth"]<-parameters["reporth"]/100
-parameters["nus"]<-1/parameters["nus"]
-parameters["rhos"]<-parameters["rhos"]/100
-parameters["amp"]<-parameters["amp"]/100
-parameters["selfis_eff"]<-parameters["selfis_eff"]/100
-parameters["dist_eff"]<-parameters["dist_eff"]/100
-parameters["hand_eff"]<-parameters["hand_eff"]/100
-parameters["work_eff"]<-parameters["work_eff"]/100
-parameters["w2h"]<-parameters["w2h"]/100
-parameters["school_eff"]<-parameters["school_eff"]/100
-parameters["s2h"]<-parameters["s2h"]/100
-parameters["cocoon_eff"]<-parameters["cocoon_eff"]/100
-parameters["age_cocoon"]<-floor((parameters["age_cocoon"]/5)+1)
-parameters["vaccine_eff"]<-parameters["vaccine_eff"]/100
-# parameters["vaccine_cov"]<-parameters["vaccine_cov"]/100
-# parameters["vac_campaign"]<-parameters["vac_campaign"]*7
-parameters["screen_test_sens"]<-parameters["screen_test_sens"]/100
-parameters["quarantine_days"]<-parameters["quarantine_days"]
-parameters["quarantine_effort"]<-1/parameters["quarantine_effort"]
-parameters["quarantine_eff_home"]<-parameters["quarantine_eff_home"]/-100
-parameters["quarantine_eff_other"]<-parameters["quarantine_eff_other"]/100
-parameters["give"]<-parameters["give"]/100
-parameters["pdeath_h"]<-parameters["pdeath_h"]/100
-parameters["pdeath_hc"]<-parameters["pdeath_hc"]/100
-parameters["pdeath_icu"]<-parameters["pdeath_icu"]/100
-parameters["pdeath_icuc"]<-parameters["pdeath_icuc"]/100
-parameters["pdeath_vent"]<-parameters["pdeath_vent"]/100
-parameters["pdeath_ventc"]<-parameters["pdeath_ventc"]/100
-parameters["nusc"]<-1/parameters["nusc"]
-parameters["nu_icu"]<-1/parameters["nu_icu"]
-parameters["nu_icuc"]<-1/parameters["nu_icuc"]
-parameters["nu_vent"]<-1/parameters["nu_vent"]
-parameters["nu_ventc"]<-1/parameters["nu_ventc"]
-parameters["pclin"]<-parameters["pclin"]/100
-parameters["prob_icu"]<-parameters["prob_icu"]/100
-parameters["prob_vent"]<-parameters["prob_vent"]/100
+parameters["rho"] <- parameters["rho"] / 100
+parameters["omega"] <- (1 / (parameters["omega"] * 365))
+parameters["gamma"] <- 1 / parameters["gamma"]
+parameters["nui"] <- 1 / parameters["nui"]
+parameters["report"] <- parameters["report"] / 100
+parameters["reportc"] <- parameters["reportc"] / 100
+parameters["reporth"] <- parameters["reporth"] / 100
+parameters["nus"] <- 1 / parameters["nus"]
+parameters["rhos"] <- parameters["rhos"] / 100
+parameters["amp"] <- parameters["amp"] / 100
+parameters["selfis_eff"] <- parameters["selfis_eff"] / 100
+parameters["dist_eff"] <- parameters["dist_eff"] / 100
+parameters["hand_eff"] <- parameters["hand_eff"] / 100
+parameters["work_eff"] <- parameters["work_eff"] / 100
+parameters["w2h"] <- parameters["w2h"] / 100
+parameters["school_eff"] <- parameters["school_eff"] / 100
+parameters["s2h"] <- parameters["s2h"] / 100
+parameters["cocoon_eff"] <- parameters["cocoon_eff"] / 100
+parameters["age_cocoon"] <- floor((parameters["age_cocoon"] / 5) + 1)
+parameters["vaccine_eff"] <- parameters["vaccine_eff"] / 100
+parameters["screen_test_sens"] <- parameters["screen_test_sens"] / 100
+parameters["quarantine_days"] <- parameters["quarantine_days"]
+parameters["quarantine_effort"] <- 1 / parameters["quarantine_effort"]
+parameters["quarantine_eff_home"] <- parameters["quarantine_eff_home"] / -100
+parameters["quarantine_eff_other"] <- parameters["quarantine_eff_other"] / 100
+parameters["give"] <- parameters["give"] / 100
+parameters["pdeath_h"] <- parameters["pdeath_h"] / 100
+parameters["pdeath_hc"] <- parameters["pdeath_hc"] / 100
+parameters["pdeath_icu"] <- parameters["pdeath_icu"] / 100
+parameters["pdeath_icuc"] <- parameters["pdeath_icuc"] / 100
+parameters["pdeath_vent"] <- parameters["pdeath_vent"] / 100
+parameters["pdeath_ventc"] <- parameters["pdeath_ventc"] / 100
+parameters["nusc"] <- 1 / parameters["nusc"]
+parameters["nu_icu"] <- 1 / parameters["nu_icu"]
+parameters["nu_icuc"] <- 1 / parameters["nu_icuc"]
+parameters["nu_vent"] <- 1 / parameters["nu_vent"]
+parameters["nu_ventc"] <- 1 / parameters["nu_ventc"]
+parameters["pclin"] <- parameters["pclin"] / 100
+parameters["prob_icu"] <- parameters["prob_icu"] / 100
+parameters["prob_vent"] <- parameters["prob_vent"] / 100
 
 
 
@@ -208,81 +203,26 @@ noise<-parameters["noise"]
 confidence<-parameters["confidence"]/100
 
 
-# Define the indices for each variable ----
-Sindex <- 1:A
-Eindex <- (A + 1):(2 * A)
-Iindex <- (2 * A + 1):(3 * A)
-Rindex <- (3 * A + 1):(4 * A)
-Xindex <- (4 * A + 1):(5 * A)
-Hindex <- (5 * A + 1):(6 * A)
-HCindex <- (6 * A + 1):(7 * A)
-Cindex <- (7 * A + 1):(8 * A)
-CMindex <- (8 * A + 1):(9 * A)
-Vindex <- (9 * A + 1):(10 * A)
-QSindex <- (10 * A + 1):(11 * A)
-QEindex <- (11 * A + 1):(12 * A)
-QIindex <- (12 * A + 1):(13 * A)
-QRindex <- (13 * A + 1):(14 * A)
-CLindex <- (14 * A + 1):(15 * A)
-QCindex <- (15 * A + 1):(16 * A)
-ICUindex <- (16 * A + 1):(17 * A)
-ICUCindex <- (17 * A + 1):(18 * A)
-ICUCVindex <- (18 * A + 1):(19 * A)
-Ventindex <- (19 * A + 1):(20 * A)
-VentCindex <- (20 * A + 1):(21 * A)
-CMCindex <- (21 * A + 1):(22 * A)
 
 
-# Set model initial conditions ----
-initI <- rep(0, A)  # Infected and symptomatic
-initE <- rep(0, A)  # Incubating
 
-initE[aci] <- 1     # Place random index case in E compartment
-
-initR <- rep(0, A)  # Immune
-initX <- rep(0, A)  # Isolated
-initV <- rep(0, A)  # Vaccinated
-initQS <- rep(0, A) # quarantined S
-initQE <- rep(0, A) # quarantined E
-initQI <- rep(0, A) # quarantined I
-initQR <- rep(0, A) # quarantined R
-initH <- rep(0, A)  # hospitalised
-initHC <- rep(0, A) # hospital critical
-initC <- rep(0, A)  # Cumulative cases (true)
-initCM <- rep(0, A) # Cumulative deaths (true)
-initCL <- rep(0, A) # symptomatic cases
-initQC <- rep(0, A) # quarantined C
-initICU <- rep(0, A)   # icu
-initICUC <- rep(0, A)  # icu critical
-initICUCV <- rep(0, A)  # icu critical
-initVent <- rep(0, A)  # icu vent
-initVentC <- rep(0, A) # icu vent crit
-initCMC <- rep(0, A)   # Cumulative deaths (true)
-initS <-
-  popstruc[, 2] - initE - initI - initR - initX - initV - initH - initHC -
-  initQS - initQE - initQI - initQR - initCL - initQC - initICU - initICUC -
-  initICUCV - initVent - initVentC  # Susceptible (non-immune)
-# END Placeholder ----
-
-
-# START Bridge ----
+# Define dataframe of interventions ----
 inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (Calibration)"),
                  interventions$future_mat %>% mutate(`Apply to` = "Hypothetical Scenario")) %>%
   rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
-# END Bridge ----
-
-# START Placeholder for covidage_v13.12.R code (DO NOT EDIT) ----
 
 
+# initial conditions for the main solution vector ----
+initS <- popstruc[, 2] - initE - initI - initR - initX - initV - initH - initHC -
+  initQS - initQE - initQI - initQR - initCL - initQC - initICU - initICUC -
+  initICUCV - initVent - initVentC  # Susceptible (non-immune)
 
-Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, initICUC, initICUCV, initVent, initVentC, initCMC) # initial conditions for the main solution vector
-# END Placeholder ----
+Y <- c(initS, initE, initI, initR, initX, initH, initHC, initC, initCM, initV, initQS, initQE, initQI, 
+     initQR, initCL, initQC, initICU, initICUC, initICUCV, initVent, initVentC, initCMC)
 
-# START Placeholder for covidage_v13.13.R code (DO NOT EDIT) ----
-process_ode_outcome <- function(out, iterations, parameters){
-  out_min<-out$min
-  out_max<-out$max
-  out<-out$mean
+# Function to process ode outcome ----
+process_ode_outcome <- function(out, iterations, parameters, nature){
+  out <- out[[nature]]
   
   # define spline functions ----
   f <- c(1, (1 + parameters["give"]) / 2, (1 - parameters["give"]) / 2, 0)
@@ -293,18 +233,14 @@ process_ode_outcome <- function(out, iterations, parameters){
   KICU <- parameters["icu_beds_available"] + parameters["ventilators_available"]
   x.ICU <- c(0, (1 + parameters["give"]) * KICU / 2, (3 - parameters["give"]) * KICU / 2, 2 * KICU)
   fICU <- splinefun(x.ICU, f, method = "hyman")
-  # Kvent <- parameters["ventilators_available"]
-  # x.Vent <- c(0, (1 + parameters["give"]) * Kvent / 2, (3 - parameters["give"]) * Kvent / 2, 2 * Kvent)
-  # fVent <- splinefun(x.Vent, f, method = "hyman")
   
+  # define critH, crit ----
   critH <- NULL
   crit <- NULL
-  # critV <- NULL
   
   for (i in 1:length(times)) {
     critH[i] <- min(1 - fH((sum(out[i, (Hindex + 1)])) + sum(out[i, (ICUCindex + 1)]) + sum(out[i, (ICUCVindex + 1)])), 1)
     crit[i] <- min(1 - fICU((sum(out[i, (ICUindex + 1)])) + (sum(out[i, (Ventindex + 1)])) + (sum(out[i, (VentCindex + 1)]))))
-    # critV[i] <- min(1 - fVent((sum(out[i, (Ventindex + 1)]))), 1)
   }
   
   # total population
@@ -350,14 +286,6 @@ process_ode_outcome <- function(out, iterations, parameters){
   }
   inc_overloadH1<-cumsum(rowSums(inc_overloadH1))
   inc_overloadICU1<-cumsum(rowSums(inc_overloadICU1))
-  
-  ##########################    CALCULATE MORTALITY 
-  # pdeath_hc<-parameters["pdeath_hc"]
-  # prob_icu<-parameters["prob_icu"]
-  # prob_vent<-parameters["prob_vent"]
-  # pdeath_icuc<-parameters["pdeath_icuc"]
-  # pdeath_ventc<-parameters["pdeath_ventc"]
-  
   
   cinc_mort_H1 <- cumsum(rowSums(parameters["nus"]*parameters["pdeath_h"]*(out[,(Hindex+1)]%*%ifr[,2])))
   cinc_mort_HC1 <- cumsum(rowSums(parameters["nusc"]*parameters["pdeath_hc"]*(out[,(HCindex+1)]%*%ifr[,2])))
@@ -503,72 +431,6 @@ process_ode_outcome <- function(out, iterations, parameters){
                                                      rename(`Day 120` = day120))
   
   results$mortality_lag <- mortality_lag
-  
-  if(iterations>1){
-    # daily incidence
-    inc1_min <- parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out_min[,(Eindex+1)]%*%(1-ihr[,2])+
-      parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out_min[,(Eindex+1)]%*%(1-ihr[,2])+
-      parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out_min[,(QEindex+1)]%*%(1-ihr[,2])+
-      parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out_min[,(QEindex+1)]%*%(1-ihr[,2])
-    inc1_max <- parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out_max[,(Eindex+1)]%*%(1-ihr[,2])+
-      parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out_max[,(Eindex+1)]%*%(1-ihr[,2])+
-      parameters["report"]*parameters["gamma"]*(1-parameters["pclin"])*out_max[,(QEindex+1)]%*%(1-ihr[,2])+
-      parameters["reportc"]*parameters["gamma"]*parameters["pclin"]*out_max[,(QEindex+1)]%*%(1-ihr[,2])
-    
-    inc1h_min<- parameters["gamma"]*out_min[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])*parameters["reporth"]+
-      parameters["gamma"]*out_min[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])*(1-parameters["reporth"])+
-      parameters["gamma"]*out_min[,(QEindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])+
-      parameters["gamma"]*out_min[,(Eindex+1)]%*%ihr[,2]*critH*parameters["reporth"]*(1-parameters["prob_icu"])+
-      parameters["gamma"]*out_min[,(QEindex+1)]%*%ihr[,2]*critH*parameters["reporth"]*(1-parameters["prob_icu"])+
-      parameters["gamma"]*out_min[,(Eindex+1)]%*%ihr[,2]*parameters["prob_icu"]+
-      parameters["gamma"]*out_min[,(QEindex+1)]%*%ihr[,2]*parameters["prob_icu"]
-    inc1h_max<- parameters["gamma"]*out_max[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])*parameters["reporth"]+
-      parameters["gamma"]*out_max[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])*(1-parameters["reporth"])+
-      parameters["gamma"]*out_max[,(QEindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters["prob_icu"])+
-      parameters["gamma"]*out_max[,(Eindex+1)]%*%ihr[,2]*critH*parameters["reporth"]*(1-parameters["prob_icu"])+
-      parameters["gamma"]*out_max[,(QEindex+1)]%*%ihr[,2]*critH*parameters["reporth"]*(1-parameters["prob_icu"])+
-      parameters["gamma"]*out_max[,(Eindex+1)]%*%ihr[,2]*parameters["prob_icu"]+
-      parameters["gamma"]*out_max[,(QEindex+1)]%*%ihr[,2]*parameters["prob_icu"]
-    
-    dailyinc1_min<-rowSums(inc1_min)+rowSums(inc1h_min)      # daily incidence
-    dailyinc1_max<-rowSums(inc1_max)+rowSums(inc1h_max)      # daily incidence
-    
-    cuminc1_min<-colSums(inc1_min)+colSums(inc1h_min)        # cumulative incidence
-    cuminc1_max<-colSums(inc1_max)+colSums(inc1h_max)        # cumulative incidence
-    
-    previcureq1_max<-rowSums(out_max[,(Hindex+1)])+ rowSums(out_max[,(ICUCindex+1)])+rowSums(out_max[,(ICUCVindex+1)]) # surge beds occupancy
-    previcureq21_max<-rowSums(out_max[,(ICUindex+1)])+rowSums(out_max[,(VentCindex+1)])   # icu beds occupancy
-    previcureq31_max<-rowSums(out_max[,(Ventindex+1)])   # ventilator occupancy
-    cmortality1_max<-rowSums(out_max[,(CMindex+1)])      # cumulative mortality
-    overloadH1_max<-rowSums(out_max[,(HCindex+1)])       # requirement for beds
-    overloadICU1_max<-rowSums(out_max[,(ICUCindex+1)])   # requirement for icu beds
-    overloadICUV1_max<-rowSums(out_max[,(ICUCVindex+1)]) # requirement for ventilators
-    overloadVent1_max<-rowSums(out_max[,(VentCindex+1)]) # requirement for ventilators
-    ccases1_max<-rowSums(out_max[,(Cindex+1)])           # cumulative cases
-    reqsurge1_max<-rowSums(out_max[,(Hindex+1)])+overloadH1  # surge beds total requirements
-    reqicu1_max<-rowSums(out_max[,(ICUindex+1)])+overloadICU1 # ICU beds total requirements
-    reqvent1_max<-rowSums(out_max[,(Ventindex+1)])+overloadICUV1+overloadVent1 # ventilator beds total requirements
-    
-    previcureq1_min<-rowSums(out_min[,(Hindex+1)])+ rowSums(out_min[,(ICUCindex+1)])+rowSums(out_min[,(ICUCVindex+1)]) # surge beds occupancy
-    previcureq21_min<-rowSums(out_min[,(ICUindex+1)])+rowSums(out_min[,(VentCindex+1)])   # icu beds occupancy
-    previcureq31_min<-rowSums(out_min[,(Ventindex+1)])   # ventilator occupancy
-    cmortality1_min<-rowSums(out_min[,(CMindex+1)])      # cumulative mortality
-    overloadH1_min<-rowSums(out_min[,(HCindex+1)])       # requirement for beds
-    overloadICU1_min<-rowSums(out_min[,(ICUCindex+1)])   # requirement for icu beds
-    overloadICUV1_min<-rowSums(out_min[,(ICUCVindex+1)]) # requirement for ventilators
-    overloadVent1_min<-rowSums(out_min[,(VentCindex+1)]) # requirement for ventilators
-    ccases1_min<-rowSums(out_min[,(Cindex+1)])           # cumulative cases
-    reqsurge1_min<-rowSums(out_min[,(Hindex+1)])+overloadH1  # surge beds total requirements
-    reqicu1_min<-rowSums(out_min[,(ICUindex+1)])+overloadICU1 # ICU beds total requirements
-    reqvent1_min<-rowSums(out_min[,(Ventindex+1)])+overloadICUV1+overloadVent1 # ventilator beds total requirements
-    
-    results$total_reported_deaths_end_min <- last(cmortality1_min)
-    results$total_reported_deaths_end_max <- last(cmortality1_max)
-    
-    results$pct_total_pop_infected_min <- round(100 * tail(cumsum(rowSums(parameters["gamma"]*out_min[,(Eindex+1)])),1)/sum(popstruc[,2]), 1)  # proportion of the  population that has been infected at the end of the simulation
-    results$pct_total_pop_infected_max <- round(100 * tail(cumsum(rowSums(parameters["gamma"]*out_max[,(Eindex+1)])),1)/sum(popstruc[,2]), 1)  # proportion of the  population that has been infected at the end of the simulation
-  }
-  
+
   return(results)
 }
-# END Placeholder ----
