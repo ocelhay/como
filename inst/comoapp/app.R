@@ -633,13 +633,13 @@ server <- function(input, output, session) {
     source("./www/fun_multi_runs.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
     
     vectors <- inputs(inp, 'Baseline (Calibration)', times = times, stopdate = stopdate)
-    out <- multi_runs(Y, times, parameters, input = vectors, A = A)
     
     if(input$iterations == 1) {
-      simul_baseline$results <- process_ode_outcome(out, parameters, startdate, times, ihr, ifr, mort, popstruc, nature = "unique_iteration")
+      simul_baseline$results <- multi_runs(Y, times, parameters, input = vectors, A = A)
     }
     
     if(input$iterations > 1) {
+      out <- multi_runs(Y, times, parameters, input = vectors, A = A)
       simul_baseline$results <- process_ode_outcome(out, parameters, startdate, times, ihr, ifr, mort, popstruc, nature = "median")
       # decide on what to do with those (naming...)
     }

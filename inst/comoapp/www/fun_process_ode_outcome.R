@@ -1,5 +1,4 @@
-process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mort, popstruc, nature){
-  out <- out[[nature]]
+process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mort, popstruc){
   
   # define spline functions ----
   f <- c(1, (1 + parameters["give"]) / 2, (1 - parameters["give"]) / 2, 0)

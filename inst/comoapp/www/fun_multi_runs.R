@@ -13,7 +13,7 @@ multi_runs <- function(Y, times, parameters, input, A){
                       popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
                       ageing=ageing, ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
     
-    results$unique_iteration <- output_ode %>% matrix(nrow = nrow, ncol = ncol)
+    results <- process_ode_outcome(output_ode, parameters, startdate, times, ihr, ifr, mort, popstruc)
   }
   
   # case when several iterations
