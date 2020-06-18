@@ -676,11 +676,31 @@ server <- function(input, output, session) {
                      duration = NULL, type = "message", id = "run_interventions_notif")
     
     source("./www/model.R", local = TRUE)
+    source("./www/fun_single_run.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
     source("./www/fun_multi_runs.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
-    vectors <- inputs(inp, 'Hypothetical Scenario', times = times, stopdate = stopdate)
-    out <- multi_runs(Y, times, parameters, input = vectors, A = A)
     
-    simul_interventions$results <- process_ode_outcome(out, parameters, nature = "median")
+    vectors <- inputs(inp, 'Hypothetical Scenario', times = times, stopdate = stopdate)
+    
+    if(input$iterations == 1) {
+      simul_interventions$results <- single_run(Y, times, parameters, input = vectors, A = A)
+    }
+    
+    if(input$iterations > 1) {
+      results <- multi_runs(Y, times, parameters, input = vectors, A = A)
+      # example where the criteria to sort runs is the value of "attributable_deaths_end"
+      
+      multi_attributable_deaths_end <- NULL
+      for (i in 1:input$iterations) {
+        multi_attributable_deaths_end <- c(multi_attributable_deaths_end, results[[i]]$attributable_deaths_end)
+      }
+      
+      index_min <- which.min(abs(multi_attributable_deaths_end - quantile(multi_attributable_deaths_end, parameters["confidence"])))
+      index_med <- which.min(abs(multi_attributable_deaths_end - quantile(multi_attributable_deaths_end, 0.5)))
+      index_max <- which.min(abs(multi_attributable_deaths_end - quantile(multi_attributable_deaths_end, (1 - parameters["confidence"]))))
+      
+      simul_interventions$results <- results[[index_med]]
+    }
+    
     simul_interventions$interventions_available <- TRUE
     
     removeNotification(id = "run_interventions_notif", session = session)
