@@ -1,11 +1,10 @@
-multi_runs <- function(Y, times, parameters, input, A, iterations, noise, confidence){
-  
+multi_runs <- function(Y, times, parameters, input, A){
   results <- list()
   nrow <- length(times)
   ncol <- (22*A) + 1
   
   # case when one iteration
-  if(iterations == 1){
+  if(parameters["iterations"] == 1){
     covidOdeCpp_reset()
     output_ode <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, 
                       parms = parameters, input = input, A = A,
@@ -18,15 +17,15 @@ multi_runs <- function(Y, times, parameters, input, A, iterations, noise, confid
   }
   
   # case when several iterations
-  if(iterations > 1){
+  if(parameters["iterations"] > 1){
     multiple_output_ode <- NULL
     
-    for (i in 1:iterations){
+    for (i in 1:parameters["iterations"]){
       print(paste0("Iteration: ", i))
       
       # add noise to parameters
       parameters[parameters_noise] <- parameters[parameters_noise] + 
-        rnorm(length(parameters_noise), mean = 0, sd = noise*abs(parameters[parameters_noise]))
+        rnorm(length(parameters_noise), mean = 0, sd = parameters["noise"]*abs(parameters[parameters_noise]))
       
       covidOdeCpp_reset()
       output_ode <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, 
@@ -40,8 +39,8 @@ multi_runs <- function(Y, times, parameters, input, A, iterations, noise, confid
     }
     
     results$median <- apply(multiple_output_ode, 1, quantile, probs = 0.5) %>% matrix(nrow = nrow, ncol = ncol)
-    results$min <- apply(multiple_output_ode, 1, quantile, probs = confidence) %>% matrix(nrow = nrow, ncol = ncol)
-    results$max <- apply(multiple_output_ode, 1, quantile, probs = (1 - confidence)) %>% matrix(nrow = nrow, ncol = ncol)
+    results$min <- apply(multiple_output_ode, 1, quantile, probs = parameters["confidence"]) %>% matrix(nrow = nrow, ncol = ncol)
+    results$max <- apply(multiple_output_ode, 1, quantile, probs = (1 - parameters["confidence"])) %>% matrix(nrow = nrow, ncol = ncol)
   }
   
   return(results)

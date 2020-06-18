@@ -105,6 +105,19 @@ initVent <- rep(0, A)  # icu vent
 initVentC <- rep(0, A) # icu vent crit
 initCMC <- rep(0, A)   # Cumulative deaths (true)
 
+
+
+parameters_noise <- c("p", "rho", "omega", "gamma", "nui", "ihr_scaling", "nus", 
+  "nusc", "nu_icu", "nu_icuc", "nu_vent", "nu_ventc", "rhos", "selfis_eff", 
+  "dist_eff", "hand_eff", "work_eff", "w2h", "school_eff", "s2h", 
+  "cocoon_eff", "mean_imports", "screen_overdispersion", "quarantine_effort", 
+  "quarantine_eff_home", "quarantine_eff_other")
+
+
+# Define per year ageing matrix ----
+ageing <- t(diff(diag(rep(1, A)), lag = 1) / (5 * 365.25))
+ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
+
 source("./www/fun_validation_interventions.R")
 source("./www/fun_inputs.R")
 

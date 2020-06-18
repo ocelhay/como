@@ -19,17 +19,12 @@ ifr <- mort_sever_rv$data %>%
   select(age_category, ifr) %>% 
   as.data.frame()
 
-# Define per year ageing matrix ----
-dd <- seq(1:A) / seq(1:A)
-ageing <- t(diff(diag(dd), lag = 1) / (5 * 365.25))
-ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
+# Complete contact Matrices ----
+c_home <- contact_home[[input$country_contact]] %>% as.matrix()
+c_school <- contact_school[[input$country_contact]] %>% as.matrix()
+c_work <- contact_work[[input$country_contact]] %>% as.matrix()
+c_other <- contact_other[[input$country_contact]] %>% as.matrix()
 
-# Contact Matrices ----
-country_name <- input$country_contact
-c_home <- contact_home[[country_name]] %>% as.matrix()
-c_school <- contact_school[[country_name]] %>% as.matrix()
-c_work <- contact_work[[country_name]] %>% as.matrix()
-c_other <- contact_other[[country_name]] %>% as.matrix()
 nce <- A - length(c_home[1, ])
 
 contact_home <- matrix(0, nrow = A, ncol = A)
@@ -37,37 +32,37 @@ contact_school <- matrix(0, nrow = A, ncol = A)
 contact_work <- matrix(0, nrow = A, ncol = A)
 contact_other <- matrix(0, nrow = A, ncol = A)
 
-for (i in 1:(A-nce)){
-  for (j in 1:(A-nce)){
-    contact_home[i,j]<-c_home[i,j]
-    contact_school[i,j]<-c_school[i,j]
-    contact_work[i,j]<-c_work[i,j]
-    contact_other[i,j]<-c_other[i,j]
+for (i in 1:(A - nce)) {
+  for (j in 1:(A - nce)) {
+    contact_home[i, j] <- c_home[i, j]
+    contact_school[i, j] <- c_school[i, j]
+    contact_work[i, j] <- c_work[i, j]
+    contact_other[i, j] <- c_other[i, j]
   }
 }
 
-for (i in (A+1-nce):A){
-  for (j in 1:(A-nce)){
-    contact_home[i,j]<-c_home[(A-nce),j]
-    contact_school[i,j]<-c_school[(A-nce),j]
-    contact_work[i,j]<-c_work[(A-nce),j]
-    contact_other[i,j]<-c_other[(A-nce),j]
+for (i in (A + 1 - nce):A) {
+  for (j in 1:(A - nce)) {
+    contact_home[i, j] <- c_home[(A - nce), j]
+    contact_school[i, j] <- c_school[(A - nce), j]
+    contact_work[i, j] <- c_work[(A - nce), j]
+    contact_other[i, j] <- c_other[(A - nce), j]
   }
 }
-for (i in 1:(A-nce)){
-  for (j in (A+1-nce):A){
-    contact_home[i,j]<-c_home[i,(A-nce)]
-    contact_school[i,j]<-c_school[i,(A-nce)]
-    contact_work[i,j]<-c_work[i,(A-nce)]
-    contact_other[i,j]<-c_other[i,(A-nce)]
+for (i in 1:(A - nce)) {
+  for (j in (A + 1 - nce):A) {
+    contact_home[i, j] <- c_home[i, (A - nce)]
+    contact_school[i, j] <- c_school[i, (A - nce)]
+    contact_work[i, j] <- c_work[i, (A - nce)]
+    contact_other[i, j] <- c_other[i, (A - nce)]
   }
 }
-for (i in (A+1-nce):A){
-  for (j in (A+1-nce):A){
-    contact_home[i,j]<-c_home[(A-nce),(A-nce)]
-    contact_school[i,j]<-c_school[(A-nce),(A-nce)]
-    contact_work[i,j]<-c_work[(A-nce),(A-nce)]
-    contact_other[i,j]<-c_other[(A-nce),(A-nce)]
+for (i in (A + 1 - nce):A) {
+  for (j in (A + 1 - nce):A) {
+    contact_home[i, j] <- c_home[(A - nce), (A - nce)]
+    contact_school[i, j] <- c_school[(A - nce), (A - nce)]
+    contact_work[i, j] <- c_work[(A - nce), (A - nce)]
+    contact_other[i, j] <- c_other[(A - nce), (A - nce)]
   }
 }
 
@@ -78,81 +73,23 @@ times <- seq(0, as.numeric(stopdate - startdate))
 
 
 # Define parameters vector ----
-parameters <- c(
-  p = input$p,
-  rho = input$rho,
-  omega = input$omega,
-  gamma = input$gamma,
-  nui = input$nui,
-  report = input$report,
-  reportc = input$reportc,
-  reporth = input$reporth,
-  beds_available = input$beds_available,
-  icu_beds_available = input$icu_beds_available,
-  ventilators_available = input$ventilators_available,
-  give = 95,
-  pdeath_h = input$pdeath_h,
-  pdeath_hc = input$pdeath_hc,
-  pdeath_icu = input$pdeath_icu,
-  pdeath_icuc = input$pdeath_icuc,
-  pdeath_vent = input$pdeath_vent,
-  pdeath_ventc = input$pdeath_ventc,
-  ihr_scaling = input$ihr_scaling,
-  nus = input$nus,
-  nusc = input$nus, # nusc = nus
-  nu_icu = input$nu_icu,
-  nu_icuc = input$nu_icu, # nu_icuc = nu_icu
-  nu_vent = input$nu_vent,
-  nu_ventc = input$nu_vent, # nu_ventc = nu_vent
-  rhos = input$rhos,
-  amp = input$amp,
-  phi = which(month.name == input$phi),
-  pclin = input$pclin,
-  prob_icu = input$prob_icu,
-  prob_vent = input$prob_vent,
-  
-  # INTERVENTIONS
-  # self isolation
-  selfis_eff = input$selfis_eff,
-  # social distancing
-  dist_eff = input$dist_eff,
-  # hand washing
-  hand_eff = input$hand_eff,
-  # working at home
-  work_eff = input$work_eff,
-  w2h = input$w2h,
-  # school closures
-  school_eff = input$school_eff,
-  s2h = input$s2h,
-  # cocooning the elderly
-  cocoon_eff = input$cocoon_eff,
-  age_cocoon = input$age_cocoon,
-  # vaccination campaign
-  vaccine_eff = input$vaccine_eff,
-  vac_campaign = input$vac_campaign,
-  # travel ban
-  mean_imports = input$mean_imports,
-  # screening
-  screen_test_sens = input$screen_test_sens,
-  screen_overdispersion = input$screen_overdispersion,
-  screen_contacts = input$screen_contacts,
-  
-  # voluntary home quarantine
-  quarantine_days = input$quarantine_days,
-  quarantine_effort = input$quarantine_effort,
-  quarantine_eff_home = input$quarantine_eff_home,
-  quarantine_eff_other = input$quarantine_eff_other,
-  
-  household_size = input$household_size,
-  noise = input$noise,
-  iterations = input$iterations,
-  confidence = input$confidence
-)
+parameters <- reactiveValuesToList(input)[c("p", "rho", "omega", "gamma", "nui", "report", "reportc", "reporth", 
+                                              "beds_available", "icu_beds_available", "ventilators_available", 
+                                              "pdeath_h", "pdeath_hc", "pdeath_icu", "pdeath_icuc", 
+                                              "pdeath_vent", "pdeath_ventc", "ihr_scaling", "nus", 
+                                              "nu_icu", "nu_vent", "rhos", "amp", 
+                                              "pclin", "prob_icu", "prob_vent", "selfis_eff", "dist_eff", "hand_eff", 
+                                              "work_eff", "w2h", "school_eff", "s2h", "cocoon_eff", "age_cocoon", 
+                                              "vaccine_eff", "vac_campaign", "mean_imports", "screen_test_sens", 
+                                              "screen_overdispersion", "quarantine_days", "quarantine_effort", 
+                                              "quarantine_eff_home", "quarantine_eff_other", "household_size", 
+                                              "noise", "iterations", "confidence")] %>% unlist()
 
-ihr[,2] <- parameters["ihr_scaling"]*ihr[,2]
+parameters <- c(parameters, give = 95, nusc = input$nus, nu_icuc = input$nu_icu, nu_ventc = input$nu_vent,
+                phi = which(month.name == input$phi))
 
 
-# Scale parameters to percentages/ rates
+# Transform parameters ----
 parameters["rho"] <- parameters["rho"] / 100
 parameters["omega"] <- (1 / (parameters["omega"] * 365))
 parameters["gamma"] <- 1 / parameters["gamma"]
@@ -193,17 +130,10 @@ parameters["nu_ventc"] <- 1 / parameters["nu_ventc"]
 parameters["pclin"] <- parameters["pclin"] / 100
 parameters["prob_icu"] <- parameters["prob_icu"] / 100
 parameters["prob_vent"] <- parameters["prob_vent"] / 100
+parameters["confidence"] <- parameters["confidence"] / 100
 
-
-
-# Additions for several iterations ----
-parameters_noise<-c(1:5,19:26,32:39,43,45,47:49)
-iterations<-parameters["iterations"]
-noise<-parameters["noise"]
-confidence<-parameters["confidence"]/100
-
-
-
+# TODO: move this line to a better location
+ihr[,2] <- parameters["ihr_scaling"]*ihr[,2]
 
 
 # Define dataframe of interventions ----
@@ -221,7 +151,7 @@ Y <- c(initS, initE, initI, initR, initX, initH, initHC, initC, initCM, initV, i
      initQR, initCL, initQC, initICU, initICUC, initICUCV, initVent, initVentC, initCMC)
 
 # Function to process ode outcome ----
-process_ode_outcome <- function(out, iterations, parameters, nature){
+process_ode_outcome <- function(out, parameters, nature){
   out <- out[[nature]]
   
   # define spline functions ----

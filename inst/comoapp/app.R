@@ -633,17 +633,15 @@ server <- function(input, output, session) {
     source("./www/fun_multi_runs.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
     
     vectors <- inputs(inp, 'Baseline (Calibration)', times = times, stopdate = stopdate)
-    out <- multi_runs(Y, times, parameters, input = vectors, A = A, iterations, noise, confidence)
+    out <- multi_runs(Y, times, parameters, input = vectors, A = A)
     
-    if(iterations == 1) {
-      simul_baseline$results <- process_ode_outcome(out, iterations, parameters, nature = "unique_iteration")
+    if(input$iterations == 1) {
+      simul_baseline$results <- process_ode_outcome(out, parameters, nature = "unique_iteration")
     }
     
-    if(iterations > 1) {
-      simul_baseline$results <- process_ode_outcome(out, iterations, parameters, nature = "median")
+    if(input$iterations > 1) {
+      simul_baseline$results <- process_ode_outcome(out, parameters, nature = "median")
       # decide on what to do with those (naming...)
-      # simul_baseline$results <- process_ode_outcome(out, iterations, parameters, nature = "min")
-      # simul_baseline$results <- process_ode_outcome(out, iterations, parameters, nature = "max")
     }
     simul_baseline$baseline_available <- TRUE
     
@@ -669,9 +667,9 @@ server <- function(input, output, session) {
     source("./www/model.R", local = TRUE)
     source("./www/fun_multi_runs.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
     vectors <- inputs(inp, 'Hypothetical Scenario', times = times, stopdate = stopdate)
-    out <- multi_runs(Y, times, parameters, input = vectors, A = A, iterations, noise, confidence)
+    out <- multi_runs(Y, times, parameters, input = vectors, A = A)
     
-    simul_interventions$results <- process_ode_outcome(out, iterations, parameters, nature = "median")
+    simul_interventions$results <- process_ode_outcome(out, parameters, nature = "median")
     simul_interventions$interventions_available <- TRUE
     
     removeNotification(id = "run_interventions_notif", session = session)
@@ -722,7 +720,6 @@ server <- function(input, output, session) {
                      cases_rv$data %>% rename(input_cases = cases,
                                               input_deaths = deaths,
                                               input_cumulative_death = cumulative_death), by = "date")
-    
     
     dta_interventions <- tibble(
       date = simul_interventions$results$time,
