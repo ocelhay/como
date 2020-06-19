@@ -19,216 +19,217 @@ ui <- function(request) {
     source("./www/ui/pushbar_parameters_virus.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_hospital.R", local = TRUE)[1],
     
-    navbarPage(NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
-               tabPanel(span("COVID-19 App | CoMo Consortium ", version_app), value = "tab_welcome",
-                        fluidRow(
-                          column(4, 
-                                 h3("COVID-19 App | CoMo Consortium"),
-                                 h4(version_app),
-                                 tags$img(src = "./como_logo.png", id = "logo"),
-                                 p("The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level.")
-                          ),
-                          column(4,
-                                 div(class = "box_outputs", h4("Important Disclaimer:")),
-                                 includeMarkdown("./www/markdown/disclaimer.md"),
-                                 br(),
-                                 div(class = "box_outputs", h4("License:")),
-                                 includeMarkdown("./www/markdown/readable_license.md")
-                          ),
-                          column(4,
-                                 div(class = "box_outputs", h4("Sources of Data:")),
-                                 includeMarkdown("./www/markdown/about_country_data.md"),
-                                 includeMarkdown("./www/markdown/about_data.md"),
-                          )
-                        ),
-                        
+    navbarPage(
+      NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
+      tabPanel(span("COVID-19 App | CoMo Consortium ", version_app), value = "tab_welcome",
+               fluidRow(
+                 column(4, 
+                        h3("COVID-19 App | CoMo Consortium"),
+                        h4(version_app),
+                        tags$img(src = "./como_logo.png", id = "logo"),
+                        p("The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level.")
+                 ),
+                 column(4,
+                        div(class = "box_outputs", h4("Important Disclaimer:")),
+                        includeMarkdown("./www/markdown/disclaimer.md"),
+                        br(),
+                        div(class = "box_outputs", h4("License:")),
+                        includeMarkdown("./www/markdown/readable_license.md")
+                 ),
+                 column(4,
+                        div(class = "box_outputs", h4("Sources of Data:")),
+                        includeMarkdown("./www/markdown/about_country_data.md"),
+                        includeMarkdown("./www/markdown/about_data.md"),
+                 )
                ),
-               tabPanel("Visual Calibration", value = "tab_visualfit",
+               
+      ),
+      tabPanel("Visual Calibration", value = "tab_visualfit",
+               fluidRow(
+                 column(2,
+                        div(class = "float_bottom_left",
+                            hr(),
+                            sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
+                                        value = 0.049, ticks = FALSE, width = "75%"),
+                            sliderInput("report", label = span("Percentage of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
+                                        value = 2.5, post = "%", ticks = FALSE, width = "75%"),
+                            sliderInput("reportc", label = span("Percentage of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
+                                        value = 5, post = "%", ticks = FALSE, width = "75%"),
+                            sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
+                                        value = 100, post = "%", ticks = FALSE, width = "75%"),
+                            htmlOutput("text_feedback_interventions_baseline"),
+                            
+                            uiOutput("conditional_run_baseline"), br(),
+                            uiOutput("conditional_validate_baseline"),
+                            hr()
+                        )
+                 ),
+                 column(10,
                         fluidRow(
-                          column(2,
-                                 div(class = "float_bottom_left",
-                                     hr(),
-                                     sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
-                                                 value = 0.049, ticks = FALSE, width = "75%"),
-                                     sliderInput("report", label = span("Percentage of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
-                                                 value = 2.5, post = "%", ticks = FALSE, width = "75%"),
-                                     sliderInput("reportc", label = span("Percentage of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
-                                                 value = 5, post = "%", ticks = FALSE, width = "75%"),
-                                     sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
-                                                 value = 100, post = "%", ticks = FALSE, width = "75%"),
-                                     htmlOutput("text_feedback_interventions_baseline"),
-                                     
-                                     uiOutput("conditional_run_baseline"), br(),
-                                     uiOutput("conditional_validate_baseline"),
-                                     hr()
+                          div(class = "box_outputs", h4("Global Simulations Parameters:")),
+                          column(6,
+                                 p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
+                                   ", edit it and upload it:"),
+                                 fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE, width = "75%"),
+                                 p("Brief explanations to be added along the lines of: (a) running time is about 1 second per run, (b) results shown are for mediane unless stated otherwise"),
+                                 fluidRow(column(6,
+                                                 sliderInput("iterations", "Number of model runs:", value = 1, min = 1, max = 500, post = " runs", ticks = FALSE)
+                                 ),
+                                 column(6,
+                                        conditionalPanel("input.iterations > 1", 
+                                                         sliderInput("noise", "Noise:", value = 0.1, min = 0.01, max = 0.2, ticks = FALSE),
+                                                         sliderInput("confidence", "Confidence:", value = 1, min = 5, max = 25, post = "%", ticks = FALSE)
+                                        )
+                                 )
                                  )
                           ),
-                          column(10,
-                                 fluidRow(
-                                   div(class = "box_outputs", h4("Global Simulations Parameters:")),
-                                   column(6,
-                                          p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
-                                            ", edit it and upload it:"),
-                                          fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE, width = "75%"),
-                                          p("Brief explanations to be added along the lines of: (a) running time is about 1 second per run, (b) results shown are for mediane unless stated otherwise"),
-                                          fluidRow(column(6,
-                                                          sliderInput("iterations", "Number of model runs:", value = 1, min = 1, max = 500, post = " runs", ticks = FALSE)
-                                          ),
-                                          column(6,
-                                                 conditionalPanel("input.iterations > 1", 
-                                                                  sliderInput("noise", "Noise:", value = 0.1, min = 0.01, max = 0.2, ticks = FALSE),
-                                                                  sliderInput("confidence", "Confidence:", value = 1, min = 5, max = 25, post = "%", ticks = FALSE)
-                                                 )
+                          column(6,
+                                 dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year"),
+                                 hr(),
+                                 fluidRow(column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                             width = "70%"),
+                                                 htmlOutput("feedback_choices")),
+                                          column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                             width = "70%"), br(), br(),
+                                                 bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                          width = "70%"), br(), br(),
+                                                 bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                          width = "70%")
                                           )
-                                          )
-                                   ),
-                                   column(6,
-                                          dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year"),
-                                          hr(),
-                                          fluidRow(column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      width = "70%"),
-                                                          htmlOutput("feedback_choices")),
-                                                   column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      width = "70%"), br(), br(),
-                                                          bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                   width = "70%"), br(), br(),
-                                                          bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                   width = "70%")
-                                                   )
-                                          )
-                                   )
-                                 ),
-                                 br(),
-                                 fluidRow(
-                                   column(6,
-                                          div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
-                                          sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 30, value = 0, step = 1, ticks = FALSE),
-                                          source("./www/ui/interventions_baseline.R", local = TRUE)$value
-                                   ),
-                                   column(6,
-                                          div(class = "box_outputs", h4("Timeline:")),
-                                          plotOutput("timevis_baseline", height = 700)
-                                   )
-                                 ),
-                                 br(), br(), 
-                                 a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
-                                 fluidRow(
-                                   column(3, htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner()),
-                                   column(3, htmlOutput("text_total_death_baseline_dup") %>% withSpinner()),
-                                   column(3, htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()),
-                                   column(3, htmlOutput("text_doubling_time") %>% withSpinner())
-                                 ),
-                                 prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
-                                                    selected = "Observed", inline = TRUE), br(),
-                                 highchartOutput("highchart_cases", height = "350px") %>% withSpinner(), 
-                                 highchartOutput("highchart_deaths", height = "350px") %>% withSpinner()
+                                 )
                           )
-                        )
-               ),
-               tabPanel("Model Predictions", value = "tab_modelpredictions",
-                        a(id = "anchor_interventions", style = "visibility: hidden", ""),
+                        ),
+                        br(),
                         fluidRow(
-                          column(2, br(),
-                                 actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success"), br(), br(),
-                                 htmlOutput("text_feedback_interventions_future"),
-                                 uiOutput("conditional_run_future")
+                          column(6,
+                                 div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
+                                 sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 30, value = 0, step = 1, ticks = FALSE),
+                                 source("./www/ui/interventions_baseline.R", local = TRUE)$value
                           ),
-                          column(5,
-                                 div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
-                                 sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 30,  value = 0, step = 1, ticks = FALSE),
-                                 source("./www/ui/interventions_future.R", local = TRUE)$value
-                          ),
-                          column(5,
-                                 div(class = "box_outputs", h4("Timeline")),
-                                 plotOutput("timevis_future", height = 700)
+                          column(6,
+                                 div(class = "box_outputs", h4("Timeline:")),
+                                 plotOutput("timevis_baseline", height = 700)
                           )
                         ),
                         br(), br(), 
+                        a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
                         fluidRow(
-                          column(2, 
-                                 uiOutput("conditional_float_results"),
-                                 a(id = "anchor_summary", style="visibility: hidden", "")
-                          ),
-                          column(5,
-                                 div(class = "box_outputs", h4("Baseline")),
-                                 htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
-                                 htmlOutput("text_total_death_baseline") %>% withSpinner(), br(),
-                                 htmlOutput("text_reported_death_baseline") %>% withSpinner()
-                          ),
-                          column(5,
-                                 div(class = "box_outputs", h4("Hypothetical Scenario")),
-                                 htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
-                                 htmlOutput("text_total_death_interventions") %>% withSpinner(), br(), 
-                                 htmlOutput("text_reported_death_interventions") %>% withSpinner()
-                          )
+                          column(3, htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner()),
+                          column(3, htmlOutput("text_total_death_baseline_dup") %>% withSpinner()),
+                          column(3, htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()),
+                          column(3, htmlOutput("text_doubling_time") %>% withSpinner())
                         ),
-                        
-                        fluidRow(
-                          column(10, offset = 2,
-                                 br(),
-                                 materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
-                                                status = "danger", right = TRUE, inline = FALSE, width = "100%"),
-                                 br(),
-                                 a(id = "anchor_cases", style="visibility: hidden", ""),
-                                 prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
-                                                    selected = "Predicted Reported + Unreported", inline = TRUE)
-                          )
-                        ),
-                        fluidRow(
-                          column(5, offset = 2,
-                                 highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br()
-                          ),
-                          column(5,
-                                 highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br()
-                          )
-                        ),
-                        
-                        fluidRow(
-                          column(10, offset = 2,
-                                 a(id = "anchor_deaths", style="visibility: hidden", ""),
-                                 prettyRadioButtons("focus_natural_death", label = "Focus on:", 
-                                                    choices = c("No Focus", "COVID-19 Deaths"), 
-                                                    selected = "No Focus", inline = TRUE)
-                          )
-                        ),
-                        fluidRow(
-                          column(5, offset = 2,
-                                 highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                                 plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br(),
-                                 plotOutput("plot_mortality_lag_baseline") %>% withSpinner(), br()
-                          ),
-                          column(5,
-                                 highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                                 plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br(),
-                                 plotOutput("plot_mortality_lag_interventions") %>% withSpinner(), br()
-                          )
-                        ),
-                        fluidRow(
-                          column(10, offset = 2,
-                                 a(id = "anchor_occupancy", style="visibility: hidden", ""),
-                                 prettyRadioButtons("focus_requirements", label = "Focus on:", 
-                                                    choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
-                                                    selected = "No Focus", inline = TRUE)
-                          )
-                        ),
-                        fluidRow(
-                          column(5, offset = 2,
-                                 highchartOutput("highchart_requirements_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                          ),
-                          column(5, 
-                                 highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                          )
-                        ),
-                        fluidRow(
-                          column(5, offset = 2,
-                                 a(id = "anchor_rt", style="visibility: hidden", ""),
-                                 highchartOutput("highchart_Rt_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                          ),
-                          column(5, 
-                                 highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                          )
-                        )
+                        prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
+                                           selected = "Observed", inline = TRUE), br(),
+                        highchartOutput("highchart_cases", height = "350px") %>% withSpinner(), 
+                        highchartOutput("highchart_deaths", height = "350px") %>% withSpinner()
+                 )
                )
+      ),
+      tabPanel("Model Predictions", value = "tab_modelpredictions",
+               a(id = "anchor_interventions", style = "visibility: hidden", ""),
+               fluidRow(
+                 column(2, br(),
+                        actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success"), br(), br(),
+                        htmlOutput("text_feedback_interventions_future"),
+                        uiOutput("conditional_run_future")
+                 ),
+                 column(5,
+                        div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
+                        sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 30,  value = 0, step = 1, ticks = FALSE),
+                        source("./www/ui/interventions_future.R", local = TRUE)$value
+                 ),
+                 column(5,
+                        div(class = "box_outputs", h4("Timeline")),
+                        plotOutput("timevis_future", height = 700)
+                 )
+               ),
+               br(), br(), 
+               fluidRow(
+                 column(2, 
+                        uiOutput("conditional_float_results"),
+                        a(id = "anchor_summary", style="visibility: hidden", "")
+                 ),
+                 column(5,
+                        div(class = "box_outputs", h4("Baseline")),
+                        htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
+                        htmlOutput("text_total_death_baseline") %>% withSpinner(), br(),
+                        htmlOutput("text_reported_death_baseline") %>% withSpinner()
+                 ),
+                 column(5,
+                        div(class = "box_outputs", h4("Hypothetical Scenario")),
+                        htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
+                        htmlOutput("text_total_death_interventions") %>% withSpinner(), br(), 
+                        htmlOutput("text_reported_death_interventions") %>% withSpinner()
+                 )
+               ),
+               
+               fluidRow(
+                 column(10, offset = 2,
+                        br(),
+                        materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
+                                       status = "danger", right = TRUE, inline = FALSE, width = "100%"),
+                        br(),
+                        a(id = "anchor_cases", style="visibility: hidden", ""),
+                        prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
+                                           selected = "Predicted Reported + Unreported", inline = TRUE)
+                 )
+               ),
+               fluidRow(
+                 column(5, offset = 2,
+                        highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br()
+                 ),
+                 column(5,
+                        highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br()
+                 )
+               ),
+               
+               fluidRow(
+                 column(10, offset = 2,
+                        a(id = "anchor_deaths", style="visibility: hidden", ""),
+                        prettyRadioButtons("focus_natural_death", label = "Focus on:", 
+                                           choices = c("No Focus", "COVID-19 Deaths"), 
+                                           selected = "No Focus", inline = TRUE)
+                 )
+               ),
+               fluidRow(
+                 column(5, offset = 2,
+                        highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                        plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br(),
+                        plotOutput("plot_mortality_lag_baseline") %>% withSpinner(), br()
+                 ),
+                 column(5,
+                        highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                        plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br(),
+                        plotOutput("plot_mortality_lag_interventions") %>% withSpinner(), br()
+                 )
+               ),
+               fluidRow(
+                 column(10, offset = 2,
+                        a(id = "anchor_occupancy", style="visibility: hidden", ""),
+                        prettyRadioButtons("focus_requirements", label = "Focus on:", 
+                                           choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
+                                           selected = "No Focus", inline = TRUE)
+                 )
+               ),
+               fluidRow(
+                 column(5, offset = 2,
+                        highchartOutput("highchart_requirements_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                 ),
+                 column(5, 
+                        highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                 )
+               ),
+               fluidRow(
+                 column(5, offset = 2,
+                        a(id = "anchor_rt", style="visibility: hidden", ""),
+                        highchartOutput("highchart_Rt_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                 ),
+                 column(5, 
+                        highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                 )
+               )
+      )
     )
   )
 }
@@ -272,153 +273,155 @@ server <- function(input, output, session) {
   
   observe({
     # Create interventions tibble
-    interventions$baseline_mat <- tibble(index = 1:30,
-                                         intervention = c(input$baseline_intervention_1, input$baseline_intervention_2,
-                                                          input$baseline_intervention_3, input$baseline_intervention_4,
-                                                          input$baseline_intervention_5, input$baseline_intervention_6,
-                                                          input$baseline_intervention_7, input$baseline_intervention_8,
-                                                          input$baseline_intervention_9, input$baseline_intervention_10,
-                                                          
-                                                          input$baseline_intervention_11, input$baseline_intervention_12,
-                                                          input$baseline_intervention_13, input$baseline_intervention_14,
-                                                          input$baseline_intervention_15, input$baseline_intervention_16,
-                                                          input$baseline_intervention_17, input$baseline_intervention_18,
-                                                          input$baseline_intervention_19, input$baseline_intervention_20,
-                                                          
-                                                          input$baseline_intervention_21, input$baseline_intervention_22,
-                                                          input$baseline_intervention_23, input$baseline_intervention_24,
-                                                          input$baseline_intervention_25, input$baseline_intervention_26,
-                                                          input$baseline_intervention_27, input$baseline_intervention_28,
-                                                          input$baseline_intervention_29, input$baseline_intervention_30),
-                                         
-                                         date_start = c(input$baseline_daterange_1[1], input$baseline_daterange_2[1],
-                                                        input$baseline_daterange_3[1], input$baseline_daterange_4[1],
-                                                        input$baseline_daterange_5[1], input$baseline_daterange_6[1],
-                                                        input$baseline_daterange_7[1], input$baseline_daterange_8[1],
-                                                        input$baseline_daterange_9[1], input$baseline_daterange_10[1],
-                                                        
-                                                        input$baseline_daterange_11[1], input$baseline_daterange_12[1],
-                                                        input$baseline_daterange_13[1], input$baseline_daterange_14[1],
-                                                        input$baseline_daterange_15[1], input$baseline_daterange_16[1],
-                                                        input$baseline_daterange_17[1], input$baseline_daterange_18[1],
-                                                        input$baseline_daterange_19[1], input$baseline_daterange_20[1],
-                                                        
-                                                        input$baseline_daterange_21[1], input$baseline_daterange_22[1],
-                                                        input$baseline_daterange_23[1], input$baseline_daterange_24[1],
-                                                        input$baseline_daterange_25[1], input$baseline_daterange_26[1],
-                                                        input$baseline_daterange_27[1], input$baseline_daterange_28[1],
-                                                        input$baseline_daterange_29[1], input$baseline_daterange_30[1]),
-                                         
-                                         date_end = c(input$baseline_daterange_1[2], input$baseline_daterange_2[2],
-                                                      input$baseline_daterange_3[2], input$baseline_daterange_4[2],
-                                                      input$baseline_daterange_5[2], input$baseline_daterange_6[2],
-                                                      input$baseline_daterange_7[2], input$baseline_daterange_8[2],
-                                                      input$baseline_daterange_9[2], input$baseline_daterange_10[2],
-                                                      
-                                                      input$baseline_daterange_11[2], input$baseline_daterange_12[2],
-                                                      input$baseline_daterange_13[2], input$baseline_daterange_14[2],
-                                                      input$baseline_daterange_15[2], input$baseline_daterange_16[2],
-                                                      input$baseline_daterange_17[2], input$baseline_daterange_18[2],
-                                                      input$baseline_daterange_19[2], input$baseline_daterange_20[2],
-                                                      
-                                                      input$baseline_daterange_21[2], input$baseline_daterange_22[2],
-                                                      input$baseline_daterange_23[2], input$baseline_daterange_24[2],
-                                                      input$baseline_daterange_25[2], input$baseline_daterange_26[2],
-                                                      input$baseline_daterange_27[2], input$baseline_daterange_28[2],
-                                                      input$baseline_daterange_29[2], input$baseline_daterange_30[2]),
-                                         
-                                         value = c(input$baseline_coverage_1, input$baseline_coverage_2,
-                                                   input$baseline_coverage_3, input$baseline_coverage_4,
-                                                   input$baseline_coverage_5, input$baseline_coverage_6,
-                                                   input$baseline_coverage_7, input$baseline_coverage_8,
-                                                   input$baseline_coverage_9, input$baseline_coverage_10,
-                                                   
-                                                   input$baseline_coverage_11, input$baseline_coverage_12,
-                                                   input$baseline_coverage_13, input$baseline_coverage_14,
-                                                   input$baseline_coverage_15, input$baseline_coverage_16,
-                                                   input$baseline_coverage_17, input$baseline_coverage_18,
-                                                   input$baseline_coverage_19, input$baseline_coverage_20,
-                                                   
-                                                   input$baseline_coverage_21, input$baseline_coverage_22,
-                                                   input$baseline_coverage_23, input$baseline_coverage_24,
-                                                   input$baseline_coverage_25, input$baseline_coverage_26,
-                                                   input$baseline_coverage_27, input$baseline_coverage_28,
-                                                   input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
+    interventions$baseline_mat <- tibble(
+      index = 1:30,
+      intervention = c(input$baseline_intervention_1, input$baseline_intervention_2,
+                       input$baseline_intervention_3, input$baseline_intervention_4,
+                       input$baseline_intervention_5, input$baseline_intervention_6,
+                       input$baseline_intervention_7, input$baseline_intervention_8,
+                       input$baseline_intervention_9, input$baseline_intervention_10,
+                       
+                       input$baseline_intervention_11, input$baseline_intervention_12,
+                       input$baseline_intervention_13, input$baseline_intervention_14,
+                       input$baseline_intervention_15, input$baseline_intervention_16,
+                       input$baseline_intervention_17, input$baseline_intervention_18,
+                       input$baseline_intervention_19, input$baseline_intervention_20,
+                       
+                       input$baseline_intervention_21, input$baseline_intervention_22,
+                       input$baseline_intervention_23, input$baseline_intervention_24,
+                       input$baseline_intervention_25, input$baseline_intervention_26,
+                       input$baseline_intervention_27, input$baseline_intervention_28,
+                       input$baseline_intervention_29, input$baseline_intervention_30),
+      
+      date_start = c(input$baseline_daterange_1[1], input$baseline_daterange_2[1],
+                     input$baseline_daterange_3[1], input$baseline_daterange_4[1],
+                     input$baseline_daterange_5[1], input$baseline_daterange_6[1],
+                     input$baseline_daterange_7[1], input$baseline_daterange_8[1],
+                     input$baseline_daterange_9[1], input$baseline_daterange_10[1],
+                     
+                     input$baseline_daterange_11[1], input$baseline_daterange_12[1],
+                     input$baseline_daterange_13[1], input$baseline_daterange_14[1],
+                     input$baseline_daterange_15[1], input$baseline_daterange_16[1],
+                     input$baseline_daterange_17[1], input$baseline_daterange_18[1],
+                     input$baseline_daterange_19[1], input$baseline_daterange_20[1],
+                     
+                     input$baseline_daterange_21[1], input$baseline_daterange_22[1],
+                     input$baseline_daterange_23[1], input$baseline_daterange_24[1],
+                     input$baseline_daterange_25[1], input$baseline_daterange_26[1],
+                     input$baseline_daterange_27[1], input$baseline_daterange_28[1],
+                     input$baseline_daterange_29[1], input$baseline_daterange_30[1]),
+      
+      date_end = c(input$baseline_daterange_1[2], input$baseline_daterange_2[2],
+                   input$baseline_daterange_3[2], input$baseline_daterange_4[2],
+                   input$baseline_daterange_5[2], input$baseline_daterange_6[2],
+                   input$baseline_daterange_7[2], input$baseline_daterange_8[2],
+                   input$baseline_daterange_9[2], input$baseline_daterange_10[2],
+                   
+                   input$baseline_daterange_11[2], input$baseline_daterange_12[2],
+                   input$baseline_daterange_13[2], input$baseline_daterange_14[2],
+                   input$baseline_daterange_15[2], input$baseline_daterange_16[2],
+                   input$baseline_daterange_17[2], input$baseline_daterange_18[2],
+                   input$baseline_daterange_19[2], input$baseline_daterange_20[2],
+                   
+                   input$baseline_daterange_21[2], input$baseline_daterange_22[2],
+                   input$baseline_daterange_23[2], input$baseline_daterange_24[2],
+                   input$baseline_daterange_25[2], input$baseline_daterange_26[2],
+                   input$baseline_daterange_27[2], input$baseline_daterange_28[2],
+                   input$baseline_daterange_29[2], input$baseline_daterange_30[2]),
+      
+      value = c(input$baseline_coverage_1, input$baseline_coverage_2,
+                input$baseline_coverage_3, input$baseline_coverage_4,
+                input$baseline_coverage_5, input$baseline_coverage_6,
+                input$baseline_coverage_7, input$baseline_coverage_8,
+                input$baseline_coverage_9, input$baseline_coverage_10,
+                
+                input$baseline_coverage_11, input$baseline_coverage_12,
+                input$baseline_coverage_13, input$baseline_coverage_14,
+                input$baseline_coverage_15, input$baseline_coverage_16,
+                input$baseline_coverage_17, input$baseline_coverage_18,
+                input$baseline_coverage_19, input$baseline_coverage_20,
+                
+                input$baseline_coverage_21, input$baseline_coverage_22,
+                input$baseline_coverage_23, input$baseline_coverage_24,
+                input$baseline_coverage_25, input$baseline_coverage_26,
+                input$baseline_coverage_27, input$baseline_coverage_28,
+                input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
       mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ "contacts", TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_baseline, intervention != "_")
     
-    interventions$future_mat <- tibble(index = 1:30,
-                                       intervention = c(input$future_intervention_1, input$future_intervention_2,
-                                                        input$future_intervention_3, input$future_intervention_4,
-                                                        input$future_intervention_5, input$future_intervention_6,
-                                                        input$future_intervention_7, input$future_intervention_8,
-                                                        input$future_intervention_9, input$future_intervention_10,
-                                                        
-                                                        input$future_intervention_11, input$future_intervention_12,
-                                                        input$future_intervention_13, input$future_intervention_14,
-                                                        input$future_intervention_15, input$future_intervention_16,
-                                                        input$future_intervention_17, input$future_intervention_18,
-                                                        input$future_intervention_19, input$future_intervention_20,
-                                                        
-                                                        input$future_intervention_21, input$future_intervention_22,
-                                                        input$future_intervention_23, input$future_intervention_24,
-                                                        input$future_intervention_25, input$future_intervention_26,
-                                                        input$future_intervention_27, input$future_intervention_28,
-                                                        input$future_intervention_29, input$future_intervention_30),
-                                       
-                                       date_start = c(input$future_daterange_1[1], input$future_daterange_2[1],
-                                                      input$future_daterange_3[1], input$future_daterange_4[1],
-                                                      input$future_daterange_5[1], input$future_daterange_6[1],
-                                                      input$future_daterange_7[1], input$future_daterange_8[1],
-                                                      input$future_daterange_9[1], input$future_daterange_10[1],
-                                                      
-                                                      input$future_daterange_11[1], input$future_daterange_12[1],
-                                                      input$future_daterange_13[1], input$future_daterange_14[1],
-                                                      input$future_daterange_15[1], input$future_daterange_16[1],
-                                                      input$future_daterange_17[1], input$future_daterange_18[1],
-                                                      input$future_daterange_19[1], input$future_daterange_20[1],
-                                                      
-                                                      input$future_daterange_21[1], input$future_daterange_22[1],
-                                                      input$future_daterange_23[1], input$future_daterange_24[1],
-                                                      input$future_daterange_25[1], input$future_daterange_26[1],
-                                                      input$future_daterange_27[1], input$future_daterange_28[1],
-                                                      input$future_daterange_29[1], input$future_daterange_30[1]),
-                                       
-                                       date_end = c(input$future_daterange_1[2], input$future_daterange_2[2],
-                                                    input$future_daterange_3[2], input$future_daterange_4[2],
-                                                    input$future_daterange_5[2], input$future_daterange_6[2],
-                                                    input$future_daterange_7[2], input$future_daterange_8[2],
-                                                    input$future_daterange_9[2], input$future_daterange_10[2],
-                                                    
-                                                    input$future_daterange_11[2], input$future_daterange_12[2],
-                                                    input$future_daterange_13[2], input$future_daterange_14[2],
-                                                    input$future_daterange_15[2], input$future_daterange_16[2],
-                                                    input$future_daterange_17[2], input$future_daterange_18[2],
-                                                    input$future_daterange_19[2], input$future_daterange_20[2],
-                                                    
-                                                    input$future_daterange_21[2], input$future_daterange_22[2],
-                                                    input$future_daterange_23[2], input$future_daterange_24[2],
-                                                    input$future_daterange_25[2], input$future_daterange_26[2],
-                                                    input$future_daterange_27[2], input$future_daterange_28[2],
-                                                    input$future_daterange_29[2], input$future_daterange_30[2]),
-                                       
-                                       value = c(input$future_coverage_1, input$future_coverage_2,
-                                                 input$future_coverage_3, input$future_coverage_4,
-                                                 input$future_coverage_5, input$future_coverage_6,
-                                                 input$future_coverage_7, input$future_coverage_8,
-                                                 input$future_coverage_9, input$future_coverage_10,
-                                                 
-                                                 input$future_coverage_11, input$future_coverage_12,
-                                                 input$future_coverage_13, input$future_coverage_14,
-                                                 input$future_coverage_15, input$future_coverage_16,
-                                                 input$future_coverage_17, input$future_coverage_18,
-                                                 input$future_coverage_19, input$future_coverage_20,
-                                                 
-                                                 input$future_coverage_21, input$future_coverage_22,
-                                                 input$future_coverage_23, input$future_coverage_24,
-                                                 input$future_coverage_25, input$future_coverage_26,
-                                                 input$future_coverage_27, input$future_coverage_28,
-                                                 input$future_coverage_29, input$future_coverage_30)) %>% 
+    interventions$future_mat <- tibble(
+      index = 1:30,
+      intervention = c(input$future_intervention_1, input$future_intervention_2,
+                       input$future_intervention_3, input$future_intervention_4,
+                       input$future_intervention_5, input$future_intervention_6,
+                       input$future_intervention_7, input$future_intervention_8,
+                       input$future_intervention_9, input$future_intervention_10,
+                       
+                       input$future_intervention_11, input$future_intervention_12,
+                       input$future_intervention_13, input$future_intervention_14,
+                       input$future_intervention_15, input$future_intervention_16,
+                       input$future_intervention_17, input$future_intervention_18,
+                       input$future_intervention_19, input$future_intervention_20,
+                       
+                       input$future_intervention_21, input$future_intervention_22,
+                       input$future_intervention_23, input$future_intervention_24,
+                       input$future_intervention_25, input$future_intervention_26,
+                       input$future_intervention_27, input$future_intervention_28,
+                       input$future_intervention_29, input$future_intervention_30),
+      
+      date_start = c(input$future_daterange_1[1], input$future_daterange_2[1],
+                     input$future_daterange_3[1], input$future_daterange_4[1],
+                     input$future_daterange_5[1], input$future_daterange_6[1],
+                     input$future_daterange_7[1], input$future_daterange_8[1],
+                     input$future_daterange_9[1], input$future_daterange_10[1],
+                     
+                     input$future_daterange_11[1], input$future_daterange_12[1],
+                     input$future_daterange_13[1], input$future_daterange_14[1],
+                     input$future_daterange_15[1], input$future_daterange_16[1],
+                     input$future_daterange_17[1], input$future_daterange_18[1],
+                     input$future_daterange_19[1], input$future_daterange_20[1],
+                     
+                     input$future_daterange_21[1], input$future_daterange_22[1],
+                     input$future_daterange_23[1], input$future_daterange_24[1],
+                     input$future_daterange_25[1], input$future_daterange_26[1],
+                     input$future_daterange_27[1], input$future_daterange_28[1],
+                     input$future_daterange_29[1], input$future_daterange_30[1]),
+      
+      date_end = c(input$future_daterange_1[2], input$future_daterange_2[2],
+                   input$future_daterange_3[2], input$future_daterange_4[2],
+                   input$future_daterange_5[2], input$future_daterange_6[2],
+                   input$future_daterange_7[2], input$future_daterange_8[2],
+                   input$future_daterange_9[2], input$future_daterange_10[2],
+                   
+                   input$future_daterange_11[2], input$future_daterange_12[2],
+                   input$future_daterange_13[2], input$future_daterange_14[2],
+                   input$future_daterange_15[2], input$future_daterange_16[2],
+                   input$future_daterange_17[2], input$future_daterange_18[2],
+                   input$future_daterange_19[2], input$future_daterange_20[2],
+                   
+                   input$future_daterange_21[2], input$future_daterange_22[2],
+                   input$future_daterange_23[2], input$future_daterange_24[2],
+                   input$future_daterange_25[2], input$future_daterange_26[2],
+                   input$future_daterange_27[2], input$future_daterange_28[2],
+                   input$future_daterange_29[2], input$future_daterange_30[2]),
+      
+      value = c(input$future_coverage_1, input$future_coverage_2,
+                input$future_coverage_3, input$future_coverage_4,
+                input$future_coverage_5, input$future_coverage_6,
+                input$future_coverage_7, input$future_coverage_8,
+                input$future_coverage_9, input$future_coverage_10,
+                
+                input$future_coverage_11, input$future_coverage_12,
+                input$future_coverage_13, input$future_coverage_14,
+                input$future_coverage_15, input$future_coverage_16,
+                input$future_coverage_17, input$future_coverage_18,
+                input$future_coverage_19, input$future_coverage_20,
+                
+                input$future_coverage_21, input$future_coverage_22,
+                input$future_coverage_23, input$future_coverage_24,
+                input$future_coverage_25, input$future_coverage_26,
+                input$future_coverage_27, input$future_coverage_28,
+                input$future_coverage_29, input$future_coverage_30)) %>% 
       mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ "contacts", TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_future, intervention != "_")
     
