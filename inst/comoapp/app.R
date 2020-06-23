@@ -491,13 +491,13 @@ server <- function(input, output, session) {
   observeEvent(input$country_demographic, if(input$country_demographic != "-- Own Value ---"){
     population_rv$data <- population %>% filter(country == input$country_demographic)
   })
+  
   observeEvent(input$country_cases, if(input$country_cases != "-- Own Value ---"){
     cases_rv$data <- cases %>% filter(country == input$country_cases) %>%
       select(-country)
   })
   
-  
-  # Source code to generate outputs ----
+  # Source files with code to generate outputs ----
   file_list <- list.files(path = "./www/outputs", pattern = "*.R")
   for (file in file_list) source(paste0("./www/outputs/", file), local = TRUE)$value
   
@@ -626,24 +626,23 @@ server <- function(input, output, session) {
   
   # Process on "run_baseline" ----
   observeEvent(input$run_baseline, {
-    showNotification(span(h4(icon("hourglass-half"), "Running Baseline (Calibration)..."), "typically runs in 10 to 30 secs."),
-                     duration = NULL, type = "message", id = "model_run_notif")
-    
     # Reset simul_interventions (expired baseline)
     simul_interventions$results <- NULL
     
+    # Create/filter objects for model that are dependent on user inputs
     source("./www/model.R", local = TRUE)
-    source("./www/fun_multi_runs.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
     
     vectors <- inputs(inp, 'Baseline (Calibration)', times = times, stopdate = stopdate)
-    results <- multi_runs(Y, times, parameters, input = vectors, A = A)
+    results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
+                          contact_home = contact_home, contact_school = contact_school, 
+                          contact_work = contact_work, contact_other = contact_other)
     simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
     simul_baseline$baseline_available <- TRUE
     
     # TODO: remove on production
     shiny_simul_baseline <<- simul_baseline$results
     
-    removeNotification(id = "model_run_notif", session = session)
+    showNotification("Displaying results (2 to 10 secs.)", duration = 4, type = "message")
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
   
@@ -656,19 +655,18 @@ server <- function(input, output, session) {
   
   # Process on "run_interventions" ----
   observeEvent(input$run_interventions, {
-    showNotification(span(h4(icon("hourglass-half"), "Running Hypothetical Scenario..."), "typically runs in 10 to 30 secs."),
-                     duration = NULL, type = "message", id = "run_interventions_notif")
-    
+    # Create/filter objects for model that are dependent on user inputs
     source("./www/model.R", local = TRUE)
-    source("./www/fun_multi_runs.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
     
     vectors <- inputs(inp, 'Hypothetical Scenario', times = times, stopdate = stopdate)
     
-    results <- multi_runs(Y, times, parameters, input = vectors, A = A)
+    results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
+                          contact_home = contact_home, contact_school = contact_school, 
+                          contact_work = contact_work, contact_other = contact_other)
     simul_interventions$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
     simul_interventions$interventions_available <- TRUE
     
-    removeNotification(id = "run_interventions_notif", session = session)
+    showNotification("Displaying results (2 to 10 secs.)", duration = 4, type = "message")
     runjs('document.getElementById("anchor_summary").scrollIntoView();')
   })
   

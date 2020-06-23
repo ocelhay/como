@@ -1,20 +1,25 @@
-multi_runs <- function(Y, times, parameters, input, A){
+multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc, popbirth, ageing,
+                       contact_home, contact_school, contact_work, contact_other){
   
   # Define objects to store results ----
   results <- list()
-  aux<-array(0, dim=c(length(times),22*A+1,parameters["iterations"]))
+  aux <- array(0, dim = c(length(times), 22*A+1, parameters["iterations"]))
   results$mean<-matrix(0,nrow = length(times),ncol = 22*A+1)
   results$min<-matrix(0,nrow = length(times),ncol = 22*A+1)
   results$max<-matrix(0,nrow = length(times),ncol = 22*A+1)
+  
   results$mean_cases<-matrix(0,nrow = length(times),ncol = 22*A+1)
   results$min_cases<-matrix(0,nrow = length(times),ncol = 22*A+1)
   results$max_cases<-matrix(0,nrow = length(times),ncol = 22*A+1)
+  
   results$mean_cum_cases<-matrix(0,nrow = length(times),ncol = 1)
   results$min_cum_cases<-matrix(0,nrow = length(times),ncol = 1)
   results$max_cum_cases<-matrix(0,nrow = length(times),ncol = 1)
+  
   results$mean_daily_infection<-matrix(0,nrow = length(times),ncol = 1)
   results$min_daily_infection<-matrix(0,nrow = length(times),ncol = 1)
   results$max_daily_infection<-matrix(0,nrow = length(times),ncol = 1)
+  
   cases<-matrix(0, nrow=length(times),ncol=parameters["iterations"])
   cum_cases<-matrix(0, nrow=length(times),ncol=parameters["iterations"])
   day_infections<-matrix(0, nrow=length(times),ncol=parameters["iterations"])
@@ -23,7 +28,8 @@ multi_runs <- function(Y, times, parameters, input, A){
   Rt <- NULL
   
   param_vector<-parameters
-  for (i in 1:parameters["iterations"]){
+  for (i in 1:parameters["iterations"]) {
+    showNotification(paste("Iteration", i, "of", parameters["iterations"]), duration = 3, type = "message")
     print(paste("Iteration", i))
     time_start <- Sys.time()
     
@@ -31,7 +37,7 @@ multi_runs <- function(Y, times, parameters, input, A){
     if (parameters["iterations"] > 1) {
       param_vector[parameters_noise]<-parameters[parameters_noise]+rnorm(length(parameters_noise),mean=0,sd=parameters["noise"]*abs(parameters[parameters_noise]))
     }
-    
+
     covidOdeCpp_reset()
     mat_ode <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, 
                    parms = param_vector, input = input, A = A,
@@ -90,42 +96,70 @@ multi_runs <- function(Y, times, parameters, input, A){
     
     time_end <- Sys.time()
     print(paste("step runtime:", round(time_end - time_start, 2) %>% as.numeric(), "secs"))
+    # removeNotification(id = "iteration")
   }
   
-  print("Aggregation of results")
+  print("Start aggregation of results")
+  if (parameters["iterations"] > 1) {
+    showNotification("Aggregation of results (20 to 60 secs.)", duration = NULL, type = "message", id = "aggregation_results")
+  }
   time_start <- Sys.time()
-  
   results$mean_infections<-quantile(infections,0.5)
   results$min_infections<-quantile(infections,parameters["confidence"])
   results$max_infections<-quantile(infections,(1-parameters["confidence"]))
   
+  if (parameters["iterations"] == 1) {
+      results$mean_cases <- cases
+      results$min_cases <- cases
+      results$max_cases <- cases
+      
+      results$mean_cum_cases <- cum_cases
+      results$min_cum_cases <- cum_cases
+      results$max_cum_cases <- cum_cases
+      
+      results$mean_daily_infection <- day_infections
+      results$min_daily_infection <- day_infections
+      results$max_daily_infection <- day_infections
+      
+      results$mean_Rt <- Rt_aux
+      results$min_Rt <- Rt_aux
+      results$max_Rt <- Rt_aux
+      
+      results$mean <- aux[, , 1]
+      results$min <- aux[, , 1]
+      results$max <- aux[, , 1]
+  }
   
-  for(i in 1:length(mat_ode[,1])){
-    results$mean_cases[i]<-quantile(cases[i,],0.5)
-    results$min_cases[i]<-quantile(cases[i,],parameters["confidence"])
-    results$max_cases[i]<-quantile(cases[i,],(1-parameters["confidence"]))
-    
-    results$mean_cum_cases[i]<-quantile(cum_cases[i,],0.5)
-    results$min_cum_cases[i]<-quantile(cum_cases[i,],parameters["confidence"])
-    results$max_cum_cases[i]<-quantile(cum_cases[i,],(1-parameters["confidence"]))
-    
-    results$mean_daily_infection[i]<-quantile(day_infections[i,],0.5)
-    results$min_daily_infection[i]<-quantile(day_infections[i,],parameters["confidence"])
-    results$max_daily_infection[i]<-quantile(day_infections[i,],(1-parameters["confidence"]))
-    
-    results$mean_Rt[i]<-quantile(Rt_aux[i,],0.5,na.rm = T)
-    results$min_Rt[i]<-quantile(Rt_aux[i,],parameters["confidence"],na.rm = T)
-    results$max_Rt[i]<-quantile(Rt_aux[i,],(1-parameters["confidence"]),na.rm = T)
-    
-    for (j in 1:length(mat_ode[1,])){
-      results$mean[i,j]<-quantile(aux[i,j,],0.5)
-      results$min[i,j]<-quantile(aux[i,j,],parameters["confidence"])
-      results$max[i,j]<-quantile(aux[i,j,],(1-parameters["confidence"]))
+  if (parameters["iterations"] > 1) {
+    for(i in 1:length(times)){
+      results$mean_cases[i]<-quantile(cases[i,],0.5)
+      results$min_cases[i]<-quantile(cases[i,],parameters["confidence"])
+      results$max_cases[i]<-quantile(cases[i,],(1-parameters["confidence"]))
+      
+      results$mean_cum_cases[i]<-quantile(cum_cases[i,],0.5)
+      results$min_cum_cases[i]<-quantile(cum_cases[i,],parameters["confidence"])
+      results$max_cum_cases[i]<-quantile(cum_cases[i,],(1-parameters["confidence"]))
+      
+      results$mean_daily_infection[i]<-quantile(day_infections[i,],0.5)
+      results$min_daily_infection[i]<-quantile(day_infections[i,],parameters["confidence"])
+      results$max_daily_infection[i]<-quantile(day_infections[i,],(1-parameters["confidence"]))
+      
+      results$mean_Rt[i]<-quantile(Rt_aux[i,],0.5,na.rm = T)
+      results$min_Rt[i]<-quantile(Rt_aux[i,],parameters["confidence"],na.rm = T)
+      results$max_Rt[i]<-quantile(Rt_aux[i,],(1-parameters["confidence"]),na.rm = T)
+      
+      for (j in 1:length(mat_ode[1,])){
+        results$mean[i,j]<-quantile(aux[i,j,],0.5)
+        results$min[i,j]<-quantile(aux[i,j,],parameters["confidence"])
+        results$max[i,j]<-quantile(aux[i,j,],(1-parameters["confidence"]))
+      }
     }
   }
-
+  
   time_end <- Sys.time()
   print(paste("step runtime:", round(time_end - time_start, 2) %>% as.numeric(), "secs"))
-  
+  if (parameters["iterations"] > 1) {
+    removeNotification(id = "aggregation_results")
+  }
   return(results)
 }
