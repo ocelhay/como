@@ -629,7 +629,7 @@ server <- function(input, output, session) {
     showNotification(span(h4(icon("hourglass-half"), "Running Baseline (Calibration)..."), "typically runs in 10 to 30 secs."),
                      duration = NULL, type = "message", id = "model_run_notif")
     
-    # Reset simul_interventions and elements of the UI
+    # Reset simul_interventions (expired baseline)
     simul_interventions$results <- NULL
     
     source("./www/model.R", local = TRUE)
@@ -637,8 +637,6 @@ server <- function(input, output, session) {
     
     vectors <- inputs(inp, 'Baseline (Calibration)', times = times, stopdate = stopdate)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A)
-    
-    # browser()
     simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
     simul_baseline$baseline_available <- TRUE
     
@@ -662,24 +660,12 @@ server <- function(input, output, session) {
                      duration = NULL, type = "message", id = "run_interventions_notif")
     
     source("./www/model.R", local = TRUE)
-    source("./www/fun_single_run.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
     source("./www/fun_multi_runs.R", local = TRUE)  # TODO: make it a real function and move this to the top of the App
     
     vectors <- inputs(inp, 'Hypothetical Scenario', times = times, stopdate = stopdate)
     
-    if(input$iterations == 1) {
-      simul_interventions$results <- single_run(Y, times, parameters, input = vectors, A = A)
-    }
-    
-    if(input$iterations > 1) {
-      results <- multi_runs(Y, times, parameters, input = vectors, A = A)
-      # example where the criteria to sort runs is the value of "attributable_deaths_end"
-      
-      
-      
-      simul_interventions$results <- results[[index_med]]
-    }
-    
+    results <- multi_runs(Y, times, parameters, input = vectors, A = A)
+    simul_interventions$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
     simul_interventions$interventions_available <- TRUE
     
     removeNotification(id = "run_interventions_notif", session = session)
