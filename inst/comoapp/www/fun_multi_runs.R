@@ -3,22 +3,25 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   
   # Define objects to store results ----
   results <- list()
-  aux <- array(0, dim = c(length(times), 22*A+1, parameters["iterations"]))
-  results$mean<-matrix(0,nrow = length(times),ncol = 22*A+1)
-  results$min<-matrix(0,nrow = length(times),ncol = 22*A+1)
-  results$max<-matrix(0,nrow = length(times),ncol = 22*A+1)
+  aux <- array(0, dim = c(length(times), 22 * A + 1, parameters["iterations"]))
+  results$mean <- matrix(0, nrow = length(times), ncol = 22 * A + 1)
+  results$min <- matrix(0, nrow = length(times), ncol = 22 * A + 1)
+  results$max <- matrix(0, nrow = length(times), ncol = 22 * A + 1)
   
-  results$mean_cases<-matrix(0,nrow = length(times),ncol = 22*A+1)
-  results$min_cases<-matrix(0,nrow = length(times),ncol = 22*A+1)
-  results$max_cases<-matrix(0,nrow = length(times),ncol = 22*A+1)
+  results$mean_cases <- matrix(0, nrow = length(times), ncol = 22 * A + 1)
+  results$min_cases <- matrix(0, nrow = length(times), ncol = 22 * A + 1)
+  results$max_cases <- matrix(0, nrow = length(times), ncol = 22 * A + 1)
   
-  results$mean_cum_cases<-matrix(0,nrow = length(times),ncol = 1)
-  results$min_cum_cases<-matrix(0,nrow = length(times),ncol = 1)
-  results$max_cum_cases<-matrix(0,nrow = length(times),ncol = 1)
+  results$mean_cum_cases <- matrix(0, nrow = length(times), ncol = 1)
+  results$min_cum_cases <- matrix(0, nrow = length(times), ncol = 1)
+  results$max_cum_cases <- matrix(0, nrow = length(times), ncol = 1)
   
-  results$mean_daily_infection<-matrix(0,nrow = length(times),ncol = 1)
-  results$min_daily_infection<-matrix(0,nrow = length(times),ncol = 1)
-  results$max_daily_infection<-matrix(0,nrow = length(times),ncol = 1)
+  results$mean_daily_infection <-
+    matrix(0, nrow = length(times), ncol = 1)
+  results$min_daily_infection <-
+    matrix(0, nrow = length(times), ncol = 1)
+  results$max_daily_infection <-
+    matrix(0, nrow = length(times), ncol = 1)
   
   cases<-matrix(0, nrow=length(times),ncol=parameters["iterations"])
   cum_cases<-matrix(0, nrow=length(times),ncol=parameters["iterations"])
@@ -27,26 +30,26 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   infections<-matrix(0, nrow=parameters["iterations"],ncol=1)
   Rt <- NULL
   
-  param_vector<-parameters
+  parameters_dup <- parameters  # duplicate parameters to add noise 
+  
   for (i in 1:parameters["iterations"]) {
-    showNotification(paste("Iteration", i, "of", parameters["iterations"]), duration = 3, type = "message")
-    print(paste("Iteration", i))
-    time_start <- Sys.time()
+    showNotification(paste("Run", i, "of", parameters["iterations"]), duration = 3, type = "message")
     
     # Add noise to parameters only if there are several iterations
     if (parameters["iterations"] > 1) {
-      param_vector[parameters_noise]<-parameters[parameters_noise]+rnorm(length(parameters_noise),mean=0,sd=parameters["noise"]*abs(parameters[parameters_noise]))
+      parameters_dup[parameters_noise] <- parameters[parameters_noise] + 
+        rnorm(length(parameters_noise), mean = 0, sd = parameters["noise"] * abs(parameters[parameters_noise]))
     }
 
     covidOdeCpp_reset()
     mat_ode <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, 
-                   parms = param_vector, input = input, A = A,
+                   parms = parameters_dup, input = input, A = A,
                    contact_home=contact_home, contact_school=contact_school,
                    contact_work=contact_work, contact_other=contact_other,
                    popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
                    ageing=ageing, ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
     
-    aux[,,i]<-mat_ode
+    aux[, , i] <- mat_ode
     
     
     f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0)
@@ -70,39 +73,36 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     }
     
     # daily incidence
-    incidence<-param_vector["report"]*param_vector["gamma"]*(1-param_vector["pclin"])*mat_ode[,(Eindex+1)]%*%(1-ihr[,2])+
-      param_vector["reportc"]*param_vector["gamma"]*param_vector["pclin"]*mat_ode[,(Eindex+1)]%*%(1-ihr[,2])+
-      param_vector["report"]*param_vector["gamma"]*(1-param_vector["pclin"])*mat_ode[,(QEindex+1)]%*%(1-ihr[,2])+
-      param_vector["reportc"]*param_vector["gamma"]*param_vector["pclin"]*mat_ode[,(QEindex+1)]%*%(1-ihr[,2])
+    incidence<-parameters_dup["report"]*parameters_dup["gamma"]*(1-parameters_dup["pclin"])*mat_ode[,(Eindex+1)]%*%(1-ihr[,2])+
+      parameters_dup["reportc"]*parameters_dup["gamma"]*parameters_dup["pclin"]*mat_ode[,(Eindex+1)]%*%(1-ihr[,2])+
+      parameters_dup["report"]*parameters_dup["gamma"]*(1-parameters_dup["pclin"])*mat_ode[,(QEindex+1)]%*%(1-ihr[,2])+
+      parameters_dup["reportc"]*parameters_dup["gamma"]*parameters_dup["pclin"]*mat_ode[,(QEindex+1)]%*%(1-ihr[,2])
     
-    incidenceh<- param_vector["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-param_vector["prob_icu"])*param_vector["reporth"]+
-      param_vector["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-param_vector["prob_icu"])*(1-param_vector["reporth"])+
-      param_vector["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*(1-critH)*(1-param_vector["prob_icu"])+
-      param_vector["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*critH*param_vector["reporth"]*(1-param_vector["prob_icu"])+
-      param_vector["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*critH*param_vector["reporth"]*(1-param_vector["prob_icu"])+
-      param_vector["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*param_vector["prob_icu"]+
-      param_vector["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*param_vector["prob_icu"]
+    incidenceh<- parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*parameters_dup["reporth"]+
+      parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*(1-parameters_dup["reporth"])+
+      parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])+
+      parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*critH*parameters_dup["reporth"]*(1-parameters_dup["prob_icu"])+
+      parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*critH*parameters_dup["reporth"]*(1-parameters_dup["prob_icu"])+
+      parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*parameters_dup["prob_icu"]+
+      parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*parameters_dup["prob_icu"]
     
     cases[,i]<-(rowSums(incidence)+rowSums(incidenceh))           # daily incidence cases
     cum_cases[,i]<-colSums(incidence)+colSums(incidenceh)         # cumulative incidence cases
-    day_infections[,i]<- round(rowSums(param_vector["gamma"]*mat_ode[,(Eindex+1)]+param_vector["gamma"]*mat_ode[,(QEindex+1)]))
+    day_infections[,i]<- round(rowSums(parameters_dup["gamma"]*mat_ode[,(Eindex+1)]+parameters_dup["gamma"]*mat_ode[,(QEindex+1)]))
     
     # daily infections
-    infections[i] <- round(100*tail(cumsum(rowSums(param_vector["gamma"]*mat_ode[,(Eindex+1)])),1)/sum(popstruc[,2]), 1)  # proportion of the  population that has been infected at the end of the simulation
-    for (w in (ceiling(1/param_vector["nui"])+1):length(times)){
-      Rt_aux[w,i]<-cumsum(sum(param_vector["gamma"]*mat_ode[w,(Eindex+1)]))/cumsum(sum(param_vector["gamma"]*mat_ode[(w-1/param_vector["nui"]),(Eindex+1)]))
+    infections[i] <- round(100*tail(cumsum(rowSums(parameters_dup["gamma"]*mat_ode[,(Eindex+1)])),1)/sum(popstruc[,2]), 1)  # proportion of the  population that has been infected at the end of the simulation
+    for (w in (ceiling(1/parameters_dup["nui"])+1):length(times)){
+      Rt_aux[w,i]<-cumsum(sum(parameters_dup["gamma"]*mat_ode[w,(Eindex+1)]))/cumsum(sum(parameters_dup["gamma"]*mat_ode[(w-1/parameters_dup["nui"]),(Eindex+1)]))
       if(Rt_aux[w,i] >= 7) {Rt_aux[w,i]  <- NA}
     }
-    
-    time_end <- Sys.time()
-    print(paste("step runtime:", round(time_end - time_start, 2) %>% as.numeric(), "secs"))
-    # removeNotification(id = "iteration")
   }
   
   print("Start aggregation of results")
   if (parameters["iterations"] > 1) {
-    showNotification("Aggregation of results (20 to 60 secs.)", duration = NULL, type = "message", id = "aggregation_results")
+    showNotification("Aggregation of results (~ half a minute)", duration = NULL, type = "message", id = "aggregation_results")
   }
+  
   time_start <- Sys.time()
   results$mean_infections<-quantile(infections,0.5)
   results$min_infections<-quantile(infections,parameters["confidence"])

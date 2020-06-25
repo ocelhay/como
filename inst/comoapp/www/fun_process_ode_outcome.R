@@ -1,9 +1,10 @@
 process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mort, popstruc){
   
-  out_min<-out$min
-  out_max<-out$max
-  out_med<-out$mean
+  out_min <- out$min
+  out_max <- out$max
+  out_med <- out$mean
   
+  # spline function ----
   critH<-c()
   crit<-c()
   critV<-c()
@@ -35,6 +36,7 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
   # added rowSums to the next two lines TODO Check if okay
   dailyinc1<-rowSums(out$mean_cases)      # daily incidence
   cuminc1<-rowSums(out$mean_cum_cases)       # cumulative incidence
+  
   previcureq1<-rowSums(out_med[,(Hindex+1)])+ rowSums(out_med[,(ICUCindex+1)])+rowSums(out_med[,(ICUCVindex+1)]) # surge beds occupancy
   previcureq21<-rowSums(out_med[,(ICUindex+1)])+rowSums(out_med[,(VentCindex+1)])   # icu beds occupancy
   previcureq31<-rowSums(out_med[,(Ventindex+1)])   # ventilator occupancy
