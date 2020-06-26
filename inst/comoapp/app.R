@@ -652,9 +652,6 @@ server <- function(input, output, session) {
     simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
     simul_baseline$baseline_available <- TRUE
     
-    # TODO: remove on production
-    shiny_simul_baseline <<- simul_baseline$results
-    
     showNotification("Displaying results (~ 5 secs.)", duration = 4, type = "message")
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
