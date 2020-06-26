@@ -16,12 +16,9 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   results$min_cum_cases <- matrix(0, nrow = length(times), ncol = 1)
   results$max_cum_cases <- matrix(0, nrow = length(times), ncol = 1)
   
-  results$mean_daily_infection <-
-    matrix(0, nrow = length(times), ncol = 1)
-  results$min_daily_infection <-
-    matrix(0, nrow = length(times), ncol = 1)
-  results$max_daily_infection <-
-    matrix(0, nrow = length(times), ncol = 1)
+  results$mean_daily_infection <- matrix(0, nrow = length(times), ncol = 1)
+  results$min_daily_infection <- matrix(0, nrow = length(times), ncol = 1)
+  results$max_daily_infection <- matrix(0, nrow = length(times), ncol = 1)
   
   cases<-matrix(0, nrow=length(times),ncol=parameters["iterations"])
   cum_cases<-matrix(0, nrow=length(times),ncol=parameters["iterations"])
@@ -51,21 +48,22 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     
     aux[, , i] <- mat_ode
     
-    
-    f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0)
-    KH<-parameters["beds_available"]
-    KICU<- parameters["icu_beds_available"]+parameters["ventilators_available"]
-    Kvent<- parameters["ventilators_available"]
-    x.H <- c(0,(1+parameters["give"])*KH/2,(3-parameters["give"])*KH/2,2*KH)
-    x.ICU <- c(0,(1+parameters["give"])*KICU/2,(3-parameters["give"])*KICU/2,2*KICU)
-    x.Vent <- c(0,(1+parameters["give"])*Kvent/2,(3-parameters["give"])*Kvent/2,2*Kvent)
+    # Define spline functions
+    # the parameters give, beds_available, icu_beds_available, ventilators_available have no noise added to them
+    f <- c(1, (1 + parameters["give"]) / 2, (1 - parameters["give"]) / 2, 0)
+    KH <- parameters["beds_available"]
+    KICU <- parameters["icu_beds_available"] + parameters["ventilators_available"]
+    Kvent <- parameters["ventilators_available"]
+    x.H <- c(0, (1 + parameters["give"]) * KH / 2, (3 - parameters["give"]) * KH / 2, 2 * KH)
+    x.ICU <- c(0, (1 + parameters["give"]) * KICU / 2, (3 - parameters["give"]) * KICU / 2, 2 * KICU)
+    x.Vent <- c(0, (1 + parameters["give"]) * Kvent / 2, (3 - parameters["give"]) * Kvent / 2, 2 * Kvent)
     fH <- splinefun(x.H, f, method = "hyman")
     fICU <- splinefun(x.ICU, f, method = "hyman")
-    fVent<- splinefun(x.Vent, f, method = "hyman")
+    fVent <- splinefun(x.Vent, f, method = "hyman")
     
-    critH<-c()
-    crit<-c()
-    critV<-c()
+    critH <- NULL
+    crit <- NULL
+    critV <- NULL
     for (ii in 1:length(times)){
       critH[ii]<-min(1-fH((sum(mat_ode[ii,(Hindex+1)]))+sum(mat_ode[ii,(ICUCindex+1)])+sum(mat_ode[ii,(ICUCVindex+1)])),1)
       crit[ii]<-min(1-fICU((sum(mat_ode[ii,(ICUindex+1)]))+(sum(mat_ode[ii,(Ventindex+1)]))+(sum(mat_ode[ii,(VentCindex+1)]))))
@@ -98,10 +96,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     }
   }
   
-  print("Start aggregation of results")
-  if (parameters["iterations"] > 1) {
-    showNotification("Aggregation of results (~ half a minute)", duration = NULL, type = "message", id = "aggregation_results")
-  }
+  if (parameters["iterations"] > 1)  showNotification("Aggregation of results (~ half a minute)", duration = NULL, type = "message", id = "aggregation_results")
   
   time_start <- Sys.time()
   results$mean_infections<-quantile(infections,0.5)
@@ -156,10 +151,8 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     }
   }
   
-  time_end <- Sys.time()
-  print(paste("step runtime:", round(time_end - time_start, 2) %>% as.numeric(), "secs"))
-  if (parameters["iterations"] > 1) {
-    removeNotification(id = "aggregation_results")
-  }
+  print(paste("Aggregation of results runtime:", round(Sys.time() - time_start, 2) %>% as.numeric(), "secs"))
+  
+  if (parameters["iterations"] > 1)  removeNotification(id = "aggregation_results")
   return(results)
 }

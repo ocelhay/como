@@ -5,10 +5,6 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
   out_med <- out$mean
   
   # spline function ----
-  critH<-c()
-  crit<-c()
-  critV<-c()
-  
   f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0)
   KH<-parameters["beds_available"]
   KICU<- parameters["icu_beds_available"]+parameters["ventilators_available"]
@@ -20,27 +16,26 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
   fICU <- splinefun(x.ICU, f, method = "hyman")
   fVent<- splinefun(x.Vent, f, method = "hyman")
   
+  # crit objects ----
+  critH <- NULL
+  crit <- NULL
+  critV <- NULL
+  
   for (i in 1:length(times)){
     critH[i]<-min(1-fH((sum(out_med[i,(Hindex+1)]))+sum(out_med[i,(ICUCindex+1)])+sum(out_med[i,(ICUCVindex+1)])),1)
     crit[i]<-min(1-fICU((sum(out_med[i,(ICUindex+1)]))+(sum(out_med[i,(Ventindex+1)]))+(sum(out_med[i,(VentCindex+1)]))))
     critV[i]<-min(1-fVent((sum(out_med[i,(Ventindex+1)]))),1)
   }
   
-  # total population
-  pop1<-out_med[,(Sindex+1)]+out_med[,(Eindex+1)]+out_med[,(Iindex+1)]+out_med[,(CLindex+1)]+out_med[,(Rindex+1)]+out_med[,(Xindex+1)]+out_med[,(Vindex+1)]+
-    out_med[,(QSindex+1)]+out_med[,(QEindex+1)]+out_med[,(QIindex+1)]+out_med[,(QCindex+1)]+out_med[,(QRindex+1)]+
-    out_med[,(Hindex+1)]+out_med[,(HCindex+1)]+out_med[,(ICUindex+1)]+out_med[,(ICUCindex+1)]+out_med[,(ICUCVindex+1)]+out_med[,(Ventindex+1)]+out_med[,(VentCindex+1)]
-  tpop1<-rowSums(pop1)
-  time<-as.Date(out_med[,1]+startdate)
-  
-  # added rowSums to the next two lines TODO Check if okay
-  dailyinc1<-rowSums(out$mean_cases)      # daily incidence
-  cuminc1<-rowSums(out$mean_cum_cases)       # cumulative incidence
-  
   previcureq1<-rowSums(out_med[,(Hindex+1)])+ rowSums(out_med[,(ICUCindex+1)])+rowSums(out_med[,(ICUCVindex+1)]) # surge beds occupancy
   previcureq21<-rowSums(out_med[,(ICUindex+1)])+rowSums(out_med[,(VentCindex+1)])   # icu beds occupancy
   previcureq31<-rowSums(out_med[,(Ventindex+1)])   # ventilator occupancy
-  cmortality1<-rowSums(out_med[,(CMindex+1)])      # cumulative mortality
+  
+  
+  # cumulative mortality
+  cmortality1<-rowSums(out_med[,(CMindex+1)])
+  
+  
   overloadH1<-rowSums(out_med[,(HCindex+1)])       # requirement for beds
   overloadICU1<-rowSums(out_med[,(ICUCindex+1)])   # requirement for icu beds
   overloadICUV1<-rowSums(out_med[,(ICUCVindex+1)]) # requirement for ventilators
@@ -51,13 +46,7 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
   reqvent1<-rowSums(out_med[,(Ventindex+1)])+overloadICUV1+overloadVent1
   
   
-  ##########################    CALCULATE MORTALITY 
-  pdeath_hc<-parameters["pdeath_hc"]
-  prob_icu<-parameters["prob_icu"]
-  prob_vent<-parameters["prob_vent"]
-  pdeath_icuc<-parameters["pdeath_icuc"]
-  pdeath_ventc<-parameters["pdeath_ventc"]
-  
+  # Calculate mortality ----
   cinc_mort_H1 <- cumsum(rowSums(parameters["nus"]*parameters["pdeath_h"]*(out_med[,(Hindex+1)]%*%ifr[,2])))
   cinc_mort_HC1 <- cumsum(rowSums(parameters["nusc"]*parameters["pdeath_hc"]*(out_med[,(HCindex+1)]%*%ifr[,2])))
   cinc_mort_ICU1 <- cumsum(rowSums(parameters["nu_icu"]*parameters["pdeath_icu"]*out_med[,(ICUindex+1)]%*%ifr[,2]))
@@ -91,10 +80,26 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
   results$Rt <- out$mean_Rt
   results$cum_mortality <- round(cmortality1)  # cumulative mortality
   results$pct_total_pop_infected <- out$mean_infections
-  results$doubling_time <- round(log(2)*7 / (log(dailyinc1[2+7] / dailyinc1[2])), 2)  # (Baseline only) to double the number of infections at inception
+  
+  
+  
+  
+  # Daily incidence
+  daily_incidence_mean <- rowSums(out$mean_cases)  
+  daily_incidence_min <- rowSums(out$min_cases)
+  daily_incidence_max <- rowSums(out$max_cases)
+  results$daily_incidence <- round(daily_incidence_mean)
+  
+  # Doubling time (only for baseline)
+  results$doubling_time_mean <- round(log(2)*7 / (log(daily_incidence_mean[2+7] / daily_incidence_mean[2])), 2)
+  results$doubling_time_min <- round(log(2)*7 / (log(daily_incidence_min[2+7] / daily_incidence_min[2])), 2)
+  results$doubling_time_max <- round(log(2)*7 / (log(daily_incidence_max[2+7] / daily_incidence_max[2])), 2)
+  
+  
+  
   results$required_beds <- round(previcureq1)  # required beds
   results$saturation <- parameters["beds_available"]  # saturation
-  results$daily_incidence <- round(dailyinc1)  # daily incidence (Reported)
+  
   results$daily_total_cases <- round(out$mean_daily_infection) # daily incidence (Reported + Unreported)  # daily incidence (Reported + Unreported)
   results$hospital_surge_beds <- round(previcureq1)
   results$icu_beds <- round(previcureq21)
@@ -114,11 +119,15 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
   results$death_untreated_hospital <- round(cinc_mort_HC1)
   results$death_untreated_icu <- round(cinc_mort_ICUC1)
   results$death_untreated_ventilator <- round(cinc_mort_VentC1)+round(cinc_mort_ICUCV1)
+  
   results$attributable_deaths <- results$death_treated_hospital + results$death_treated_icu + results$death_treated_ventilator +
     results$death_untreated_hospital + results$death_untreated_icu + results$death_untreated_ventilator
+  
   results$attributable_deaths_end <- last(results$attributable_deaths)
+  
   results$total_deaths <- results$attributable_deaths + results$death_natural_non_exposed + results$death_natural_exposed
   results$total_deaths_end <- last(results$total_deaths)
+  
   results$total_reported_deaths_end <- last(results$cum_mortality)
   results$base_mort_H <- base_mort_H1
   results$base_mort_HC <- base_mort_HC1
