@@ -652,6 +652,9 @@ server <- function(input, output, session) {
     simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
     simul_baseline$baseline_available <- TRUE
     
+    # TODO: remove on production
+    shiny_simul_baseline <<- simul_baseline$results
+    
     showNotification("Displaying results (~ 5 secs.)", duration = 4, type = "message")
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
@@ -704,7 +707,7 @@ server <- function(input, output, session) {
       date = simul_baseline$results$time,
       baseline_predicted_reported = simul_baseline$results$daily_incidence,
       baseline_predicted_reported_and_unreported = simul_baseline$results$daily_total_cases,
-      baseline_normal_bed_occupancy = simul_baseline$results$required_beds,
+      baseline_normal_bed_occupancy = simul_baseline$results$hospital_surge_beds,
       baseline_icu_bed_occupancy = simul_baseline$results$icu_beds,
       baseline_icu_ventilator_occupancy = simul_baseline$results$ventilators,
       baseline_normal_bed_requirement = simul_baseline$results$normal_bed_requirement,
@@ -729,7 +732,7 @@ server <- function(input, output, session) {
       date = simul_interventions$results$time,
       hypothetical_predicted_reported = simul_interventions$results$daily_incidence,
       hypothetical_predicted_reported_and_unreported = simul_interventions$results$daily_total_cases,
-      hypothetical_normal_bed_occupancy = simul_interventions$results$required_beds,
+      hypothetical_normal_bed_occupancy = simul_interventions$results$hospital_surge_beds,
       hypothetical_icu_bed_occupancy = simul_interventions$results$icu_beds,
       hypothetical_icu_ventilator_occupancy = simul_interventions$results$ventilators,
       hypothetical_normal_bed_requirement = simul_interventions$results$normal_bed_requirement,
