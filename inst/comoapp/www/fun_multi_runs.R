@@ -27,6 +27,13 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   infections<-matrix(0, nrow=parameters["iterations"],ncol=1)
   Rt <- NULL
   
+  # Define spline function ----
+  # the parameters give, beds_available, icu_beds_available, ventilators_available have no noise added to them
+  f <- c(1, (1 + parameters["give"]) / 2, (1 - parameters["give"]) / 2, 0)
+  KH <- parameters["beds_available"]
+  x.H <- c(0, (1 + parameters["give"]) * KH / 2, (3 - parameters["give"]) * KH / 2, 2 * KH)
+  fH <- splinefun(x.H, f, method = "hyman")
+  
   parameters_dup <- parameters  # duplicate parameters to add noise 
   
   for (i in 1:parameters["iterations"]) {
@@ -48,26 +55,10 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     
     aux[, , i] <- mat_ode
     
-    # Define spline functions
-    # the parameters give, beds_available, icu_beds_available, ventilators_available have no noise added to them
-    f <- c(1, (1 + parameters["give"]) / 2, (1 - parameters["give"]) / 2, 0)
-    KH <- parameters["beds_available"]
-    KICU <- parameters["icu_beds_available"] + parameters["ventilators_available"]
-    Kvent <- parameters["ventilators_available"]
-    x.H <- c(0, (1 + parameters["give"]) * KH / 2, (3 - parameters["give"]) * KH / 2, 2 * KH)
-    x.ICU <- c(0, (1 + parameters["give"]) * KICU / 2, (3 - parameters["give"]) * KICU / 2, 2 * KICU)
-    x.Vent <- c(0, (1 + parameters["give"]) * Kvent / 2, (3 - parameters["give"]) * Kvent / 2, 2 * Kvent)
-    fH <- splinefun(x.H, f, method = "hyman")
-    fICU <- splinefun(x.ICU, f, method = "hyman")
-    fVent <- splinefun(x.Vent, f, method = "hyman")
-    
+    # Use spline function
     critH <- NULL
-    crit <- NULL
-    critV <- NULL
     for (ii in 1:length(times)){
       critH[ii]<-min(1-fH((sum(mat_ode[ii,(Hindex+1)]))+sum(mat_ode[ii,(ICUCindex+1)])+sum(mat_ode[ii,(ICUCVindex+1)])),1)
-      crit[ii]<-min(1-fICU((sum(mat_ode[ii,(ICUindex+1)]))+(sum(mat_ode[ii,(Ventindex+1)]))+(sum(mat_ode[ii,(VentCindex+1)]))))
-      critV[ii]<-min(1-fVent((sum(mat_ode[ii,(Ventindex+1)]))),1)
     }
     
     # daily incidence
