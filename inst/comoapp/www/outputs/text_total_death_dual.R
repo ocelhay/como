@@ -65,7 +65,7 @@ output$text_attributable_death_interventions <- renderText({
           conf_interval_deaths(simul_interventions$results$min$attributable_deaths_end, 
                                simul_interventions$results$med$attributable_deaths_end, 
                                simul_interventions$results$max$attributable_deaths_end),
-          p("Covid-19",  strong("reported"), "deaths during the range of simulation.")
+          p("Covid-19",  strong("attributable"), "deaths during the range of simulation.")
       )))
 })
 
