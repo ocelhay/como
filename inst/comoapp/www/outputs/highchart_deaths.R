@@ -1,7 +1,7 @@
 output$highchart_deaths <- renderHighchart({
   req(simul_baseline$baseline_available)
   
-  dta <- left_join(tibble(cum_mortality = simul_baseline$results$cum_mortality,
+  dta <- left_join(tibble(cum_mortality = simul_baseline$results$med$cum_mortality,
                           time = simul_baseline$results$time), 
                    cases_rv$data, # cumulative_death
                    by = c("time" = "date"))

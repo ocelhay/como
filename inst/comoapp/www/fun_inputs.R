@@ -1,4 +1,4 @@
-inputs<-function(inp, run, times, stopdate){
+inputs<-function(inp, run, times, startdate, stopdate){
   # cap intervention end dates with simulation end date
   inp$`Date End` = pmin(stopdate, inp$`Date End`)
   

@@ -128,7 +128,7 @@ ui <- function(request) {
             a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
             fluidRow(
               column(3, htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner()),
-              column(3, htmlOutput("text_total_death_baseline_dup") %>% withSpinner()),
+              column(3, htmlOutput("text_attributable_death_baseline_dup") %>% withSpinner()),
               column(3, htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()),
               column(3, htmlOutput("text_doubling_time") %>% withSpinner())
             ),
@@ -166,13 +166,13 @@ ui <- function(request) {
                  column(5,
                         div(class = "box_outputs", h4("Baseline")),
                         htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
-                        htmlOutput("text_total_death_baseline") %>% withSpinner(), br(),
+                        htmlOutput("text_attributable_death_baseline") %>% withSpinner(), br(),
                         htmlOutput("text_reported_death_baseline") %>% withSpinner()
                  ),
                  column(5,
                         div(class = "box_outputs", h4("Hypothetical Scenario")),
                         htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
-                        htmlOutput("text_total_death_interventions") %>% withSpinner(), br(), 
+                        htmlOutput("text_attributable_death_interventions") %>% withSpinner(), br(), 
                         htmlOutput("text_reported_death_interventions") %>% withSpinner()
                  )
                ),
@@ -645,7 +645,7 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times = times, stopdate = stopdate)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
@@ -668,8 +668,7 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times = times, stopdate = stopdate)
-    
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)

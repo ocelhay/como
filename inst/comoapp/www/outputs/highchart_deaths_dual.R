@@ -3,32 +3,32 @@ output$highchart_deaths_dual_baseline <- renderHighchart({
   req(simul_interventions$interventions_available)
   
   dta <- tibble(time = simul_baseline$results$time,
-                death_natural_non_exposed = simul_baseline$results$death_natural_non_exposed,
-                death_natural_exposed = simul_baseline$results$death_natural_exposed,
-                death_treated_hospital = simul_baseline$results$death_treated_hospital,
-                death_treated_icu = simul_baseline$results$death_treated_icu,
-                death_treated_ventilator = simul_baseline$results$death_treated_ventilator,
-                death_untreated_hospital = simul_baseline$results$death_untreated_hospital,
-                death_untreated_icu = simul_baseline$results$death_untreated_icu,
-                death_untreated_ventilator = simul_baseline$results$death_untreated_ventilator,
-                total_deaths = simul_baseline$results$total_deaths)
+                death_natural_non_exposed = simul_baseline$results$med$death_natural_non_exposed,
+                death_natural_exposed = simul_baseline$results$med$death_natural_exposed,
+                death_treated_hospital = simul_baseline$results$med$death_treated_hospital,
+                death_treated_icu = simul_baseline$results$med$death_treated_icu,
+                death_treated_ventilator = simul_baseline$results$med$death_treated_ventilator,
+                death_untreated_hospital = simul_baseline$results$med$death_untreated_hospital,
+                death_untreated_icu = simul_baseline$results$med$death_untreated_icu,
+                death_untreated_ventilator = simul_baseline$results$med$death_untreated_ventilator,
+                total_deaths = simul_baseline$results$med$total_deaths)
   
   if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
   if(input$focus_natural_death == "No Focus"){
-    max_y <- max(simul_baseline$results$total_deaths, 
-                 simul_interventions$results$total_deaths)
+    max_y <- max(simul_baseline$results$med$total_deaths, 
+                 simul_interventions$results$med$total_deaths)
   }
   
   if(input$focus_natural_death == "COVID-19 Deaths"){
-    max_y <- max(simul_baseline$results$death_treated_icu + simul_baseline$results$death_treated_ventilator + 
-                   simul_baseline$results$death_treated_hospital +  simul_baseline$results$death_untreated_hospital + 
-                   simul_baseline$results$death_untreated_icu + simul_baseline$results$death_untreated_ventilator,
+    max_y <- max(simul_baseline$results$med$death_treated_icu + simul_baseline$results$med$death_treated_ventilator + 
+                   simul_baseline$results$med$death_treated_hospital +  simul_baseline$results$med$death_untreated_hospital + 
+                   simul_baseline$results$med$death_untreated_icu + simul_baseline$results$med$death_untreated_ventilator,
                  
                  
-                   simul_interventions$results$death_treated_icu + simul_interventions$results$death_treated_ventilator + 
-                   simul_interventions$results$death_treated_hospital +  simul_interventions$results$death_untreated_hospital + 
-                   simul_interventions$results$death_untreated_icu + simul_interventions$results$death_untreated_ventilator)
+                   simul_interventions$results$med$death_treated_icu + simul_interventions$results$med$death_treated_ventilator + 
+                   simul_interventions$results$med$death_treated_hospital +  simul_interventions$results$med$death_untreated_hospital + 
+                   simul_interventions$results$med$death_untreated_icu + simul_interventions$results$med$death_untreated_ventilator)
   }
   
   hchart(dta, type = "area", name = "Natural Death, Non Exposed", color = "#636363", hcaes(x = time, y = death_natural_non_exposed)) %>%
@@ -54,32 +54,32 @@ output$highchart_deaths_dual_interventions <- renderHighchart({
   req(simul_interventions$interventions_available)
   
   dta <- tibble(time = simul_interventions$results$time,
-                death_natural_non_exposed = simul_interventions$results$death_natural_non_exposed,
-                death_natural_exposed = simul_interventions$results$death_natural_exposed,
-                death_treated_hospital = simul_interventions$results$death_treated_hospital,
-                death_treated_icu = simul_interventions$results$death_treated_icu,
-                death_treated_ventilator = simul_interventions$results$death_treated_ventilator,
-                death_untreated_hospital = simul_interventions$results$death_untreated_hospital,
-                death_untreated_icu = simul_interventions$results$death_untreated_icu,
-                death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator,
-                total_deaths = simul_interventions$results$total_deaths)
+                death_natural_non_exposed = simul_interventions$results$med$death_natural_non_exposed,
+                death_natural_exposed = simul_interventions$results$med$death_natural_exposed,
+                death_treated_hospital = simul_interventions$results$med$death_treated_hospital,
+                death_treated_icu = simul_interventions$results$med$death_treated_icu,
+                death_treated_ventilator = simul_interventions$results$med$death_treated_ventilator,
+                death_untreated_hospital = simul_interventions$results$med$death_untreated_hospital,
+                death_untreated_icu = simul_interventions$results$med$death_untreated_icu,
+                death_untreated_ventilator = simul_interventions$results$med$death_untreated_ventilator,
+                total_deaths = simul_interventions$results$med$total_deaths)
   
   if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
   if(input$focus_natural_death == "No Focus"){
-    max_y <- max(simul_baseline$results$total_deaths, 
-                 simul_interventions$results$total_deaths)
+    max_y <- max(simul_baseline$results$med$total_deaths, 
+                 simul_interventions$results$med$total_deaths)
   }
   
   if(input$focus_natural_death == "COVID-19 Deaths"){
-    max_y <- max(simul_baseline$results$death_treated_icu + simul_baseline$results$death_treated_ventilator + 
-                   simul_baseline$results$death_treated_hospital +  simul_baseline$results$death_untreated_hospital + 
-                   simul_baseline$results$death_untreated_icu + simul_baseline$results$death_untreated_ventilator,
+    max_y <- max(simul_baseline$results$med$death_treated_icu + simul_baseline$results$med$death_treated_ventilator + 
+                   simul_baseline$results$med$death_treated_hospital +  simul_baseline$results$med$death_untreated_hospital + 
+                   simul_baseline$results$med$death_untreated_icu + simul_baseline$results$med$death_untreated_ventilator,
                  
                  
-                 simul_interventions$results$death_treated_icu + simul_interventions$results$death_treated_ventilator + 
-                   simul_interventions$results$death_treated_hospital +  simul_interventions$results$death_untreated_hospital + 
-                   simul_interventions$results$death_untreated_icu + simul_interventions$results$death_untreated_ventilator)
+                 simul_interventions$results$med$death_treated_icu + simul_interventions$results$med$death_treated_ventilator + 
+                   simul_interventions$results$med$death_treated_hospital +  simul_interventions$results$med$death_untreated_hospital + 
+                   simul_interventions$results$med$death_untreated_icu + simul_interventions$results$med$death_untreated_ventilator)
   }
   
   hchart(dta, type = "area", name = "Natural Death, Non Exposed", color = "#636363", hcaes(x = time, y = death_natural_non_exposed)) %>%

@@ -3,20 +3,20 @@ output$highchart_requirements_dual_baseline <- renderHighchart({
   req(simul_interventions$interventions_available)
   
   dta <- tibble(time = simul_baseline$results$time,
-                hospital_surge_beds = simul_baseline$results$hospital_surge_beds,
-                icu_beds = simul_baseline$results$icu_beds,
-                ventilators = simul_baseline$results$ventilators,
+                hospital_surge_beds = simul_baseline$results$med$hospital_surge_beds,
+                icu_beds = simul_baseline$results$med$icu_beds,
+                ventilators = simul_baseline$results$med$ventilators,
                 max_beds = input$beds_available,
                 max_icu_beds = input$icu_beds_available,
                 max_ventilators = input$ventilators_available)
   
   if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
-  if(input$focus_requirements == "No Focus") max_y <- max((simul_baseline$results$hospital_surge_beds + simul_baseline$results$icu_beds + simul_baseline$results$ventilators), 
-                                                          (simul_interventions$results$hospital_surge_beds + simul_interventions$results$icu_beds + simul_interventions$results$ventilators))
-  if(input$focus_requirements == "Hospital Beds") max_y <- max(simul_baseline$results$hospital_surge_beds, simul_interventions$results$hospital_surge_beds)
-  if(input$focus_requirements == "ICU Beds") max_y <- max(simul_baseline$results$icu_beds, simul_interventions$results$icu_beds)
-  if(input$focus_requirements == "Ventilators") max_y <- max(simul_baseline$results$ventilators, simul_interventions$results$ventilators)
+  if(input$focus_requirements == "No Focus") max_y <- max((simul_baseline$results$med$hospital_surge_beds + simul_baseline$results$med$icu_beds + simul_baseline$results$med$ventilators), 
+                                                          (simul_interventions$results$med$hospital_surge_beds + simul_interventions$results$med$icu_beds + simul_interventions$results$med$ventilators))
+  if(input$focus_requirements == "Hospital Beds") max_y <- max(simul_baseline$results$med$hospital_surge_beds, simul_interventions$results$med$hospital_surge_beds)
+  if(input$focus_requirements == "ICU Beds") max_y <- max(simul_baseline$results$med$icu_beds, simul_interventions$results$med$icu_beds)
+  if(input$focus_requirements == "Ventilators") max_y <- max(simul_baseline$results$med$ventilators, simul_interventions$results$med$ventilators)
   
   
   if(input$focus_requirements == "No Focus") return(
@@ -72,20 +72,20 @@ output$highchart_requirements_dual_interventions <- renderHighchart({
   req(simul_interventions$interventions_available)
   
   dta <- tibble(time = simul_interventions$results$time,
-                hospital_surge_beds = simul_interventions$results$hospital_surge_beds,
-                icu_beds = simul_interventions$results$icu_beds,
-                ventilators = simul_interventions$results$ventilators,
+                hospital_surge_beds = simul_interventions$results$med$hospital_surge_beds,
+                icu_beds = simul_interventions$results$med$icu_beds,
+                ventilators = simul_interventions$results$med$ventilators,
                 max_beds = input$beds_available,
                 max_icu_beds = input$icu_beds_available,
                 max_ventilators = input$ventilators_available)
   
   if (!input$show_all_days) dta <- dta %>% filter(wday(time) == 4)
   
-  if(input$focus_requirements == "No Focus") max_y <- max((simul_baseline$results$hospital_surge_beds + simul_baseline$results$icu_beds + simul_baseline$results$ventilators), 
-                                                          (simul_interventions$results$hospital_surge_beds + simul_interventions$results$icu_beds + simul_interventions$results$ventilators))
-  if(input$focus_requirements == "Hospital Beds") max_y <- max(simul_baseline$results$hospital_surge_beds, simul_interventions$results$hospital_surge_beds)
-  if(input$focus_requirements == "ICU Beds") max_y <- max(simul_baseline$results$icu_beds, simul_interventions$results$icu_beds)
-  if(input$focus_requirements == "Ventilators") max_y <- max(simul_baseline$results$ventilators, simul_interventions$results$ventilators)
+  if(input$focus_requirements == "No Focus") max_y <- max((simul_baseline$results$med$hospital_surge_beds + simul_baseline$results$med$icu_beds + simul_baseline$results$med$ventilators), 
+                                                          (simul_interventions$results$med$hospital_surge_beds + simul_interventions$results$med$icu_beds + simul_interventions$results$med$ventilators))
+  if(input$focus_requirements == "Hospital Beds") max_y <- max(simul_baseline$results$med$hospital_surge_beds, simul_interventions$results$med$hospital_surge_beds)
+  if(input$focus_requirements == "ICU Beds") max_y <- max(simul_baseline$results$med$icu_beds, simul_interventions$results$med$icu_beds)
+  if(input$focus_requirements == "Ventilators") max_y <- max(simul_baseline$results$med$ventilators, simul_interventions$results$med$ventilators)
   
   
   if(input$focus_requirements == "No Focus") return(

@@ -2,8 +2,8 @@ output$highchart_cases_dual_baseline <- renderHighchart({
   req(simul_baseline$baseline_available)
   req(simul_interventions$interventions_available)
   
-  dta <- left_join(tibble(daily_incidence = simul_baseline$results$daily_incidence,
-                          daily_total_cases = simul_baseline$results$daily_total_cases,
+  dta <- left_join(tibble(daily_incidence = simul_baseline$results$med$daily_incidence,
+                          daily_total_cases = simul_baseline$results$med$daily_total_cases,
                           time = simul_baseline$results$time), 
                    cases_rv$data, 
                    by = c("time" = "date"))
@@ -17,11 +17,11 @@ output$highchart_cases_dual_baseline <- renderHighchart({
   }
   if(input$focus_axis_dup == "Predicted Reported")  {
     max_x <- max(dta$time)
-    max_y <- 1.2 * max(simul_baseline$results$daily_incidence, simul_interventions$results$daily_incidence, na.rm = TRUE)
+    max_y <- 1.2 * max(simul_baseline$results$med$daily_incidence, simul_interventions$results$med$daily_incidence, na.rm = TRUE)
   }
   if(input$focus_axis_dup == "Predicted Reported + Unreported")  {
     max_x <- max(dta$time)
-    max_y <- 1.2 * max(simul_baseline$results$daily_total_cases, simul_interventions$results$daily_total_cases, na.rm = TRUE)
+    max_y <- 1.2 * max(simul_baseline$results$med$daily_total_cases, simul_interventions$results$med$daily_total_cases, na.rm = TRUE)
   }
   
   dta2 <- dta %>%
@@ -45,8 +45,8 @@ output$highchart_cases_dual_interventions <- renderHighchart({
   req(simul_baseline$baseline_available)
   req(simul_interventions$interventions_available)
   
-  dta <- left_join(tibble(daily_incidence = simul_interventions$results$daily_incidence,
-                          daily_total_cases = simul_interventions$results$daily_total_cases,
+  dta <- left_join(tibble(daily_incidence = simul_interventions$results$med$daily_incidence,
+                          daily_total_cases = simul_interventions$results$med$daily_total_cases,
                           time = simul_interventions$results$time), 
                    cases_rv$data, 
                    by = c("time" = "date"))
@@ -60,11 +60,11 @@ output$highchart_cases_dual_interventions <- renderHighchart({
   }
   if(input$focus_axis_dup == "Predicted Reported")  {
     max_x <- max(dta$time)
-    max_y <- 1.2 * max(simul_baseline$results$daily_incidence, simul_interventions$results$daily_incidence, na.rm = TRUE)
+    max_y <- 1.2 * max(simul_baseline$results$med$daily_incidence, simul_interventions$results$med$daily_incidence, na.rm = TRUE)
   }
   if(input$focus_axis_dup == "Predicted Reported + Unreported")  {
     max_x <- max(dta$time)
-    max_y <- 1.2 * max(simul_baseline$results$daily_total_cases, simul_interventions$results$daily_total_cases, na.rm = TRUE)
+    max_y <- 1.2 * max(simul_baseline$results$med$daily_total_cases, simul_interventions$results$med$daily_total_cases, na.rm = TRUE)
   }
   
   dta2 <- dta %>%

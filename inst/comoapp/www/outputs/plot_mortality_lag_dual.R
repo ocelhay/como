@@ -1,15 +1,15 @@
 output$plot_mortality_lag_baseline <- renderPlot({
   req(simul_baseline$baseline_available)
   req(simul_interventions$interventions_available)
-  req(simul_baseline$results$mortality_lag %>% ncol() > 1)
-  req(simul_interventions$results$mortality_lag %>% ncol() > 1)
+  req(simul_baseline$results$med$mortality_lag %>% ncol() > 1)
+  req(simul_interventions$results$med$mortality_lag %>% ncol() > 1)
   
-  dta_baseline <- simul_baseline$results$mortality_lag %>%
+  dta_baseline <- simul_baseline$results$med$mortality_lag %>%
     pivot_longer(-Age, names_to = "Lag", values_to = "Mortality") %>% 
     mutate(Age = fct_relevel(Age, age_categories),
            Lag = factor(Lag, levels = c("Day 30", "Day 60", "Day 90", "Day 120")))
   
-  dta_interventions <- simul_interventions$results$mortality_lag %>%
+  dta_interventions <- simul_interventions$results$med$mortality_lag %>%
     pivot_longer(-Age, names_to = "Lag", values_to = "Mortality") %>% 
     mutate(Age = fct_relevel(Age, age_categories),
            Lag = factor(Lag, levels = c("Day 30", "Day 60", "Day 90", "Day 120")))
@@ -31,12 +31,12 @@ output$plot_mortality_lag_interventions <- renderPlot({
   req(simul_baseline$baseline_available)
   req(simul_interventions$interventions_available)
   
-  dta_baseline <- simul_baseline$results$mortality_lag %>%
+  dta_baseline <- simul_baseline$results$med$mortality_lag %>%
     pivot_longer(-Age, names_to = "Lag", values_to = "Mortality") %>% 
     mutate(Age = fct_relevel(Age, age_categories),
            Lag = factor(Lag, levels = c("Day 30", "Day 60", "Day 90", "Day 120")))
   
-  dta_interventions <- simul_interventions$results$mortality_lag %>%
+  dta_interventions <- simul_interventions$results$med$mortality_lag %>%
     pivot_longer(-Age, names_to = "Lag", values_to = "Mortality") %>% 
     mutate(Age = fct_relevel(Age, age_categories),
            Lag = factor(Lag, levels = c("Day 30", "Day 60", "Day 90", "Day 120")))

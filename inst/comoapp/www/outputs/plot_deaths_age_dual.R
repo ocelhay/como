@@ -2,7 +2,7 @@ output$plot_deaths_age_baseline <- renderPlot({
   req(simul_baseline$baseline_available)
   req(simul_interventions$interventions_available)
   
-  ggplot(data=simul_baseline$results$tc, aes(x=Date,y=value,fill=age_cat))+ 
+  ggplot(data=simul_baseline$results$med$tc, aes(x=Date,y=value,fill=age_cat))+ 
     geom_bar(stat = "identity",position="fill", width=1)+
     scale_fill_brewer(palette = "BrBG") + 
     ylab("Proportion of Deaths") + xlab("") +
@@ -14,7 +14,7 @@ output$plot_deaths_age_baseline <- renderPlot({
 output$plot_deaths_age_interventions <- renderPlot({
   
   req(simul_interventions$interventions_available)
-  ggplot(data=simul_interventions$results$tc, aes(x=Date,y=value,fill=age_cat))+ 
+  ggplot(data=simul_interventions$results$med$tc, aes(x=Date,y=value,fill=age_cat))+ 
     geom_bar(stat = "identity",position="fill", width=1)+
     scale_fill_brewer(palette = "BrBG") + 
     ylab("Proportion of Deaths") + xlab("") +

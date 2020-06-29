@@ -13,20 +13,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   day_infections <- empty_mat
   Rt_aux <- empty_mat
   infections <- matrix(0, nrow = parameters["iterations"], ncol = 1)
-  # Rt <- NULL
-  
-  # results$mean_cases <- matrix(0, nrow = length(times), ncol = 1)
-  # results$min_cases <- matrix(0, nrow = length(times), ncol = 1)
-  # results$max_cases <- matrix(0, nrow = length(times), ncol = 1)
-  # 
-  # results$mean_cum_cases <- matrix(0, nrow = length(times), ncol = 1)
-  # results$min_cum_cases <- matrix(0, nrow = length(times), ncol = 1)
-  # results$max_cum_cases <- matrix(0, nrow = length(times), ncol = 1)
-  # 
-  # results$mean_daily_infection <- matrix(0, nrow = length(times), ncol = 1)
-  # results$min_daily_infection <- matrix(0, nrow = length(times), ncol = 1)
-  # results$max_daily_infection <- matrix(0, nrow = length(times), ncol = 1)
-  
+
   # Define spline function ----
   # the parameters give and beds_available have no noise added to them
   beds <- parameters["beds_available"]
@@ -132,25 +119,6 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     results$mean_Rt <- apply(Rt_aux, 1, quantile, probs = 0.5, na.rm = TRUE)
     results$min_Rt <- apply(Rt_aux, 1, quantile, probs = parameters["confidence"], na.rm = TRUE)
     results$max_Rt <- apply(Rt_aux, 1, quantile, probs = (1 - parameters["confidence"]), na.rm = TRUE)
-    
-    # for(i in 1:length(times)){
-    #   results$mean_cases[i]<-quantile(cases[i,],0.5)
-    #   results$min_cases[i]<-quantile(cases[i,],parameters["confidence"])
-    #   results$max_cases[i]<-quantile(cases[i,],(1-parameters["confidence"]))
-    #   
-    #   results$mean_cum_cases[i]<-quantile(cum_cases[i,],0.5)
-    #   results$min_cum_cases[i]<-quantile(cum_cases[i,],parameters["confidence"])
-    #   results$max_cum_cases[i]<-quantile(cum_cases[i,],(1-parameters["confidence"]))
-    #   
-    #   results$mean_daily_infection[i]<-quantile(day_infections[i,],0.5)
-    #   results$min_daily_infection[i]<-quantile(day_infections[i,],parameters["confidence"])
-    #   results$max_daily_infection[i]<-quantile(day_infections[i,],(1-parameters["confidence"]))
-    #   
-    #   results$mean_Rt[i]<-quantile(Rt_aux[i,],0.5,na.rm = T)
-    #   results$min_Rt[i]<-quantile(Rt_aux[i,],parameters["confidence"],na.rm = T)
-    #   results$max_Rt[i]<-quantile(Rt_aux[i,],(1-parameters["confidence"]),na.rm = T)
-    # }
-    # browser()
     
     # runs in 37 sec with 10 runs / 205 days
     results$mean <- apply(aux, 1:2, quantile, probs = 0.5)

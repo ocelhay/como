@@ -1,214 +1,181 @@
 process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mort, popstruc){
+  # Define object to return ----
+  results <- list(
+    time = startdate + times
+  )
   
+  # Results derived from out$min, out$max or out$mean ----
+  compute_results <- function(out_mat) {
+    # Occupancies
+    surge_bed_occupancy <- rowSums(out_mat[, c(Hindex, ICUCindex, ICUCVindex) + 1])
+    icu_bed_occupancy <- rowSums(out_mat[, c(ICUindex, VentCindex) + 1])
+    ventilator_occupancy <- rowSums(out_mat[, Ventindex + 1])
+    
+    # Requirements ----
+    overloadH1<-rowSums(out_mat[,(HCindex+1)])       # requirement for beds
+    overloadICU1<-rowSums(out_mat[,(ICUCindex+1)])   # requirement for icu beds
+    overloadICUV1<-rowSums(out_mat[,(ICUCVindex+1)]) # requirement for ventilators
+    overloadVent1<-rowSums(out_mat[,(VentCindex+1)]) # requirement for ventilators
+    ccases1<-rowSums(out_mat[,(Cindex+1)])           # cumulative cases
+    reqsurge1<-rowSums(out_mat[,(Hindex+1)])+overloadH1
+    reqicu1<-rowSums(out_mat[,(ICUindex+1)])+overloadICU1
+    reqvent1<-rowSums(out_mat[,(Ventindex+1)])+overloadICUV1+overloadVent1
+    
+    # Age-dependent mortality ----
+    totage_H1 <- parameters["nus"]*parameters["pdeath_h"]*(out_mat[,(Hindex+1)])
+    totage_HC1 <- parameters["nusc"]*parameters["pdeath_hc"]*(out_mat[,(HCindex+1)])
+    totage_ICU1 <- parameters["nu_icu"]*parameters["pdeath_icu"]*out_mat[,(ICUindex+1)]
+    totage_ICUC1 <- parameters["nu_icuc"]*parameters["pdeath_icuc"]*out_mat[,(ICUCindex+1)] 
+    totage_ICUCV1 <- parameters["nu_ventc"]*parameters["pdeath_ventc"]*out_mat[,(ICUCVindex+1)]
+    totage_Vent1 <- parameters["nu_vent"]*parameters["pdeath_vent"]*out_mat[,(Ventindex+1)] 
+    totage_VentC1 <- parameters["nu_ventc"]*parameters["pdeath_ventc"]*out_mat[,(VentCindex+1)] 
+    totage <- as.data.frame(totage_H1+totage_HC1+totage_ICU1+totage_ICUC1+totage_ICUCV1+totage_Vent1+totage_VentC1)
+    
+    totage_base_H1 <- out_mat[, (Hindex+1)]
+    totage_base_HC1 <- out_mat[, (HCindex+1)]
+    totage_base_ICU1 <- out_mat[, (ICUindex+1)]
+    totage_base_ICUC1 <- out_mat[, (ICUCindex+1)]
+    totage_base_ICUCV1 <- out_mat[, (ICUCVindex+1)]
+    totage_base_Vent1 <- out_mat[, (Ventindex+1)]
+    totage_base_VentC1 <- out_mat[, (VentCindex+1)]
+    totbase <- as.data.frame(totage_base_H1+totage_base_HC1+totage_base_ICU1+totage_base_ICUC1+totage_base_ICUCV1+totage_base_Vent1+totage_base_VentC1)
+    
+    tc <- NULL
+    for (i in 1:dim(totage_H1)[1]) {
+      for (j in 1:dim(totage_H1)[2]) {
+        tc<-rbind(tc,c(i, j, totage[i,j]*ifr[j,2]+totbase[i,j]*mort[j])) 
+      }
+    }
+    tc<-as.data.frame(tc)
+    colnames(tc)<-c("Day","Age","value")
+    
+    tc <- tc %>%
+      mutate(Date = startdate + Day,
+             age_cat = case_when(
+               Age >=  1 & Age <= 6   ~ "≤ 30 y.o.",
+               Age >  6 & Age <= 8    ~ "30-40 y.o.",
+               Age >  8 & Age <= 10    ~ "40-50 y.o.",
+               Age >  10 & Age <= 12    ~ "50-60 y.o.",
+               Age >  12 & Age <= 14    ~ "60-70 y.o.",
+               Age >=  15  ~ "≥ 70 y.o.")) %>%
+      mutate(age_cat = factor(age_cat, levels = rev(c("≤ 30 y.o.", "30-40 y.o.", "40-50 y.o.", "50-60 y.o.", "60-70 y.o.", "≥ 70 y.o."))))
+    
+    # Mortality lag ----
+    mortality_lag <- data.frame(Age = popstruc$agefloor)
+    if(nrow(out_mat) >= 30)  mortality_lag <- bind_cols(mortality_lag, 
+                                                        data.frame(day30 = out_mat[30,CMindex+1]/out_mat[30,Cindex+1]) %>%
+                                                          mutate(day30 = ifelse(is.infinite(day30), 0, day30)) %>%
+                                                          rename(`Day 30` = day30))
+    if(nrow(out_mat) >= 60)  mortality_lag <- bind_cols(mortality_lag, 
+                                                        data.frame(day60 = out_mat[60,CMindex+1]/out_mat[60,Cindex+1]) %>%
+                                                          mutate(day60 = ifelse(is.infinite(day60), 0, day60)) %>%
+                                                          rename(`Day 60` = day60))
+    if(nrow(out_mat) >= 90)  mortality_lag <- bind_cols(mortality_lag, 
+                                                        data.frame(day90 = out_mat[90,CMindex+1]/out_mat[90,Cindex+1]) %>%
+                                                          mutate(day90 = ifelse(is.infinite(day90), 0, day90)) %>%
+                                                          rename(`Day 90` = day90))
+    if(nrow(out_mat) >= 120)  mortality_lag <- bind_cols(mortality_lag, 
+                                                         data.frame(day120 = out_mat[120,CMindex+1]/out_mat[120,Cindex+1]) %>%
+                                                           mutate(day120 = ifelse(is.infinite(day120), 0, day120)) %>%
+                                                           rename(`Day 120` = day120))
+    
+    
+    # Calculate mortality ----
+    cinc_mort_H1 <- cumsum(rowSums(parameters["nus"]*parameters["pdeath_h"]*(out_mat[,(Hindex+1)]%*%ifr[,2])))
+    cinc_mort_HC1 <- cumsum(rowSums(parameters["nusc"]*parameters["pdeath_hc"]*(out_mat[,(HCindex+1)]%*%ifr[,2])))
+    cinc_mort_ICU1 <- cumsum(rowSums(parameters["nu_icu"]*parameters["pdeath_icu"]*out_mat[,(ICUindex+1)]%*%ifr[,2]))
+    cinc_mort_ICUC1 <- cumsum(rowSums(parameters["nu_icuc"]*parameters["pdeath_icuc"]*out_mat[,(ICUCindex+1)]%*%ifr[,2]))
+    cinc_mort_ICUCV1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out_mat[,(ICUCVindex+1)]%*%ifr[,2]))
+    cinc_mort_Vent1 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*out_mat[,(Ventindex+1)]%*%ifr[,2]))
+    cinc_mort_VentC1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out_mat[,(VentCindex+1)]%*%ifr[,2]))
+    
+    base_mort_H1 <- cumsum(rowSums(out_mat[,(Hindex+1)]%*%mort))
+    base_mort_HC1 <- cumsum(rowSums(out_mat[,(HCindex+1)]%*%mort))
+    base_mort_ICU1 <- cumsum(rowSums(out_mat[,(ICUindex+1)]%*%mort))
+    base_mort_ICUC1 <- cumsum(rowSums(out_mat[,(ICUCindex+1)]%*%mort))
+    base_mort_ICUCV1 <- cumsum(rowSums(out_mat[,(ICUCVindex+1)]%*%mort))
+    base_mort_Vent1 <- cumsum(rowSums(out_mat[,(Ventindex+1)]%*%mort))
+    base_mort_VentC1 <- cumsum(rowSums(out_mat[,(VentCindex+1)]%*%mort))
+    
+    base_mort_S1 <- cumsum(rowSums(out_mat[,(Sindex+1)]%*%mort))
+    base_mort_E1 <- cumsum(rowSums(out_mat[,(Eindex+1)]%*%mort))
+    base_mort_I1 <- cumsum(rowSums(out_mat[,(Iindex+1)]%*%mort))
+    base_mort_CL1 <- cumsum(rowSums(out_mat[,(CLindex+1)]%*%mort))
+    base_mort_X1 <- cumsum(rowSums(out_mat[,(Xindex+1)]%*%mort))
+    base_mort_QS1 <- cumsum(rowSums(out_mat[,(QSindex+1)]%*%mort))
+    base_mort_QE1 <- cumsum(rowSums(out_mat[,(QEindex+1)]%*%mort))
+    base_mort_QI1 <- cumsum(rowSums(out_mat[,(QIindex+1)]%*%mort))
+    base_mort_QC1 <- cumsum(rowSums(out_mat[,(QCindex+1)]%*%mort))
+    base_mort_QR1 <- cumsum(rowSums(out_mat[,(QRindex+1)]%*%mort))
+    base_mort_R1 <- cumsum(rowSums(out_mat[,(Rindex+1)]%*%mort))
+    
+
+    # Fill in results
+    results$cum_mortality <- round(rowSums(out_mat[, CMindex + 1]))
+    results$total_reported_deaths_end <- last(results$cum_mortality)
+    
+    results$hospital_surge_beds <- round(surge_bed_occupancy)
+    results$icu_beds <- round(icu_bed_occupancy)
+    results$ventilators <- round(ventilator_occupancy)
+    results$normal_bed_requirement <- round(reqsurge1) #real required beds. surge_bed_occupancy above is the occupancy
+    results$icu_bed_requirement <- round(reqicu1)
+    results$icu_ventilator_requirement <- round(reqvent1)
+    
+    results$death_natural_non_exposed <- round(base_mort_S1)
+    results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 + base_mort_QS1 + 
+                                             base_mort_QE1 + base_mort_QI1 + base_mort_QC1 + base_mort_QR1 + base_mort_R1+
+                                             base_mort_H1+base_mort_HC1+base_mort_ICU1+base_mort_ICUC1+base_mort_ICUCV1+
+                                             base_mort_Vent1+base_mort_VentC1)
+    results$death_treated_hospital <- round(cinc_mort_H1)
+    results$death_treated_icu <- round(cinc_mort_ICU1)
+    results$death_treated_ventilator <- round(cinc_mort_Vent1)
+    results$death_untreated_hospital <- round(cinc_mort_HC1)
+    results$death_untreated_icu <- round(cinc_mort_ICUC1)
+    results$death_untreated_ventilator <- round(cinc_mort_VentC1)+round(cinc_mort_ICUCV1)
+    
+    results$attributable_deaths <- results$death_treated_hospital + results$death_treated_icu + results$death_treated_ventilator +
+      results$death_untreated_hospital + results$death_untreated_icu + results$death_untreated_ventilator
+    
+    results$attributable_deaths_end <- last(results$attributable_deaths)
+    
+    results$total_deaths <- results$attributable_deaths + results$death_natural_non_exposed + results$death_natural_exposed
+    results$total_deaths_end <- last(results$total_deaths)
+    
+    results$tc <- tc
+    results$mortality_lag <- mortality_lag
+    
+    return(results)
+  }
   
-  # Complete matrices
-  out_min <- out$min
-  out_max <- out$max
-  out_med <- out$mean
+  results$med <- compute_results(out$mean)
+  results$min <- compute_results(out$min)
+  results$max <- compute_results(out$max)
   
-  # Occupancies
-  surge_bed_occupancy <- rowSums(out_med[, c(Hindex, ICUCindex, ICUCVindex) + 1])
-  icu_bed_occupancy <- rowSums(out_med[, c(ICUindex, VentCindex) + 1])
-  ventilator_occupancy <- rowSums(out_med[, Ventindex + 1])
-  
-  surge_bed_occupancy_max <- rowSums(out_max[, c(Hindex, ICUCindex, ICUCVindex) + 1])
-  icu_bed_occupancy_max <- rowSums(out_max[, c(ICUindex, VentCindex) + 1])
-  ventilator_occupancy_max <- rowSums(out_max[, Ventindex + 1])
-  
-  surge_bed_occupancy_min <- rowSums(out_min[, c(Hindex, ICUCindex, ICUCVindex) + 1])
-  icu_bed_occupancy_min <- rowSums(out_min[, c(ICUindex, VentCindex) + 1])
-  ventilator_occupancy_min <- rowSums(out_min[, Ventindex + 1])
-  
-  
-  
-  
-  # Requirements ----
-  # Median
-  overloadH1<-rowSums(out_med[,(HCindex+1)])       # requirement for beds
-  overloadICU1<-rowSums(out_med[,(ICUCindex+1)])   # requirement for icu beds
-  overloadICUV1<-rowSums(out_med[,(ICUCVindex+1)]) # requirement for ventilators
-  overloadVent1<-rowSums(out_med[,(VentCindex+1)]) # requirement for ventilators
-  ccases1<-rowSums(out_med[,(Cindex+1)])           # cumulative cases
-  reqsurge1<-rowSums(out_med[,(Hindex+1)])+overloadH1
-  reqicu1<-rowSums(out_med[,(ICUindex+1)])+overloadICU1
-  reqvent1<-rowSums(out_med[,(Ventindex+1)])+overloadICUV1+overloadVent1
-  
-  # Max
-  overloadH1_max<-rowSums(out_max[,(HCindex+1)])       # requirement for beds
-  overloadICU1_max<-rowSums(out_max[,(ICUCindex+1)])   # requirement for icu beds
-  overloadICUV1_max<-rowSums(out_max[,(ICUCVindex+1)]) # requirement for ventilators
-  overloadVent1_max<-rowSums(out_max[,(VentCindex+1)]) # requirement for ventilators
-  ccases1_max<-rowSums(out_max[,(Cindex+1)])           # cumulative cases
-  reqsurge1_max<-rowSums(out_max[,(Hindex+1)])+overloadH1  # surge beds total requirements
-  reqicu1_max<-rowSums(out_max[,(ICUindex+1)])+overloadICU1 # ICU beds total requirements
-  reqvent1_max<-rowSums(out_max[,(Ventindex+1)])+overloadICUV1+overloadVent1 # ventilator beds total requirements
-  
-  # Min
-  overloadH1_min<-rowSums(out_min[,(HCindex+1)])       # requirement for beds
-  overloadICU1_min<-rowSums(out_min[,(ICUCindex+1)])   # requirement for icu beds
-  overloadICUV1_min<-rowSums(out_min[,(ICUCVindex+1)]) # requirement for ventilators
-  overloadVent1_min<-rowSums(out_min[,(VentCindex+1)]) # requirement for ventilators
-  ccases1_min<-rowSums(out_min[,(Cindex+1)])           # cumulative cases
-  reqsurge1_min<-rowSums(out_min[,(Hindex+1)])+overloadH1  # surge beds total requirements
-  reqicu1_min<-rowSums(out_min[,(ICUindex+1)])+overloadICU1 # ICU beds total requirements
-  reqvent1_min<-rowSums(out_min[,(Ventindex+1)])+overloadICUV1+overloadVent1 # ventilator beds total requirements
-  
-  
-  # Calculate mortality ----
-  cinc_mort_H1 <- cumsum(rowSums(parameters["nus"]*parameters["pdeath_h"]*(out_med[,(Hindex+1)]%*%ifr[,2])))
-  cinc_mort_HC1 <- cumsum(rowSums(parameters["nusc"]*parameters["pdeath_hc"]*(out_med[,(HCindex+1)]%*%ifr[,2])))
-  cinc_mort_ICU1 <- cumsum(rowSums(parameters["nu_icu"]*parameters["pdeath_icu"]*out_med[,(ICUindex+1)]%*%ifr[,2]))
-  cinc_mort_ICUC1 <- cumsum(rowSums(parameters["nu_icuc"]*parameters["pdeath_icuc"]*out_med[,(ICUCindex+1)]%*%ifr[,2]))
-  cinc_mort_ICUCV1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out_med[,(ICUCVindex+1)]%*%ifr[,2]))
-  cinc_mort_Vent1 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*out_med[,(Ventindex+1)]%*%ifr[,2]))
-  cinc_mort_VentC1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out_med[,(VentCindex+1)]%*%ifr[,2]))
-  base_mort_H1 <- cumsum(rowSums(out_med[,(Hindex+1)]%*%mort))
-  base_mort_HC1 <- cumsum(rowSums(out_med[,(HCindex+1)]%*%mort))
-  base_mort_ICU1 <- cumsum(rowSums(out_med[,(ICUindex+1)]%*%mort))
-  base_mort_ICUC1 <- cumsum(rowSums(out_med[,(ICUCindex+1)]%*%mort))
-  base_mort_ICUCV1 <- cumsum(rowSums(out_med[,(ICUCVindex+1)]%*%mort))
-  base_mort_Vent1 <- cumsum(rowSums(out_med[,(Ventindex+1)]%*%mort))
-  base_mort_VentC1 <- cumsum(rowSums(out_med[,(VentCindex+1)]%*%mort))
-  base_mort_S1 <- cumsum(rowSums(out_med[,(Sindex+1)]%*%mort))
-  base_mort_E1 <- cumsum(rowSums(out_med[,(Eindex+1)]%*%mort))
-  base_mort_I1 <- cumsum(rowSums(out_med[,(Iindex+1)]%*%mort))
-  base_mort_CL1 <- cumsum(rowSums(out_med[,(CLindex+1)]%*%mort))
-  base_mort_X1 <- cumsum(rowSums(out_med[,(Xindex+1)]%*%mort))
-  base_mort_QS1 <- cumsum(rowSums(out_med[,(QSindex+1)]%*%mort))
-  base_mort_QE1 <- cumsum(rowSums(out_med[,(QEindex+1)]%*%mort))
-  base_mort_QI1 <- cumsum(rowSums(out_med[,(QIindex+1)]%*%mort))
-  base_mort_QC1 <- cumsum(rowSums(out_med[,(QCindex+1)]%*%mort))
-  base_mort_QR1 <- cumsum(rowSums(out_med[,(QRindex+1)]%*%mort))
-  base_mort_R1 <- cumsum(rowSums(out_med[,(Rindex+1)]%*%mort))
-  
-  
-  
-  # object to return
-  results <- list()
-  
-  # time
-  results$time <- startdate + times  # dates
-  
-  # Cumulative mortality ----
-  results$cum_mortality <- round(rowSums(out_med[, CMindex + 1]))
-  results$total_reported_deaths_end <- last(results$cum_mortality)
-  results$total_reported_deaths_end_min <- last(rowSums(out_min[, CMindex + 1]))
-  results$total_reported_deaths_end_max <- last(rowSums(out_max[, CMindex + 1]))
-  
+  # Results already computed in multi_runs() ----
   # Rt
-  results$Rt <- out$mean_Rt
-  results$Rt_min <- out$min_Rt
-  results$Rt_max <- out$max_Rt
+  results$med$Rt <- out$mean_Rt
+  results$min$Rt <- out$min_Rt
+  results$max$Rt <- out$max_Rt
   
   # proportion of the  population that has been infected at the end of the simulation
-  results$pct_total_pop_infected <- out$mean_infections
-  results$pct_total_pop_infected_min <- out$min_infections
-  results$pct_total_pop_infected_max <- out$max_infections
+  results$med$pct_total_pop_infected <- out$mean_infections
+  results$min$pct_total_pop_infected <- out$min_infections
+  results$max$pct_total_pop_infected <- out$max_infections
   
   # Daily incidence
-  results$daily_incidence <- round(out$mean_cases)
-  results$daily_incidence_min <- round(out$min_cases)
-  results$daily_incidence_max <- round(out$max_cases)
+  results$med$daily_incidence <- round(out$mean_cases)
+  results$min$daily_incidence <- round(out$min_cases)
+  results$max$daily_incidence <- round(out$max_cases)
   
   # Daily total cases
-  results$daily_total_cases <- round(out$mean_daily_infection)
-  results$daily_total_cases_max <- round(out$max_daily_infection)
-  results$daily_total_cases_min <- round(out$min_daily_infection)
+  results$med$daily_total_cases <- round(out$mean_daily_infection)
+  results$min$daily_total_cases <- round(out$min_daily_infection)
+  results$max$daily_total_cases <- round(out$max_daily_infection)
   
   # Doubling time (only for baseline)
-  results$doubling_time_mean <- round(log(2)*7 / (log(out$mean_cases[2+7] / out$mean_cases[2])), 2)
-  results$doubling_time_min <- round(log(2)*7 / (log(out$min_cases[2+7] / out$min_cases[2])), 2)
-  results$doubling_time_max <- round(log(2)*7 / (log(out$max_cases[2+7] / out$max_cases[2])), 2)
-  
-  
-  # Median (Mean?!) only ---
-  results$hospital_surge_beds <- round(surge_bed_occupancy)
-  results$icu_beds <- round(icu_bed_occupancy)
-  results$ventilators <- round(ventilator_occupancy)
-  results$normal_bed_requirement <- round(reqsurge1) #real required beds. surge_bed_occupancy above is the occupancy
-  results$icu_bed_requirement <- round(reqicu1)
-  results$icu_ventilator_requirement <- round(reqvent1)
-  
-  results$death_natural_non_exposed <- round(base_mort_S1)
-  results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 + base_mort_QS1 + 
-                                           base_mort_QE1 + base_mort_QI1 + base_mort_QC1 + base_mort_QR1 + base_mort_R1+
-                                           base_mort_H1+base_mort_HC1+base_mort_ICU1+base_mort_ICUC1+base_mort_ICUCV1+
-                                           base_mort_Vent1+base_mort_VentC1)
-  results$death_treated_hospital <- round(cinc_mort_H1)
-  results$death_treated_icu <- round(cinc_mort_ICU1)
-  results$death_treated_ventilator <- round(cinc_mort_Vent1)
-  results$death_untreated_hospital <- round(cinc_mort_HC1)
-  results$death_untreated_icu <- round(cinc_mort_ICUC1)
-  results$death_untreated_ventilator <- round(cinc_mort_VentC1)+round(cinc_mort_ICUCV1)
-  
-  results$attributable_deaths <- results$death_treated_hospital + results$death_treated_icu + results$death_treated_ventilator +
-    results$death_untreated_hospital + results$death_untreated_icu + results$death_untreated_ventilator
-  
-  results$attributable_deaths_end <- last(results$attributable_deaths)
-  
-  results$total_deaths <- results$attributable_deaths + results$death_natural_non_exposed + results$death_natural_exposed
-  results$total_deaths_end <- last(results$total_deaths)
-  
-  # Age-dependent mortality ----
-  cinc_mort_H1 <- parameters["nus"]*parameters["pdeath_h"]*(out_med[,(Hindex+1)])
-  cinc_mort_HC1 <- parameters["nusc"]*parameters["pdeath_hc"]*(out_med[,(HCindex+1)])
-  cinc_mort_ICU1 <- parameters["nu_icu"]*parameters["pdeath_icu"]*out_med[,(ICUindex+1)]
-  cinc_mort_ICUC1 <- parameters["nu_icuc"]*parameters["pdeath_icuc"]*out_med[,(ICUCindex+1)] 
-  cinc_mort_ICUCV1 <- parameters["nu_ventc"]*parameters["pdeath_ventc"]*out_med[,(ICUCVindex+1)]
-  cinc_mort_Vent1 <- parameters["nu_vent"]*parameters["pdeath_vent"]*out_med[,(Ventindex+1)] 
-  cinc_mort_VentC1 <- parameters["nu_ventc"]*parameters["pdeath_ventc"]*out_med[,(VentCindex+1)] 
-  totage1<-as.data.frame(cinc_mort_H1+cinc_mort_HC1+cinc_mort_ICU1+cinc_mort_ICUC1+cinc_mort_ICUCV1+cinc_mort_Vent1+cinc_mort_VentC1)
-  
-  basemort_H1<-(out_med[,(Hindex+1)])
-  basemort_HC1<-(out_med[,(HCindex+1)])
-  basemort_ICU1<-(out_med[,(ICUindex+1)])
-  basemort_ICUC1<-(out_med[,(ICUCindex+1)])
-  basemort_ICUCV1<-(out_med[,(ICUCVindex+1)])
-  basemort_Vent1<-(out_med[,(Ventindex+1)])
-  basemort_VentC1<-(out_med[,(VentCindex+1)])
-  totbase1<-as.data.frame(basemort_H1+basemort_HC1+basemort_ICU1+basemort_ICUC1+basemort_ICUCV1+basemort_Vent1+basemort_VentC1)
-  
-  tc <- NULL
-  for (i in 1:dim(cinc_mort_H1)[1]) {
-    for (j in 1:dim(cinc_mort_H1)[2]) {
-      tc<-rbind(tc,c(i, j, totage1[i,j]*ifr[j,2]+totbase1[i,j]*mort[j])) 
-    }
-  }
-  tc<-as.data.frame(tc)
-  colnames(tc)<-c("Day","Age","value")
-  
-  results$tc <- tc %>%
-    mutate(Date = startdate + Day,
-           age_cat = case_when(
-             Age >=  1 & Age <= 6   ~ "≤ 30 y.o.",
-             Age >  6 & Age <= 8    ~ "30-40 y.o.",
-             Age >  8 & Age <= 10    ~ "40-50 y.o.",
-             Age >  10 & Age <= 12    ~ "50-60 y.o.",
-             Age >  12 & Age <= 14    ~ "60-70 y.o.",
-             Age >=  15  ~ "≥ 70 y.o.")) %>%
-    mutate(age_cat = factor(age_cat, levels = rev(c("≤ 30 y.o.", "30-40 y.o.",
-                                                    "40-50 y.o.", "50-60 y.o.", "60-70 y.o.", "≥ 70 y.o."))))
-  
-  # Mortality lag ----
-  mortality_lag <- data.frame(Age = popstruc$agefloor)
-  if(nrow(out_med) >= 30)  mortality_lag <- bind_cols(mortality_lag, 
-                                                      data.frame(day30 = out_med[30,CMindex+1]/out_med[30,Cindex+1]) %>%
-                                                        mutate(day30 = ifelse(is.infinite(day30), 0, day30)) %>%
-                                                        rename(`Day 30` = day30))
-  if(nrow(out_med) >= 60)  mortality_lag <- bind_cols(mortality_lag, 
-                                                      data.frame(day60 = out_med[60,CMindex+1]/out_med[60,Cindex+1]) %>%
-                                                        mutate(day60 = ifelse(is.infinite(day60), 0, day60)) %>%
-                                                        rename(`Day 60` = day60))
-  if(nrow(out_med) >= 90)  mortality_lag <- bind_cols(mortality_lag, 
-                                                      data.frame(day90 = out_med[90,CMindex+1]/out_med[90,Cindex+1]) %>%
-                                                        mutate(day90 = ifelse(is.infinite(day90), 0, day90)) %>%
-                                                        rename(`Day 90` = day90))
-  if(nrow(out_med) >= 120)  mortality_lag <- bind_cols(mortality_lag, 
-                                                       data.frame(day120 = out_med[120,CMindex+1]/out_med[120,Cindex+1]) %>%
-                                                         mutate(day120 = ifelse(is.infinite(day120), 0, day120)) %>%
-                                                         rename(`Day 120` = day120))
-  
-  results$mortality_lag <- mortality_lag
+  results$med$doubling_time <- round(log(2)*7 / (log(out$mean_cases[2+7] / out$mean_cases[2])), 2)
+  results$min$doubling_time <- round(log(2)*7 / (log(out$min_cases[2+7] / out$min_cases[2])), 2)
+  results$max$doubling_time <- round(log(2)*7 / (log(out$max_cases[2+7] / out$max_cases[2])), 2)
   
   return(results)
 }
