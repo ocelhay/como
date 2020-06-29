@@ -134,8 +134,8 @@ ui <- function(request) {
             ),
             prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
                                selected = "Observed", inline = TRUE), br(),
-            highchartOutput("highchart_cases", height = "350px") %>% withSpinner(), 
-            highchartOutput("highchart_deaths", height = "350px") %>% withSpinner()
+            plotOutput("plot_cases_baseline", height = "350px") %>% withSpinner(), 
+            plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner()
           )
         )
       ),
@@ -652,7 +652,7 @@ server <- function(input, output, session) {
     simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
     simul_baseline$baseline_available <- TRUE
     
-    showNotification("Displaying results (~ 5 secs.)", duration = 4, type = "message")
+    showNotification("Displaying results", duration = 3, type = "message")
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
   
