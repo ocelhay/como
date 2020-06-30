@@ -124,18 +124,19 @@ ui <- function(request) {
                      plotOutput("timevis_baseline", height = 700)
               )
             ),
-            br(), br(), 
+            br(), hr(), 
             a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
-            fluidRow(
-              column(3, htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner()),
-              column(3, htmlOutput("text_attributable_death_baseline_dup") %>% withSpinner()),
-              column(3, htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()),
-              column(3, htmlOutput("text_doubling_time") %>% withSpinner())
-            ),
             prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
                                selected = "Observed", inline = TRUE), br(),
+            fluidRow(
+              column(4, htmlOutput("text_pct_pop_baseline") %>% withSpinner()),
+              column(4, htmlOutput("text_attributable_death_baseline") %>% withSpinner()),
+              column(4, htmlOutput("text_reported_death_baseline") %>% withSpinner())
+            ),
             plotOutput("plot_cases_baseline", height = "350px") %>% withSpinner(), 
-            plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner()
+            plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner(),
+            plotOutput("plot_Rt_baseline", height = "200px") %>% withSpinner(),
+            
           )
         )
       ),
@@ -164,10 +165,12 @@ ui <- function(request) {
                         a(id = "anchor_summary", style="visibility: hidden", "")
                  ),
                  column(5,
+                        prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
+                                           selected = "Predicted Reported + Unreported", inline = TRUE),
                         div(class = "box_outputs", h4("Baseline")),
-                        htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
-                        htmlOutput("text_attributable_death_baseline") %>% withSpinner(), br(),
-                        htmlOutput("text_reported_death_baseline") %>% withSpinner()
+                        htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner(), br(),
+                        htmlOutput("text_attributable_death_baseline_dup") %>% withSpinner(), br(),
+                        htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()
                  ),
                  column(5,
                         div(class = "box_outputs", h4("Hypothetical Scenario")),
@@ -183,9 +186,7 @@ ui <- function(request) {
                         materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
                                        status = "danger", right = TRUE, inline = FALSE, width = "100%"),
                         br(),
-                        a(id = "anchor_cases", style="visibility: hidden", ""),
-                        prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
-                                           selected = "Predicted Reported + Unreported", inline = TRUE)
+                        a(id = "anchor_cases", style="visibility: hidden", "")
                  )
                ),
                fluidRow(

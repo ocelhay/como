@@ -8,7 +8,7 @@ output$highchart_Rt_dual_baseline <- renderHighchart({
   
   if (!input$show_all_days) dta <- dta %>% filter(wday(Date) == 4)
   
-  max_y <- 1.2 * max(simul_baseline$results$med$Rt, simul_baseline$results$med$Rt, na.rm = TRUE)
+  max_y <- 1.2 * max(simul_baseline$results$med$Rt, simul_interventions$results$med$Rt, na.rm = TRUE)
   
   return(
     hchart(dta, "line", name = "Rt", hcaes(x = Date, y = Rt), color = "#74c476") %>%
@@ -32,7 +32,7 @@ output$highchart_Rt_dual_interventions <- renderHighchart({
   
   if (!input$show_all_days) dta <- dta %>% filter(wday(Date) == 4)
   
-  max_y <- 1.2 * max(simul_interventions$results$med$Rt, simul_interventions$results$med$Rt, na.rm = TRUE)
+  max_y <- 1.2 * max(simul_baseline$results$med$Rt, simul_interventions$results$med$Rt, na.rm = TRUE)
   
   return(
     hchart(dta, "line", name = "Rt", hcaes(x = Date, y = Rt), color = "#6baed6") %>%

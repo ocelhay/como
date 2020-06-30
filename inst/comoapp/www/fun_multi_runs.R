@@ -12,7 +12,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   cum_cases <- empty_mat
   day_infections <- empty_mat
   Rt_aux <- empty_mat
-  infections <- matrix(0, nrow = parameters["iterations"], ncol = 1)
+  infections <- empty_mat
 
   # Define spline function ----
   # the parameters give and beds_available have no noise added to them
@@ -69,8 +69,9 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     day_infections[,i]<- round(rowSums(parameters_dup["gamma"]*mat_ode[,(Eindex+1)]+
                                          parameters_dup["gamma"]*mat_ode[,(QEindex+1)]))
     
-    # daily infections
-    infections[i] <- round(100*tail(cumsum(rowSums(parameters_dup["gamma"]*mat_ode[,(Eindex+1)])),1)/sum(popstruc[,2]), 1)  # proportion of the  population that has been infected at the end of the simulation
+    # overtime proportion of the  population that is infected
+    infections[, i] <- round(100 * cumsum(rowSums(parameters_dup["gamma"]*mat_ode[,(Eindex+1)])) / sum(popstruc[,2]), 1)
+    
     for (w in (ceiling(1/parameters_dup["nui"])+1):nb_times){
       Rt_aux[w,i]<-cumsum(sum(parameters_dup["gamma"]*mat_ode[w,(Eindex+1)]))/cumsum(sum(parameters_dup["gamma"]*mat_ode[(w-1/parameters_dup["nui"]),(Eindex+1)]))
       if(Rt_aux[w,i] >= 7) {Rt_aux[w,i]  <- NA}
@@ -78,13 +79,13 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   }
   
   if (parameters["iterations"] > 1)  showNotification("Aggregation of results (~ half a minute)", duration = NULL, type = "message", id = "aggregation_results")
-  
   time_start <- Sys.time()
-  results$mean_infections <- quantile(infections, 0.5)
-  results$min_infections <- quantile(infections, parameters["confidence"])
-  results$max_infections <- quantile(infections, (1 - parameters["confidence"]))
   
   if (parameters["iterations"] == 1) {
+    results$mean_infections <- infections
+    results$min_infections <- infections
+    results$max_infections <- infections
+    
     results$mean_cases <- cases
     results$min_cases <- cases
     results$max_cases <- cases
@@ -107,7 +108,10 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   }
   
   if (parameters["iterations"] > 1) {
-    # runs in 0.4 sec with 10 runs / 205 days:
+    results$mean_infections <- apply(infections, 1, quantile, probs = 0.5)
+    results$min_infections <- apply(infections, 1, quantile, probs = parameters["confidence"])
+    results$max_infections <- apply(infections, 1, quantile, probs = (1 - parameters["confidence"]))
+    
     results$mean_cases <- apply(cases, 1, quantile, probs = 0.5)
     results$min_cases <- apply(cases, 1, quantile, probs = parameters["confidence"])
     results$max_cases <- apply(cases, 1, quantile, probs = (1 - parameters["confidence"]))
