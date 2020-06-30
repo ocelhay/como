@@ -23,21 +23,13 @@ output$plot_deaths_baseline <- renderPlot({
     rename(Date = time) %>%
     filter(Date <= max_x)
   
-  # return(
-  #   hchart(dta2, "line", name = "Predicted Reported Deaths", hcaes(x = Date, y = cum_mortality), color = "#00441b") %>% 
-  #     hc_add_series(dta2, type = 'line', name = "Observed", hcaes(x = Date, y = cumulative_death), color = "red") %>%
-  #     hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
-  #            {point.y:,.0f}<br/>", shared = TRUE) %>%
-  #     hc_title(text = "Baseline Cumulative Deaths") %>%
-  #     hc_yAxis(max = max_y, title = "Cases") %>%
-  #     hc_xAxis(title = "")
-  # )
-  
   ggplot(data = dta2, aes(x = Date)) +
-    geom_ribbon(aes(ymin = cum_mortality_min, ymax = cum_mortality_max), fill = "#00441b") +
-    geom_line(aes(y = cum_mortality_med)) + 
-    geom_line(aes(y = cumulative_death), color = "red") +
+    geom_ribbon(aes(ymin = cum_mortality_min, ymax = cum_mortality_max), fill = "#00441b", alpha = 0.7) +
+    geom_line(aes(y = cum_mortality_med, color = "Predicted"), lwd = 1.2) + 
+    geom_line(aes(y = cumulative_death, color = "Observed"), lwd = 1.2) +
+    geom_point(aes(y = cumulative_death), color = "red") +
     coord_cartesian(ylim = c(NA, max_y)) +
     ggtitle("Baseline Cumulative Deaths") + xlab("") + ylab("Deaths") +
-    theme_light(base_size = 14)
+    theme_light(base_size = 14) +
+    scale_color_manual(name = "Cumulative Deaths", values = c("Predicted" = "#00441b", "Observed" = "red"))
 })
