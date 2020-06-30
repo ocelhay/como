@@ -209,11 +209,13 @@ ui <- function(request) {
                  column(5, offset = 2,
                         highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
                         plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br(),
+                        plotOutput("plot_total_deaths_age_baseline") %>% withSpinner(), br(),
                         plotOutput("plot_mortality_lag_baseline") %>% withSpinner(), br()
                  ),
                  column(5,
                         highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
                         plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br(),
+                        plotOutput("plot_total_deaths_age_interventions") %>% withSpinner(), br(),
                         plotOutput("plot_mortality_lag_interventions") %>% withSpinner(), br()
                  )
                ),
