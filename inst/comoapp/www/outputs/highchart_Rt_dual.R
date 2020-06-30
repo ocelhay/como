@@ -39,7 +39,7 @@ output$highchart_Rt_dual_interventions <- renderHighchart({
       hc_add_series(dta, type = "line", name = "Threshold", color = "red", hcaes(x = Date, y = One)) %>%
       hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
              {point.y:,.2f}<br/>", shared = TRUE) %>%
-      hc_title(text = "Future Scenarios Rt") %>%
+      hc_title(text = "Hypothetical Scenario Rt") %>%
       hc_yAxis(max = max_y, title = "Rt") %>%
       hc_xAxis(title = "") %>%
       hc_exporting(enabled = TRUE, buttons = list(contextButton = list(menuItems = hc_export_items)))

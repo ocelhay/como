@@ -94,7 +94,7 @@ output$highchart_deaths_dual_interventions <- renderHighchart({
     hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
              {point.y:,.0f} deaths<br/>",shared = TRUE) %>%
     hc_plotOptions(area = list(stacking = "normal")) %>%
-    hc_title(text = "Future Scenarios Cumulative Deaths") %>%
+    hc_title(text = "Hypothetical Scenario Cumulative Deaths") %>%
     hc_yAxis(max = max_y, title = "Deaths") %>%
     hc_xAxis(title = "") %>%
     hc_exporting(enabled = TRUE, buttons = list(contextButton = list(menuItems = hc_export_items)))

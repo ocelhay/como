@@ -77,7 +77,7 @@ output$highchart_cases_dual_interventions <- renderHighchart({
       hc_add_series(dta2, type = 'line', name = "Observed", hcaes(y = cases, x = Date), color = "red") %>%
       hc_tooltip(pointFormat = "<span style=\"color:{series.color}\">{series.name}</span>:
              {point.y:,.0f}<br/>", shared = TRUE) %>%
-      hc_title(text = "Future Scenarios Cases") %>%
+      hc_title(text = "Hypothetical Scenario Cases") %>%
       hc_yAxis(max = max_y, title = "Cases") %>%
       hc_xAxis(title = "") %>%
       hc_exporting(enabled = TRUE, buttons = list(contextButton = list(menuItems = hc_export_items)))
