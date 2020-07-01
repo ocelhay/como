@@ -20,6 +20,7 @@ output$text_pct_pop_baseline <- renderText({
 
 output$text_pct_pop_baseline_dup <- renderText({
   req(simul_baseline$baseline_available)
+  req(simul_interventions$interventions_available)
   
   # end date is the date of the last data point if the focus is "Observed"
   # end date os the last day of the simulation otherwise
