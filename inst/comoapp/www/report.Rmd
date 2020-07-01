@@ -1,5 +1,5 @@
 ---
-title: ""
+title: "Summary of Model Simulations"
 output: word_document
 editor_options: 
   chunk_output_type: console
@@ -16,34 +16,86 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 -->
 
-**Version `r version_app`**
-
-Document generated the `r Sys.time()` from CoMo Consortium COVID-19 App.
-
-The report template is being actively developed, please suggest elements to add and provide general feedback on CoMo Slack' `#app_development` channel. Expert users can also customise this report by editing the RMarkdown file available on the [COVID-19 App' GitHub repository](https://github.com/ocelhay/como). Please contact us on `#app_development` to discuss it.
-
-</hr>
-
-Table of Content:
-
-* [Summary](#summary)
+- Author
+- Document generated the `r Sys.time()`.
 
 
-## Summary {#summary}
+The following is a summary of the output from the CoMo Consortium model version `r version_app` which can be accessed through an online interface at https://comomodel.net/.
 
-### Baseline
+*Whilst every effort has been taken during the development of this tool/model for it to be as accurate and reliable as possible it is important that the user understands that the outputs are a prediction based on the assumptions chosen through the input parameter values. In view of the current uncertainty on the COVID-19 mechanisms of action, the output of the model should be used to explore multiple scenarios and in combination with a larger evidence base during decision-making. The appropriate use of this tool/model and its output can contribute to effective policymaking, but misuse or misinterpretation of the output can mislead decision-making. Any decisions taken whist using these tools are the responsibility of the user and no liability whatsoever will be taken by the developers/authors of the tool.*
 
-```{r}
-n <- simul_baseline$results$pct_total_pop_infected
-text <- paste0(n, "% of the population infected during the range of simulation.")
-return(HTML(text))
-```
+# Model Calibration
 
-### Hypothetical Scenario
+## Inputs
 
-```{r}
-n <- simul_interventions$results$pct_total_pop_infected
-text <- paste0(n, "% of the population infected during the range of simulation.")
-return(HTML(text))
-```
+The CoMo model uses demographic data for Country from UN 2019 Revision of World Population Prospects (https://population.un.org/wpp/Download/Standard/Population/). The model is age structured and the contacts between age classes in Country are assumed to follow those predicted in [1] for Country_contacts. The cases and mortality data are downloaded from the European Centre for Disease Prevention and Control website https://www.ecdc.europa.eu/en. The severity and risk of death are assumed to be age dependent and are assumed to follow the distributions reported by the Chinese CDC (http://weekly.chinacdc.cn/en/article/id/e53946e2-c6c4-41e9-9a9b-fea8db1a8f51) and in [2]. 
+
+The simulation was started on `r input$date_range[1]` with the following interventions assumed to be applied for the duration of the observed data:
+	Bulleted list of Baseline (Calibration) interventions
+The following chart illustrates the timelines of these interventions:
+
+
+
+There follows a list of the key input values (for a full list, please see the Appendix):
+
+- Probability of infection given a contact is `r input$p`
+- Percentage of all asymptomatic infections reported is `r input$report`%
+- Percentage of all symptomatic infections reported is `r input$reportc`%
+- Percentage of all hospital surge bed occupancy (in the app: of all hospitalisations) reported is `r input$reporth`%
+
+## Model output compared with data
+
+The following graph shows the reported cases data compared with the model prediction:
+
+
+
+The following graph shows the cumulative mortality data compared with the model prediction:
+
+
+
+For this “baseline scenario” between `r input$date_range[1]` and `r input$date_range[2]`:
+
+- `r simul_baseline$results$med$pct_total_pop_infected[which(simul_baseline$results$med$time == input$date_range[2])]`% of the population is predicted to have experienced the infection (including unreported, mildly symptomatic, and/or asymptomatic infections)
+- `r simul_baseline$results$med$attributable_deaths[which(simul_baseline$results$med$time == input$date_range[2])]` Covid-19 attributable deaths are expected during the range of simulation of which `r simul_baseline$results$med$cum_mortality[which(simul_baseline$results$med$time == input$date_range[2])]` would be reported. 
+
+# Baseline compared with hypothetical scenario
+
+*The following series of charts represents a series of model projections for various values over time for both baseline and hypothetical scenarios. In reviewing this output, note that COVID-19 is a novel disease. Knowledge on transmission dynamics is still being discovered. Models are therefore based on assumptions and unknown information about the disease. Model inputs and outputs will change as we learn more about the disease and the impact of interventions on the disease. Uncertainty is even more pronounced in a country or population where the epidemic is still at early stage. Options and outputs will change once better serology, treatments, vaccines become widely available.*
+
+A “hypothetical scenario” was simulated with the same inputs values except for the interventions which were set up as follows: 
+	Bulleted list of Hypothetical Scenario interventions
+The following chart illustrates the timelines of these interventions:
+
+
+
+Observed / Predicted Reported/ Predicted Reported + Unreported cases 
+
+The above graphs show the Observed / Predicted Reported/ Predicted Reported + Unreported cases over time expected from the Baseline compared with the Hypothetical scenario. 
+Cumulative mortality 
+
+The above graphs show the cumulative mortality over time expected from the Baseline compared with the Hypothetical scenario. The expected mortality has been further stratified to reflect death from severe COVID-19 during hospital treatment or in severely ill patients who were not able to access these resources. The predicted COVID-19 attributable deaths may be compared with mortality from other causes where patients may or may not test positive for COVID-19 post-mortem depending on their infection status upon death. 
+Hospital occupancy 
+
+The above graphs show expected hospital occupancy for the baseline and hypothetical scenarios depending on the input values of resource availability as follows:
+	Maximum number of hospital surge beds is maxhosp
+	Maximum number of ICU beds without ventilators is maxICU
+	Maximum number of ICU beds with ventilators is maxvent
+In most simulations, the occupancy for each classification will plateau at the input capacity. A level of flexibility is assumed in the model which allows for the occupancy to exceed capacity in some cases. Especially in the hospital surge category. For this reason, some simulations will predict occupancy exceeding capacity. 
+
+Hospital demand 
+
+The above graphs represent the expected demand for baseline and hypothetical scenarios for hospital surge beds, ICU beds without ventilators, and ICU beds with ventilators, even if some of this demand cannot be met with the current health system. 
+Reproduction number 
+
+The above graphs show the model prediction of the reproduction number over time, R_t, if this value is greater than 1, then the epidemic may spread in the population. R_t may be less than 1 if either the interventions deployed are sufficient to stop transmission, if a sufficient percentage of the population have been exposed to the infection and are immune (herd immunity), or some combination of these outcomes.
+
+# References
+
+1.	Prem, K., A.R. Cook, and M. Jit, Projecting social contact matrices in 152 countries using contact surveys and demographic data. PLoS Comput Biol, 2017. 13(9): p. e1005697.
+2.	Verity, R., et al., Estimates of the severity of coronavirus disease 2019: a model-based analysis. Lancet Infect Dis, 2020.
+
+# Appendix: full parameter table
+
+Full parameter table generated from the app
+
 

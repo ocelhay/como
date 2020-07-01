@@ -20,7 +20,7 @@ list(
                 sliderInput("confidence", "Confidence:", value = 1, min = 5, max = 25, post = "%", ticks = FALSE)
               )
             ),
-            actionButton("run_baseline_2", "Run Baseline w/ Generated Uncertainty", class = "btn btn-success"),
+            actionButton("run_baseline_multi", "Run Baseline w/ Generated Uncertainty", class = "btn btn-success"),
           ),
           div(class = "closebutton", bsButton("close_generate_uncertainty", "Close (Esc.)", icon("times"), style = "danger", size = "small"))
   )

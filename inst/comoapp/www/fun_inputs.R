@@ -1,19 +1,19 @@
-inputs<-function(inp, run, times, startdate, stopdate){
+inputs <- function(inp, run, times, startdate, stopdate){
   # cap intervention end dates with simulation end date
   inp$`Date End` = pmin(stopdate, inp$`Date End`)
   
-  tb<-which(inp$`Apply to`==run)
+  tab<-which(inp$`Apply to`==run)
   
-  si<-intersect(which(inp$Intervention=="Self-isolation if Symptomatic"),tb)
-  scr<-intersect(which(inp$Intervention=="Screening (when S.I.)"),tb)
-  sd<-intersect(which(inp$Intervention=="Social Distancing"),tb)
-  hw<-intersect(which(inp$Intervention=="Handwashing"),tb)
-  wah<-intersect(which(inp$Intervention=="Working at Home"),tb)
-  sc<-intersect(which(inp$Intervention=="School Closures"),tb)
-  cte<-intersect(which(inp$Intervention=="Shielding the Elderly"),tb)
-  q<-intersect(which(inp$Intervention=="Household Isolation (when S.I.)"),tb)
-  tb<-intersect(which(inp$Intervention=="International Travel Ban"),tb)
-  vc<-intersect(which(inp$Intervention=="Vaccination"),tb)
+  si<-intersect(which(inp$Intervention=="Self-isolation if Symptomatic"),tab)
+  scr<-intersect(which(inp$Intervention=="Screening (when S.I.)"),tab)
+  sd<-intersect(which(inp$Intervention=="Social Distancing"),tab)
+  hw<-intersect(which(inp$Intervention=="Handwashing"),tab)
+  wah<-intersect(which(inp$Intervention=="Working at Home"),tab)
+  sc<-intersect(which(inp$Intervention=="School Closures"),tab)
+  cte<-intersect(which(inp$Intervention=="Shielding the Elderly"),tab)
+  q<-intersect(which(inp$Intervention=="Household Isolation (when S.I.)"),tab)
+  tb<-intersect(which(inp$Intervention=="International Travel Ban"),tab)
+  vc<-intersect(which(inp$Intervention=="Vaccination"),tab)
   
   v<-(format(as.POSIXct(inp$`Date Start`,format='%Y/%m/%d %H:%M:%S'),format="%d/%m/%y"))
   v2<-as.Date(v,format="%d/%m/%y")

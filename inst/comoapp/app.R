@@ -69,17 +69,19 @@ ui <- function(request) {
           ),
           column(
             width = 10,
+            div(class = "box_outputs", h4("Global Simulations Parameters:")),
             fluidRow(
-              div(class = "box_outputs", h4("Global Simulations Parameters:")),
-              column(6,
-                     p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
-                       ", edit it and upload it:"),
-                     fileInput("own_data", buttonLabel = "Browse for template", label = NULL, accept = ".xlsx", multiple = FALSE, width = "75%"),
-                     hr()
+              column(
+                5, fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE)  %>% 
+                  helper(type = "markdown", content = "help_upload_template", colour = "red", size = "s"),
+              )
+            ),
+            hr(),
+            fluidRow(
+              column(4,
+                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year")
               ),
-              column(6,
-                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year"),
-                     hr(),
+              column(6, offset = 2,
                      fluidRow(column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
                                                  width = "70%"),
                                      htmlOutput("feedback_choices")),
@@ -635,9 +637,11 @@ server <- function(input, output, session) {
     showTab(inputId = "tabs", target = "tab_visualfit")
     hideTab(inputId = "tabs", target = "tab_modelpredictions")
     updateNavbarPage(session, "tabs", selected = "tab_visualfit")
+    
+    updateSliderInput(session, "iterations", value = 1)
   })
   
-  # Process on "run_baseline"
+  # Process on "run_baseline" ----
   observeEvent(input$run_baseline, {
     # Reset simul_interventions (expired baseline)
     simul_interventions$results <- NULL
@@ -656,13 +660,10 @@ server <- function(input, output, session) {
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
   
-  # Process on "run_baseline_2"
-  observeEvent(input$run_baseline_2, {
+  # Process on "run_baseline_multi" ----
+  observeEvent(input$run_baseline_multi, {
     # Close pushbar
     pushbar_close()
-    
-    # Reset simul_interventions (expired baseline)
-    simul_interventions$results <- NULL
     
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model.R", local = TRUE)
