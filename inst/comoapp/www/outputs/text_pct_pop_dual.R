@@ -46,7 +46,7 @@ output$text_pct_pop_interventions <- renderText({
   # end date is the date of the last data point if the focus is "Observed"
   # end date os the last day of the simulation otherwise
   end_date <- input$date_range[2]
-  if(input$focus_axis == "Observed")  end_date <- cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))]
+  if(input$focus_axis_dup == "Observed")  end_date <- cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))]
   
   n <- simul_interventions$results$med$pct_total_pop_infected[which(simul_interventions$results$min$time == end_date)]
   reduction <- round((n - simul_baseline$results$med$pct_total_pop_infected[which(simul_baseline$results$min$time == end_date)]), 1)

@@ -87,7 +87,7 @@ output$text_attributable_death_interventions <- renderText({
   # end date is the date of the last data point if the focus is "Observed"
   # end date os the last day of the simulation otherwise
   end_date <- input$date_range[2]
-  if(input$focus_axis == "Observed")  end_date <- cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))]
+  if(input$focus_axis_dup == "Observed")  end_date <- cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))]
   
   reduction <- (simul_interventions$results$med$attributable_deaths[which(simul_interventions$results$med$time == end_date)] - 
                   simul_baseline$results$med$attributable_deaths[which(simul_baseline$results$med$time == end_date)])
@@ -111,7 +111,7 @@ output$text_reported_death_interventions <- renderText({
   # end date is the date of the last data point if the focus is "Observed"
   # end date os the last day of the simulation otherwise
   end_date <- input$date_range[2]
-  if(input$focus_axis == "Observed")  end_date <- cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))]
+  if(input$focus_axis_dup == "Observed")  end_date <- cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))]
   
   reduction <- (simul_interventions$results$med$cum_mortality[which(simul_interventions$results$med$time == end_date)] - 
                   simul_baseline$results$med$cum_mortality[which(simul_baseline$results$med$time == end_date)])
