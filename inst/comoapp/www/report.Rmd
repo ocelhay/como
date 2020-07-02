@@ -209,7 +209,7 @@ if(interventions$future_mat %>% nrow() > 0) return({
 ```
 
 
-# `r input$focus_axis_dup` cases
+## `r input$focus_axis_dup` cases
 
 ```{r warning = FALSE, dpi = 200, fig.width = 12, fig.height = 8, eval = show}
 
@@ -238,7 +238,6 @@ if(input$focus_axis_dup == "Predicted Reported + Unreported")  {
   max_x <- max(dta$time)
   max_y <- 1.2 * max(dta$daily_total_cases_max, na.rm = TRUE)
 }
-
 dta2 <- dta %>%
   rename(Date = time) %>%
   filter(Date <= max_x)
@@ -304,10 +303,65 @@ grid.arrange(plot1, plot2, ncol = 2)
 
 
 The above graphs show the `r input$focus_axis_dup` cases over time expected from the Baseline compared with the Hypothetical scenario. 
-Cumulative mortality 
+
+
+## Cumulative mortality
+
+```{r warning = FALSE, dpi = 200, fig.width = 14, fig.height = 8, eval = show}
+max_y <- max(simul_baseline$results$med$total_deaths, 
+             simul_interventions$results$med$total_deaths)
+
+nb_time <- length(simul_baseline$results$time)
+
+dta <- tibble(
+  time = rep(simul_baseline$results$time, 8),
+  value = c(simul_baseline$results$med$death_natural_non_exposed, simul_baseline$results$med$death_natural_exposed, 
+            simul_baseline$results$med$death_treated_hospital, simul_baseline$results$med$death_treated_icu,
+            simul_baseline$results$med$death_treated_ventilator, simul_baseline$results$med$death_untreated_hospital,
+            simul_baseline$results$med$death_untreated_icu, simul_baseline$results$med$death_untreated_ventilator),
+  nature = c(rep("Deaths Natural non Exposed", nb_time), rep("Deaths Natural Exposed", nb_time),
+             rep("Deaths Treated Hospital", nb_time), rep("Deaths Treated ICU", nb_time),
+             rep("Deaths Treated Ventilator", nb_time), rep("Deaths Untreated Hospital", nb_time),
+             rep("Deaths Untreated ICU", nb_time), rep("Deaths Untreated Ventilator", nb_time))
+)
+
+plot1 <- ggplot(data = dta, aes(x = time, y = value, fill = nature))+
+  geom_bar(stat = "identity", width = 1)+
+  scale_fill_brewer(palette = "Set1") +
+  ylab("Deaths") + xlab("") +
+  coord_cartesian(ylim = c(NA, max_y)) +
+  theme_minimal(base_size = 14) +
+  theme(legend.title = element_blank(), legend.position = "bottom") +
+  labs(title = "Baseline Cumulative Deaths")
+
+dta <- tibble(
+  time = rep(simul_interventions$results$time, 8),
+  value = c(simul_interventions$results$med$death_natural_non_exposed, simul_interventions$results$med$death_natural_exposed, 
+            simul_interventions$results$med$death_treated_hospital, simul_interventions$results$med$death_treated_icu,
+            simul_interventions$results$med$death_treated_ventilator, simul_interventions$results$med$death_untreated_hospital,
+            simul_interventions$results$med$death_untreated_icu, simul_interventions$results$med$death_untreated_ventilator),
+  nature = c(rep("Deaths Natural non Exposed", nb_time), rep("Deaths Natural Exposed", nb_time),
+             rep("Deaths Treated Hospital", nb_time), rep("Deaths Treated ICU", nb_time),
+             rep("Deaths Treated Ventilator", nb_time), rep("Deaths Untreated Hospital", nb_time),
+             rep("Deaths Untreated ICU", nb_time), rep("Deaths Untreated Ventilator", nb_time))
+)
+
+plot2 <- ggplot(data = dta, aes(x = time, y = value, fill = nature))+
+  geom_bar(stat = "identity", width = 1)+
+  scale_fill_brewer(palette = "Set1") +
+  ylab("Deaths") + xlab("") +
+  coord_cartesian(ylim = c(NA, max_y)) +
+  theme_minimal(base_size = 14) +
+  theme(legend.title = element_blank(), legend.position = "none") +
+  labs(title = "Hypthetical Scenario Cumulative Deaths")
+
+grid.arrange(plot1, plot2, ncol = 2)
+```
+
 
 The above graphs show the cumulative mortality over time expected from the Baseline compared with the Hypothetical scenario. The expected mortality has been further stratified to reflect death from severe COVID-19 during hospital treatment or in severely ill patients who were not able to access these resources. The predicted COVID-19 attributable deaths may be compared with mortality from other causes where patients may or may not test positive for COVID-19 post-mortem depending on their infection status upon death. 
-Hospital occupancy 
+
+## Hospital occupancy 
 
 The above graphs show expected hospital occupancy for the baseline and hypothetical scenarios depending on the input values of resource availability as follows:
 Maximum number of hospital surge beds is maxhosp
@@ -315,10 +369,12 @@ Maximum number of ICU beds without ventilators is maxICU
 Maximum number of ICU beds with ventilators is maxvent
 In most simulations, the occupancy for each classification will plateau at the input capacity. A level of flexibility is assumed in the model which allows for the occupancy to exceed capacity in some cases. Especially in the hospital surge category. For this reason, some simulations will predict occupancy exceeding capacity. 
 
-Hospital demand 
+## Hospital demand 
 
 The above graphs represent the expected demand for baseline and hypothetical scenarios for hospital surge beds, ICU beds without ventilators, and ICU beds with ventilators, even if some of this demand cannot be met with the current health system. 
-Reproduction number 
+
+
+## Reproduction number 
 
 The above graphs show the model prediction of the reproduction number over time, R_t, if this value is greater than 1, then the epidemic may spread in the population. R_t may be less than 1 if either the interventions deployed are sufficient to stop transmission, if a sufficient percentage of the population have been exposed to the infection and are immune (herd immunity), or some combination of these outcomes.
 

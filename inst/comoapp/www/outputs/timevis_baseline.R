@@ -9,7 +9,7 @@ output$timevis_baseline <- renderPlot(execOnResize = TRUE, {
   if(interventions$baseline_mat %>% nrow() == 0) return({
     plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
     text(x = 0.5, y = 0.8, paste("No Interventions have been selected"), 
-         cex = 3, col = "black")
+         cex = 1.5, col = "black")
   })
   
   if(interventions$baseline_mat %>% nrow() > 0) return({
