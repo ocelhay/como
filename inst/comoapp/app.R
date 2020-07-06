@@ -724,8 +724,12 @@ server <- function(input, output, session) {
   results_aggregated <- reactive({
     dta_baseline <- tibble(
       date = simul_baseline$results$time,
-      baseline_predicted_reported = simul_baseline$results$daily_incidence,
-      baseline_predicted_reported_and_unreported = simul_baseline$results$daily_total_cases,
+      baseline_predicted_reported = simul_baseline$results$med$daily_incidence,
+      baseline_predicted_reported_min = simul_baseline$results$min$daily_incidence,
+      baseline_predicted_reported_max = simul_baseline$results$max$daily_incidence,
+      baseline_predicted_reported_and_unreported = simul_baseline$results$med$daily_total_cases,
+      baseline_predicted_reported_and_unreported_min = simul_baseline$results$min$daily_total_cases,
+      baseline_predicted_reported_and_unreported_max = simul_baseline$results$max$daily_total_cases,
       baseline_normal_bed_occupancy = simul_baseline$results$hospital_surge_beds,
       baseline_icu_bed_occupancy = simul_baseline$results$icu_beds,
       baseline_icu_ventilator_occupancy = simul_baseline$results$ventilators,
@@ -749,8 +753,12 @@ server <- function(input, output, session) {
     
     dta_interventions <- tibble(
       date = simul_interventions$results$time,
-      hypothetical_predicted_reported = simul_interventions$results$daily_incidence,
-      hypothetical_predicted_reported_and_unreported = simul_interventions$results$daily_total_cases,
+      hypothetical_predicted_reported = simul_interventions$results$med$daily_incidence,
+      hypothetical_predicted_reported_min = simul_interventions$results$min$daily_incidence,
+      hypothetical_predicted_reported_max = simul_interventions$results$max$daily_incidence,
+      hypothetical_predicted_reported_and_unreported = simul_interventions$results$med$daily_total_cases,
+      hypothetical_predicted_reported_and_unreported_min = simul_interventions$results$min$daily_total_cases,
+      hypothetical_predicted_reported_and_unreported_max = simul_interventions$results$max$daily_total_cases,
       hypothetical_normal_bed_occupancy = simul_interventions$results$hospital_surge_beds,
       hypothetical_icu_bed_occupancy = simul_interventions$results$icu_beds,
       hypothetical_icu_ventilator_occupancy = simul_interventions$results$ventilators,
