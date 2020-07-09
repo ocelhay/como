@@ -331,7 +331,7 @@ plot1 <- ggplot(data = dta, aes(x = time, y = value, fill = nature))+
   ylab("Deaths") + xlab("") +
   coord_cartesian(ylim = c(NA, max_y)) +
   theme_minimal(base_size = 14) +
-  theme(legend.title = element_blank(), legend.position = "bottom") +
+  theme(legend.title = element_blank(), legend.position = "left") +
   labs(title = "Baseline Cumulative Deaths")
 
 dta <- tibble(
@@ -355,7 +355,7 @@ plot2 <- ggplot(data = dta, aes(x = time, y = value, fill = nature))+
   theme(legend.title = element_blank(), legend.position = "none") +
   labs(title = "Hypthetical Scenario Cumulative Deaths")
 
-grid.arrange(plot1, plot2, ncol = 2)
+grid.arrange(plot1, plot2, ncol = 2, widths = c(1.5, 1))
 ```
 
 
@@ -363,18 +363,122 @@ The above graphs show the cumulative mortality over time expected from the Basel
 
 ## Hospital occupancy 
 
+
+```{r warning = FALSE, dpi = 200, fig.width = 14, fig.height = 12, eval = show}
+nb_time <- length(simul_baseline$results$time)
+
+
+# Baseline
+
+dta <- tibble(time = rep(simul_baseline$results$time, 3),
+              nature = c(rep("Hospital Surge Beds", nb_time), rep("ICU Beds", nb_time), rep("Ventilators", nb_time)),
+              value = c(simul_baseline$results$med$hospital_surge_beds, simul_baseline$results$med$icu_beds, simul_baseline$results$med$ventilators))
+
+
+plot11 <- ggplot(data = dta %>% filter(nature == "Hospital Surge Beds"), aes(x = time, y = value))+
+  geom_line()+
+  ylab("Beds") + xlab("") +
+  geom_hline(yintercept = input$beds_available, linetype = "dashed") +
+  ylim(0, max(simul_baseline$results$med$hospital_surge_beds, simul_interventions$results$med$hospital_surge_beds)) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Baseline, Hospital Surge Beds")
+
+plot12 <- ggplot(data = dta %>% filter(nature == "ICU Beds"), aes(x = time, y = value))+
+  geom_line()+
+  ylab("Beds") + xlab("") +
+  geom_hline(yintercept = input$icu_beds_available, linetype = "dashed") +
+  ylim(0, max(simul_baseline$results$med$icu_beds, simul_interventions$results$med$icu_beds)) +
+  coord_cartesian(ylim = c(NA,  max(simul_baseline$results$med$icu_beds, simul_interventions$results$med$icu_beds))) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Baseline, ICU Beds")
+
+plot13 <- ggplot(data = dta %>% filter(nature == "Ventilators"), aes(x = time, y = value))+
+  geom_line()+
+  ylab("Ventilators") + xlab("") +
+  geom_hline(yintercept = input$ventilators_available, linetype = "dashed") +
+  ylim(0, max(simul_baseline$results$med$ventilators, simul_interventions$results$med$ventilators)) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Baseline, Ventilators")
+
+# Hypothetical Scenario
+
+dta <- tibble(time = rep(simul_interventions$results$time, 3),
+              nature = c(rep("Hospital Surge Beds", nb_time), rep("ICU Beds", nb_time), rep("Ventilators", nb_time)),
+              value = c(simul_interventions$results$med$hospital_surge_beds, simul_interventions$results$med$icu_beds, simul_interventions$results$med$ventilators))
+
+
+plot21 <- ggplot(data = dta %>% filter(nature == "Hospital Surge Beds"), aes(x = time, y = value))+
+  geom_line()+
+  ylab("Beds") + xlab("") +
+  geom_hline(yintercept = input$beds_available, linetype = "dashed") +
+  ylim(0, max(simul_baseline$results$med$hospital_surge_beds, simul_interventions$results$med$hospital_surge_beds)) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Hypothetical Scenario, Hospital Surge Beds")
+
+plot22 <- ggplot(data = dta %>% filter(nature == "ICU Beds"), aes(x = time, y = value))+
+  geom_line()+
+  ylab("Beds") + xlab("") +
+  geom_hline(yintercept = input$icu_beds_available, linetype = "dashed") +
+  ylim(0, max(simul_baseline$results$med$icu_beds, simul_interventions$results$med$icu_beds)) +
+  coord_cartesian(ylim = c(NA,  max(simul_baseline$results$med$icu_beds, simul_interventions$results$med$icu_beds))) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Hypothetical Scenario, ICU Beds")
+
+plot23 <- ggplot(data = dta %>% filter(nature == "Ventilators"), aes(x = time, y = value))+
+  geom_line()+
+  ylab("Ventilators") + xlab("") +
+  geom_hline(yintercept = input$ventilators_available, linetype = "dashed") +
+  ylim(0, max(simul_baseline$results$med$ventilators, simul_interventions$results$med$ventilators)) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Hypothetical Scenario, Ventilators")
+
+grid.arrange(plot11, plot21,
+             plot12, plot22, 
+             plot13, plot23,
+             ncol = 2)
+```
+
+
 The above graphs show expected hospital occupancy for the baseline and hypothetical scenarios depending on the input values of resource availability as follows:
-Maximum number of hospital surge beds is maxhosp
-Maximum number of ICU beds without ventilators is maxICU
-Maximum number of ICU beds with ventilators is maxvent
+
+- Maximum number of hospital surge beds is `r input$beds_available`
+- Maximum number of ICU beds without ventilators is  `r input$icu_beds_available`
+- Maximum number of ICU beds with ventilators is  `r input$ventilators_available`
+
 In most simulations, the occupancy for each classification will plateau at the input capacity. A level of flexibility is assumed in the model which allows for the occupancy to exceed capacity in some cases. Especially in the hospital surge category. For this reason, some simulations will predict occupancy exceeding capacity. 
 
 ## Hospital demand 
 
+**These graphs will be addedd in the next iteration of the App.**
+
 The above graphs represent the expected demand for baseline and hypothetical scenarios for hospital surge beds, ICU beds without ventilators, and ICU beds with ventilators, even if some of this demand cannot be met with the current health system. 
 
-
 ## Reproduction number 
+
+```{r warning = FALSE, dpi = 200, fig.width = 14, fig.height = 6, eval = show}
+dta <- tibble(Rt = simul_baseline$results$med$Rt, Date = simul_baseline$results$time)
+
+plot1 <- ggplot(data = dta, aes(x = Date, y = Rt))+
+  geom_line()+
+  ylab("Rt") + xlab("") +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  ylim(0, max(simul_baseline$results$med$Rt, simul_interventions$results$med$Rt, na.rm = TRUE)) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Baseline, Rt")
+
+dta <- tibble(Rt = simul_interventions$results$med$Rt, Date = simul_interventions$results$time)
+
+plot2 <- ggplot(data = dta, aes(x = Date, y = Rt))+
+  geom_line()+
+  ylab("Rt") + xlab("") +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  ylim(0, max(simul_baseline$results$med$Rt, simul_interventions$results$med$Rt, na.rm = TRUE)) +
+  theme_minimal(base_size = 14) +
+  labs(title = "Hypothetical Scenario, Rt")
+
+grid.arrange(plot1, plot2, ncol = 2)
+```
+
 
 The above graphs show the model prediction of the reproduction number over time, R_t, if this value is greater than 1, then the epidemic may spread in the population. R_t may be less than 1 if either the interventions deployed are sufficient to stop transmission, if a sufficient percentage of the population have been exposed to the infection and are immune (herd immunity), or some combination of these outcomes.
 
@@ -385,6 +489,26 @@ The above graphs show the model prediction of the reproduction number over time,
 
 # Appendix: full parameter table
 
-Full parameter table generated from the app
+Full parameter table generated from the app. (The presentation of these parameters will be improved in a future version).
+
+```{r}
+parameters <- reactiveValuesToList(input)[c("p", "rho", "omega", "gamma", "nui", "report", "reportc", "reporth", 
+                                              "beds_available", "icu_beds_available", "ventilators_available", 
+                                              "pdeath_h", "pdeath_hc", "pdeath_icu", "pdeath_icuc", 
+                                              "pdeath_vent", "pdeath_ventc", "ihr_scaling", "nus", 
+                                              "nu_icu", "nu_vent", "rhos", "amp", 
+                                              "pclin", "prob_icu", "prob_vent", "selfis_eff", "dist_eff", "hand_eff", 
+                                              "work_eff", "w2h", "school_eff", "s2h", "cocoon_eff", "age_cocoon", 
+                                              "vaccine_eff", "vac_campaign", "mean_imports", "screen_test_sens", 
+                                              "screen_overdispersion", "quarantine_days", "quarantine_effort", 
+                                              "quarantine_eff_home", "quarantine_eff_other", "household_size", 
+                                              "noise", "iterations", "confidence")] %>% unlist()
+
+parameters <- c(parameters, give = 95, nusc = input$nus, nu_icuc = input$nu_icu, nu_ventc = input$nu_vent,
+                phi = which(month.name == input$phi))
+
+print(data_frame("Parameter" = names(parameters), "Value" = parameters))
+```
+
 
 
