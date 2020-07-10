@@ -491,24 +491,12 @@ The above graphs show the model prediction of the reproduction number over time,
 
 Full parameter table generated from the app. (The presentation of these parameters will be improved in a future version).
 
-```{r}
-parameters <- reactiveValuesToList(input)[c("p", "rho", "omega", "gamma", "nui", "report", "reportc", "reporth", 
-                                              "beds_available", "icu_beds_available", "ventilators_available", 
-                                              "pdeath_h", "pdeath_hc", "pdeath_icu", "pdeath_icuc", 
-                                              "pdeath_vent", "pdeath_ventc", "ihr_scaling", "nus", 
-                                              "nu_icu", "nu_vent", "rhos", "amp", 
-                                              "pclin", "prob_icu", "prob_vent", "selfis_eff", "dist_eff", "hand_eff", 
-                                              "work_eff", "w2h", "school_eff", "s2h", "cocoon_eff", "age_cocoon", 
-                                              "vaccine_eff", "vac_campaign", "mean_imports", "screen_test_sens", 
-                                              "screen_overdispersion", "quarantine_days", "quarantine_effort", 
-                                              "quarantine_eff_home", "quarantine_eff_other", "household_size", 
-                                              "noise", "iterations", "confidence")] %>% unlist()
-
-parameters <- c(parameters, give = 95, nusc = input$nus, nu_icuc = input$nu_icu, nu_ventc = input$nu_vent,
-                phi = which(month.name == input$phi))
-
-print(data_frame("Parameter" = names(parameters), "Value" = parameters))
-```
-
-
-
+| Category     | Parameter                                                    | Value                     |
+|--------------|--------------------------------------------------------------|---------------------------|
+| General      | Probability of infection given contact: (0 to 0.2)           | `r input$p`               |
+| General      | Percentage of all asymptomatic infections that are reported: | `r input$report`          |
+| General      | Percentage of all symptomatic infections that are reported:  | `r input$reportc`         |
+| General      | Percentage of all hospitalisations that are reported:        | `r input$reporth`         |
+| Country/Area | Social Contacts Data:                                        | `r input$country_contact` |
+| Country/Area | Mean Household size:                                         | `r input$household_size`  |
+| Country/Area | Mean number of infectious migrants per day:                  | `r input$mean_imports`    |

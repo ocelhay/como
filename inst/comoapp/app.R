@@ -1,5 +1,6 @@
 # CoMo COVID-19 App
 version_app <- "v14.14.1"
+code_for_development <- TRUE
 
 # Load packages and data
 source("./www/source_on_inception.R")
@@ -698,6 +699,11 @@ server <- function(input, output, session) {
     simul_interventions$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
     simul_interventions$interventions_available <- TRUE
     
+    if(code_for_development) {
+      shiny_simul_baseline <<- simul_baseline$results
+      shiny_simul_interventions <<- simul_interventions$results
+    }
+    
     showNotification("Displaying results (~ 5 secs.)", duration = 4, type = "message")
     runjs('document.getElementById("anchor_summary").scrollIntoView();')
   })
@@ -722,72 +728,150 @@ server <- function(input, output, session) {
   
   # Downloadable csv ----
   results_aggregated <- reactive({
-    dta_baseline <- tibble(
-      date = simul_baseline$results$time,
-      baseline_predicted_reported = simul_baseline$results$med$daily_incidence,
-      baseline_predicted_reported_min = simul_baseline$results$min$daily_incidence,
-      baseline_predicted_reported_max = simul_baseline$results$max$daily_incidence,
-      baseline_predicted_reported_and_unreported = simul_baseline$results$med$daily_total_cases,
-      baseline_predicted_reported_and_unreported_min = simul_baseline$results$min$daily_total_cases,
-      baseline_predicted_reported_and_unreported_max = simul_baseline$results$max$daily_total_cases,
-      baseline_normal_bed_occupancy = simul_baseline$results$hospital_surge_beds,
-      baseline_icu_bed_occupancy = simul_baseline$results$icu_beds,
-      baseline_icu_ventilator_occupancy = simul_baseline$results$ventilators,
-      baseline_normal_bed_requirement = simul_baseline$results$normal_bed_requirement,
-      baseline_icu_bed_requirement = simul_baseline$results$icu_bed_requirement,
-      baseline_icu_ventilator_requirement = simul_baseline$results$icu_ventilator_requirement,
-      baseline_death_natural_non_exposed = simul_baseline$results$death_natural_non_exposed,
-      baseline_death_natural_exposed = simul_baseline$results$death_natural_exposed,
-      baseline_death_treated_hospital = simul_baseline$results$death_treated_hospital,
-      baseline_death_treated_icu = simul_baseline$results$death_treated_icu,
-      baseline_death_treated_ventilator = simul_baseline$results$death_treated_ventilator,
-      baseline_death_untreated_hospital = simul_baseline$results$death_untreated_hospital,
-      baseline_death_untreated_icu = simul_baseline$results$death_untreated_icu,
-      baseline_death_untreated_ventilator = simul_baseline$results$death_untreated_ventilator,
-      baseline_cum_mortality = simul_baseline$results$cum_mortality)
     
-    dta <- left_join(dta_baseline, 
-                     cases_rv$data %>% rename(input_cases = cases,
-                                              input_deaths = deaths,
-                                              input_cumulative_death = cumulative_death), by = "date")
+    # simul_baseline$results and simul_interventions$results ----
+    dta <- tibble(
+      date = simul_baseline$results$time, 
+      
+      # Baseline
+      baseline_predicted_reported_min = simul_baseline$results$min$daily_incidence[, 1],
+      baseline_predicted_reported_and_unreported_min = simul_baseline$results$min$daily_total_cases[, 1],
+      baseline_normal_bed_occupancy_min = simul_baseline$results$min$hospital_surge_beds,
+      baseline_icu_bed_occupancy_min = simul_baseline$results$min$icu_beds,
+      baseline_icu_ventilator_occupancy_min = simul_baseline$results$min$ventilators,
+      baseline_normal_bed_requirement_min = simul_baseline$results$min$normal_bed_requirement,
+      baseline_icu_bed_requirement_min = simul_baseline$results$min$icu_bed_requirement,
+      baseline_icu_ventilator_requirement_min = simul_baseline$results$min$icu_ventilator_requirement,
+      baseline_death_natural_non_exposed_min = simul_baseline$results$min$death_natural_non_exposed,
+      baseline_death_natural_exposed_min = simul_baseline$results$min$death_natural_exposed,
+      baseline_death_treated_hospital_min = simul_baseline$results$min$death_treated_hospital,
+      baseline_death_treated_icu_min = simul_baseline$results$min$death_treated_icu,
+      baseline_death_treated_ventilator_min = simul_baseline$results$min$death_treated_ventilator,
+      baseline_death_untreated_hospital_min = simul_baseline$results$min$death_untreated_hospital,
+      baseline_death_untreated_icu_min = simul_baseline$results$min$death_untreated_icu,
+      baseline_death_untreated_ventilator_min = simul_baseline$results$min$death_untreated_ventilator,
+      baseline_cum_mortality_min = simul_baseline$results$min$cum_mortality,
+      
+      baseline_predicted_reported_med = simul_baseline$results$med$daily_incidence[, 1],
+      baseline_predicted_reported_and_unreported_med = simul_baseline$results$med$daily_total_cases[, 1],
+      baseline_normal_bed_occupancy_med = simul_baseline$results$med$hospital_surge_beds,
+      baseline_icu_bed_occupancy_med = simul_baseline$results$med$icu_beds,
+      baseline_icu_ventilator_occupancy_med = simul_baseline$results$med$ventilators,
+      baseline_normal_bed_requirement_med = simul_baseline$results$med$normal_bed_requirement,
+      baseline_icu_bed_requirement_med = simul_baseline$results$med$icu_bed_requirement,
+      baseline_icu_ventilator_requirement_med = simul_baseline$results$med$icu_ventilator_requirement,
+      baseline_death_natural_non_exposed_med = simul_baseline$results$med$death_natural_non_exposed,
+      baseline_death_natural_exposed_med = simul_baseline$results$med$death_natural_exposed,
+      baseline_death_treated_hospital_med = simul_baseline$results$med$death_treated_hospital,
+      baseline_death_treated_icu_med = simul_baseline$results$med$death_treated_icu,
+      baseline_death_treated_ventilator_med = simul_baseline$results$med$death_treated_ventilator,
+      baseline_death_untreated_hospital_med = simul_baseline$results$med$death_untreated_hospital,
+      baseline_death_untreated_icu_med = simul_baseline$results$med$death_untreated_icu,
+      baseline_death_untreated_ventilator_med = simul_baseline$results$med$death_untreated_ventilator,
+      baseline_cum_mortality_med = simul_baseline$results$med$cum_mortality,
+      
+      baseline_predicted_reported_max = simul_baseline$results$max$daily_incidence[, 1],
+      baseline_predicted_reported_and_unreported_max = simul_baseline$results$max$daily_total_cases[, 1],
+      baseline_normal_bed_occupancy_max = simul_baseline$results$max$hospital_surge_beds,
+      baseline_icu_bed_occupancy_max = simul_baseline$results$max$icu_beds,
+      baseline_icu_ventilator_occupancy_max = simul_baseline$results$max$ventilators,
+      baseline_normal_bed_requirement_max = simul_baseline$results$max$normal_bed_requirement,
+      baseline_icu_bed_requirement_max = simul_baseline$results$max$icu_bed_requirement,
+      baseline_icu_ventilator_requirement_max = simul_baseline$results$max$icu_ventilator_requirement,
+      baseline_death_natural_non_exposed_max = simul_baseline$results$max$death_natural_non_exposed,
+      baseline_death_natural_exposed_max = simul_baseline$results$max$death_natural_exposed,
+      baseline_death_treated_hospital_max = simul_baseline$results$max$death_treated_hospital,
+      baseline_death_treated_icu_max = simul_baseline$results$max$death_treated_icu,
+      baseline_death_treated_ventilator_max = simul_baseline$results$max$death_treated_ventilator,
+      baseline_death_untreated_hospital_max = simul_baseline$results$max$death_untreated_hospital,
+      baseline_death_untreated_icu_max = simul_baseline$results$max$death_untreated_icu,
+      baseline_death_untreated_ventilator_max = simul_baseline$results$max$death_untreated_ventilator,
+      baseline_cum_mortality_max = simul_baseline$results$max$cum_mortality,
+      
+      
+      # Hypothetical scenario
+      hypothetical_predicted_reported_min = simul_interventions$results$min$daily_incidence[, 1],
+      hypothetical_predicted_reported_and_unreported_min = simul_interventions$results$min$daily_total_cases[, 1],
+      hypothetical_normal_bed_occupancy_min = simul_interventions$results$min$hospital_surge_beds,
+      hypothetical_icu_bed_occupancy_min = simul_interventions$results$min$icu_beds,
+      hypothetical_icu_ventilator_occupancy_min = simul_interventions$results$min$ventilators,
+      hypothetical_normal_bed_requirement_min = simul_interventions$results$min$normal_bed_requirement,
+      hypothetical_icu_bed_requirement_min = simul_interventions$results$min$icu_bed_requirement,
+      hypothetical_icu_ventilator_requirement_min = simul_interventions$results$min$icu_ventilator_requirement,
+      hypothetical_death_natural_non_exposed_min = simul_interventions$results$min$death_natural_non_exposed,
+      hypothetical_death_natural_exposed_min = simul_interventions$results$min$death_natural_exposed,
+      hypothetical_death_treated_hospital_min = simul_interventions$results$min$death_treated_hospital,
+      hypothetical_death_treated_icu_min = simul_interventions$results$min$death_treated_icu,
+      hypothetical_death_treated_ventilator_min = simul_interventions$results$min$death_treated_ventilator,
+      hypothetical_death_untreated_hospital_min = simul_interventions$results$min$death_untreated_hospital,
+      hypothetical_death_untreated_icu_min = simul_interventions$results$min$death_untreated_icu,
+      hypothetical_death_untreated_ventilator_min = simul_interventions$results$min$death_untreated_ventilator,
+      hypothetical_cum_mortality_min = simul_interventions$results$min$cum_mortality,
+      
+      hypothetical_predicted_reported_med = simul_interventions$results$med$daily_incidence[, 1],
+      hypothetical_predicted_reported_and_unreported_med = simul_interventions$results$med$daily_total_cases[, 1],
+      hypothetical_normal_bed_occupancy_med = simul_interventions$results$med$hospital_surge_beds,
+      hypothetical_icu_bed_occupancy_med = simul_interventions$results$med$icu_beds,
+      hypothetical_icu_ventilator_occupancy_med = simul_interventions$results$med$ventilators,
+      hypothetical_normal_bed_requirement_med = simul_interventions$results$med$normal_bed_requirement,
+      hypothetical_icu_bed_requirement_med = simul_interventions$results$med$icu_bed_requirement,
+      hypothetical_icu_ventilator_requirement_med = simul_interventions$results$med$icu_ventilator_requirement,
+      hypothetical_death_natural_non_exposed_med = simul_interventions$results$med$death_natural_non_exposed,
+      hypothetical_death_natural_exposed_med = simul_interventions$results$med$death_natural_exposed,
+      hypothetical_death_treated_hospital_med = simul_interventions$results$med$death_treated_hospital,
+      hypothetical_death_treated_icu_med = simul_interventions$results$med$death_treated_icu,
+      hypothetical_death_treated_ventilator_med = simul_interventions$results$med$death_treated_ventilator,
+      hypothetical_death_untreated_hospital_med = simul_interventions$results$med$death_untreated_hospital,
+      hypothetical_death_untreated_icu_med = simul_interventions$results$med$death_untreated_icu,
+      hypothetical_death_untreated_ventilator_med = simul_interventions$results$med$death_untreated_ventilator,
+      hypothetical_cum_mortality_med = simul_interventions$results$med$cum_mortality,
+      
+      hypothetical_predicted_reported_max = simul_interventions$results$max$daily_incidence[, 1],
+      hypothetical_predicted_reported_and_unreported_max = simul_interventions$results$max$daily_total_cases[, 1],
+      hypothetical_normal_bed_occupancy_max = simul_interventions$results$max$hospital_surge_beds,
+      hypothetical_icu_bed_occupancy_max = simul_interventions$results$max$icu_beds,
+      hypothetical_icu_ventilator_occupancy_max = simul_interventions$results$max$ventilators,
+      hypothetical_normal_bed_requirement_max = simul_interventions$results$max$normal_bed_requirement,
+      hypothetical_icu_bed_requirement_max = simul_interventions$results$max$icu_bed_requirement,
+      hypothetical_icu_ventilator_requirement_max = simul_interventions$results$max$icu_ventilator_requirement,
+      hypothetical_death_natural_non_exposed_max = simul_interventions$results$max$death_natural_non_exposed,
+      hypothetical_death_natural_exposed_max = simul_interventions$results$max$death_natural_exposed,
+      hypothetical_death_treated_hospital_max = simul_interventions$results$max$death_treated_hospital,
+      hypothetical_death_treated_icu_max = simul_interventions$results$max$death_treated_icu,
+      hypothetical_death_treated_ventilator_max = simul_interventions$results$max$death_treated_ventilator,
+      hypothetical_death_untreated_hospital_max = simul_interventions$results$max$death_untreated_hospital,
+      hypothetical_death_untreated_icu_max = simul_interventions$results$max$death_untreated_icu,
+      hypothetical_death_untreated_ventilator_max = simul_interventions$results$max$death_untreated_ventilator,
+      hypothetical_cum_mortality_max = simul_interventions$results$max$cum_mortality,
+    )
     
-    dta_interventions <- tibble(
-      date = simul_interventions$results$time,
-      hypothetical_predicted_reported = simul_interventions$results$med$daily_incidence,
-      hypothetical_predicted_reported_min = simul_interventions$results$min$daily_incidence,
-      hypothetical_predicted_reported_max = simul_interventions$results$max$daily_incidence,
-      hypothetical_predicted_reported_and_unreported = simul_interventions$results$med$daily_total_cases,
-      hypothetical_predicted_reported_and_unreported_min = simul_interventions$results$min$daily_total_cases,
-      hypothetical_predicted_reported_and_unreported_max = simul_interventions$results$max$daily_total_cases,
-      hypothetical_normal_bed_occupancy = simul_interventions$results$hospital_surge_beds,
-      hypothetical_icu_bed_occupancy = simul_interventions$results$icu_beds,
-      hypothetical_icu_ventilator_occupancy = simul_interventions$results$ventilators,
-      hypothetical_normal_bed_requirement = simul_interventions$results$normal_bed_requirement,
-      hypothetical_icu_bed_requirement = simul_interventions$results$icu_bed_requirement,
-      hypothetical_icu_ventilator_requirement = simul_interventions$results$icu_ventilator_requirement,
-      hypothetical_death_natural_non_exposed = simul_interventions$results$death_natural_non_exposed,
-      hypothetical_death_natural_exposed = simul_interventions$results$death_natural_exposed,
-      hypothetical_death_treated_hospital = simul_interventions$results$death_treated_hospital,
-      hypothetical_death_treated_icu = simul_interventions$results$death_treated_icu,
-      hypothetical_death_treated_ventilator = simul_interventions$results$death_treated_ventilator,
-      hypothetical_death_untreated_hospital = simul_interventions$results$death_untreated_hospital,
-      hypothetical_death_untreated_icu = simul_interventions$results$death_untreated_icu,
-      hypothetical_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator,
-      hypothetical_cum_mortality = simul_interventions$results$cum_mortality)
+    # add cases data ----
+    dta <- left_join(
+      dta, 
+      cases_rv$data %>% rename(input_cases = cases, input_deaths = deaths, input_cumulative_death = cumulative_death), 
+      by = "date")
     
-    dta <- left_join(dta, dta_interventions, by = "date")
+    # add interventions vectors ----
+    startdate <- input$date_range[1]
+    stopdate <- input$date_range[2]
+    times <- seq(0, as.numeric(stopdate - startdate))
+    inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (Calibration)"),
+                     interventions$future_mat %>% mutate(`Apply to` = "Hypothetical Scenario")) %>%
+      rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
     
+    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     vectors0_cbind <- do.call(cbind, vectors0)
     vectors0_reduced <- vectors0_cbind[seq(from=0,to=nrow(vectors0_cbind),by=20),]
     vectors0_reduced <- as.data.frame(rbind(rep(0,ncol(vectors0_reduced)),vectors0_reduced))
     vectors0_reduced <- vectors0_reduced[,1:10] #subsetting only the coverages
-    names(vectors0_reduced) <- paste0("baseline_",names(vectors0_reduced))
+    names(vectors0_reduced) <- paste0("interventions_baseline_",names(vectors0_reduced))
     
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
     vectors_cbind <- do.call(cbind, vectors)
     vectors_reduced <- vectors_cbind[seq(from=0,to=nrow(vectors_cbind),by=20),]
     vectors_reduced <- as.data.frame(rbind(rep(0,ncol(vectors_reduced)),vectors_reduced))
     vectors_reduced <- vectors_reduced[,1:10] #subsetting only the coverages
-    names(vectors_reduced) <- paste0("hypothetical_",names(vectors_reduced))
+    names(vectors_reduced) <- paste0("interventions_hypothetical_",names(vectors_reduced))
     
     intv_vectors <- as_tibble(cbind(date=simul_baseline$results$time, vectors0_reduced, vectors_reduced))
     intv_vectors$date <- as.Date(intv_vectors$date)
@@ -802,7 +886,6 @@ server <- function(input, output, session) {
       write.csv(results_aggregated(), file, row.names = FALSE)
     }
   )
-  
 }
 
 # Run the App ----
