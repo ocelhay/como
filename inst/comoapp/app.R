@@ -713,7 +713,7 @@ server <- function(input, output, session) {
   output$report <- downloadHandler(
     filename = "CoMo Report.docx",
     content = function(file) {
-      showNotification(HTML("Generation of the report typically takes 5 to 30 seconds"), duration = NULL, type = "message", id = "report_generation", session = session)
+      showNotification(HTML("Generating report (~ 15 secs.)"), duration = NULL, type = "message", id = "report_generation", session = session)
       
       tempReport <- file.path(tempdir(), "report.Rmd")
       tempLogo <- file.path(tempdir(), "como_logo.png")
@@ -734,8 +734,8 @@ server <- function(input, output, session) {
       date = simul_baseline$results$time, 
       
       # Baseline
-      baseline_predicted_reported_min = simul_baseline$results$min$daily_incidence[, 1],
-      baseline_predicted_reported_and_unreported_min = simul_baseline$results$min$daily_total_cases[, 1],
+      baseline_predicted_reported_min = simul_baseline$results$min$daily_incidence,
+      baseline_predicted_reported_and_unreported_min = simul_baseline$results$min$daily_total_cases,
       baseline_normal_bed_occupancy_min = simul_baseline$results$min$hospital_surge_beds,
       baseline_icu_bed_occupancy_min = simul_baseline$results$min$icu_beds,
       baseline_icu_ventilator_occupancy_min = simul_baseline$results$min$ventilators,
@@ -752,8 +752,8 @@ server <- function(input, output, session) {
       baseline_death_untreated_ventilator_min = simul_baseline$results$min$death_untreated_ventilator,
       baseline_cum_mortality_min = simul_baseline$results$min$cum_mortality,
       
-      baseline_predicted_reported_med = simul_baseline$results$med$daily_incidence[, 1],
-      baseline_predicted_reported_and_unreported_med = simul_baseline$results$med$daily_total_cases[, 1],
+      baseline_predicted_reported_med = simul_baseline$results$med$daily_incidence,
+      baseline_predicted_reported_and_unreported_med = simul_baseline$results$med$daily_total_cases,
       baseline_normal_bed_occupancy_med = simul_baseline$results$med$hospital_surge_beds,
       baseline_icu_bed_occupancy_med = simul_baseline$results$med$icu_beds,
       baseline_icu_ventilator_occupancy_med = simul_baseline$results$med$ventilators,
@@ -770,8 +770,8 @@ server <- function(input, output, session) {
       baseline_death_untreated_ventilator_med = simul_baseline$results$med$death_untreated_ventilator,
       baseline_cum_mortality_med = simul_baseline$results$med$cum_mortality,
       
-      baseline_predicted_reported_max = simul_baseline$results$max$daily_incidence[, 1],
-      baseline_predicted_reported_and_unreported_max = simul_baseline$results$max$daily_total_cases[, 1],
+      baseline_predicted_reported_max = simul_baseline$results$max$daily_incidence,
+      baseline_predicted_reported_and_unreported_max = simul_baseline$results$max$daily_total_cases,
       baseline_normal_bed_occupancy_max = simul_baseline$results$max$hospital_surge_beds,
       baseline_icu_bed_occupancy_max = simul_baseline$results$max$icu_beds,
       baseline_icu_ventilator_occupancy_max = simul_baseline$results$max$ventilators,
@@ -790,8 +790,8 @@ server <- function(input, output, session) {
       
       
       # Hypothetical scenario
-      hypothetical_predicted_reported_min = simul_interventions$results$min$daily_incidence[, 1],
-      hypothetical_predicted_reported_and_unreported_min = simul_interventions$results$min$daily_total_cases[, 1],
+      hypothetical_predicted_reported_min = simul_interventions$results$min$daily_incidence,
+      hypothetical_predicted_reported_and_unreported_min = simul_interventions$results$min$daily_total_cases,
       hypothetical_normal_bed_occupancy_min = simul_interventions$results$min$hospital_surge_beds,
       hypothetical_icu_bed_occupancy_min = simul_interventions$results$min$icu_beds,
       hypothetical_icu_ventilator_occupancy_min = simul_interventions$results$min$ventilators,
@@ -808,8 +808,8 @@ server <- function(input, output, session) {
       hypothetical_death_untreated_ventilator_min = simul_interventions$results$min$death_untreated_ventilator,
       hypothetical_cum_mortality_min = simul_interventions$results$min$cum_mortality,
       
-      hypothetical_predicted_reported_med = simul_interventions$results$med$daily_incidence[, 1],
-      hypothetical_predicted_reported_and_unreported_med = simul_interventions$results$med$daily_total_cases[, 1],
+      hypothetical_predicted_reported_med = simul_interventions$results$med$daily_incidence,
+      hypothetical_predicted_reported_and_unreported_med = simul_interventions$results$med$daily_total_cases,
       hypothetical_normal_bed_occupancy_med = simul_interventions$results$med$hospital_surge_beds,
       hypothetical_icu_bed_occupancy_med = simul_interventions$results$med$icu_beds,
       hypothetical_icu_ventilator_occupancy_med = simul_interventions$results$med$ventilators,
@@ -826,8 +826,8 @@ server <- function(input, output, session) {
       hypothetical_death_untreated_ventilator_med = simul_interventions$results$med$death_untreated_ventilator,
       hypothetical_cum_mortality_med = simul_interventions$results$med$cum_mortality,
       
-      hypothetical_predicted_reported_max = simul_interventions$results$max$daily_incidence[, 1],
-      hypothetical_predicted_reported_and_unreported_max = simul_interventions$results$max$daily_total_cases[, 1],
+      hypothetical_predicted_reported_max = simul_interventions$results$max$daily_incidence,
+      hypothetical_predicted_reported_and_unreported_max = simul_interventions$results$max$daily_total_cases,
       hypothetical_normal_bed_occupancy_max = simul_interventions$results$max$hospital_surge_beds,
       hypothetical_icu_bed_occupancy_max = simul_interventions$results$max$icu_beds,
       hypothetical_icu_ventilator_occupancy_max = simul_interventions$results$max$ventilators,

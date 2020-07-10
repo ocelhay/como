@@ -162,15 +162,16 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
   results$min$pct_total_pop_infected <- out$min_infections
   results$max$pct_total_pop_infected <- out$max_infections
   
+  
   # Daily incidence
-  results$med$daily_incidence <- round(out$mean_cases)
-  results$min$daily_incidence <- round(out$min_cases)
-  results$max$daily_incidence <- round(out$max_cases)
+  ifelse(is.null(dim(out$mean_cases)), results$med$daily_incidence <- round(out$mean_cases), results$med$daily_incidence <- round(out$mean_cases[, 1]))
+  ifelse(is.null(dim(out$min_cases)), results$min$daily_incidence <- round(out$min_cases), results$min$daily_incidence <- round(out$min_cases[, 1]))
+  ifelse(is.null(dim(out$max_cases)), results$max$daily_incidence <- round(out$max_cases), results$max$daily_incidence <- round(out$max_cases[, 1]))
   
   # Daily total cases
-  results$med$daily_total_cases <- round(out$mean_daily_infection)
-  results$min$daily_total_cases <- round(out$min_daily_infection)
-  results$max$daily_total_cases <- round(out$max_daily_infection)
+  ifelse(is.null(dim(out$mean_daily_infection)), results$med$daily_total_cases <- round(out$mean_daily_infection), results$med$daily_total_cases <- round(out$mean_daily_infection[, 1]))
+  ifelse(is.null(dim(out$min_daily_infection)), results$min$daily_total_cases <- round(out$min_daily_infection), results$min$daily_total_cases <- round(out$min_daily_infection[, 1]))
+  ifelse(is.null(dim(out$max_daily_infection)), results$max$daily_total_cases <- round(out$max_daily_infection), results$max$daily_total_cases <- round(out$max_daily_infection[, 1]))
   
   # Doubling time (only for baseline)
   results$med$doubling_time <- round(log(2)*7 / (log(out$mean_cases[2+7] / out$mean_cases[2])), 2)
