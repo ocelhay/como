@@ -80,8 +80,6 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   
   if (parameters["iterations"] > 1)  showNotification("Aggregation of results (~ 30 secs.)", duration = NULL, type = "message", id = "aggregation_results")
   
-  if(code_for_development) time_start <- Sys.time()
-  
   if (parameters["iterations"] == 1) {
     results$mean_infections <- infections
     results$min_infections <- infections
@@ -129,10 +127,6 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     results$mean <- apply(aux, 1:2, quantile, probs = 0.5)
     results$min <- apply(aux, 1:2, quantile, probs = parameters["confidence"])
     results$max <- apply(aux, 1:2, quantile, probs = (1 - parameters["confidence"]))
-  }
-  
-  if(code_for_development) {
-    print(paste("Aggregation of results runtime:", round(Sys.time() - time_start, 2) %>% as.numeric(), "secs"))
   }
   
   if (parameters["iterations"] > 1)  removeNotification(id = "aggregation_results")
