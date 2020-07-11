@@ -448,7 +448,7 @@ In most simulations, the occupancy for each classification will plateau at the i
 
 ## Hospital demand 
 
-PLEASE NOTE THAT THE GRAPH BELOW HASVEN"T YET BEEN REVIEWED AND COULD BE INCORRECT.
+PLEASE NOTE THAT THE GRAPH BELOW HASN'T YET BEEN REVIEWED AND COULD BE INCORRECT.
 
 ```{r warning = FALSE, dpi = 200, fig.width = 14, fig.height = 12, eval = show}
 nb_time <- length(simul_baseline$results$time)

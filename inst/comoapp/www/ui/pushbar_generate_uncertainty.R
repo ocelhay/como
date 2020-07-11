@@ -1,7 +1,6 @@
 list(
   pushbar(id = "pushbar_generate_uncertainty", from = "right",
-          br(), br(),
-          includeMarkdown("./www/markdown/generate_uncertainty.md"),
+          br(),
           fluidRow(
             column(
               width = 12,
@@ -22,6 +21,8 @@ list(
             ),
             actionButton("run_baseline_multi", "Run Baseline w/ Generated Uncertainty", class = "btn btn-success"),
           ),
+          br(),
+          includeMarkdown("./www/markdown/generate_uncertainty.md"),
           div(class = "closebutton", bsButton("close_generate_uncertainty", "Close (Esc.)", icon("times"), style = "danger", size = "small"))
   )
 )
