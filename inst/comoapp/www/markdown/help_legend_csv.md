@@ -1,7 +1,7 @@
 [Download this table in Excel format.](https://github.com/ocelhay/como/blob/master/Results_Legend_CoMoCOVID-19App.xlsx)
 
 `*_`: either for baseline or hypothetical scenario.
-Each variable ends with `_min`, `_med` or `_max`. If there is only one model run (no generated uncertainty), these values are identical. Otherwise these are respectively the upper limit, median and lower limit for the model credible interval, as per the "Generate Uncertainty" section.
+Each variable ends with `_min`, `_med` or `_max`. If there is only one model run (no generated uncertainty), these values are identical. Otherwise these are the lower limit, median and upper limit for the model credible interval, as per the "Generate Uncertainty" section.
 
 
 | Variable                        | Description                                                                                                                                                          |

@@ -3,7 +3,7 @@ If you decide to perform several model runs, **we recommend to go for a minimum 
 
 ### Running time
 
-When performimng several model runs, simulation time can amount to 1 second per run and half a minute to aggregate results.
+When performing several model runs, simulation time can amount to 1 second per run and half a minute to aggregate results.
 
 
 ### Noise
