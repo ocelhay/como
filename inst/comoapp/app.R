@@ -1,5 +1,6 @@
 # CoMo COVID-19 App
-version_app <- "v13.13.2"
+version_app <- "v14.14.1"
+code_for_development <- TRUE
 
 # Load packages and data
 source("./www/source_on_inception.R")
@@ -18,204 +19,226 @@ ui <- function(request) {
     source("./www/ui/pushbar_parameters_country.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_virus.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_hospital.R", local = TRUE)[1],
+    source("./www/ui/pushbar_generate_uncertainty.R", local = TRUE)[1],
     
-    navbarPage(NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
-               tabPanel(span("COVID-19 App | CoMo Consortium ", version_app), value = "tab_welcome",
-                        fluidRow(
-                          column(4, 
-                                 h3("COVID-19 App | CoMo Consortium"),
-                                 h4(version_app),
-                                 tags$img(src = "./como_logo.png", id = "logo"),
-                                 p("The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level.")
-                          ),
-                          column(4,
-                                 div(class = "box_outputs", h4("Important Disclaimer:")),
-                                 includeMarkdown("./www/markdown/disclaimer.md"),
-                                 br(),
-                                 div(class = "box_outputs", h4("License:")),
-                                 includeMarkdown("./www/markdown/readable_license.md")
-                          ),
-                          column(4,
-                                 div(class = "box_outputs", h4("Sources of Data:")),
-                                 includeMarkdown("./www/markdown/about_country_data.md"),
-                                 includeMarkdown("./www/markdown/about_data.md"),
-                          )
-                        ),
-                        
+    navbarPage(
+      NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
+      tabPanel(span("COVID-19 App | CoMo Consortium ", version_app), value = "tab_welcome",
+               fluidRow(
+                 column(4, 
+                        h3("COVID-19 App | CoMo Consortium"),
+                        h4(version_app),
+                        tags$img(src = "./como_logo.png", id = "logo"),
+                        p("The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level.")
+                 ),
+                 column(4,
+                        div(class = "box_outputs", h4("Important Disclaimer:")),
+                        includeMarkdown("./www/markdown/disclaimer.md"),
+                        br(),
+                        div(class = "box_outputs", h4("License:")),
+                        includeMarkdown("./www/markdown/readable_license.md")
+                 ),
+                 column(4,
+                        div(class = "box_outputs", h4("Sources of Data:")),
+                        includeMarkdown("./www/markdown/about_country_data.md"),
+                        includeMarkdown("./www/markdown/about_data.md"),
+                 )
                ),
-               tabPanel("Visual Calibration", value = "tab_visualfit",
-                        fluidRow(
-                          column(2,
-                                 div(class = "float_bottom_left",
-                                     hr(),
-                                     sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
-                                                 value = 0.049, ticks = FALSE, width = "75%"),
-                                     sliderInput("report", label = span("Percentage of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
-                                                 value = 2.5, post = "%", ticks = FALSE, width = "75%"),
-                                     sliderInput("reportc", label = span("Percentage of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
-                                                 value = 5, post = "%", ticks = FALSE, width = "75%"),
-                                     sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
-                                                 value = 100, post = "%", ticks = FALSE, width = "75%"),
-                                     htmlOutput("text_feedback_interventions_baseline"),
-                                     
-                                     uiOutput("conditional_run_baseline"), br(),
-                                     uiOutput("conditional_validate_baseline"),
-                                     hr()
-                                 )
-                          ),
-                          column(10,
-                                 fluidRow(
-                                   div(class = "box_outputs", h4("Global Simulations Parameters:")),
-                                   column(6,
-                                          p("Use customised data/update default parameters: ", br(), a("download 'Template_CoMo_App.xlsx'", href = "https://github.com/ocelhay/como/blob/master/Template_CoMoCOVID-19App.xlsx", target = "_blank"), 
-                                            ", edit it and upload it:"),
-                                          fileInput("own_data", buttonLabel = span("Browse for", tags$strong("v13"), " template"), label = NULL, accept = ".xlsx", multiple = FALSE, width = "75%"),
-                                          htmlOutput("feedback_choices")
-                                   ),
-                                   column(6,
-                                          dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year"),
-                                          fluidRow(column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      width = "70%")), 
-                                                   column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      width = "70%"))),
-                                          br(),
-                                          fluidRow(column(6, bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      width = "70%")), 
-                                                   column(6, bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                                      width = "70%")))
-                                   )
-                                 ),
-                                 br(),
-                                 fluidRow(
-                                   column(6,
-                                          div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
-                                          sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 30, value = 0, step = 1),
-                                          source("./www/ui/interventions_baseline.R", local = TRUE)$value
-                                   ),
-                                   column(6,
-                                          div(class = "box_outputs", h4("Timeline:")),
-                                          plotOutput("timevis_baseline", height = 700)
-                                   )
-                                 ),
-                                 br(), br(), 
-                                 a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
-                                 fluidRow(
-                                   column(3, htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner()),
-                                   column(3, htmlOutput("text_total_death_baseline_dup") %>% withSpinner()),
-                                   column(3, htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()),
-                                   column(3, htmlOutput("text_doubling_time") %>% withSpinner())
-                                 ),
-                                 prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
-                                                    selected = "Observed", inline = TRUE), br(),
-                                 highchartOutput("highchart_cases", height = "350px") %>% withSpinner(), 
-                                 highchartOutput("highchart_deaths", height = "350px") %>% withSpinner()
-                          )
-                        )
-               ),
-               tabPanel("Model Predictions", value = "tab_modelpredictions",
-                        a(id = "anchor_interventions", style = "visibility: hidden", ""),
-                        fluidRow(
-                          column(2, br(),
-                                 actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success"), br(), br(),
-                                 htmlOutput("text_feedback_interventions_future"),
-                                 uiOutput("conditional_run_future")
-                          ),
-                          column(5,
-                                 div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
-                                 sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 30,  value = 0, step = 1),
-                                 source("./www/ui/interventions_future.R", local = TRUE)$value
-                          ),
-                          column(5,
-                                 div(class = "box_outputs", h4("Timeline")),
-                                 plotOutput("timevis_future", height = 700)
-                          )
-                        ),
-                        br(), br(), 
-                        fluidRow(
-                          column(2, 
-                                 uiOutput("conditional_float_results"),
-                                 a(id = "anchor_summary", style="visibility: hidden", "")
-                          ),
-                          column(5,
-                                 div(class = "box_outputs", h4("Baseline")),
-                                 htmlOutput("text_pct_pop_baseline") %>% withSpinner(), br(),
-                                 htmlOutput("text_total_death_baseline") %>% withSpinner(), br(),
-                                 htmlOutput("text_reported_death_baseline") %>% withSpinner()
-                          ),
-                          column(5,
-                                 div(class = "box_outputs", h4("Hypothetical Scenario")),
-                                 htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
-                                 htmlOutput("text_total_death_interventions") %>% withSpinner(), br(), 
-                                 htmlOutput("text_reported_death_interventions") %>% withSpinner()
-                          )
-                        ),
-                        
-                        fluidRow(
-                          column(10, offset = 2,
-                                 br(),
-                                 materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
-                                                status = "danger", right = TRUE, inline = FALSE, width = "100%"),
-                                 br(),
-                                 a(id = "anchor_cases", style="visibility: hidden", ""),
-                                 prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
-                                                    selected = "Predicted Reported + Unreported", inline = TRUE)
-                          )
-                        ),
-                        fluidRow(
-                          column(5, offset = 2,
-                                 highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br()
-                          ),
-                          column(5,
-                                 highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br()
-                          )
-                        ),
-                        
-                        fluidRow(
-                          column(10, offset = 2,
-                                 a(id = "anchor_deaths", style="visibility: hidden", ""),
-                                 prettyRadioButtons("focus_natural_death", label = "Focus on:", 
-                                                    choices = c("No Focus", "COVID-19 Deaths"), 
-                                                    selected = "No Focus", inline = TRUE)
-                          )
-                        ),
-                        fluidRow(
-                          column(5, offset = 2,
-                                 highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                                 plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br(),
-                                 plotOutput("plot_mortality_lag_baseline") %>% withSpinner(), br()
-                          ),
-                          column(5,
-                                 highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                                 plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br(),
-                                 plotOutput("plot_mortality_lag_interventions") %>% withSpinner(), br()
-                          )
-                        ),
-                        fluidRow(
-                          column(10, offset = 2,
-                                 a(id = "anchor_occupancy", style="visibility: hidden", ""),
-                                 prettyRadioButtons("focus_requirements", label = "Focus on:", 
-                                                    choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
-                                                    selected = "No Focus", inline = TRUE)
-                          )
-                        ),
-                        fluidRow(
-                          column(5, offset = 2,
-                                 highchartOutput("highchart_requirements_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                          ),
-                          column(5, 
-                                 highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                          )
-                        ),
-                        fluidRow(
-                          column(5, offset = 2,
-                                 a(id = "anchor_rt", style="visibility: hidden", ""),
-                                 highchartOutput("highchart_Rt_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                          ),
-                          column(5, 
-                                 highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                          )
-                        )
-               )
+               
+      ),
+      tabPanel(
+        "Visual Calibration", value = "tab_visualfit",
+        fluidRow(
+          column(
+            width = 2,
+            div(class = "float_bottom_left",
+                hr(),
+                sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
+                            value = 0.049, ticks = FALSE, width = "75%"),
+                sliderInput("report", label = span("Percentage of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
+                            value = 2.5, post = "%", ticks = FALSE, width = "75%"),
+                sliderInput("reportc", label = span("Percentage of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
+                            value = 5, post = "%", ticks = FALSE, width = "75%"),
+                sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
+                            value = 100, post = "%", ticks = FALSE, width = "75%"),
+                htmlOutput("text_feedback_interventions_baseline"),
+                
+                uiOutput("conditional_run_baseline"), br(),
+                uiOutput("conditional_validate_baseline"),
+                hr()
+            )
+          ),
+          column(
+            width = 10,
+            div(class = "box_outputs", h4("Global Simulations Parameters:")),
+            fluidRow(
+              column(
+                5, fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE)  %>% 
+                  helper(type = "markdown", content = "help_upload_template", colour = "red", size = "s"),
+              )
+            ),
+            hr(),
+            fluidRow(
+              column(4,
+                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year")
+              ),
+              column(6, offset = 2,
+                     fluidRow(column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                 width = "70%"),
+                                     htmlOutput("feedback_choices")),
+                              column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                                 width = "70%"), br(), br(),
+                                     bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                              width = "70%"), br(), br(),
+                                     bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
+                                              width = "70%")
+                              )
+                     )
+              )
+            ),
+            br(),
+            fluidRow(
+              column(6,
+                     div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
+                     sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 30, value = 0, step = 1, ticks = FALSE),
+                     source("./www/ui/interventions_baseline.R", local = TRUE)$value
+              ),
+              column(6,
+                     div(class = "box_outputs", h4("Timeline:")),
+                     plotOutput("timevis_baseline", height = 700)
+              )
+            ),
+            br(), hr(), 
+            a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
+            prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
+                               selected = "Observed", inline = TRUE), br(),
+            fluidRow(
+              column(4, htmlOutput("text_pct_pop_baseline") %>% withSpinner()),
+              column(4, htmlOutput("text_attributable_death_baseline") %>% withSpinner()),
+              column(4, htmlOutput("text_reported_death_baseline") %>% withSpinner())
+            ),
+            plotOutput("plot_cases_baseline", height = "350px") %>% withSpinner(), 
+            plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner(),
+            plotOutput("plot_Rt_baseline", height = "200px") %>% withSpinner(),
+            
+          )
+        )
+      ),
+      tabPanel(
+        "Model Predictions", value = "tab_modelpredictions",
+        a(id = "anchor_interventions", style = "visibility: hidden", ""),
+        fluidRow(
+          column(2, br(),
+                 actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success"), br(), br(),
+                 htmlOutput("text_feedback_interventions_future"),
+                 uiOutput("conditional_run_future")
+          ),
+          column(5,
+                 div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
+                 sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 30,  value = 0, step = 1, ticks = FALSE),
+                 source("./www/ui/interventions_future.R", local = TRUE)$value
+          ),
+          column(5,
+                 div(class = "box_outputs", h4("Timeline")),
+                 plotOutput("timevis_future", height = 700)
+          )
+        ),
+        br(), br(), 
+        fluidRow(
+          column(
+            2, 
+            uiOutput("conditional_float_results"),
+            a(id = "anchor_summary", style="visibility: hidden", "")
+          ),
+          column(
+            10,
+            prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
+                               selected = "Predicted Reported + Unreported", inline = TRUE),
+            fluidRow(
+              column(
+                6,
+                div(class = "box_outputs", h4("Baseline")),
+                htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner(), br(),
+                htmlOutput("text_attributable_death_baseline_dup") %>% withSpinner(), br(),
+                htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()
+              ),
+              column(
+                6,
+                div(class = "box_outputs", h4("Hypothetical Scenario")),
+                htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
+                htmlOutput("text_attributable_death_interventions") %>% withSpinner(), br(), 
+                htmlOutput("text_reported_death_interventions") %>% withSpinner()
+              )
+            )
+          )
+        ),
+        
+        fluidRow(
+          column(10, offset = 2,
+                 br(),
+                 materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
+                                status = "danger", right = TRUE, inline = FALSE, width = "100%"),
+                 br(),
+                 a(id = "anchor_cases", style="visibility: hidden", "")
+          )
+        ),
+        fluidRow(
+          column(5, offset = 2,
+                 highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br()
+          ),
+          column(5,
+                 highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br()
+          )
+        ),
+        
+        fluidRow(
+          column(10, offset = 2,
+                 a(id = "anchor_deaths", style="visibility: hidden", ""),
+                 prettyRadioButtons("focus_natural_death", label = "Focus on:", 
+                                    choices = c("No Focus", "COVID-19 Deaths"), 
+                                    selected = "No Focus", inline = TRUE)
+          )
+        ),
+        fluidRow(
+          column(5, offset = 2,
+                 highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                 plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br(),
+                 plotOutput("plot_total_deaths_age_baseline") %>% withSpinner(), br(),
+                 plotOutput("plot_mortality_lag_baseline") %>% withSpinner(), br()
+          ),
+          column(5,
+                 highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                 plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br(),
+                 plotOutput("plot_total_deaths_age_interventions") %>% withSpinner(), br(),
+                 plotOutput("plot_mortality_lag_interventions") %>% withSpinner(), br()
+          )
+        ),
+        fluidRow(
+          column(10, offset = 2,
+                 a(id = "anchor_occupancy", style="visibility: hidden", ""),
+                 prettyRadioButtons("focus_requirements", label = "Focus on:", 
+                                    choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
+                                    selected = "No Focus", inline = TRUE)
+          )
+        ),
+        fluidRow(
+          column(5, offset = 2,
+                 highchartOutput("highchart_requirements_dual_baseline", height = "350px") %>% withSpinner(), br(),
+          ),
+          column(5, 
+                 highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
+          )
+        ),
+        fluidRow(
+          column(5, offset = 2,
+                 a(id = "anchor_rt", style="visibility: hidden", ""),
+                 highchartOutput("highchart_Rt_dual_baseline", height = "350px") %>% withSpinner(), br(),
+          ),
+          column(5, 
+                 highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
+          )
+        )
+      )
     )
   )
 }
@@ -239,6 +262,10 @@ server <- function(input, output, session) {
   observeEvent(input$open_hospital_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_hospitalisation"))  
   observeEvent(input$close_hospital_param, pushbar_close())
   
+  # Pushbar for uncertainty ----
+  observeEvent(input$open_generate_uncertainty, ignoreInit = TRUE, pushbar_open(id = "pushbar_generate_uncertainty"))  
+  observeEvent(input$close_generate_uncertainty, pushbar_close())
+  
   # Define reactiveValues elements ----
   population_rv <- reactiveValues(data = NULL)
   cases_rv <- reactiveValues(data = NULL)
@@ -259,153 +286,155 @@ server <- function(input, output, session) {
   
   observe({
     # Create interventions tibble
-    interventions$baseline_mat <- tibble(index = 1:30,
-                                         intervention = c(input$baseline_intervention_1, input$baseline_intervention_2,
-                                                          input$baseline_intervention_3, input$baseline_intervention_4,
-                                                          input$baseline_intervention_5, input$baseline_intervention_6,
-                                                          input$baseline_intervention_7, input$baseline_intervention_8,
-                                                          input$baseline_intervention_9, input$baseline_intervention_10,
-                                                          
-                                                          input$baseline_intervention_11, input$baseline_intervention_12,
-                                                          input$baseline_intervention_13, input$baseline_intervention_14,
-                                                          input$baseline_intervention_15, input$baseline_intervention_16,
-                                                          input$baseline_intervention_17, input$baseline_intervention_18,
-                                                          input$baseline_intervention_19, input$baseline_intervention_20,
-                                                          
-                                                          input$baseline_intervention_21, input$baseline_intervention_22,
-                                                          input$baseline_intervention_23, input$baseline_intervention_24,
-                                                          input$baseline_intervention_25, input$baseline_intervention_26,
-                                                          input$baseline_intervention_27, input$baseline_intervention_28,
-                                                          input$baseline_intervention_29, input$baseline_intervention_30),
-                                         
-                                         date_start = c(input$baseline_daterange_1[1], input$baseline_daterange_2[1],
-                                                        input$baseline_daterange_3[1], input$baseline_daterange_4[1],
-                                                        input$baseline_daterange_5[1], input$baseline_daterange_6[1],
-                                                        input$baseline_daterange_7[1], input$baseline_daterange_8[1],
-                                                        input$baseline_daterange_9[1], input$baseline_daterange_10[1],
-                                                        
-                                                        input$baseline_daterange_11[1], input$baseline_daterange_12[1],
-                                                        input$baseline_daterange_13[1], input$baseline_daterange_14[1],
-                                                        input$baseline_daterange_15[1], input$baseline_daterange_16[1],
-                                                        input$baseline_daterange_17[1], input$baseline_daterange_18[1],
-                                                        input$baseline_daterange_19[1], input$baseline_daterange_20[1],
-                                                        
-                                                        input$baseline_daterange_21[1], input$baseline_daterange_22[1],
-                                                        input$baseline_daterange_23[1], input$baseline_daterange_24[1],
-                                                        input$baseline_daterange_25[1], input$baseline_daterange_26[1],
-                                                        input$baseline_daterange_27[1], input$baseline_daterange_28[1],
-                                                        input$baseline_daterange_29[1], input$baseline_daterange_30[1]),
-                                         
-                                         date_end = c(input$baseline_daterange_1[2], input$baseline_daterange_2[2],
-                                                      input$baseline_daterange_3[2], input$baseline_daterange_4[2],
-                                                      input$baseline_daterange_5[2], input$baseline_daterange_6[2],
-                                                      input$baseline_daterange_7[2], input$baseline_daterange_8[2],
-                                                      input$baseline_daterange_9[2], input$baseline_daterange_10[2],
-                                                      
-                                                      input$baseline_daterange_11[2], input$baseline_daterange_12[2],
-                                                      input$baseline_daterange_13[2], input$baseline_daterange_14[2],
-                                                      input$baseline_daterange_15[2], input$baseline_daterange_16[2],
-                                                      input$baseline_daterange_17[2], input$baseline_daterange_18[2],
-                                                      input$baseline_daterange_19[2], input$baseline_daterange_20[2],
-                                                      
-                                                      input$baseline_daterange_21[2], input$baseline_daterange_22[2],
-                                                      input$baseline_daterange_23[2], input$baseline_daterange_24[2],
-                                                      input$baseline_daterange_25[2], input$baseline_daterange_26[2],
-                                                      input$baseline_daterange_27[2], input$baseline_daterange_28[2],
-                                                      input$baseline_daterange_29[2], input$baseline_daterange_30[2]),
-                                         
-                                         value = c(input$baseline_coverage_1, input$baseline_coverage_2,
-                                                   input$baseline_coverage_3, input$baseline_coverage_4,
-                                                   input$baseline_coverage_5, input$baseline_coverage_6,
-                                                   input$baseline_coverage_7, input$baseline_coverage_8,
-                                                   input$baseline_coverage_9, input$baseline_coverage_10,
-                                                   
-                                                   input$baseline_coverage_11, input$baseline_coverage_12,
-                                                   input$baseline_coverage_13, input$baseline_coverage_14,
-                                                   input$baseline_coverage_15, input$baseline_coverage_16,
-                                                   input$baseline_coverage_17, input$baseline_coverage_18,
-                                                   input$baseline_coverage_19, input$baseline_coverage_20,
-                                                   
-                                                   input$baseline_coverage_21, input$baseline_coverage_22,
-                                                   input$baseline_coverage_23, input$baseline_coverage_24,
-                                                   input$baseline_coverage_25, input$baseline_coverage_26,
-                                                   input$baseline_coverage_27, input$baseline_coverage_28,
-                                                   input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
+    interventions$baseline_mat <- tibble(
+      index = 1:30,
+      intervention = c(input$baseline_intervention_1, input$baseline_intervention_2,
+                       input$baseline_intervention_3, input$baseline_intervention_4,
+                       input$baseline_intervention_5, input$baseline_intervention_6,
+                       input$baseline_intervention_7, input$baseline_intervention_8,
+                       input$baseline_intervention_9, input$baseline_intervention_10,
+                       
+                       input$baseline_intervention_11, input$baseline_intervention_12,
+                       input$baseline_intervention_13, input$baseline_intervention_14,
+                       input$baseline_intervention_15, input$baseline_intervention_16,
+                       input$baseline_intervention_17, input$baseline_intervention_18,
+                       input$baseline_intervention_19, input$baseline_intervention_20,
+                       
+                       input$baseline_intervention_21, input$baseline_intervention_22,
+                       input$baseline_intervention_23, input$baseline_intervention_24,
+                       input$baseline_intervention_25, input$baseline_intervention_26,
+                       input$baseline_intervention_27, input$baseline_intervention_28,
+                       input$baseline_intervention_29, input$baseline_intervention_30),
+      
+      date_start = c(input$baseline_daterange_1[1], input$baseline_daterange_2[1],
+                     input$baseline_daterange_3[1], input$baseline_daterange_4[1],
+                     input$baseline_daterange_5[1], input$baseline_daterange_6[1],
+                     input$baseline_daterange_7[1], input$baseline_daterange_8[1],
+                     input$baseline_daterange_9[1], input$baseline_daterange_10[1],
+                     
+                     input$baseline_daterange_11[1], input$baseline_daterange_12[1],
+                     input$baseline_daterange_13[1], input$baseline_daterange_14[1],
+                     input$baseline_daterange_15[1], input$baseline_daterange_16[1],
+                     input$baseline_daterange_17[1], input$baseline_daterange_18[1],
+                     input$baseline_daterange_19[1], input$baseline_daterange_20[1],
+                     
+                     input$baseline_daterange_21[1], input$baseline_daterange_22[1],
+                     input$baseline_daterange_23[1], input$baseline_daterange_24[1],
+                     input$baseline_daterange_25[1], input$baseline_daterange_26[1],
+                     input$baseline_daterange_27[1], input$baseline_daterange_28[1],
+                     input$baseline_daterange_29[1], input$baseline_daterange_30[1]),
+      
+      date_end = c(input$baseline_daterange_1[2], input$baseline_daterange_2[2],
+                   input$baseline_daterange_3[2], input$baseline_daterange_4[2],
+                   input$baseline_daterange_5[2], input$baseline_daterange_6[2],
+                   input$baseline_daterange_7[2], input$baseline_daterange_8[2],
+                   input$baseline_daterange_9[2], input$baseline_daterange_10[2],
+                   
+                   input$baseline_daterange_11[2], input$baseline_daterange_12[2],
+                   input$baseline_daterange_13[2], input$baseline_daterange_14[2],
+                   input$baseline_daterange_15[2], input$baseline_daterange_16[2],
+                   input$baseline_daterange_17[2], input$baseline_daterange_18[2],
+                   input$baseline_daterange_19[2], input$baseline_daterange_20[2],
+                   
+                   input$baseline_daterange_21[2], input$baseline_daterange_22[2],
+                   input$baseline_daterange_23[2], input$baseline_daterange_24[2],
+                   input$baseline_daterange_25[2], input$baseline_daterange_26[2],
+                   input$baseline_daterange_27[2], input$baseline_daterange_28[2],
+                   input$baseline_daterange_29[2], input$baseline_daterange_30[2]),
+      
+      value = c(input$baseline_coverage_1, input$baseline_coverage_2,
+                input$baseline_coverage_3, input$baseline_coverage_4,
+                input$baseline_coverage_5, input$baseline_coverage_6,
+                input$baseline_coverage_7, input$baseline_coverage_8,
+                input$baseline_coverage_9, input$baseline_coverage_10,
+                
+                input$baseline_coverage_11, input$baseline_coverage_12,
+                input$baseline_coverage_13, input$baseline_coverage_14,
+                input$baseline_coverage_15, input$baseline_coverage_16,
+                input$baseline_coverage_17, input$baseline_coverage_18,
+                input$baseline_coverage_19, input$baseline_coverage_20,
+                
+                input$baseline_coverage_21, input$baseline_coverage_22,
+                input$baseline_coverage_23, input$baseline_coverage_24,
+                input$baseline_coverage_25, input$baseline_coverage_26,
+                input$baseline_coverage_27, input$baseline_coverage_28,
+                input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
       mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ "contacts", TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_baseline, intervention != "_")
     
-    interventions$future_mat <- tibble(index = 1:30,
-                                       intervention = c(input$future_intervention_1, input$future_intervention_2,
-                                                        input$future_intervention_3, input$future_intervention_4,
-                                                        input$future_intervention_5, input$future_intervention_6,
-                                                        input$future_intervention_7, input$future_intervention_8,
-                                                        input$future_intervention_9, input$future_intervention_10,
-                                                        
-                                                        input$future_intervention_11, input$future_intervention_12,
-                                                        input$future_intervention_13, input$future_intervention_14,
-                                                        input$future_intervention_15, input$future_intervention_16,
-                                                        input$future_intervention_17, input$future_intervention_18,
-                                                        input$future_intervention_19, input$future_intervention_20,
-                                                        
-                                                        input$future_intervention_21, input$future_intervention_22,
-                                                        input$future_intervention_23, input$future_intervention_24,
-                                                        input$future_intervention_25, input$future_intervention_26,
-                                                        input$future_intervention_27, input$future_intervention_28,
-                                                        input$future_intervention_29, input$future_intervention_30),
-                                       
-                                       date_start = c(input$future_daterange_1[1], input$future_daterange_2[1],
-                                                      input$future_daterange_3[1], input$future_daterange_4[1],
-                                                      input$future_daterange_5[1], input$future_daterange_6[1],
-                                                      input$future_daterange_7[1], input$future_daterange_8[1],
-                                                      input$future_daterange_9[1], input$future_daterange_10[1],
-                                                      
-                                                      input$future_daterange_11[1], input$future_daterange_12[1],
-                                                      input$future_daterange_13[1], input$future_daterange_14[1],
-                                                      input$future_daterange_15[1], input$future_daterange_16[1],
-                                                      input$future_daterange_17[1], input$future_daterange_18[1],
-                                                      input$future_daterange_19[1], input$future_daterange_20[1],
-                                                      
-                                                      input$future_daterange_21[1], input$future_daterange_22[1],
-                                                      input$future_daterange_23[1], input$future_daterange_24[1],
-                                                      input$future_daterange_25[1], input$future_daterange_26[1],
-                                                      input$future_daterange_27[1], input$future_daterange_28[1],
-                                                      input$future_daterange_29[1], input$future_daterange_30[1]),
-                                       
-                                       date_end = c(input$future_daterange_1[2], input$future_daterange_2[2],
-                                                    input$future_daterange_3[2], input$future_daterange_4[2],
-                                                    input$future_daterange_5[2], input$future_daterange_6[2],
-                                                    input$future_daterange_7[2], input$future_daterange_8[2],
-                                                    input$future_daterange_9[2], input$future_daterange_10[2],
-                                                    
-                                                    input$future_daterange_11[2], input$future_daterange_12[2],
-                                                    input$future_daterange_13[2], input$future_daterange_14[2],
-                                                    input$future_daterange_15[2], input$future_daterange_16[2],
-                                                    input$future_daterange_17[2], input$future_daterange_18[2],
-                                                    input$future_daterange_19[2], input$future_daterange_20[2],
-                                                    
-                                                    input$future_daterange_21[2], input$future_daterange_22[2],
-                                                    input$future_daterange_23[2], input$future_daterange_24[2],
-                                                    input$future_daterange_25[2], input$future_daterange_26[2],
-                                                    input$future_daterange_27[2], input$future_daterange_28[2],
-                                                    input$future_daterange_29[2], input$future_daterange_30[2]),
-                                       
-                                       value = c(input$future_coverage_1, input$future_coverage_2,
-                                                 input$future_coverage_3, input$future_coverage_4,
-                                                 input$future_coverage_5, input$future_coverage_6,
-                                                 input$future_coverage_7, input$future_coverage_8,
-                                                 input$future_coverage_9, input$future_coverage_10,
-                                                 
-                                                 input$future_coverage_11, input$future_coverage_12,
-                                                 input$future_coverage_13, input$future_coverage_14,
-                                                 input$future_coverage_15, input$future_coverage_16,
-                                                 input$future_coverage_17, input$future_coverage_18,
-                                                 input$future_coverage_19, input$future_coverage_20,
-                                                 
-                                                 input$future_coverage_21, input$future_coverage_22,
-                                                 input$future_coverage_23, input$future_coverage_24,
-                                                 input$future_coverage_25, input$future_coverage_26,
-                                                 input$future_coverage_27, input$future_coverage_28,
-                                                 input$future_coverage_29, input$future_coverage_30)) %>% 
+    interventions$future_mat <- tibble(
+      index = 1:30,
+      intervention = c(input$future_intervention_1, input$future_intervention_2,
+                       input$future_intervention_3, input$future_intervention_4,
+                       input$future_intervention_5, input$future_intervention_6,
+                       input$future_intervention_7, input$future_intervention_8,
+                       input$future_intervention_9, input$future_intervention_10,
+                       
+                       input$future_intervention_11, input$future_intervention_12,
+                       input$future_intervention_13, input$future_intervention_14,
+                       input$future_intervention_15, input$future_intervention_16,
+                       input$future_intervention_17, input$future_intervention_18,
+                       input$future_intervention_19, input$future_intervention_20,
+                       
+                       input$future_intervention_21, input$future_intervention_22,
+                       input$future_intervention_23, input$future_intervention_24,
+                       input$future_intervention_25, input$future_intervention_26,
+                       input$future_intervention_27, input$future_intervention_28,
+                       input$future_intervention_29, input$future_intervention_30),
+      
+      date_start = c(input$future_daterange_1[1], input$future_daterange_2[1],
+                     input$future_daterange_3[1], input$future_daterange_4[1],
+                     input$future_daterange_5[1], input$future_daterange_6[1],
+                     input$future_daterange_7[1], input$future_daterange_8[1],
+                     input$future_daterange_9[1], input$future_daterange_10[1],
+                     
+                     input$future_daterange_11[1], input$future_daterange_12[1],
+                     input$future_daterange_13[1], input$future_daterange_14[1],
+                     input$future_daterange_15[1], input$future_daterange_16[1],
+                     input$future_daterange_17[1], input$future_daterange_18[1],
+                     input$future_daterange_19[1], input$future_daterange_20[1],
+                     
+                     input$future_daterange_21[1], input$future_daterange_22[1],
+                     input$future_daterange_23[1], input$future_daterange_24[1],
+                     input$future_daterange_25[1], input$future_daterange_26[1],
+                     input$future_daterange_27[1], input$future_daterange_28[1],
+                     input$future_daterange_29[1], input$future_daterange_30[1]),
+      
+      date_end = c(input$future_daterange_1[2], input$future_daterange_2[2],
+                   input$future_daterange_3[2], input$future_daterange_4[2],
+                   input$future_daterange_5[2], input$future_daterange_6[2],
+                   input$future_daterange_7[2], input$future_daterange_8[2],
+                   input$future_daterange_9[2], input$future_daterange_10[2],
+                   
+                   input$future_daterange_11[2], input$future_daterange_12[2],
+                   input$future_daterange_13[2], input$future_daterange_14[2],
+                   input$future_daterange_15[2], input$future_daterange_16[2],
+                   input$future_daterange_17[2], input$future_daterange_18[2],
+                   input$future_daterange_19[2], input$future_daterange_20[2],
+                   
+                   input$future_daterange_21[2], input$future_daterange_22[2],
+                   input$future_daterange_23[2], input$future_daterange_24[2],
+                   input$future_daterange_25[2], input$future_daterange_26[2],
+                   input$future_daterange_27[2], input$future_daterange_28[2],
+                   input$future_daterange_29[2], input$future_daterange_30[2]),
+      
+      value = c(input$future_coverage_1, input$future_coverage_2,
+                input$future_coverage_3, input$future_coverage_4,
+                input$future_coverage_5, input$future_coverage_6,
+                input$future_coverage_7, input$future_coverage_8,
+                input$future_coverage_9, input$future_coverage_10,
+                
+                input$future_coverage_11, input$future_coverage_12,
+                input$future_coverage_13, input$future_coverage_14,
+                input$future_coverage_15, input$future_coverage_16,
+                input$future_coverage_17, input$future_coverage_18,
+                input$future_coverage_19, input$future_coverage_20,
+                
+                input$future_coverage_21, input$future_coverage_22,
+                input$future_coverage_23, input$future_coverage_24,
+                input$future_coverage_25, input$future_coverage_26,
+                input$future_coverage_27, input$future_coverage_28,
+                input$future_coverage_29, input$future_coverage_30)) %>% 
       mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ "contacts", TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_future, intervention != "_")
     
@@ -430,13 +459,16 @@ server <- function(input, output, session) {
   # To show/hide elements of the App depending on the status ----
   output$conditional_run_baseline <- renderUI({
     if(interventions$valid_baseline_interventions) {
-      actionButton("run_baseline", "Run Baseline", class = "btn btn-success")
+      actionButton("run_baseline", "Calibrate Baseline", class = "btn btn-success")
     }
   })
   
   output$conditional_validate_baseline <- renderUI({
     if(simul_baseline$baseline_available){
-      actionButton("validate_baseline", span(icon("thumbs-up"), " Validate the Baseline"), class = "btn btn-success")
+      div(
+        actionButton("open_generate_uncertainty", span(icon("random"), " Generate Uncertainty"), class = "btn btn-success"),br(), br(),
+        actionButton("validate_baseline", span(icon("thumbs-up"), " Validate the Baseline"), class = "btn btn-success")
+      )
     }
   })
   
@@ -475,13 +507,13 @@ server <- function(input, output, session) {
   observeEvent(input$country_demographic, if(input$country_demographic != "-- Own Value ---"){
     population_rv$data <- population %>% filter(country == input$country_demographic)
   })
+  
   observeEvent(input$country_cases, if(input$country_cases != "-- Own Value ---"){
     cases_rv$data <- cases %>% filter(country == input$country_cases) %>%
       select(-country)
   })
   
-  
-  # Source code to generate outputs ----
+  # Source files with code to generate outputs ----
   file_list <- list.files(path = "./www/outputs", pattern = "*.R")
   for (file in file_list) source(paste0("./www/outputs/", file), local = TRUE)$value
   
@@ -606,30 +638,46 @@ server <- function(input, output, session) {
     showTab(inputId = "tabs", target = "tab_visualfit")
     hideTab(inputId = "tabs", target = "tab_modelpredictions")
     updateNavbarPage(session, "tabs", selected = "tab_visualfit")
+    
+    updateSliderInput(session, "iterations", value = 1)
   })
   
   # Process on "run_baseline" ----
   observeEvent(input$run_baseline, {
-    showNotification(span(h4(icon("hourglass-half"), "Running Baseline (Calibration)..."), "typically runs in 10 to 30 secs."),
-                     duration = NULL, type = "message", id = "model_run_notif")
-    
-    # Reset simul_interventions and elements of the UI
+    # Reset simul_interventions (expired baseline)
     simul_interventions$results <- NULL
     
+    # Create/filter objects for model that are dependent on user inputs
     source("./www/model.R", local = TRUE)
-    covidOdeCpp_reset()
-    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, parms = parameters, input=vectors0, A=A,
-               contact_home=contact_home, contact_school=contact_school,
-               contact_work=contact_work, contact_other=contact_other,
-               popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
-               ageing=ageing, ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
-    simul_baseline$results <- process_ode_outcome(out)
     
-    removeNotification(id = "model_run_notif", session = session)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
+    results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
+                          contact_home = contact_home, contact_school = contact_school, 
+                          contact_work = contact_work, contact_other = contact_other)
+    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
     simul_baseline$baseline_available <- TRUE
-    runjs('
-      document.getElementById("anchor_results_baseline").scrollIntoView();
-    ')
+    
+    showNotification("Displaying results", duration = 3, type = "message")
+    runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
+  })
+  
+  # Process on "run_baseline_multi" ----
+  observeEvent(input$run_baseline_multi, {
+    # Close pushbar
+    pushbar_close()
+    
+    # Create/filter objects for model that are dependent on user inputs
+    source("./www/model.R", local = TRUE)
+    
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
+    results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
+                          contact_home = contact_home, contact_school = contact_school, 
+                          contact_work = contact_work, contact_other = contact_other)
+    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
+    simul_baseline$baseline_available <- TRUE
+    
+    showNotification("Displaying results", duration = 3, type = "message")
+    runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
   
   # Process on "Validate Baseline" ----
@@ -641,23 +689,23 @@ server <- function(input, output, session) {
   
   # Process on "run_interventions" ----
   observeEvent(input$run_interventions, {
-    showNotification(span(h4(icon("hourglass-half"), "Running Hypothetical Scenario..."), "typically runs in 10 to 30 secs."),
-                     duration = NULL, type = "message", id = "run_interventions_notif")
-    
+    # Create/filter objects for model that are dependent on user inputs
     source("./www/model.R", local = TRUE)
-    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, parms = parameters2,input=vectors, A=A,
-               contact_home=contact_home, contact_school=contact_school,
-               contact_work=contact_work, contact_other=contact_other,
-               popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
-               ageing=ageing, ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
-    simul_interventions$results <- process_ode_outcome(out)
     
-    removeNotification(id = "run_interventions_notif", session = session)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
+    results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
+                          contact_home = contact_home, contact_school = contact_school, 
+                          contact_work = contact_work, contact_other = contact_other)
+    simul_interventions$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
     simul_interventions$interventions_available <- TRUE
     
-    runjs('
-      document.getElementById("anchor_summary").scrollIntoView();
-    ')
+    if(code_for_development) {
+      shiny_simul_baseline <<- simul_baseline$results
+      shiny_simul_interventions <<- simul_interventions$results
+    }
+    
+    showNotification("Displaying results (~ 5 secs.)", duration = 4, type = "message")
+    runjs('document.getElementById("anchor_summary").scrollIntoView();')
   })
   
   
@@ -665,7 +713,7 @@ server <- function(input, output, session) {
   output$report <- downloadHandler(
     filename = "CoMo Report.docx",
     content = function(file) {
-      showNotification(HTML("Generation of the report typically takes 5 to 30 seconds"), duration = NULL, type = "message", id = "report_generation", session = session)
+      showNotification(HTML("Generating report (~ 15 secs.)"), duration = NULL, type = "message", id = "report_generation", session = session)
       
       tempReport <- file.path(tempdir(), "report.Rmd")
       tempLogo <- file.path(tempdir(), "como_logo.png")
@@ -680,65 +728,150 @@ server <- function(input, output, session) {
   
   # Downloadable csv ----
   results_aggregated <- reactive({
-    dta_baseline <- tibble(
-      date = simul_baseline$results$time,
-      baseline_predicted_reported = simul_baseline$results$daily_incidence,
-      baseline_predicted_reported_and_unreported = simul_baseline$results$daily_total_cases,
-      baseline_normal_bed_occupancy = simul_baseline$results$required_beds,
-      baseline_icu_bed_occupancy = simul_baseline$results$icu_beds,
-      baseline_icu_ventilator_occupancy = simul_baseline$results$ventilators,
-      baseline_normal_bed_requirement = simul_baseline$results$normal_bed_requirement,
-      baseline_icu_bed_requirement = simul_baseline$results$icu_bed_requirement,
-      baseline_icu_ventilator_requirement = simul_baseline$results$icu_ventilator_requirement,
-      baseline_death_natural_non_exposed = simul_baseline$results$death_natural_non_exposed,
-      baseline_death_natural_exposed = simul_baseline$results$death_natural_exposed,
-      baseline_death_treated_hospital = simul_baseline$results$death_treated_hospital,
-      baseline_death_treated_icu = simul_baseline$results$death_treated_icu,
-      baseline_death_treated_ventilator = simul_baseline$results$death_treated_ventilator,
-      baseline_death_untreated_hospital = simul_baseline$results$death_untreated_hospital,
-      baseline_death_untreated_icu = simul_baseline$results$death_untreated_icu,
-      baseline_death_untreated_ventilator = simul_baseline$results$death_untreated_ventilator,
-      baseline_cum_mortality = simul_baseline$results$cum_mortality)
     
-    dta <- left_join(dta_baseline, 
-                     cases_rv$data %>% rename(input_cases = cases,
-                                              input_deaths = deaths,
-                                              input_cumulative_death = cumulative_death), by = "date")
+    # simul_baseline$results and simul_interventions$results ----
+    dta <- tibble(
+      date = simul_baseline$results$time, 
+      
+      # Baseline
+      baseline_predicted_reported_min = simul_baseline$results$min$daily_incidence,
+      baseline_predicted_reported_and_unreported_min = simul_baseline$results$min$daily_total_cases,
+      baseline_normal_bed_occupancy_min = simul_baseline$results$min$hospital_surge_beds,
+      baseline_icu_bed_occupancy_min = simul_baseline$results$min$icu_beds,
+      baseline_icu_ventilator_occupancy_min = simul_baseline$results$min$ventilators,
+      baseline_normal_bed_requirement_min = simul_baseline$results$min$normal_bed_requirement,
+      baseline_icu_bed_requirement_min = simul_baseline$results$min$icu_bed_requirement,
+      baseline_icu_ventilator_requirement_min = simul_baseline$results$min$icu_ventilator_requirement,
+      baseline_death_natural_non_exposed_min = simul_baseline$results$min$death_natural_non_exposed,
+      baseline_death_natural_exposed_min = simul_baseline$results$min$death_natural_exposed,
+      baseline_death_treated_hospital_min = simul_baseline$results$min$death_treated_hospital,
+      baseline_death_treated_icu_min = simul_baseline$results$min$death_treated_icu,
+      baseline_death_treated_ventilator_min = simul_baseline$results$min$death_treated_ventilator,
+      baseline_death_untreated_hospital_min = simul_baseline$results$min$death_untreated_hospital,
+      baseline_death_untreated_icu_min = simul_baseline$results$min$death_untreated_icu,
+      baseline_death_untreated_ventilator_min = simul_baseline$results$min$death_untreated_ventilator,
+      baseline_cum_mortality_min = simul_baseline$results$min$cum_mortality,
+      
+      baseline_predicted_reported_med = simul_baseline$results$med$daily_incidence,
+      baseline_predicted_reported_and_unreported_med = simul_baseline$results$med$daily_total_cases,
+      baseline_normal_bed_occupancy_med = simul_baseline$results$med$hospital_surge_beds,
+      baseline_icu_bed_occupancy_med = simul_baseline$results$med$icu_beds,
+      baseline_icu_ventilator_occupancy_med = simul_baseline$results$med$ventilators,
+      baseline_normal_bed_requirement_med = simul_baseline$results$med$normal_bed_requirement,
+      baseline_icu_bed_requirement_med = simul_baseline$results$med$icu_bed_requirement,
+      baseline_icu_ventilator_requirement_med = simul_baseline$results$med$icu_ventilator_requirement,
+      baseline_death_natural_non_exposed_med = simul_baseline$results$med$death_natural_non_exposed,
+      baseline_death_natural_exposed_med = simul_baseline$results$med$death_natural_exposed,
+      baseline_death_treated_hospital_med = simul_baseline$results$med$death_treated_hospital,
+      baseline_death_treated_icu_med = simul_baseline$results$med$death_treated_icu,
+      baseline_death_treated_ventilator_med = simul_baseline$results$med$death_treated_ventilator,
+      baseline_death_untreated_hospital_med = simul_baseline$results$med$death_untreated_hospital,
+      baseline_death_untreated_icu_med = simul_baseline$results$med$death_untreated_icu,
+      baseline_death_untreated_ventilator_med = simul_baseline$results$med$death_untreated_ventilator,
+      baseline_cum_mortality_med = simul_baseline$results$med$cum_mortality,
+      
+      baseline_predicted_reported_max = simul_baseline$results$max$daily_incidence,
+      baseline_predicted_reported_and_unreported_max = simul_baseline$results$max$daily_total_cases,
+      baseline_normal_bed_occupancy_max = simul_baseline$results$max$hospital_surge_beds,
+      baseline_icu_bed_occupancy_max = simul_baseline$results$max$icu_beds,
+      baseline_icu_ventilator_occupancy_max = simul_baseline$results$max$ventilators,
+      baseline_normal_bed_requirement_max = simul_baseline$results$max$normal_bed_requirement,
+      baseline_icu_bed_requirement_max = simul_baseline$results$max$icu_bed_requirement,
+      baseline_icu_ventilator_requirement_max = simul_baseline$results$max$icu_ventilator_requirement,
+      baseline_death_natural_non_exposed_max = simul_baseline$results$max$death_natural_non_exposed,
+      baseline_death_natural_exposed_max = simul_baseline$results$max$death_natural_exposed,
+      baseline_death_treated_hospital_max = simul_baseline$results$max$death_treated_hospital,
+      baseline_death_treated_icu_max = simul_baseline$results$max$death_treated_icu,
+      baseline_death_treated_ventilator_max = simul_baseline$results$max$death_treated_ventilator,
+      baseline_death_untreated_hospital_max = simul_baseline$results$max$death_untreated_hospital,
+      baseline_death_untreated_icu_max = simul_baseline$results$max$death_untreated_icu,
+      baseline_death_untreated_ventilator_max = simul_baseline$results$max$death_untreated_ventilator,
+      baseline_cum_mortality_max = simul_baseline$results$max$cum_mortality,
+      
+      
+      # Hypothetical scenario
+      hypothetical_predicted_reported_min = simul_interventions$results$min$daily_incidence,
+      hypothetical_predicted_reported_and_unreported_min = simul_interventions$results$min$daily_total_cases,
+      hypothetical_normal_bed_occupancy_min = simul_interventions$results$min$hospital_surge_beds,
+      hypothetical_icu_bed_occupancy_min = simul_interventions$results$min$icu_beds,
+      hypothetical_icu_ventilator_occupancy_min = simul_interventions$results$min$ventilators,
+      hypothetical_normal_bed_requirement_min = simul_interventions$results$min$normal_bed_requirement,
+      hypothetical_icu_bed_requirement_min = simul_interventions$results$min$icu_bed_requirement,
+      hypothetical_icu_ventilator_requirement_min = simul_interventions$results$min$icu_ventilator_requirement,
+      hypothetical_death_natural_non_exposed_min = simul_interventions$results$min$death_natural_non_exposed,
+      hypothetical_death_natural_exposed_min = simul_interventions$results$min$death_natural_exposed,
+      hypothetical_death_treated_hospital_min = simul_interventions$results$min$death_treated_hospital,
+      hypothetical_death_treated_icu_min = simul_interventions$results$min$death_treated_icu,
+      hypothetical_death_treated_ventilator_min = simul_interventions$results$min$death_treated_ventilator,
+      hypothetical_death_untreated_hospital_min = simul_interventions$results$min$death_untreated_hospital,
+      hypothetical_death_untreated_icu_min = simul_interventions$results$min$death_untreated_icu,
+      hypothetical_death_untreated_ventilator_min = simul_interventions$results$min$death_untreated_ventilator,
+      hypothetical_cum_mortality_min = simul_interventions$results$min$cum_mortality,
+      
+      hypothetical_predicted_reported_med = simul_interventions$results$med$daily_incidence,
+      hypothetical_predicted_reported_and_unreported_med = simul_interventions$results$med$daily_total_cases,
+      hypothetical_normal_bed_occupancy_med = simul_interventions$results$med$hospital_surge_beds,
+      hypothetical_icu_bed_occupancy_med = simul_interventions$results$med$icu_beds,
+      hypothetical_icu_ventilator_occupancy_med = simul_interventions$results$med$ventilators,
+      hypothetical_normal_bed_requirement_med = simul_interventions$results$med$normal_bed_requirement,
+      hypothetical_icu_bed_requirement_med = simul_interventions$results$med$icu_bed_requirement,
+      hypothetical_icu_ventilator_requirement_med = simul_interventions$results$med$icu_ventilator_requirement,
+      hypothetical_death_natural_non_exposed_med = simul_interventions$results$med$death_natural_non_exposed,
+      hypothetical_death_natural_exposed_med = simul_interventions$results$med$death_natural_exposed,
+      hypothetical_death_treated_hospital_med = simul_interventions$results$med$death_treated_hospital,
+      hypothetical_death_treated_icu_med = simul_interventions$results$med$death_treated_icu,
+      hypothetical_death_treated_ventilator_med = simul_interventions$results$med$death_treated_ventilator,
+      hypothetical_death_untreated_hospital_med = simul_interventions$results$med$death_untreated_hospital,
+      hypothetical_death_untreated_icu_med = simul_interventions$results$med$death_untreated_icu,
+      hypothetical_death_untreated_ventilator_med = simul_interventions$results$med$death_untreated_ventilator,
+      hypothetical_cum_mortality_med = simul_interventions$results$med$cum_mortality,
+      
+      hypothetical_predicted_reported_max = simul_interventions$results$max$daily_incidence,
+      hypothetical_predicted_reported_and_unreported_max = simul_interventions$results$max$daily_total_cases,
+      hypothetical_normal_bed_occupancy_max = simul_interventions$results$max$hospital_surge_beds,
+      hypothetical_icu_bed_occupancy_max = simul_interventions$results$max$icu_beds,
+      hypothetical_icu_ventilator_occupancy_max = simul_interventions$results$max$ventilators,
+      hypothetical_normal_bed_requirement_max = simul_interventions$results$max$normal_bed_requirement,
+      hypothetical_icu_bed_requirement_max = simul_interventions$results$max$icu_bed_requirement,
+      hypothetical_icu_ventilator_requirement_max = simul_interventions$results$max$icu_ventilator_requirement,
+      hypothetical_death_natural_non_exposed_max = simul_interventions$results$max$death_natural_non_exposed,
+      hypothetical_death_natural_exposed_max = simul_interventions$results$max$death_natural_exposed,
+      hypothetical_death_treated_hospital_max = simul_interventions$results$max$death_treated_hospital,
+      hypothetical_death_treated_icu_max = simul_interventions$results$max$death_treated_icu,
+      hypothetical_death_treated_ventilator_max = simul_interventions$results$max$death_treated_ventilator,
+      hypothetical_death_untreated_hospital_max = simul_interventions$results$max$death_untreated_hospital,
+      hypothetical_death_untreated_icu_max = simul_interventions$results$max$death_untreated_icu,
+      hypothetical_death_untreated_ventilator_max = simul_interventions$results$max$death_untreated_ventilator,
+      hypothetical_cum_mortality_max = simul_interventions$results$max$cum_mortality,
+    )
     
+    # add cases data ----
+    dta <- left_join(
+      dta, 
+      cases_rv$data %>% rename(input_cases = cases, input_deaths = deaths, input_cumulative_death = cumulative_death), 
+      by = "date")
     
-    dta_interventions <- tibble(
-      date = simul_interventions$results$time,
-      hypothetical_predicted_reported = simul_interventions$results$daily_incidence,
-      hypothetical_predicted_reported_and_unreported = simul_interventions$results$daily_total_cases,
-      hypothetical_normal_bed_occupancy = simul_interventions$results$required_beds,
-      hypothetical_icu_bed_occupancy = simul_interventions$results$icu_beds,
-      hypothetical_icu_ventilator_occupancy = simul_interventions$results$ventilators,
-      hypothetical_normal_bed_requirement = simul_interventions$results$normal_bed_requirement,
-      hypothetical_icu_bed_requirement = simul_interventions$results$icu_bed_requirement,
-      hypothetical_icu_ventilator_requirement = simul_interventions$results$icu_ventilator_requirement,
-      hypothetical_death_natural_non_exposed = simul_interventions$results$death_natural_non_exposed,
-      hypothetical_death_natural_exposed = simul_interventions$results$death_natural_exposed,
-      hypothetical_death_treated_hospital = simul_interventions$results$death_treated_hospital,
-      hypothetical_death_treated_icu = simul_interventions$results$death_treated_icu,
-      hypothetical_death_treated_ventilator = simul_interventions$results$death_treated_ventilator,
-      hypothetical_death_untreated_hospital = simul_interventions$results$death_untreated_hospital,
-      hypothetical_death_untreated_icu = simul_interventions$results$death_untreated_icu,
-      hypothetical_death_untreated_ventilator = simul_interventions$results$death_untreated_ventilator,
-      hypothetical_cum_mortality = simul_interventions$results$cum_mortality)
+    # add interventions vectors ----
+    startdate <- input$date_range[1]
+    stopdate <- input$date_range[2]
+    times <- seq(0, as.numeric(stopdate - startdate))
+    inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (Calibration)"),
+                     interventions$future_mat %>% mutate(`Apply to` = "Hypothetical Scenario")) %>%
+      rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
     
-    dta <- left_join(dta, dta_interventions, by = "date")
-    
+    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     vectors0_cbind <- do.call(cbind, vectors0)
     vectors0_reduced <- vectors0_cbind[seq(from=0,to=nrow(vectors0_cbind),by=20),]
     vectors0_reduced <- as.data.frame(rbind(rep(0,ncol(vectors0_reduced)),vectors0_reduced))
     vectors0_reduced <- vectors0_reduced[,1:10] #subsetting only the coverages
-    names(vectors0_reduced) <- paste0("baseline_",names(vectors0_reduced))
+    names(vectors0_reduced) <- paste0("interventions_baseline_",names(vectors0_reduced))
     
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
     vectors_cbind <- do.call(cbind, vectors)
     vectors_reduced <- vectors_cbind[seq(from=0,to=nrow(vectors_cbind),by=20),]
     vectors_reduced <- as.data.frame(rbind(rep(0,ncol(vectors_reduced)),vectors_reduced))
     vectors_reduced <- vectors_reduced[,1:10] #subsetting only the coverages
-    names(vectors_reduced) <- paste0("hypothetical_",names(vectors_reduced))
+    names(vectors_reduced) <- paste0("interventions_hypothetical_",names(vectors_reduced))
     
     intv_vectors <- as_tibble(cbind(date=simul_baseline$results$time, vectors0_reduced, vectors_reduced))
     intv_vectors$date <- as.Date(intv_vectors$date)
@@ -753,7 +886,6 @@ server <- function(input, output, session) {
       write.csv(results_aggregated(), file, row.names = FALSE)
     }
   )
-  
 }
 
 # Run the App ----

@@ -1,10 +1,4 @@
 output$timevis_baseline <- renderPlot(execOnResize = TRUE, {
-  # DEVEL
-  # shiny_interventions_baseline <<- interventions$baseline_mat
-  # interventions <- list()
-  # interventions$baseline_mat <- shiny_interventions_baseline
-  # input <- list(date_range = c(as.Date("2020-01-01"), as.Date("2021-01-01")))
-  
   dta <- interventions$baseline_mat %>%
     mutate(date_end = date_end + 1,
            label = paste0(value, unit, " ", difftime(date_end, date_start, units = "days") - 1, "d."))
@@ -13,22 +7,12 @@ output$timevis_baseline <- renderPlot(execOnResize = TRUE, {
   dta <- bind_rows(dta, tibble(intervention = setdiff(all_interventions[-1], dta$intervention)))
   
   if(interventions$baseline_mat %>% nrow() == 0) return({
-    ggplot(dta) + 
-      labs(x = NULL, y = NULL) +
-      guides(fill = guide_legend(title = NULL), colour = guide_legend(title = NULL)) +
-      scale_x_date(labels = date_format("%b' %y")) +
-      scale_y_continuous(limits = c(0, 100)) + 
-      theme_bw(base_size = 19) +
-      theme(legend.position = "bottom", legend.title = element_text(), legend.text = element_text(size = 13),
-            panel.border = element_blank(),
-            panel.grid.major.y = element_blank(),  panel.grid.minor = element_blank(),
-            panel.grid.major.x = element_line(size = 0.5, colour= "grey80"),
-            axis.line = element_blank(), axis.ticks = element_blank(),
-            axis.text = element_text(color = "grey20", size = 12)) +
-      facet_wrap(~ intervention, ncol = 2, strip.position = "top", scales = "fixed")
+    plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
+    text(x = 0.5, y = 0.8, paste("No Interventions has been selected"), 
+         cex = 1.5, col = "black")
   })
   
-  
+  if(interventions$baseline_mat %>% nrow() > 0) return({
   ggplot(dta) + 
     geom_rect(aes(xmin = date_start , xmax = date_end, ymin = 0, ymax = value), fill = "#e74c3c", alpha = 0.2) +
     geom_point(aes(x = date_start, y = value)) +
@@ -53,4 +37,5 @@ output$timevis_baseline <- renderPlot(execOnResize = TRUE, {
           axis.line = element_blank(), axis.ticks = element_blank(),
           axis.text = element_text(color = "grey20", size = 12)) +
     facet_wrap(~ intervention, ncol = 2, strip.position = "top", scales = "fixed")
+  })
 })
