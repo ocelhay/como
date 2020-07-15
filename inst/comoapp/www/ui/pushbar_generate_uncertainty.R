@@ -4,7 +4,7 @@ list(
           fluidRow(
             column(
               width = 12,
-              sliderInput("iterations", "Number of model runs:", value = 1, min = 1, max = 100, post = " runs", ticks = FALSE)
+              sliderInput("iterations", "Number of model runs:", value = 10, min = 1, max = 100, post = " runs", ticks = FALSE)
             )
           ),
           conditionalPanel(
@@ -16,7 +16,7 @@ list(
               ),
               column(
                 width = 6,
-                sliderInput("confidence", "Confidence:", value = 1, min = 5, max = 25, post = "%", ticks = FALSE)
+                sliderInput("confidence", "Confidence:", value = 5, min = 5, max = 25, post = "%", ticks = FALSE)
               )
             ),
             actionButton("run_baseline_multi", "Run Baseline w/ Generated Uncertainty", class = "btn btn-success"),
