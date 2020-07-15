@@ -2,8 +2,30 @@
 version_app <- "v14.14.1"
 code_for_development <- TRUE
 
+
+library(bsplus)
+library(comoOdeCpp)
+library(deSolve)
+library(DT)
+library(gridExtra)
+library(highcharter)
+library(knitr)
+library(lubridate)
+library(pushbar)
+library(readxl)
+library(reshape2)
+library(scales)
+library(shiny)
+library(shinyBS)
+library(shinycssloaders)
+library(shinyhelper)
+library(shinyjs)
+library(shinythemes)
+library(shinyWidgets)
+library(tidyverse)
+
 # Load packages and data
-source("./www/source_on_inception.R")
+source("./www/model/model_once.R")
 
 # Define UI ----
 ui <- function(request) {
@@ -648,7 +670,7 @@ server <- function(input, output, session) {
     simul_interventions$results <- NULL
     
     # Create/filter objects for model that are dependent on user inputs
-    source("./www/model.R", local = TRUE)
+    source("./www/model/model_repeat.R", local = TRUE)
     
     vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
@@ -667,7 +689,7 @@ server <- function(input, output, session) {
     pushbar_close()
     
     # Create/filter objects for model that are dependent on user inputs
-    source("./www/model.R", local = TRUE)
+    source("./www/model/model_repeat.R", local = TRUE)
     
     vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
@@ -690,7 +712,7 @@ server <- function(input, output, session) {
   # Process on "run_interventions" ----
   observeEvent(input$run_interventions, {
     # Create/filter objects for model that are dependent on user inputs
-    source("./www/model.R", local = TRUE)
+    source("./www/model/model_repeat.R", local = TRUE)
     
     vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
