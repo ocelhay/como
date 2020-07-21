@@ -73,23 +73,28 @@ times <- seq(0, as.numeric(stopdate - startdate))
 
 
 # Define parameters vector ----
-parameters <- reactiveValuesToList(input)[c("p", "rho", "omega", "gamma", "nui", "report", "reportc", "reporth", 
-                                              "beds_available", "icu_beds_available", "ventilators_available", 
-                                              "pdeath_h", "pdeath_hc", "pdeath_icu", "pdeath_icuc", 
-                                              "pdeath_vent", "pdeath_ventc", "ihr_scaling", "nus", 
-                                              "nu_icu", "nu_vent", "rhos", "amp", 
-                                              "pclin", "prob_icu", "prob_vent", "selfis_eff", "dist_eff", "hand_eff", 
-                                              "work_eff", "w2h", "school_eff", "s2h", "cocoon_eff", "age_cocoon", 
-                                              "vaccine_eff", "vac_campaign", "mean_imports", "screen_test_sens", 
-                                              "screen_overdispersion", "quarantine_days", "quarantine_effort", 
-                                              "quarantine_eff_home", "quarantine_eff_other", "household_size", 
-                                              "noise", "iterations", "confidence")] %>% unlist()
+parameters <- reactiveValuesToList(input)[
+  c("p", "rho", "omega", "gamma", "nui", "report", "reportc", "reporth", 
+    "beds_available", "icu_beds_available", "ventilators_available", 
+    "pdeath_h", "pdeath_hc", "pdeath_icu", "pdeath_icuc", 
+    "pdeath_vent", "pdeath_ventc", "ihr_scaling", "nus", 
+    "nu_icu", "nu_vent", "rhos", "amp", 
+    "pclin", "prob_icu", "prob_vent", "selfis_eff", "dist_eff", "hand_eff", 
+    "work_eff", "w2h", "school_eff", "s2h", "cocoon_eff", "age_cocoon", 
+    "vaccine_eff", "vac_campaign", "mean_imports", "screen_test_sens", 
+    "screen_overdispersion", "quarantine_days", "quarantine_effort", 
+    "quarantine_eff_home", "quarantine_eff_other", "household_size", 
+    "noise", "iterations", "confidence", 
+    # below are additions in v14.14
+    "age_vaccine_min", "mass_test_sens", "isolation_days", "age_testing_min", "age_testing_max")] %>% 
+  unlist()
 
-parameters <- c(parameters, give = 95, nusc = input$nus, nu_icuc = input$nu_icu, nu_ventc = input$nu_vent,
-                phi = which(month.name == input$phi))
+parameters <- c(
+  parameters, 
+  give = 95, nusc = input$nus, nu_icuc = input$nu_icu, nu_ventc = input$nu_vent, phi = which(month.name == input$phi))
 
 
-# Transform parameters ----
+# Transform/scale parameters ----
 parameters["rho"] <- parameters["rho"] / 100
 parameters["omega"] <- (1 / (parameters["omega"] * 365))
 parameters["gamma"] <- 1 / parameters["gamma"]
@@ -131,6 +136,7 @@ parameters["pclin"] <- parameters["pclin"] / 100
 parameters["prob_icu"] <- parameters["prob_icu"] / 100
 parameters["prob_vent"] <- parameters["prob_vent"] / 100
 parameters["confidence"] <- parameters["confidence"] / 100
+parameters["mass_test_sens"] <- parameters["mass_test_sens"] / 100
 
 # TODO: move this line to a better location
 ihr[,2] <- parameters["ihr_scaling"]*ihr[,2]
@@ -143,9 +149,9 @@ inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (C
 
 
 # initial conditions for the main solution vector ----
-initS <- popstruc[, 2] - initE - initI - initR - initX - initV - initH - initHC -
+initS <- popstruc[, 2] - initE - initI - initR - initX - initZ - initV - initH - initHC -
   initQS - initQE - initQI - initQR - initCL - initQC - initICU - initICUC -
   initICUCV - initVent - initVentC  # Susceptible (non-immune)
 
 Y <- c(initS, initE, initI, initR, initX, initH, initHC, initC, initCM, initV, initQS, initQE, initQI, 
-     initQR, initCL, initQC, initICU, initICUC, initICUCV, initVent, initVentC, initCMC)
+       initQR, initCL, initQC, initICU, initICUC, initICUCV, initVent, initVentC, initCMC, initZ)

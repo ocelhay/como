@@ -1,9 +1,32 @@
 # CoMo COVID-19 App
-version_app <- "v14.14.1"
+version_app <- "v15.1.1"
 code_for_development <- TRUE
 
+
+library(bsplus)
+# install_github("ocelhay/comoOdeCpp", subdir = "comoOdeCpp")
+library(comoOdeCpp)
+library(deSolve)
+library(DT)
+library(gridExtra)
+library(highcharter)
+library(knitr)
+library(lubridate)
+library(pushbar)
+library(readxl)
+library(reshape2)
+library(scales)
+library(shiny)
+library(shinyBS)
+library(shinycssloaders)
+library(shinyhelper)
+library(shinyjs)
+library(shinythemes)
+library(shinyWidgets)
+library(tidyverse)
+
 # Load packages and data
-source("./www/source_on_inception.R")
+source("./www/model/model_once.R")
 
 # Define UI ----
 ui <- function(request) {
@@ -119,8 +142,10 @@ ui <- function(request) {
             ),
             plotOutput("plot_cases_baseline", height = "350px") %>% withSpinner(), 
             plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner(),
-            plotOutput("plot_Rt_baseline", height = "200px") %>% withSpinner(),
-            
+            fluidRow(
+              column(6, plotOutput("plot_total_deaths_age", height = "400px") %>% withSpinner()),
+              column(6, plotOutput("plot_Rt_baseline", height = "400px") %>% withSpinner())
+            )
           )
         )
       ),
@@ -359,7 +384,9 @@ server <- function(input, output, session) {
                 input$baseline_coverage_25, input$baseline_coverage_26,
                 input$baseline_coverage_27, input$baseline_coverage_28,
                 input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
-      mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ "contacts", TRUE ~ "%")) %>%
+      mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ " contacts",
+                              intervention == "Mass Testing" ~ " tests", 
+                              TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_baseline, intervention != "_")
     
     interventions$future_mat <- tibble(
@@ -435,7 +462,9 @@ server <- function(input, output, session) {
                 input$future_coverage_25, input$future_coverage_26,
                 input$future_coverage_27, input$future_coverage_28,
                 input$future_coverage_29, input$future_coverage_30)) %>% 
-      mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ "contacts", TRUE ~ "%")) %>%
+      mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ " contacts",
+                              intervention == "Mass Testing" ~ " tests", 
+                              TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_future, intervention != "_")
     
     # Validation of interventions, Baseline (Calibration)
@@ -648,9 +677,10 @@ server <- function(input, output, session) {
     simul_interventions$results <- NULL
     
     # Create/filter objects for model that are dependent on user inputs
-    source("./www/model.R", local = TRUE)
+    source("./www/model/model_repeat.R", local = TRUE)
+    parameters["iterations"] <- 1
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
@@ -667,9 +697,9 @@ server <- function(input, output, session) {
     pushbar_close()
     
     # Create/filter objects for model that are dependent on user inputs
-    source("./www/model.R", local = TRUE)
+    source("./www/model/model_repeat.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
@@ -690,9 +720,9 @@ server <- function(input, output, session) {
   # Process on "run_interventions" ----
   observeEvent(input$run_interventions, {
     # Create/filter objects for model that are dependent on user inputs
-    source("./www/model.R", local = TRUE)
+    source("./www/model/model_repeat.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
@@ -859,14 +889,14 @@ server <- function(input, output, session) {
                      interventions$future_mat %>% mutate(`Apply to` = "Hypothetical Scenario")) %>%
       rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
     
-    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
+    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
     vectors0_cbind <- do.call(cbind, vectors0)
     vectors0_reduced <- vectors0_cbind[seq(from=0,to=nrow(vectors0_cbind),by=20),]
     vectors0_reduced <- as.data.frame(rbind(rep(0,ncol(vectors0_reduced)),vectors0_reduced))
     vectors0_reduced <- vectors0_reduced[,1:10] #subsetting only the coverages
     names(vectors0_reduced) <- paste0("interventions_baseline_",names(vectors0_reduced))
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
     vectors_cbind <- do.call(cbind, vectors)
     vectors_reduced <- vectors_cbind[seq(from=0,to=nrow(vectors_cbind),by=20),]
     vectors_reduced <- as.data.frame(rbind(rep(0,ncol(vectors_reduced)),vectors_reduced))

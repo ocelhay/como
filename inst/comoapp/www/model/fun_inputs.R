@@ -1,19 +1,27 @@
-inputs <- function(inp, run, times, startdate, stopdate){
+inputs <- function(inp, run, times, startdate, stopdate, age_testing_min, age_testing_max, age_vaccine_min){
   # cap intervention end dates with simulation end date
   inp$`Date End` = pmin(stopdate, inp$`Date End`)
   
-  tab<-which(inp$`Apply to`==run)
+  # cap intervention end dates with simulation end date
+  inp$`Date End` = pmin(stopdate, inp$`Date End`)
   
-  si<-intersect(which(inp$Intervention=="Self-isolation if Symptomatic"),tab)
-  scr<-intersect(which(inp$Intervention=="Screening (when S.I.)"),tab)
-  sd<-intersect(which(inp$Intervention=="Social Distancing"),tab)
-  hw<-intersect(which(inp$Intervention=="Handwashing"),tab)
-  wah<-intersect(which(inp$Intervention=="Working at Home"),tab)
-  sc<-intersect(which(inp$Intervention=="School Closures"),tab)
-  cte<-intersect(which(inp$Intervention=="Shielding the Elderly"),tab)
-  q<-intersect(which(inp$Intervention=="Household Isolation (when S.I.)"),tab)
-  tb<-intersect(which(inp$Intervention=="International Travel Ban"),tab)
-  vc<-intersect(which(inp$Intervention=="Vaccination"),tab)
+  tv<-which(inp$`Apply to`==run)
+  
+  si<-intersect(which(inp$Intervention=="Self-isolation if Symptomatic"),tv)
+  scr<-intersect(which(inp$Intervention=="Screening (when S.I.)"),tv)
+  sd<-intersect(which(inp$Intervention=="Social Distancing"),tv)
+  hw<-intersect(which(inp$Intervention=="Handwashing"),tv)
+  wah<-intersect(which(inp$Intervention=="Working at Home"),tv)
+  sc<-intersect(which(inp$Intervention=="School Closures"),tv)
+  cte<-intersect(which(inp$Intervention=="Shielding the Elderly"),tv)
+  q<-intersect(which(inp$Intervention=="Household Isolation (when S.I.)"),tv)
+  tb<-intersect(which(inp$Intervention=="International Travel Ban"),tv)
+  vc<-intersect(which(inp$Intervention=="Vaccination"),tv)
+  mt<-intersect(which(inp$Intervention=="Mass Testing"),tv)
+  minas<-intersect(which(inp$Intervention=="Age Testing Minimum"),tv)
+  maxas<-intersect(which(inp$Intervention=="Age Testing Maximum"),tv)
+  vc<-intersect(which(inp$Intervention=="Vaccination"),tv)
+  minav<-intersect(which(inp$Intervention=="Age Vaccine Minimum"),tv)
   
   v<-(format(as.POSIXct(inp$`Date Start`,format='%Y/%m/%d %H:%M:%S'),format="%d/%m/%y"))
   v2<-as.Date(v,format="%d/%m/%y")
@@ -328,6 +336,90 @@ inputs <- function(inp, run, times, startdate, stopdate){
     tb_vector<-rep(0,tail(times,1)*20)
     travelban<-rep(0,tail(times,1)*20)
   }
+  ## mass testing
+  f<-c()
+  mt_vector<-c()
+  masstesting<-c()
+  if (length(mt)>=1){
+    for (i in 1:length(mt)){
+      
+      f<-c(f,as.numeric(inp$`Date Start`[mt[i]]-startdate),as.numeric(inp$`Date End`[mt[i]]-startdate))
+      
+      if(i==1){
+        if (inp$`Date Start`[mt[i]]>startdate){
+          mt_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[mt[i]],(f[i+1]-f[i])*20))
+          masstesting<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          mt_vector<-c(rep(inp$`Value`[mt[i]],(f[i+1])*20))
+          masstesting<-c(rep(1,(f[i+1])*20))
+        }
+      }
+      else{
+        mt_vector<-c(mt_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        mt_vector<-c(mt_vector,rep(inp$`Value`[mt[i]],(f[i*2]-f[i*2-1])*20))
+        masstesting<-c(masstesting,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        masstesting<-c(masstesting,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(mt)&& f[i*2]<tail(times,1)){
+        mt_vector<-c(mt_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        masstesting<-c(masstesting,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    mt_vector<-rep(0,tail(times,1)*20)
+    masstesting<-rep(0,tail(times,1)*20)
+  }
+  ## min age testing
+  f<-c()
+  minas_vector<-c()
+  if (length(minas)>=1){
+    for (i in 1:length(minas)){
+      f<-c(f,as.numeric(inp$`Date Start`[minas[i]]-startdate),as.numeric(inp$`Date End`[minas[i]]-startdate))
+      if(i==1){
+        if (inp$`Date Start`[minas[i]]>startdate){
+          minas_vector<-c(rep(age_testing_min,f[i]*20),rep(inp$`Value`[minas[i]],(f[i+1]-f[i])*20))
+        }
+        else{
+          minas_vector<-c(rep(inp$`Value`[minas[i]],(f[i+1])*20))
+        }
+      }
+      else{
+        minas_vector<-c(minas_vector,rep(age_testing_min,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        minas_vector<-c(minas_vector,rep(inp$`Value`[minas[i]],(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(minas)&& f[i*2]<tail(times,1)){
+        minas_vector<-c(minas_vector,rep(age_testing_min,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    minas_vector<-rep(age_testing_min,tail(times,1)*20)
+  }
+  ## max age testing
+  f<-c()
+  maxas_vector<-c()
+  if (length(maxas)>=1){
+    for (i in 1:length(maxas)){
+      f<-c(f,as.numeric(inp$`Date Start`[maxas[i]]-startdate),as.numeric(inp$`Date End`[maxas[i]]-startdate))
+      if(i==1){
+        if (inp$`Date Start`[maxas[i]]>startdate){
+          maxas_vector<-c(rep(age_testing_max,f[i]*20),rep(inp$`Value`[maxas[i]],(f[i+1]-f[i])*20))
+        }
+        else{
+          maxas_vector<-c(rep(inp$`Value`[maxas[i]],(f[i+1])*20))
+        }
+      }
+      else{
+        maxas_vector<-c(maxas_vector,rep(age_testing_max,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        maxas_vector<-c(maxas_vector,rep(inp$`Value`[maxas[i]],(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(maxas)&& f[i*2]<tail(times,1)){
+        maxas_vector<-c(maxas_vector,rep(age_testing_max,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    maxas_vector<-rep(age_testing_max,tail(times,1)*20)
+  }
   ## vaccine
   f<-c()
   vc_vector<-c()
@@ -362,9 +454,34 @@ inputs <- function(inp, run, times, startdate, stopdate){
     vc_vector<-rep(0,tail(times,1)*20)
     vaccine<-rep(0,tail(times,1)*20)
   }
-  
+  ## min age vaccine
+  f<-c()
+  minav_vector<-c()
+  if (length(minav)>=1){
+    for (i in 1:length(minav)){
+      f<-c(f,as.numeric(inp$`Date Start`[minav[i]]-startdate),as.numeric(inp$`Date End`[minav[i]]-startdate))
+      if(i==1){
+        if (inp$`Date Start`[minav[i]]>startdate){
+          minav_vector<-c(rep(age_vaccine_min,f[i]*20),rep(inp$`Value`[minav[i]],(f[i+1]-f[i])*20))
+        }
+        else{
+          minav_vector<-c(rep(inp$`Value`[minav[i]],(f[i+1])*20))
+        }
+      }
+      else{
+        minav_vector<-c(minav_vector,rep(age_vaccine_min,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        minav_vector<-c(minav_vector,rep(inp$`Value`[minav[i]],(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(minav)&& f[i*2]<tail(times,1)){
+        minav_vector<-c(minav_vector,rep(age_vaccine_min,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    minav_vector<-rep(age_vaccine_min,tail(times,1)*20)
+  }
   return(list(si_vector=si_vector,sd_vector=sd_vector,scr_vector=scr_vector,hw_vector=hw_vector,wah_vector=wah_vector,
-              sc_vector=sc_vector,tb_vector=tb_vector,cte_vector=cte_vector,q_vector=q_vector,vc_vector=vc_vector,isolation=isolation,
+              sc_vector=sc_vector,tb_vector=tb_vector,mt_vector=mt_vector,cte_vector=cte_vector,q_vector=q_vector,vc_vector=vc_vector,isolation=isolation,
               screen=screen,cocoon=cocoon,schoolclose=schoolclose,workhome=workhome,handwash=handwash,
-              quarantine=quarantine,vaccine=vaccine,travelban=travelban,distancing=distancing))
+              quarantine=quarantine,vaccine=vaccine,travelban=travelban,distancing=distancing,masstesting=masstesting,
+              maxas_vector=maxas_vector,minas_vector=minas_vector,minav_vector=minav_vector))
 }

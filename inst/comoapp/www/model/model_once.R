@@ -1,24 +1,3 @@
-library(bsplus)
-library(comoOdeCpp)
-library(deSolve)
-library(DT)
-library(gridExtra)
-library(highcharter)
-library(knitr)
-library(lubridate)
-library(pushbar)
-library(readxl)
-library(reshape2)
-library(scales)
-library(shiny)
-library(shinyBS)
-library(shinycssloaders)
-library(shinyhelper)
-library(shinyjs)
-library(shinythemes)
-library(shinyWidgets)
-library(tidyverse)
-
 # load data ----
 load(file = "./www/data/cases.Rda")
 load(file = "./www/data/contacts.Rda")
@@ -39,11 +18,12 @@ all_interventions <- c("_",
                        "School Closures",
                        "Shielding the Elderly",
                        "International Travel Ban",
-                       "Vaccination")
+                       "Vaccination",
+                       "Mass Testing")
 
 # Default values for interventions
 nb_interventions_max <- 30
-new_intervention_value <- all_interventions[1]
+new_intervention_value <- "_"
 new_daterange_value <- c(as.Date("2020-01-01"), as.Date("2020-12-31"))
 new_coverage_value <- 0
 
@@ -78,6 +58,7 @@ ICUCVindex <- (18 * A + 1):(19 * A)
 Ventindex <- (19 * A + 1):(20 * A)
 VentCindex <- (20 * A + 1):(21 * A)
 CMCindex <- (21 * A + 1):(22 * A)
+Zindex <- (22 * A + 1):(23 * A)
 
 # Define index case ----
 ageindcase <- 20
@@ -106,6 +87,7 @@ initICUCV <- rep(0, A)  # icu critical
 initVent <- rep(0, A)  # icu vent
 initVentC <- rep(0, A) # icu vent crit
 initCMC <- rep(0, A)   # Cumulative deaths (true)
+initZ <- rep(0, A)
 
 
 
@@ -119,9 +101,9 @@ parameters_noise <- c("p", "rho", "omega", "gamma", "nui", "ihr_scaling", "nus",
 ageing <- t(diff(diag(rep(1, A)), lag = 1) / (5 * 365.25))
 ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
 
-source("./www/fun_validation_interventions.R")
-source("./www/fun_inputs.R")
-source("./www/fun_multi_runs.R")
-source("./www/fun_process_ode_outcome.R")
-source("./www/fun_conf_interval.R")
+source("./www/model/fun_validation_interventions.R")
+source("./www/model/fun_inputs.R")
+source("./www/model/fun_multi_runs.R")
+source("./www/model/fun_process_ode_outcome.R")
+source("./www/model/fun_conf_interval.R")
 
