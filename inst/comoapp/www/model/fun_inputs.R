@@ -1,5 +1,4 @@
-inputs <- function(inp, run, times, startdate, stopdate){
-  browser()
+inputs <- function(inp, run, times, startdate, stopdate, age_testing_min, age_testing_max, age_vaccine_min){
   # cap intervention end dates with simulation end date
   inp$`Date End` = pmin(stopdate, inp$`Date End`)
   
@@ -456,7 +455,6 @@ inputs <- function(inp, run, times, startdate, stopdate){
     vaccine<-rep(0,tail(times,1)*20)
   }
   ## min age vaccine
-  age_vaccine_min <- 0
   f<-c()
   minav_vector<-c()
   if (length(minav)>=1){

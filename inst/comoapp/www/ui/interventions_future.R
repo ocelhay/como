@@ -4,7 +4,7 @@ div(
                    fluidRow(
                      column(4, h5("Interventions:")),
                      column(5, h5("Date range:")),
-                     column(3, h5("Value:"))
+                     column(3, h5("Value:") %>% helper(type = "markdown", content = "help_value_unit_interventions", colour = "red"))
                    )
   ),
   conditionalPanel("input.nb_interventions_future >= 1", fluidRow(

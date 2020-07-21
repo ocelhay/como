@@ -4,7 +4,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   # Define objects to store results ----
   results <- list()
   nb_times <- length(times)
-  nb_col <- 22 * A + 1
+  nb_col <- 23 * A + 1
   aux <- array(0, dim = c(nb_times, nb_col, parameters["iterations"]))
   
   empty_mat <- matrix(0, nrow = nb_times, ncol = parameters["iterations"])

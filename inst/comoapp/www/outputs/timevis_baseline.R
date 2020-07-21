@@ -8,7 +8,7 @@ output$timevis_baseline <- renderPlot(execOnResize = TRUE, {
   
   if(interventions$baseline_mat %>% nrow() == 0) return({
     plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
-    text(x = 0.5, y = 0.8, paste("No Interventions has been selected"), 
+    text(x = 0.5, y = 0.8, paste("No Intervention has been selected"), 
          cex = 1.5, col = "black")
   })
   
@@ -23,7 +23,7 @@ output$timevis_baseline <- renderPlot(execOnResize = TRUE, {
     geom_segment(data = dta %>% filter(!is.na(index)), aes(colour = "Simulation Range", x = input$date_range[2], xend = input$date_range[2], y = 0, yend = 100), lty = 2, alpha = 1, lwd = 1.3) +
     scale_colour_manual(name="Line Color", values = c(`Today` = "#c0392b", `Simulation Range` = "#2980b9")) +
     geom_label(aes(x = date_start, y = value, label = label), 
-               hjust = -0.1, vjust = 1.2, inherit.aes = FALSE, fill = "grey80", alpha = 1, size = 4) + 
+               hjust = -0.1, vjust = 0.6, inherit.aes = FALSE, fill = "grey80", alpha = 1, size = 4) + 
     
     labs(x = NULL, y = NULL) +
     guides(fill = guide_legend(title = NULL), colour = guide_legend(title = NULL)) +
