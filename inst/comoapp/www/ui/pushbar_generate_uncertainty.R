@@ -4,7 +4,7 @@ list(
           fluidRow(
             column(
               width = 12,
-              sliderInput("iterations", "Number of model runs:", value = 10, min = 1, max = 100, post = " runs", ticks = FALSE)
+              sliderInput("iterations", "Number of model runs:", value = 1, min = 1, max = 100, post = " runs", ticks = FALSE)
             )
           ),
           conditionalPanel(

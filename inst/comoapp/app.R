@@ -142,8 +142,10 @@ ui <- function(request) {
             ),
             plotOutput("plot_cases_baseline", height = "350px") %>% withSpinner(), 
             plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner(),
-            plotOutput("plot_Rt_baseline", height = "200px") %>% withSpinner(),
-            
+            fluidRow(
+              column(6, plotOutput("plot_total_deaths_age", height = "400px") %>% withSpinner()),
+              column(6, plotOutput("plot_Rt_baseline", height = "400px") %>% withSpinner())
+            )
           )
         )
       ),
