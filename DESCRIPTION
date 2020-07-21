@@ -14,5 +14,5 @@ Depends:
     bsplus, comoOdeCpp, deSolve, DT, gridExtra, highcharter, knitr, lubridate, pushbar, RColorBrewer, readxl, 
     reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinyjs,
     shinythemes, shinyWidgets, tidyverse
-Remotes: url::https://github.com/ocelhay/comoOdeCpp/releases/download/v13.13.4/comoOdeCpp_13.13.4.tar.gz
-RoxygenNote: 7.1.0
+Remotes: url::https://github.com/ocelhay/comoOdeCpp/releases/download/v14.4.2/comoOdeCpp_14.4.2.tar.gz
+RoxygenNote: 7.1.1
