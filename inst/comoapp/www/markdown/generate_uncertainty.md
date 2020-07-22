@@ -1,14 +1,11 @@
-If you decide to perform several model runs, **we recommend to go for a minimum of 10 runs.**
+
+**Choosing a "Number of model runs" greater than 1 will generate uncertainty as described below. If you decide to do so, we recommend to go for a minimum of 10 runs. Simulation running time can amount to 1 second per run and 30 seconds to aggregate results (irrespective of the number of runs).**
 
 
-### Running time
+Users of the CoMo Collaborative COVID-19 model need to comprehend and effectively communicate the multiple uncertainties involved in making quantitative projections about evolving outbreaks.  To assist in this "propagation of uncertainty", the model development team has created a way for users to specify a level of parametric (Gaussian) "white noise"" to **all of the model parameters listed below**.  If implemented by the user, this means that the chosen point value for each of these parameters will become the midpoint for a range defined by the standard deviation selected on the **Noise** slider bar.  With each modeling run, these parameters are then sampled from the resulting Gaussian distribution with mean given by the chosen parameter value.
 
-When performing several model runs, simulation time can amount to 1 second per run and half a minute to aggregate results.
+**Confidence** sets the degree of uncertainty the user would like to have reflected in the model prediction, expressed over all the model runs. Specifically, this defines the quantile of model predictions for each time point that comprise the chosen the credible intervals. Thus, if confidence is set at 5%, the upper limit for the model credible interval will be one that excludes the highest 5% values of the model predictions for each data point; since the same restriction applies to the lowest 5% of values, this choice corresponds to a 90% credible interval.  Similarly, if the user choses 25%, then only the middle 50% of values is shown in the model output.
 
-
-### Noise
-
-To provide a measure of model prediction uncertainty, we impose Gaussian white noise to the following model parameters:
 
 | Category                        	| Description                                                      	| Parameter             	|
 |---------------------------------	|------------------------------------------------------------------	|-----------------------	|
@@ -36,10 +33,4 @@ To provide a measure of model prediction uncertainty, we impose Gaussian white n
 | School Closures                 	| Home contacts inflation due to school closure:                   	| s2h                   	|
 | Shielding the Elderly           	| Efficacy:                                                        	| cocoon_eff            	|
 
-
 </br>
-For each model run we then have a set of these parameters each sampled from a Gaussian distribution with mean given by the parameter value set in the data template or app, and a standard deviation given by parameter noise. The remaining model parameters do not change across model runs
-
-### Confidence
-
-This sets the degree of uncertainty one wants to have reflected in the model prediction. Given all the model runs, this defined the quantile of model predictions for each time point that will define the credible intervals. Thus, if confidence is set at 95%, the upper limit for the model credible interval will be one that excludes the highest 5% values of the model predictions for each data point.
