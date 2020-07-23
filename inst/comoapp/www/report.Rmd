@@ -48,7 +48,7 @@ dta <- bind_rows(dta, tibble(intervention = setdiff(all_interventions[-1], dta$i
 
 if(interventions$baseline_mat %>% nrow() == 0) return({
   plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
-  text(x = 0.5, y = 0.8, paste("No Intervention have been selected"), 
+  text(x = 0.5, y = 0.8, paste("No Intervention has been selected"), 
        cex = 3, col = "black")
 })
 
@@ -176,7 +176,7 @@ dta <- bind_rows(dta, tibble(intervention = setdiff(all_interventions[-1], dta$i
 
 if(interventions$future_mat %>% nrow() == 0) return({
   plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
-  text(x = 0.5, y = 0.8, paste("No Intervention have been selected"), 
+  text(x = 0.5, y = 0.8, paste("No Intervention has been selected"), 
        cex = 3, col = "black")
 })
 
@@ -360,6 +360,41 @@ grid.arrange(plot1, plot2, ncol = 2, widths = c(1.5, 1))
 
 
 The above graphs show the cumulative mortality over time expected from the Baseline compared with the Hypothetical scenario. The expected mortality has been further stratified to reflect death from severe COVID-19 during hospital treatment or in severely ill patients who were not able to access these resources. The predicted COVID-19 attributable deaths may be compared with mortality from other causes where patients may or may not test positive for COVID-19 post-mortem depending on their infection status upon death. 
+
+## Deaths per Age Category
+
+```{r warning = FALSE, dpi = 200, fig.width = 14, fig.height = 8, eval = show}
+dta <- simul_baseline$results$med$tc %>%
+  group_by(age_cat) %>%
+  summarise(total_deaths = round(sum(value)), .groups = "drop") %>% 
+  mutate(freq = round(100 * total_deaths / sum(total_deaths), 2))
+
+plot1 <- ggplot(data = dta, aes(x = age_cat, y = total_deaths, fill = age_cat))+ 
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(total_deaths, "\n (", freq, "%)")), vjust = 0.3, size = 5) + 
+  scale_fill_brewer(palette = "BrBG") + 
+  ylab("Total Deaths") + xlab("") +
+  theme_minimal(base_size = 14) + 
+  theme(legend.title = element_blank(), legend.position = "bottom") + 
+  labs(title = "Total Covid-19 Deaths per Age Category", subtitle = "Baseline")
+
+dta <- simul_interventions$results$med$tc %>%
+  group_by(age_cat) %>%
+  summarise(total_deaths = round(sum(value)), .groups = "drop") %>% 
+  mutate(freq = round(100 * total_deaths / sum(total_deaths), 2))
+
+plot2 <- ggplot(data = dta, aes(x = age_cat, y = total_deaths, fill = age_cat))+ 
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(total_deaths, "\n (", freq, "%)")), vjust = 0.3, size = 5) + 
+  scale_fill_brewer(palette = "BrBG") + 
+  ylab("Total Deaths") + xlab("") +
+  theme_minimal(base_size = 14) + 
+  theme(legend.title = element_blank(), legend.position = "bottom") + 
+  labs(title = "Total Covid-19 Deaths per Age Category", subtitle = "Hypothetical Scenario")
+
+grid.arrange(plot1, plot2, ncol = 2)
+```
+
 
 ## Hospital occupancy 
 
