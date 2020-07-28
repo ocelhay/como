@@ -18,6 +18,8 @@ list(
                                 width = "50%")
             )
           ),
+          p("Demographic data for selected country (as per Population sheet in template):"),
+          tableOutput("table_demographic_data"),
           div(class = "closebutton", bsButton("close_country_param", "Close (Esc.)", icon("times"), style = "danger", size = "small"))
   )
 )

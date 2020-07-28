@@ -4,7 +4,7 @@ code_for_development <- TRUE
 
 
 library(bsplus)
-# install_github("ocelhay/comoOdeCpp", subdir = "comoOdeCpp")
+# remotes::install_github("ocelhay/comoOdeCpp", subdir = "comoOdeCpp")
 library(comoOdeCpp)
 library(deSolve)
 library(DT)
