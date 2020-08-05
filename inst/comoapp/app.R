@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v15.1.2"
+version_app <- "v15.1.3"
 code_for_development <- TRUE
 
 
