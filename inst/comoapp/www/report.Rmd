@@ -209,6 +209,11 @@ if(interventions$future_mat %>% nrow() > 0) return({
 ```
 
 
+For this “hypothetical scenario” between `r input$date_range[1]` and `r input$date_range[2]`:
+
+- `r simul_interventions$results$med$pct_total_pop_infected[which(simul_interventions$results$med$time == input$date_range[2])]`% of the population is predicted to have experienced the infection (including unreported, mildly symptomatic, and/or asymptomatic infections)
+- `r format(simul_interventions$results$med$attributable_deaths[which(simul_interventions$results$med$time == input$date_range[2])], big.mark = ",")` Covid-19 attributable deaths are expected during the range of simulation of which `r format(simul_interventions$results$med$cum_mortality[which(simul_interventions$results$med$time == input$date_range[2])], big.mark = ",")` would be reported. 
+
 ## `r input$focus_axis_dup` cases
 
 ```{r warning = FALSE, dpi = 200, fig.width = 12, fig.height = 8, eval = show}
