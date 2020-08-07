@@ -1,6 +1,6 @@
 inputs <- function(inp, run, times, startdate, stopdate, age_testing_min, age_testing_max, age_vaccine_min){
-  # cap intervention end dates with simulation end date
-  inp$`Date End` = pmin(stopdate, inp$`Date End`)
+  # cap intervention start dates with simulation end date
+  inp$`Date Start` = pmin(stopdate, inp$`Date Start`)
   
   # cap intervention end dates with simulation end date
   inp$`Date End` = pmin(stopdate, inp$`Date End`)
