@@ -7,8 +7,6 @@ editor_options:
 
 
 ```{r message = FALSE, echo = FALSE}
-library(knitr)
-library(gridExtra)
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
