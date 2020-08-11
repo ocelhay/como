@@ -84,7 +84,7 @@ ui <- function(request) {
                             value = 5, post = "%", ticks = FALSE, width = "75%"),
                 sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
                             value = 100, post = "%", ticks = FALSE, width = "75%"),
-                htmlOutput("text_feedback_interventions_baseline"),
+                
                 
                 uiOutput("conditional_run_baseline"), br(),
                 uiOutput("conditional_validate_baseline"),
@@ -124,6 +124,7 @@ ui <- function(request) {
               column(6,
                      div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
                      sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 30, value = 0, step = 1, ticks = FALSE),
+                     htmlOutput("text_feedback_interventions_baseline"),
                      source("./www/ui/interventions_baseline.R", local = TRUE)$value
               ),
               column(6,
@@ -155,12 +156,12 @@ ui <- function(request) {
         fluidRow(
           column(2, br(),
                  actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success"), br(), br(),
-                 htmlOutput("text_feedback_interventions_future"),
                  uiOutput("conditional_run_future")
           ),
           column(5,
                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
                  sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 30,  value = 0, step = 1, ticks = FALSE),
+                 htmlOutput("text_feedback_interventions_future"),
                  source("./www/ui/interventions_future.R", local = TRUE)$value
           ),
           column(5,
