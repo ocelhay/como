@@ -28,7 +28,9 @@ list(
                    sliderInput("prob_icu", label = "Probability upon hospitalisation of requiring ICU admission:", post = "%", ticks = FALSE,
                                value = 50, min = 0, max = 100, step = 1),
                    sliderInput("prob_vent", label = "Probability upon admission to the ICU of requiring a ventilator:", post = "%", ticks = FALSE,
-                               value = 75, min = 0, max = 100, step = 1)
+                               value = 75, min = 0, max = 100, step = 1),
+                   sliderInput("propo2", label = "Proportion of hospitalised patients needing O2:", post = "%", ticks = FALSE,
+                               value = 50, min = 0, max = 100, step = 1)
             )
           ),
           div(class = "closebutton", bsButton("close_virus_param", "Close (Esc.)", icon("times"), style = "danger", size = "small"))
