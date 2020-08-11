@@ -52,24 +52,26 @@ ui <- function(request) {
     navbarPage(
       NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
       tabPanel(span("COVID-19 App | CoMo Consortium ", version_app), value = "tab_welcome",
+               h3("COVID-19 App | CoMo Consortium"),
                fluidRow(
-                 column(4, 
-                        h3("COVID-19 App | CoMo Consortium"),
+                 column(3,
                         h4(version_app),
                         tags$img(src = "./como_logo.png", id = "logo"),
                         p("The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level.")
                  ),
-                 column(4,
-                        div(class = "box_outputs", h4("Important Disclaimer:")),
-                        includeMarkdown("./www/markdown/disclaimer.md"),
-                        br(),
-                        div(class = "box_outputs", h4("License:")),
-                        includeMarkdown("./www/markdown/readable_license.md")
+                 column(6,
+                        h4("CoMo Consortium member countries’ stages of engagement with policymakers"),
+                        tags$img(src = "./como_policy_makers.png", class = "map"),
+                        includeMarkdown("./www/markdown/stages_countries.md")
+              
                  ),
-                 column(4,
-                        div(class = "box_outputs", h4("Sources of Data:")),
-                        includeMarkdown("./www/markdown/about_country_data.md"),
-                        includeMarkdown("./www/markdown/about_data.md"),
+                 column(3,
+                        bs_accordion(id = "about") %>%
+                          bs_set_opts(panel_type = "default", use_heading_link = TRUE) %>%
+                          bs_append(title = "Important Disclaimer", content = includeMarkdown("./www/markdown/disclaimer.md")) %>%
+                          bs_append(title = "License", content = includeMarkdown("./www/markdown/readable_license.md")) %>%
+                          bs_append(title = "Countries Data", content = includeMarkdown("./www/markdown/about_country_data.md")) %>%
+                          bs_append(title = "Epidemiological Data", content = includeMarkdown("./www/markdown/about_data.md"))
                  )
                ),
                
