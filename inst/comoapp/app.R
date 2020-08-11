@@ -4,8 +4,13 @@ code_for_development <- TRUE
 
 
 library(bsplus)
+
+# comoOdeCpp
 # remotes::install_github("ocelhay/comoOdeCpp", subdir = "comoOdeCpp")
 library(comoOdeCpp)
+# ensure use of the correct version of comoOdeCpp
+if(packageVersion("comoOdeCpp") != "15.1.2" )  stop("Require comoOdeCpp v15.1.2. Other versions will not work.")
+
 library(deSolve)
 library(DT)
 library(gridExtra)
@@ -385,7 +390,7 @@ server <- function(input, output, session) {
                 input$baseline_coverage_25, input$baseline_coverage_26,
                 input$baseline_coverage_27, input$baseline_coverage_28,
                 input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
-      mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ " contacts",
+      mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " tests", 
                               TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_baseline, intervention != "_")
@@ -463,7 +468,7 @@ server <- function(input, output, session) {
                 input$future_coverage_25, input$future_coverage_26,
                 input$future_coverage_27, input$future_coverage_28,
                 input$future_coverage_29, input$future_coverage_30)) %>% 
-      mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ " contacts",
+      mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " tests", 
                               TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_future, intervention != "_")

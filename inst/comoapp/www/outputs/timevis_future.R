@@ -4,7 +4,9 @@ output$timevis_future <- renderPlot(execOnResize = TRUE, {
            label = paste0(value, unit, " ", difftime(date_end, date_start, units = "days") - 1, "d."))
   
   # Adding interventions not practiced
-  dta <- bind_rows(dta, tibble(intervention = setdiff(all_interventions[-1], dta$intervention)))
+  dta <- bind_rows(
+    dta, 
+    tibble(intervention = setdiff(all_interventions[-c(1, 12, 14, 15)], dta$intervention)))
   
   if(interventions$future_mat %>% nrow() == 0) return({
     plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')

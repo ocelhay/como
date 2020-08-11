@@ -84,9 +84,14 @@ parameters <- reactiveValuesToList(input)[
     "vaccine_eff", "vac_campaign", "mean_imports", "screen_test_sens", 
     "screen_overdispersion", "quarantine_days", "quarantine_effort", 
     "quarantine_eff_home", "quarantine_eff_other", "household_size", 
-    "noise", "iterations", "confidence", 
-    # below are additions in v14.14
-    "age_vaccine_min", "mass_test_sens", "isolation_days", "age_testing_min", "age_testing_max")] %>% 
+    "noise", "iterations", "confidence",
+    # additions in v14.14:
+    "age_vaccine_min", "mass_test_sens", "isolation_days", "age_testing_min", "age_testing_max",
+    # additions in v15.1.0:
+    "pdeath_ho", "pdeath_hco", "pdeath_icuo", "pdeath_icuco",
+    "propo2", "dexo2", "dexo2c", "dexv", "dexvc", "vent_dex",
+    "mask_eff"
+    )] %>% 
   unlist()
 
 parameters <- c(
@@ -137,9 +142,19 @@ parameters["prob_icu"] <- parameters["prob_icu"] / 100
 parameters["prob_vent"] <- parameters["prob_vent"] / 100
 parameters["confidence"] <- parameters["confidence"] / 100
 parameters["mass_test_sens"] <- parameters["mass_test_sens"] / 100
+# additions in v15.1.0:
+parameters["pdeath_ho"] <- parameters["pdeath_ho"] / 100
+parameters["pdeath_hco"] <- parameters["pdeath_hco"] / 100
+parameters["pdeath_icuo"] <- parameters["pdeath_icuo"] / 100
+parameters["propo2"] <- parameters["propo2"] / 100
+parameters["dexo2"] <- parameters["dexo2"] / 100
+parameters["dexo2c"] <- parameters["dexo2c"] / 100
+parameters["dexv"] <- parameters["dexv"] / 100
+parameters["dexvc"] <- parameters["dexvc"] / 100
+parameters["vent_dex"] <- parameters["vent_dex"] / 100
+parameters["mask_eff"] <- parameters["mask_eff"] / 100
 
-# TODO: move this line to a better location
-ihr[,2] <- parameters["ihr_scaling"]*ihr[,2]
+ihr[,2] <- parameters["ihr_scaling"] * ihr[,2]
 
 
 # Define dataframe of interventions ----
