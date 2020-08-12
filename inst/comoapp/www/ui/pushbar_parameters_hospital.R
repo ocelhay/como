@@ -12,10 +12,18 @@ list(
                                value = 1, min = 0.1, max = 5, step = 0.1)
             ),
             column(4,
-                   sliderInput("pdeath_h", label = "Probability of dying when hospitalised:", value = 35, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
-                   sliderInput("pdeath_hc", label = "Probability of dying when denied hospitalisation:", value = 45, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
-                   sliderInput("pdeath_icu", label = "Probability of dying when admitted to ICU:", value = 55, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
-                   sliderInput("pdeath_icuc", label = "Probability of dying when admission to ICU denied:", value = 80, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("pdeath_h", label = "Probability of dying when hospitalised (not req. O2):", value = 35, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("pdeath_ho", label = "Probability of dying when hospitalised if req. O2:", value = 35, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   
+                   sliderInput("pdeath_hc", label = "Probability of dying when denied hospitalisation (not req. O2):", value = 45, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("pdeath_hco", label = "Probability of dying when denied hospitalisation if req. O2:", value = 45, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   
+                   sliderInput("pdeath_icu", label = "Probability of dying when admitted to ICU (not req. O2):", value = 55, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("pdeath_icuo", label = "Probability of dying when admitted to ICU if req. O2:", value = 55, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   
+                   sliderInput("pdeath_icuc", label = "Probability of dying when admission to ICU denied (not req. O2):", value = 75, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("pdeath_icuco", label = "Probability of dying when admission to ICU denied if req. O2:", value = 75, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   
                    sliderInput("pdeath_vent", label = "Probability of dying when ventilated:", value = 80, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
                    sliderInput("pdeath_ventc", label = "Probability of dying when ventilator denied:", value = 95, min = 0, max = 100, step = 1, post = "%", ticks = FALSE)
             ),

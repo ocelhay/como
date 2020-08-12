@@ -10,9 +10,16 @@
   position: fixed;
 }
 
-.logo { 
-  margin-top: 40px;
-  width: 30%;
+#logo { 
+  margin-top: 5px;
+  width: 100%;
+}
+
+#map {
+  margin-top: 15px;
+  margin-bottom: 5px;
+  width: 100%;
+  border: 1px solid black;
 }
 
 /* Sidebar */

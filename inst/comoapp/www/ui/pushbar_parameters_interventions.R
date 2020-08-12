@@ -6,6 +6,9 @@ list(
                    div(class = "box_interventions", h4(icon("hand-paper"), " Handwashing")),
                    sliderInput("hand_eff", label = "Efficacy of handwashing:", value = 20, min = 0, max = 25,
                                step = 1, post = "%", ticks = FALSE),
+                   div(class = "box_interventions", h4("Mask Wearing")),
+                   sliderInput("mask_eff", label = "Efficacy of mask wearing:", value = 15, min = 0, max = 35,
+                               step = 1, post = "%", ticks = FALSE),
                    div(class = "box_interventions", h4(icon("house-user"), "Working at Home")),
                    sliderInput("work_eff", label = "Efficacy of working from home:", value = 85, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),
@@ -42,7 +45,7 @@ list(
                    div(class = "box_interventions", h4("Self-isolation if Symptomatic")),
                    sliderInput("selfis_eff", label = "Adherence to self-isolation:", value = 50, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),
-                   div(class = "box_interventions", h4("Screening (when Self-isolation)")),
+                   div(class = "box_interventions", h4("(*Self-isolation) Screening")),
                    sliderInput("screen_overdispersion", label = "Overdispersion of cases around index case. If  1 likelihood same as general population:", value = 4, min = 1, max = 5,
                                step = 0.2, ticks = FALSE),
                    sliderInput("screen_test_sens", label = "Test Sensitivity:", value = 80, min = 0, max = 100,
@@ -54,7 +57,7 @@ list(
                    sliderInput("age_testing_max", label = "Maximum age for mass testing (0 to 100)", value = 60, min = 0, max = 100, step = 1, post = " y.o.", ticks = FALSE),
                    ),
             column(3, 
-                   div(class = "box_interventions", h4("Household isolation (when Self-isolation)")),
+                   div(class = "box_interventions", h4("(*Self-isolation) Household Isolation")),
                    sliderInput("quarantine_days", label = "Days in isolation for average person:", value = 14, min = 1, max = 21,
                                step = 1, post = " days", ticks = FALSE),
                    sliderInput("quarantine_effort", label = "Days to implement maximum quarantine coverage:", value = 2, 
@@ -62,7 +65,13 @@ list(
                    sliderInput("quarantine_eff_other", label = "Decrease in the number of other contacts when quarantined:", value = 20, 
                                min = 0, max = 100, step = 5, post = "%", ticks = FALSE),
                    sliderInput("quarantine_eff_home", label = "Increase in the number of contacts at home when quarantined:", value = 100, 
-                               min = 0, max = 100, step = 5, post = "%", ticks = FALSE)
+                               min = 0, max = 100, step = 5, post = "%", ticks = FALSE),
+                   div(class = "box_interventions", h4("Dexamethasone")),
+                   sliderInput("dexo2", label = "Relative risk of dying if needing O2 and taking Dex", value =  82, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("dexv", label = "Relative risk of dying if needing ventilation and taking Dex", value = 64 , min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("dexo2c", label = "Relative risk of dying if needing  but not receivingO2 and taking Dex", value = 82, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("dexvc", label = "Relative risk of dying if needing but not receiving ventilation and taking Dex", value = 64, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   sliderInput("vent_dex", label = "Change in ventilation requirement if given Dex", value = 87, min = 0, max = 100, step = 1, post = "%", ticks = FALSE)
             )
           ),
           div(class = "closebutton", bsButton("close_interventions_param", "Close (Esc.)", icon("times"), style = "danger", size = "small"))

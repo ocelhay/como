@@ -1,11 +1,16 @@
 # CoMo COVID-19 App
-version_app <- "v15.1.3"
+version_app <- "v15.2.0"
 code_for_development <- TRUE
 
 
 library(bsplus)
+
+# comoOdeCpp
 # remotes::install_github("ocelhay/comoOdeCpp", subdir = "comoOdeCpp")
 library(comoOdeCpp)
+# ensure use of the correct version of comoOdeCpp
+if(packageVersion("comoOdeCpp") != "15.1.2" )  stop("Require comoOdeCpp v15.1.2. Other versions will not work.")
+
 library(deSolve)
 library(DT)
 library(gridExtra)
@@ -36,7 +41,7 @@ ui <- function(request) {
     pushbar_deps(),
     shinyjs::useShinyjs(),
     chooseSliderSkin('HTML5'),
-    title = "COVID-19 App | CoMo Consortium",
+    title = "CoMo Consortium | COVID-19 App",
     
     source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_country.R", local = TRUE)[1],
@@ -46,25 +51,27 @@ ui <- function(request) {
     
     navbarPage(
       NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
-      tabPanel(span("COVID-19 App | CoMo Consortium ", version_app), value = "tab_welcome",
+      tabPanel(span("CoMo Consortium | COVID-19 App ", version_app), value = "tab_welcome",
+               div(class = "box_outputs", h4(paste0("CoMo Consortium | COVID-19 App ", version_app))),
+               a(span(icon("external-link-alt"), " GitHub Respository"), href = "https://github.com/ocelhay/como", target = "_blank"),
                fluidRow(
-                 column(4, 
-                        h3("COVID-19 App | CoMo Consortium"),
-                        h4(version_app),
-                        tags$img(src = "./como_logo.png", id = "logo"),
-                        p("The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level.")
-                 ),
-                 column(4,
-                        div(class = "box_outputs", h4("Important Disclaimer:")),
-                        includeMarkdown("./www/markdown/disclaimer.md"),
+                 column(6,
+                        fluidRow(
+                          column(4, img(src = "./como_logo.png", id = "logo")),
+                          column(8, br(), p("The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level."))
+                        ),
                         br(),
-                        div(class = "box_outputs", h4("License:")),
-                        includeMarkdown("./www/markdown/readable_license.md")
+                        h5("CoMo Consortium member countries’ stages of engagement with policymakers — August 6, 2020") %>%
+                          helper(content = "stages_countries", colour = "red"),
+                        tags$img(src = "./como_policy_makers.png", id = "map")
                  ),
-                 column(4,
-                        div(class = "box_outputs", h4("Sources of Data:")),
-                        includeMarkdown("./www/markdown/about_country_data.md"),
-                        includeMarkdown("./www/markdown/about_data.md"),
+                 column(6,
+                        bs_accordion(id = "about") %>%
+                          bs_set_opts(panel_type = "default", use_heading_link = TRUE) %>%
+                          bs_append(title = "Important Disclaimer", content = includeMarkdown("./www/markdown/disclaimer.md")) %>%
+                          bs_append(title = "License", content = includeMarkdown("./www/markdown/readable_license.md")) %>%
+                          bs_append(title = "Countries Data", content = includeMarkdown("./www/markdown/about_country_data.md")) %>%
+                          bs_append(title = "Epidemiological Data", content = includeMarkdown("./www/markdown/about_data.md"))
                  )
                ),
                
@@ -84,7 +91,7 @@ ui <- function(request) {
                             value = 5, post = "%", ticks = FALSE, width = "75%"),
                 sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
                             value = 100, post = "%", ticks = FALSE, width = "75%"),
-                htmlOutput("text_feedback_interventions_baseline"),
+                
                 
                 uiOutput("conditional_run_baseline"), br(),
                 uiOutput("conditional_validate_baseline"),
@@ -93,7 +100,7 @@ ui <- function(request) {
           ),
           column(
             width = 10,
-            div(class = "box_outputs", h4("Global Simulations Parameters:")),
+            div(class = "box_outputs", h4("Global Simulations Parameters")),
             fluidRow(
               column(
                 5, fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE)  %>% 
@@ -124,10 +131,11 @@ ui <- function(request) {
               column(6,
                      div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
                      sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 30, value = 0, step = 1, ticks = FALSE),
+                     htmlOutput("text_feedback_interventions_baseline"),
                      source("./www/ui/interventions_baseline.R", local = TRUE)$value
               ),
               column(6,
-                     div(class = "box_outputs", h4("Timeline:")),
+                     div(class = "box_outputs", h4("Timeline")),
                      plotOutput("timevis_baseline", height = 700)
               )
             ),
@@ -155,12 +163,12 @@ ui <- function(request) {
         fluidRow(
           column(2, br(),
                  actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success"), br(), br(),
-                 htmlOutput("text_feedback_interventions_future"),
                  uiOutput("conditional_run_future")
           ),
           column(5,
-                 div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
+                 div(class = "box_outputs", h4("Interventions for Hypothetical Scenario")),
                  sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 30,  value = 0, step = 1, ticks = FALSE),
+                 htmlOutput("text_feedback_interventions_future"),
                  source("./www/ui/interventions_future.R", local = TRUE)$value
           ),
           column(5,
@@ -384,7 +392,7 @@ server <- function(input, output, session) {
                 input$baseline_coverage_25, input$baseline_coverage_26,
                 input$baseline_coverage_27, input$baseline_coverage_28,
                 input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
-      mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ " contacts",
+      mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " tests", 
                               TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_baseline, intervention != "_")
@@ -462,7 +470,7 @@ server <- function(input, output, session) {
                 input$future_coverage_25, input$future_coverage_26,
                 input$future_coverage_27, input$future_coverage_28,
                 input$future_coverage_29, input$future_coverage_30)) %>% 
-      mutate(unit = case_when(intervention == "Screening (when S.I.)" ~ " contacts",
+      mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " tests", 
                               TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_future, intervention != "_")

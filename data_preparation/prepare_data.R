@@ -9,13 +9,16 @@ library(tidyverse)
 
 
 # Cases Data ----
-file <- "COVID-19-geographic-disbtribution-worldwide-2020-07-28.xlsx"
+file <- "COVID-19-geographic-disbtribution-worldwide_2020-08-10.xlsx"
 
 cases <- read_excel(file) %>%
   transmute(date = as.Date(dateRep), cases = cases, deaths = deaths, country = countriesAndTerritories) %>%
   group_by(country) %>%
   arrange(date) %>%
   mutate(cumulative_death = cumsum(deaths)) %>%
+  mutate(cases = replace(cases, cases < 0, NA), 
+         deaths = replace(deaths, deaths < 0, NA), 
+         cumulative_death = replace(cases, cases < 0, NA)) %>% 
   ungroup()
 
 

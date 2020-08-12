@@ -21,10 +21,10 @@ Users of the CoMo Collaborative COVID-19 model need to comprehend and effectivel
 | Hospitalisation                 	| Duration of ICU infection: (1 to 30)                             	| nu_icu                	|
 | Hospitalisation                 	| Duration of ventilated infection: (1 to 30)                      	| nu_vent               	|
 | Self-isolation if Symptomatic   	| Adherence:                                                       	| selfis_eff            	|
-| Screening (when S.I.)           	| Overdispersion: (1, 2, 3, 4 or 5)                                	| screen_overdispersion 	|
-| Household Isolation (when S.I.) 	| Days to implement maximum quarantine coverage: (1 to 5)          	| quarantine_effort     	|
-| Household Isolation (when S.I.) 	| Decrease in the number of other contacts when quarantined:       	| quarantine_eff_other  	|
-| Household Isolation (when S.I.) 	| Increase in the number of contacts at home when quarantined:     	| quarantine_eff_home   	|
+| (*Self-isol.) Screening           | Overdispersion: (1, 2, 3, 4 or 5)                                	| screen_overdispersion 	|
+| (*Self-isol.) Household Isolation | Days to implement maximum quarantine coverage: (1 to 5)          	| quarantine_effort     	|
+| (*Self-isol.) Household Isolation | Decrease in the number of other contacts when quarantined:       	| quarantine_eff_other  	|
+| (*Self-isol.) Household Isolation | Increase in the number of contacts at home when quarantined:     	| quarantine_eff_home   	|
 | Social Distancing               	| Adherence:                                                       	| dist_eff              	|
 | Handwashing                     	| Efficacy: (0-25%)                                                	| hand_eff              	|
 | Working at Home                 	| Efficacy:                                                        	| work_eff              	|
@@ -32,5 +32,6 @@ Users of the CoMo Collaborative COVID-19 model need to comprehend and effectivel
 | School Closures                 	| Efficacy:                                                        	| school_eff            	|
 | School Closures                 	| Home contacts inflation due to school closure:                   	| s2h                   	|
 | Shielding the Elderly           	| Efficacy:                                                        	| cocoon_eff            	|
+| Wearing Mask                     	| Efficacy:                                                        	| mask_eff              	|
 
 </br>
