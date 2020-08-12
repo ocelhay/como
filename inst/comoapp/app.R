@@ -41,7 +41,7 @@ ui <- function(request) {
     pushbar_deps(),
     shinyjs::useShinyjs(),
     chooseSliderSkin('HTML5'),
-    title = "COVID-19 App | CoMo Consortium",
+    title = "CoMo Consortium | COVID-19 App",
     
     source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_country.R", local = TRUE)[1],
@@ -51,21 +51,21 @@ ui <- function(request) {
     
     navbarPage(
       NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
-      tabPanel(span("COVID-19 App | CoMo Consortium ", version_app), value = "tab_welcome",
-               h3("COVID-19 App | CoMo Consortium"),
+      tabPanel(span("CoMo Consortium | COVID-19 App ", version_app), value = "tab_welcome",
+               div(class = "box_outputs", h4(paste0("CoMo Consortium | COVID-19 App ", version_app))),
+               a(span(icon("external-link-alt"), " GitHub Respository"), href = "https://github.com/ocelhay/como", target = "_blank"),
                fluidRow(
-                 column(3,
-                        h4(version_app),
-                        tags$img(src = "./como_logo.png", id = "logo"),
-                        p("The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level.")
+                 column(6,
+                        fluidRow(
+                          column(4, img(src = "./como_logo.png", id = "logo")),
+                          column(8, br(), p("The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level."))
+                        ),
+                        br(),
+                        h5("CoMo Consortium member countries’ stages of engagement with policymakers — August 6, 2020") %>%
+                          helper(content = "stages_countries", colour = "red"),
+                        tags$img(src = "./como_policy_makers.png", id = "map")
                  ),
                  column(6,
-                        h4("CoMo Consortium member countries’ stages of engagement with policymakers — August 6, 2020"),
-                        tags$img(src = "./como_policy_makers.png", class = "map"),
-                        includeMarkdown("./www/markdown/stages_countries.md")
-              
-                 ),
-                 column(3,
                         bs_accordion(id = "about") %>%
                           bs_set_opts(panel_type = "default", use_heading_link = TRUE) %>%
                           bs_append(title = "Important Disclaimer", content = includeMarkdown("./www/markdown/disclaimer.md")) %>%
@@ -100,7 +100,7 @@ ui <- function(request) {
           ),
           column(
             width = 10,
-            div(class = "box_outputs", h4("Global Simulations Parameters:")),
+            div(class = "box_outputs", h4("Global Simulations Parameters")),
             fluidRow(
               column(
                 5, fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE)  %>% 
@@ -135,7 +135,7 @@ ui <- function(request) {
                      source("./www/ui/interventions_baseline.R", local = TRUE)$value
               ),
               column(6,
-                     div(class = "box_outputs", h4("Timeline:")),
+                     div(class = "box_outputs", h4("Timeline")),
                      plotOutput("timevis_baseline", height = 700)
               )
             ),
@@ -166,7 +166,7 @@ ui <- function(request) {
                  uiOutput("conditional_run_future")
           ),
           column(5,
-                 div(class = "box_outputs", h4("Interventions for Hypothetical Scenario:")),
+                 div(class = "box_outputs", h4("Interventions for Hypothetical Scenario")),
                  sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 30,  value = 0, step = 1, ticks = FALSE),
                  htmlOutput("text_feedback_interventions_future"),
                  source("./www/ui/interventions_future.R", local = TRUE)$value
