@@ -12,6 +12,7 @@
 
 - <a href="https://orcid.org/0000-0002-2971-9110" width="16" height="16" target="_blank">Olivier Celhay<img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" border="0"></a>, ORCID
 - <a href="https://orcid.org/0000-0002-6507-6597" width="16" height="16" target="_blank">Ricardo Aguas<img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" border="0"></a>, ORCID
+- <a href="https://orcid.org/0000-0002-7405-7507" width="16" height="16" target="_blank">Bo Gao<img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" border="0"></a>, ORCID
 - <a href="https://orcid.org/0000-0001-9733-8304" width="16" height="16" target="_blank">Sai Thein Than Tun<img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" border="0"></a>, ORCID
 - <a href="https://orcid.org/0000-0002-6523-185X" width="16" height="16" target="_blank">Lisa J. White<img src="https://orcid.org/sites/default/files/images/orcid_16x16(1).gif" border="0"></a>, ORCID
 - CoMo Consortium
