@@ -17,7 +17,6 @@ library(gridExtra)
 library(highcharter)
 library(knitr)
 library(lubridate)
-library(oxcovid19)
 library(pushbar)
 library(readxl)
 library(reshape2)
@@ -30,12 +29,6 @@ library(shinyjs)
 library(shinythemes)
 library(shinyWidgets)
 library(tidyverse)
-
-# Create a connection to OxCOVID19 PostgreSQL server and access ECDC table
-con <- connect_oxcovid19()
-epi_tab <- get_table(con = con, tbl_name = "epidemiology") %>%
-  filter(source == "WRD_ECDC") %>%
-  collect()
 
 # Load packages and data
 source("./www/model/model_once.R")
@@ -553,12 +546,8 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$country_cases, if(input$country_cases != "-- Own Value ---"){
-    cases_rv$data <- epi_tab %>%
-      filter(country == input$country_cases) %>% 
-      transmute(date, cumulative_cases = confirmed, cumulative_death = dead) %>%
-      arrange(date) %>%
-      mutate(cases = cumulative_cases - lag(cumulative_cases),
-             deaths = cumulative_death - lag(cumulative_death))
+    cases_rv$data <- cases %>%
+      filter(country == input$country_cases)
   })
   
   # Source files with code to generate outputs ----

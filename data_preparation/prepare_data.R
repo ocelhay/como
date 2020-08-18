@@ -4,23 +4,29 @@
 
 # Prolegomenon ----
 setwd("/Users/olivier/Documents/CoMo/como/data_preparation/raw_data/")
+library(oxcovid19)
 library(readxl)
 library(tidyverse)
 
 
 # Cases Data ----
-# (!) with the use of oxcovid19 API, cases.Rda may not be required anymore
-file <- "COVID-19-geographic-disbtribution-worldwide_2020-08-10.xlsx"
+# Create a connection to OxCOVID19 PostgreSQL server and access ECDC table
+con <- connect_oxcovid19()
+ecdc <- get_table(con = con, tbl_name = "epidemiology") %>%
+  filter(source == "WRD_ECDC") %>%
+  collect()
 
-cases <- read_excel(file) %>%
-  transmute(date = as.Date(dateRep), cases = cases, deaths = deaths, country = countriesAndTerritories) %>%
+cases <- ecdc %>%
+  transmute(country, date, cumulative_cases = confirmed, cumulative_death = dead) %>%
   group_by(country) %>%
   arrange(date) %>%
-  mutate(cumulative_death = cumsum(deaths)) %>%
-  mutate(cases = replace(cases, cases < 0, NA), 
-         deaths = replace(deaths, deaths < 0, NA), 
-         cumulative_death = replace(cases, cases < 0, NA)) %>% 
+  mutate(cases = cumulative_cases - lag(cumulative_cases),
+         deaths = cumulative_death - lag(cumulative_death)) %>%
   ungroup()
+
+save(cases, file = "/Users/olivier/Documents/CoMo/como/inst/comoapp/www/data/cases.Rda")
+# cases %>% filter(country == "France", date >= "2020-08-01")
+
 
 
 # Mortality/Severity
@@ -137,8 +143,6 @@ population <- population %>%
 
 
 # Export data ----
-setwd("/Users/olivier/Documents/CoMo/como/data_preparation/")
-save(cases, file = "cases.Rda")
 save(mort_sever_default, file = "mort_sever_default.Rda")
 save(contact_home, contact_work, contact_school, contact_other, file = "contacts.Rda")
 save(age_categories, population, file = "demog.Rda")
