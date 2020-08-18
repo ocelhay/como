@@ -1,18 +1,57 @@
 Package: como
 Type: Package
-Title: CoMo COVID-19 App
+Title: A Web Application of the CoMo COVID-19 Model
 Version: 15.2.1
-Author: Olivier Celhay, Ricardo Aguas, Sai Thein Than Tun, Lisa J. White & CoMo Consortium
-Maintainer: Olivier Celhay <olivier.celhay@gmail.com>
-Description: Developed by the Covid-19 International Modelling Consortium (CoMo Consortium).
-    This app allows to perform a model fit to the available data and 
-    investigate the potential impact of several non-pharmaceutical interventions.
-License: GPL-3
+Author: c(person("Olivier", "Celhay", 
+                email = "olivier.celhay@gmail.com", 
+                role = c("aut", "cre"), comment = c(ORCID = "https://orcid.org/0000-0002-2971-9110")),
+         person("Ricardo", "Aguas", 
+                email = "ricardo@tropmedres.ac", 
+                role = c("aut"), comment = c(ORCID = "https://orcid.org/0000-0002-6507-6597")),
+        person("Bo", "Gao", 
+                email = "bo.gao@ndm.ox.ac.uk", 
+                role = c("aut"), comment = c(ORCID = "https://orcid.org/0000-0002-7405-7507")),
+        person("Sai", "Thein Than Tun", 
+                email = "sai@tropmedres.ac", 
+                role = c("aut"), comment = c(ORCID = "https://orcid.org/0000-0001-9733-8304")),
+        person("Lisa J.", "White", 
+                email = "lisa.white@ndm.ox.ac.uk", 
+                role = c("aut"), comment = c(ORCID = "https://orcid.org/0000-0002-6523-185X")),
+        "CoMo Consortium")
+Description: The Covid-19 International Modelling Consortium (CoMo Consortium) 
+    is made up of various working groups. Each working group plays a specific role in 
+    formulating a mathematical modelling response to help guide policymaking responses
+    to the Covid-19 pandemic. This Web Application offers an access to a mathematical model 
+    that allows to investigate the potential impact of several non-pharmaceutical interventions.
+License: CC BY-NC 4.0
+URL: https://github.com/ocelhay/como
+BugReports: https://github.com/ocelhay/como/issues
 Encoding: UTF-8
+Language: en-gb
 LazyData: true
-Depends:
-    bsplus, comoOdeCpp, deSolve, DT, gridExtra, highcharter, knitr, lubridate, pushbar, RColorBrewer, readxl, 
-    reshape2, scales, shiny, shinyBS, shinycssloaders, shinyhelper, shinyjs,
-    shinythemes, shinyWidgets, tidyverse
-Remotes: url::https://github.com/ocelhay/comoOdeCpp/releases/download/v15.1.2/comoOdeCpp_15.1.2.tar.gz
+Depends: 
+    R (>= 3.6.3)
+Imports:
+    bsplus, 
+    deSolve, 
+    DT, 
+    gridExtra, 
+    highcharter, 
+    knitr, 
+    lubridate, 
+    pushbar, 
+    RColorBrewer, 
+    readxl, 
+    reshape2, 
+    scales, 
+    shiny, 
+    shinyBS, 
+    shinycssloaders, 
+    shinyhelper, 
+    shinyjs,
+    shinythemes, 
+    shinyWidgets, 
+    tidyverse
+Remotes: 
+    url::https://github.com/ocelhay/comoOdeCpp/releases/download/v15.1.2/comoOdeCpp_15.1.2.tar.gz
 RoxygenNote: 7.1.1
