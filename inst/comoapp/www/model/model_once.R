@@ -1,5 +1,4 @@
 # load data ----
-load(file = "./www/data/cases.Rda")
 load(file = "./www/data/contacts.Rda")
 load(file = "./www/data/demog.Rda")
 load(file = "./www/data/mort_sever_default.Rda")
