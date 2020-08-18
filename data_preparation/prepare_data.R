@@ -9,6 +9,7 @@ library(tidyverse)
 
 
 # Cases Data ----
+# (!) with the use of oxcovid19 API, cases.Rda may not be required anymore
 file <- "COVID-19-geographic-disbtribution-worldwide_2020-08-10.xlsx"
 
 cases <- read_excel(file) %>%

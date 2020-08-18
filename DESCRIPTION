@@ -39,6 +39,7 @@ Imports:
     highcharter, 
     knitr, 
     lubridate, 
+    oxcovid19,
     pushbar, 
     RColorBrewer, 
     readxl, 
