@@ -1,6 +1,4 @@
-# From data on raw_data folder, generate data_CoMo.RData to be loaded in the App
-# data_CoMo.RData should be added/updated in the www/data folder of the App
-# about_data.md in the www/markdown folder should be updated to reflect whenever cases data is updated
+## Manually prepare data files (.Rda) to be used in the App
 
 # Prolegomenon ----
 setwd("/Users/olivier/Documents/CoMo/como/data_preparation/raw_data/")
@@ -25,8 +23,6 @@ cases <- ecdc %>%
   ungroup()
 
 save(cases, file = "/Users/olivier/Documents/CoMo/como/inst/comoapp/www/data/cases.Rda")
-# cases %>% filter(country == "France", date >= "2020-08-01")
-
 
 
 # Mortality/Severity
