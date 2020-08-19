@@ -1,7 +1,7 @@
 
 **Cases/Deaths Data:**
 
-<a href="https://www.ecdc.europa.eu/" target="_blank">European Centre for Disease Prevention and Control.</a><span style="color:#EC6568;"> Updated 2020-08-10</span>
+<a href="https://www.ecdc.europa.eu/" target="_blank">European Centre for Disease Prevention and Control.</a>. Accessed through <a href="https://covid19.eng.ox.ac.uk" target="_blank">OxCOVID19 Database</a> via the <a href="https://github.com/como-ph/oxcovid19" target="_blank"> R API</a>. Last updated: 2020-08-18.
 
 
 **Severity/Mortality by Age Category:**

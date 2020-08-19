@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v15.2.1"
+version_app <- "v15.2.2"
 code_for_development <- TRUE
 
 
@@ -7,8 +7,8 @@ library(bsplus)
 
 # comoOdeCpp
 # remotes::install_github("ocelhay/comoOdeCpp", subdir = "comoOdeCpp")
+# load comoOdeCpp and ensure this is the correct version of comoOdeCpp
 library(comoOdeCpp)
-# ensure use of the correct version of comoOdeCpp
 if(packageVersion("comoOdeCpp") != "15.1.2" )  stop("Require comoOdeCpp v15.1.2. Other versions will not work.")
 
 library(deSolve)
@@ -53,7 +53,7 @@ ui <- function(request) {
       NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
       tabPanel(span("CoMo Consortium | COVID-19 App ", version_app), value = "tab_welcome",
                div(class = "box_outputs", h4(paste0("CoMo Consortium | COVID-19 App ", version_app))),
-               a(span(icon("external-link-alt"), " GitHub Respository"), href = "https://github.com/ocelhay/como", target = "_blank"),
+               a(span("Source Code Respository", icon("external-link-alt")), href = "https://github.com/ocelhay/como", target = "_blank"),
                fluidRow(
                  column(6,
                         fluidRow(
@@ -546,8 +546,8 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$country_cases, if(input$country_cases != "-- Own Value ---"){
-    cases_rv$data <- cases %>% filter(country == input$country_cases) %>%
-      select(-country)
+    cases_rv$data <- cases %>%
+      filter(country == input$country_cases)
   })
   
   # Source files with code to generate outputs ----
