@@ -83,7 +83,7 @@ ui <- function(request) {
             width = 2,
             div(class = "float_bottom_left",
                 hr(),
-                sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
+                sliderInput("p", label = "Probability of infection given contact:", min = 0.01, max = 0.08, step = 0.001,
                             value = 0.049, ticks = FALSE, width = "75%"),
                 sliderInput("report", label = span("Percentage of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
                             value = 2.5, post = "%", ticks = FALSE, width = "75%"),
