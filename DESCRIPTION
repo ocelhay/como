@@ -2,22 +2,21 @@ Package: como
 Type: Package
 Title: A Web Application of the CoMo COVID-19 Model
 Version: 15.2.2
-Author: c(person("Olivier", "Celhay", 
+Authors@R: c(person(given = "Olivier", family = "Celhay", 
                 email = "olivier.celhay@gmail.com", 
                 role = c("aut", "cre"), comment = c(ORCID = "https://orcid.org/0000-0002-2971-9110")),
-         person("Ricardo", "Aguas", 
+         person(given = "Ricardo", family = "Aguas", 
                 email = "ricardo@tropmedres.ac", 
                 role = c("aut"), comment = c(ORCID = "https://orcid.org/0000-0002-6507-6597")),
-        person("Bo", "Gao", 
+        person(given = "Bo", family = "Gao", 
                 email = "bo.gao@ndm.ox.ac.uk", 
                 role = c("aut"), comment = c(ORCID = "https://orcid.org/0000-0002-7405-7507")),
-        person("Sai", "Thein Than Tun", 
+        person(given = "Sai", family = "Thein Than Tun", 
                 email = "sai@tropmedres.ac", 
                 role = c("aut"), comment = c(ORCID = "https://orcid.org/0000-0001-9733-8304")),
-        person("Lisa J.", "White", 
+        person(given = "Lisa J.", family = "White", 
                 email = "lisa.white@ndm.ox.ac.uk", 
-                role = c("aut"), comment = c(ORCID = "https://orcid.org/0000-0002-6523-185X")),
-        "CoMo Consortium")
+                role = c("aut"), comment = c(ORCID = "https://orcid.org/0000-0002-6523-185X")))
 Description: The Covid-19 International Modelling Consortium (CoMo Consortium) 
     is made up of various working groups. Each working group plays a specific role in 
     formulating a mathematical modelling response to help guide policymaking responses
@@ -30,7 +29,7 @@ Encoding: UTF-8
 Language: en-gb
 LazyData: true
 Depends: 
-    R (>= 3.6.3)
+    R (>= 3.6)
 Imports:
     bsplus, 
     deSolve, 

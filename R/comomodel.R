@@ -13,7 +13,7 @@ comomodel <- function() {
   
   # Print information on the session
   R.Version()$version.string
-  print(paste0("App version: ", packageVersion("como")))
+  print(paste0("App version: ", utils::packageVersion("como")))
   
   shiny::runApp(appDir, display.mode = "normal", launch.browser = TRUE)
 }
