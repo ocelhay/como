@@ -53,7 +53,7 @@ ui <- function(request) {
       NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
       tabPanel(span("CoMo Consortium | COVID-19 App ", version_app), value = "tab_welcome",
                div(class = "box_outputs", h4(paste0("CoMo Consortium | COVID-19 App ", version_app))),
-               a(span(icon("external-link-alt"), " GitHub Respository"), href = "https://github.com/ocelhay/como", target = "_blank"),
+               a(span("Source Code Respository", icon("external-link-alt")), href = "https://github.com/ocelhay/como", target = "_blank"),
                fluidRow(
                  column(6,
                         fluidRow(
