@@ -12,8 +12,9 @@ Stage 1: Preliminary analyses and model calibration to explore optimal containme
 * Sierra Leone 
 * Malaysia
 
-Stage 2: Have engaged with local Ministries of Health (MoH) or relevant policymakers and are in the process of analysing the different strategies under consideration 	•	Philippines 
+Stage 2: Have engaged with local Ministries of Health (MoH) or relevant policymakers and are in the process of analysing the different strategies under consideration
 
+* Philippines 
 * Portugal
 * Nepal 
 * Northwest Syria
