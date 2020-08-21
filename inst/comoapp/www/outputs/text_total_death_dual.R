@@ -55,7 +55,7 @@ output$text_reported_death_baseline <- renderText({
             simul_baseline$results$med$cum_mortality[which(simul_baseline$results$med$time == end_date)], 
             simul_baseline$results$max$cum_mortality[which(simul_baseline$results$max$time == end_date)]
           ),
-          p("Covid-19",  strong("reported"), "deaths from ", input$date_range[1], " to ", strong(end_date))
+          p("Covid-19",  strong("reportable"), "deaths from ", input$date_range[1], " to ", strong(end_date))
       )))
 })
 
@@ -76,7 +76,7 @@ output$text_reported_death_baseline_dup <- renderText({
             simul_baseline$results$med$cum_mortality[which(simul_baseline$results$med$time == end_date)], 
             simul_baseline$results$max$cum_mortality[which(simul_baseline$results$max$time == end_date)]
           ),
-          p("Covid-19",  strong("reported"), "deaths from ", input$date_range[1], " to ", strong(end_date))
+          p("Covid-19",  strong("reportable"), "deaths from ", input$date_range[1], " to ", strong(end_date))
       )))
 })
 
@@ -125,6 +125,6 @@ output$text_reported_death_interventions <- renderText({
             simul_interventions$results$med$cum_mortality[which(simul_interventions$results$med$time == end_date)], 
             simul_interventions$results$max$cum_mortality[which(simul_interventions$results$max$time == end_date)]
           ),
-          p("Covid-19",  strong("reported"), "deaths from ", input$date_range[1], " to ", strong(end_date))
+          p("Covid-19",  strong("reportable"), "deaths from ", input$date_range[1], " to ", strong(end_date))
       )))
 })

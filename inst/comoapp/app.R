@@ -1,15 +1,13 @@
 # CoMo COVID-19 App
-version_app <- "v15.2.2"
+version_app <- "v15.3.1"
 code_for_development <- TRUE
 
 
 library(bsplus)
 
-# comoOdeCpp
-# remotes::install_github("ocelhay/comoOdeCpp", subdir = "comoOdeCpp")
-# load comoOdeCpp and ensure this is the correct version of comoOdeCpp
+# Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "15.1.2" )  stop("Require comoOdeCpp v15.1.2. Other versions will not work.")
+if(packageVersion("comoOdeCpp") != "15.3.1" )  stop("Require comoOdeCpp v15.3.1.")
 
 library(deSolve)
 library(DT)
@@ -83,7 +81,7 @@ ui <- function(request) {
             width = 2,
             div(class = "float_bottom_left",
                 hr(),
-                sliderInput("p", label = "Probability of infection given contact:", min = 0, max = 0.2, step = 0.001,
+                sliderInput("p", label = "Probability of infection given contact:", min = 0.01, max = 0.08, step = 0.001,
                             value = 0.049, ticks = FALSE, width = "75%"),
                 sliderInput("report", label = span("Percentage of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
                             value = 2.5, post = "%", ticks = FALSE, width = "75%"),
