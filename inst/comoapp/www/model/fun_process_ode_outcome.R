@@ -108,7 +108,7 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     base_mort_QC1 <- cumsum(rowSums(out_mat[,(QCindex+1)]%*%mort))
     base_mort_QR1 <- cumsum(rowSums(out_mat[,(QRindex+1)]%*%mort))
     base_mort_R1 <- cumsum(rowSums(out_mat[,(Rindex+1)]%*%mort))
-    base_mort_V1 <- cumsum(rowSums(out_mean[,(Vindex+1)]%*%mort))
+    base_mort_V1 <- cumsum(rowSums(out_mat[,(Vindex+1)]%*%mort))
     
 
     # Fill in results
