@@ -5,11 +5,9 @@ code_for_development <- TRUE
 
 library(bsplus)
 
-# comoOdeCpp
-# remotes::install_github("ocelhay/comoOdeCpp", subdir = "comoOdeCpp")
-# load comoOdeCpp and ensure this is the correct version of comoOdeCpp
+# Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "15.3.1" )  stop("Require comoOdeCpp v15.3.1. Other versions will not work.")
+if(packageVersion("comoOdeCpp") != "15.3.1" )  stop("Require comoOdeCpp v15.3.1.")
 
 library(deSolve)
 library(DT)
