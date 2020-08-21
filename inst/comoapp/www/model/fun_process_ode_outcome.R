@@ -52,13 +52,13 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     tc <- tc %>%
       mutate(Date = startdate + Day,
              age_cat = case_when(
-               Age >= 1 & Age <= 6   ~ "≤ 30 y.o.",
+               Age >= 1 & Age <= 6   ~ "less than 30 y.o.",
                Age > 6 & Age <= 8    ~ "30-40 y.o.",
                Age > 8 & Age <= 10    ~ "40-50 y.o.",
                Age > 10 & Age <= 12    ~ "50-60 y.o.",
                Age > 12 & Age <= 14    ~ "60-70 y.o.",
-               Age >= 15  ~ "≥ 70 y.o.")) %>%
-      mutate(age_cat = factor(age_cat, levels = rev(c("≤ 30 y.o.", "30-40 y.o.", "40-50 y.o.", "50-60 y.o.", "60-70 y.o.", "≥ 70 y.o."))))
+               Age >= 15  ~ "above 70 y.o.")) %>%
+      mutate(age_cat = factor(age_cat, levels = rev(c("less than 30 y.o.", "30-40 y.o.", "40-50 y.o.", "50-60 y.o.", "60-70 y.o.", "above 70 y.o."))))
     
     # Mortality lag ----
     mortality_lag <- data.frame(Age = popstruc$agefloor)

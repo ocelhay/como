@@ -10,7 +10,7 @@ output$plot_total_deaths_age <- renderPlot({
     filter(Date <= end_date) %>% 
     group_by(age_cat) %>%
     summarise(total_deaths = round(sum(value))) %>% 
-    mutate(freq = round(100 * total_deaths / sum(total_deaths), 2))
+    mutate(freq = round(100 * total_deaths / sum(total_deaths), 1))
   
   ggplot(data = dta, aes(x = age_cat, y = total_deaths, fill = age_cat))+ 
     geom_bar(stat = "identity") +
