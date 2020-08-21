@@ -19,7 +19,7 @@ inputs <- function(inp, run, times, startdate, stopdate, age_testing_min, age_te
   cte<-intersect(which(inp$Intervention=="Shielding the Elderly"),tv)
   q<-intersect(which(inp$Intervention=="(*Self-isolation) Household Isolation"),tv)
   tb<-intersect(which(inp$Intervention=="International Travel Ban"),tv)
-  vc<-intersect(which(inp$Intervention=="Vaccination"),tv)
+  
   mt<-intersect(which(inp$Intervention=="Mass Testing"),tv)
   minas<-intersect(which(inp$Intervention=="(*Mass Testing) Age Testing Minimum"),tv)
   maxas<-intersect(which(inp$Intervention=="(*Mass Testing) Age Testing Maximum"),tv)
