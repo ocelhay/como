@@ -5,6 +5,5 @@
 ^\.travis\.yml$
 ^appveyor\.yml$
 ^LICENSE\.txt$
-^Results_Legend_CoMoCOVID-19App\.xlsx$
 ^docs$
 ^misc$
