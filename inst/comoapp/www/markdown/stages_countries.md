@@ -1,11 +1,11 @@
 Stage 1: Preliminary analyses and model calibration to explore optimal containment strategies
 
-* Argentina
 * Bangladesh 
 * Brazil
 * Cambodia
 * Ecuador 
 * Ethiopia
+* Fiji
 * Nigeria
 * Myanmar
 * Taiwan 
@@ -14,6 +14,7 @@ Stage 1: Preliminary analyses and model calibration to explore optimal containme
 
 Stage 2: Have engaged with local Ministries of Health (MoH) or relevant policymakers and are in the process of analysing the different strategies under consideration
 
+* Argentina
 * Philippines 
 * Portugal
 * Nepal 
