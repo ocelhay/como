@@ -59,7 +59,7 @@ ui <- function(request) {
                           column(8, br(), p("The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level."))
                         ),
                         br(),
-                        h5("CoMo Consortium member countries’ stages of engagement with policymakers — August 6, 2020") %>%
+                        h5("CoMo Consortium member countries’ stages of engagement with policymakers — August 21, 2020") %>%
                           helper(content = "stages_countries", colour = "red"),
                         tags$img(src = "./como_policy_makers.png", id = "map")
                  ),
