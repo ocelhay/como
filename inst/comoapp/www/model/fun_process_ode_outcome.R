@@ -108,6 +108,7 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     base_mort_QC1 <- cumsum(rowSums(out_mat[,(QCindex+1)]%*%mort))
     base_mort_QR1 <- cumsum(rowSums(out_mat[,(QRindex+1)]%*%mort))
     base_mort_R1 <- cumsum(rowSums(out_mat[,(Rindex+1)]%*%mort))
+    base_mort_V1 <- cumsum(rowSums(out_mean[,(Vindex+1)]%*%mort))
     
 
     # Fill in results
@@ -121,11 +122,11 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     results$icu_bed_requirement <- round(reqicu1)
     results$icu_ventilator_requirement <- round(reqvent1)
     
-    results$death_natural_non_exposed <- round(base_mort_S1)
-    results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 + base_mort_QS1 + 
+    results$death_natural_non_exposed <- round(base_mort_S1+base_mort_V1+base_mort_QS1)
+    results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 +  
                                              base_mort_QE1 + base_mort_QI1 + base_mort_QC1 + base_mort_QR1 + base_mort_R1+
                                              base_mort_H1+base_mort_HC1+base_mort_ICU1+base_mort_ICUC1+base_mort_ICUCV1+
-                                             base_mort_Vent1+base_mort_VentC1)
+                                             base_mort_Vent1+base_mort_VentC1) 
     results$death_treated_hospital <- round(cinc_mort_H1)
     results$death_treated_icu <- round(cinc_mort_ICU1)
     results$death_treated_ventilator <- round(cinc_mort_Vent1)
