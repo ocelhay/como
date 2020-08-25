@@ -765,7 +765,7 @@ server <- function(input, output, session) {
   # Downloadable csv ----
   results_aggregated <- reactive({
     
-    # simul_baseline$results and simul_interventions$results ----
+    ## Outputs of the model ----
     dta <- tibble(
       date = simul_baseline$results$time, 
       
@@ -881,13 +881,13 @@ server <- function(input, output, session) {
       hypothetical_cum_mortality_max = simul_interventions$results$max$cum_mortality,
     )
     
-    # add cases data ----
+    ## Cases Data ----
     dta <- left_join(
       dta, 
       cases_rv$data %>% rename(input_cases = cases, input_deaths = deaths, input_cumulative_death = cumulative_death), 
       by = "date")
     
-    # add interventions vectors ----
+    ## Interventions ----
     startdate <- input$date_range[1]
     stopdate <- input$date_range[2]
     times <- seq(0, as.numeric(stopdate - startdate))
