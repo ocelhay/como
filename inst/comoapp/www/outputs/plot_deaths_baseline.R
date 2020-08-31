@@ -5,6 +5,9 @@ output$plot_deaths_baseline <- renderPlot({
     cum_mortality_min = simul_baseline$results$min$cum_mortality,
     cum_mortality_med = simul_baseline$results$med$cum_mortality,
     cum_mortality_max = simul_baseline$results$max$cum_mortality,
+    attributable_deaths_min = simul_baseline$results$min$attributable_deaths,
+    attributable_deaths_med = simul_baseline$results$med$attributable_deaths,
+    attributable_deaths_max = simul_baseline$results$max$attributable_deaths,
     time = simul_baseline$results$time), 
     cases_rv$data, # cumulative_death
     by = c("time" = "date"))
@@ -25,11 +28,17 @@ output$plot_deaths_baseline <- renderPlot({
   
   ggplot(data = dta2, aes(x = Date)) +
     geom_ribbon(aes(ymin = cum_mortality_min, ymax = cum_mortality_max), fill = "#00441b", alpha = 0.7) +
-    geom_line(aes(y = cum_mortality_med, color = "Predicted"), lwd = 1.2) + 
+    geom_line(aes(y = cum_mortality_med, color = "Reportable"), lwd = 1.2) + 
+    
+    geom_ribbon(aes(ymin = attributable_deaths_min, ymax = attributable_deaths_max), fill = "#74c476", alpha = 0.7) +
+    geom_line(aes(y = attributable_deaths_med, color = "Attributable"), lwd = 1.2) + 
+    
     geom_line(aes(y = cumulative_death, color = "Observed"), lwd = 1.2) +
+    
     geom_point(aes(y = cumulative_death), color = "red") +
     coord_cartesian(ylim = c(NA, max_y)) +
     ggtitle("Baseline Cumulative Deaths") + xlab("") + ylab("Deaths") +
     theme_light(base_size = 14) +
-    scale_color_manual(name = "Cumulative Deaths", values = c("Predicted" = "#00441b", "Observed" = "red"))
+    scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
+    scale_color_manual(name = "Cumulative Deaths", values = c("Reportable" = "#00441b", "Attributable" = "#74c476", "Observed" = "red"))
 })

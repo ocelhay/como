@@ -33,6 +33,6 @@ list(
                                value = 50, min = 0, max = 100, step = 1)
             )
           ),
-          div(class = "closebutton", bsButton("close_virus_param", "Close (Esc.)", icon("times"), style = "danger", size = "small"))
+          div(class = "closebutton", actionButton("close_virus_param", label = span(icon('times'), " Close (Esc.)"), class = "btn-danger btn-sm"))
   )
 )

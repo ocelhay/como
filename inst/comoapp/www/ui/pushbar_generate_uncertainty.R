@@ -23,6 +23,6 @@ list(
           ),
           br(),
           includeMarkdown("./www/markdown/generate_uncertainty.md"),
-          div(class = "closebutton", bsButton("close_generate_uncertainty", "Close (Esc.)", icon("times"), style = "danger", size = "small"))
+          div(class = "closebutton", actionButton("close_generate_uncertainty", label = span(icon('times'), " Close (Esc.)"), class = "btn-danger btn-sm"))
   )
 )

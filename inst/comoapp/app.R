@@ -1,14 +1,12 @@
 # CoMo COVID-19 App
-version_app <- "v15.3.1"
+version_app <- "v15.3.2"
 code_for_development <- TRUE
-
-
-library(bsplus)
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
 library(comoOdeCpp)
 if(packageVersion("comoOdeCpp") != "15.3.1" )  stop("Require comoOdeCpp v15.3.1.")
 
+library(bsplus)
 library(deSolve)
 library(DT)
 library(gridExtra)
@@ -20,7 +18,6 @@ library(readxl)
 library(reshape2)
 library(scales)
 library(shiny)
-library(shinyBS)
 library(shinycssloaders)
 library(shinyhelper)
 library(shinyjs)
@@ -111,15 +108,13 @@ ui <- function(request) {
                      dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year")
               ),
               column(6, offset = 2,
-                     fluidRow(column(6, bsButton("open_country_param", label = "Country", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                 width = "70%"),
+                     fluidRow(column(6, 
+                                     actionButton("open_country_param", label = span(icon('cog'), " Country"), class = "btn-primary", width = "70%"),
                                      htmlOutput("feedback_choices")),
-                              column(6, bsButton("open_interventions_param", label = "Interventions", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                                 width = "70%"), br(), br(),
-                                     bsButton("open_virus_param", label = "Virus", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                              width = "70%"), br(), br(),
-                                     bsButton("open_hospital_param", label = "Hospital", icon = icon('cog'), style = "primary", type = "action", value = FALSE, 
-                                              width = "70%")
+                              column(6, 
+                                     actionButton("open_interventions_param", label = span(icon('cog'), " Interventions"), class = "btn-primary", width = "70%"), br(), br(),
+                                     actionButton("open_virus_param", label = span(icon('cog'), " Virus"), class = "btn-primary", width = "70%"), br(), br(),
+                                     actionButton("open_hospital_param", label = span(icon('cog'), " Hospital"), class = "btn-primary", width = "70%")
                               )
                      )
               )
@@ -765,7 +760,7 @@ server <- function(input, output, session) {
   # Downloadable csv ----
   results_aggregated <- reactive({
     
-    # simul_baseline$results and simul_interventions$results ----
+    ## Outputs of the model ----
     dta <- tibble(
       date = simul_baseline$results$time, 
       
@@ -881,13 +876,13 @@ server <- function(input, output, session) {
       hypothetical_cum_mortality_max = simul_interventions$results$max$cum_mortality,
     )
     
-    # add cases data ----
+    ## Cases Data ----
     dta <- left_join(
       dta, 
       cases_rv$data %>% rename(input_cases = cases, input_deaths = deaths, input_cumulative_death = cumulative_death), 
       by = "date")
     
-    # add interventions vectors ----
+    ## Interventions ----
     startdate <- input$date_range[1]
     stopdate <- input$date_range[2]
     times <- seq(0, as.numeric(stopdate - startdate))

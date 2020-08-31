@@ -33,6 +33,6 @@ list(
                    sliderInput("nu_vent", label = "Duration of ventilated infection:", value = 25, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),
             )
           ),
-          div(class = "closebutton", bsButton("close_hospital_param", "Close (Esc.)", icon("times"), style = "danger", size = "small"))
+          div(class = "closebutton", actionButton("close_hospital_param", label = span(icon('times'), " Close (Esc.)"), class = "btn-danger btn-sm"))
   )
 )

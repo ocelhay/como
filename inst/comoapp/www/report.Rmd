@@ -42,10 +42,10 @@ dta <- interventions$baseline_mat %>%
          label = paste0(value, unit, " ", difftime(date_end, date_start, units = "days") - 1, "d."))
 
 # showing all "real" interventions
-  dta <- bind_rows(
-    dta, 
-    tibble(intervention = setdiff(all_interventions[-c(1, 12, 14, 15)], dta$intervention))) %>%
-    filter(intervention %in% all_interventions[-c(1, 12, 14, 15)])
+dta <- bind_rows(
+  dta, 
+  tibble(intervention = setdiff(all_interventions[-c(1, 12, 14, 15)], dta$intervention))) %>%
+  filter(intervention %in% all_interventions[-c(1, 12, 14, 15)])
 
 if(interventions$baseline_mat %>% nrow() == 0) return({
   plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
@@ -120,6 +120,7 @@ ggplot(data = dta2, aes(x = Date)) +
   coord_cartesian(ylim = c(NA, max_y)) +
   ggtitle("Baseline Cases") + xlab("") + ylab("Daily Cases") +
   theme_light(base_size = 17) +
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   scale_color_manual(name = "Cases", values = c("Predicted Reported" = "#74c476", "Predicted Reported + Unreported" = "#00441b", "Observed" = "red"))
 ```
 
@@ -131,12 +132,22 @@ dta <- left_join(tibble(
   cum_mortality_min = simul_baseline$results$min$cum_mortality,
   cum_mortality_med = simul_baseline$results$med$cum_mortality,
   cum_mortality_max = simul_baseline$results$max$cum_mortality,
+  attributable_deaths_min = simul_baseline$results$min$attributable_deaths,
+  attributable_deaths_med = simul_baseline$results$med$attributable_deaths,
+  attributable_deaths_max = simul_baseline$results$max$attributable_deaths,
   time = simul_baseline$results$time), 
   cases_rv$data, # cumulative_death
   by = c("time" = "date"))
 
-max_x <- dta$time[last(which(!is.na(dta$cumulative_death)))] + 3
-max_y <- 1.2 * max(dta$cumulative_death, na.rm = TRUE)
+# X/Y scales
+if(input$focus_axis == "Observed")  {
+  max_x <- dta$time[last(which(!is.na(dta$cumulative_death)))] + 3
+  max_y <- 1.2 * max(dta$cumulative_death, na.rm = TRUE)
+}
+if(input$focus_axis == "Predicted Reported" | input$focus_axis == "Predicted Reported + Unreported")  {
+  max_x <- max(dta$time)
+  max_y <- NA
+}
 
 dta2 <- dta %>%
   rename(Date = time) %>%
@@ -144,13 +155,19 @@ dta2 <- dta %>%
 
 ggplot(data = dta2, aes(x = Date)) +
   geom_ribbon(aes(ymin = cum_mortality_min, ymax = cum_mortality_max), fill = "#00441b", alpha = 0.7) +
-  geom_line(aes(y = cum_mortality_med, color = "Predicted"), lwd = 1.2) + 
+  geom_line(aes(y = cum_mortality_med, color = "Reportable"), lwd = 1.2) + 
+  
+  geom_ribbon(aes(ymin = attributable_deaths_min, ymax = attributable_deaths_max), fill = "#74c476", alpha = 0.7) +
+  geom_line(aes(y = attributable_deaths_med, color = "Attributable"), lwd = 1.2) + 
+  
   geom_line(aes(y = cumulative_death, color = "Observed"), lwd = 1.2) +
+  
   geom_point(aes(y = cumulative_death), color = "red") +
   coord_cartesian(ylim = c(NA, max_y)) +
   ggtitle("Baseline Cumulative Deaths") + xlab("") + ylab("Deaths") +
-  theme_light(base_size = 17) +
-  scale_color_manual(name = "Cumulative Deaths", values = c("Predicted" = "#00441b", "Observed" = "red"))
+  theme_light(base_size = 14) +
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
+  scale_color_manual(name = "Cumulative Deaths", values = c("Reportable" = "#00441b", "Attributable" = "#74c476", "Observed" = "red"))
 ```
 
 For this “baseline scenario” between `r input$date_range[1]` and `r input$date_range[2]`:
@@ -173,10 +190,10 @@ dta <- interventions$future_mat %>%
          label = paste0(value, unit, " ", difftime(date_end, date_start, units = "days") - 1, "d."))
 
 # showing all "real" interventions
-  dta <- bind_rows(
-    dta, 
-    tibble(intervention = setdiff(all_interventions[-c(1, 12, 14, 15)], dta$intervention))) %>%
-    filter(intervention %in% all_interventions[-c(1, 12, 14, 15)])
+dta <- bind_rows(
+  dta, 
+  tibble(intervention = setdiff(all_interventions[-c(1, 12, 14, 15)], dta$intervention))) %>%
+  filter(intervention %in% all_interventions[-c(1, 12, 14, 15)])
 
 if(interventions$future_mat %>% nrow() == 0) return({
   plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
@@ -259,6 +276,7 @@ plot1 <- ggplot(data = dta2, aes(x = Date)) +
   geom_line(aes(y = cases, color = "Observed"), lwd = 1.2) +
   geom_point(aes(y = cases), color = "red") + 
   coord_cartesian(ylim = c(NA, max_y)) +
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   ggtitle("Baseline Cases") + xlab("") + ylab("Daily Cases") +
   theme_light(base_size = 14) +
   theme(legend.position = "bottom") +
@@ -302,6 +320,7 @@ plot2 <- ggplot(data = dta2, aes(x = Date)) +
   geom_line(aes(y = cases, color = "Observed"), lwd = 1.2) +
   geom_point(aes(y = cases), color = "red") + 
   coord_cartesian(ylim = c(NA, max_y)) +
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   ggtitle("Hypthetical Scenario Cases") + xlab("") + ylab("Daily Cases") +
   theme_light(base_size = 14) +
   theme(legend.position = "bottom") +
@@ -339,6 +358,7 @@ plot1 <- ggplot(data = dta, aes(x = time, y = value, fill = nature))+
   scale_fill_brewer(palette = "Set1") +
   ylab("Deaths") + xlab("") +
   coord_cartesian(ylim = c(NA, max_y)) +
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   theme(legend.title = element_blank(), legend.position = "left") +
   labs(title = "Baseline Cumulative Deaths")
@@ -360,6 +380,7 @@ plot2 <- ggplot(data = dta, aes(x = time, y = value, fill = nature))+
   scale_fill_brewer(palette = "Set1") +
   ylab("Deaths") + xlab("") +
   coord_cartesian(ylim = c(NA, max_y)) +
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   theme(legend.title = element_blank(), legend.position = "none") +
   labs(title = "Hypthetical Scenario Cumulative Deaths")
@@ -380,7 +401,8 @@ dta <- simul_baseline$results$med$tc %>%
 
 plot1 <- ggplot(data = dta, aes(x = age_cat, y = total_deaths, fill = age_cat))+ 
   geom_bar(stat = "identity") +
-  geom_text(aes(label = paste0(total_deaths, "(", freq, "%)")), vjust = 0.3, size = 5) + 
+  geom_text(aes(label = paste0(format(total_deaths, big.mark = ",", scientific = FALSE), " (", freq, "%)")), vjust = -0.2, size = 4) + 
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   scale_fill_brewer(palette = "BrBG") + 
   ylab("Total Deaths") + xlab("") +
   theme_minimal(base_size = 14) + 
@@ -394,7 +416,8 @@ dta <- simul_interventions$results$med$tc %>%
 
 plot2 <- ggplot(data = dta, aes(x = age_cat, y = total_deaths, fill = age_cat))+ 
   geom_bar(stat = "identity") +
-  geom_text(aes(label = paste0(total_deaths, "(", freq, "%)")), vjust = 0.3, size = 5) + 
+  geom_text(aes(label = paste0(format(total_deaths, big.mark = ",", scientific = FALSE), " (", freq, "%)")), vjust = -0.2, size = 4) + 
+  scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   scale_fill_brewer(palette = "BrBG") + 
   ylab("Total Deaths") + xlab("") +
   theme_minimal(base_size = 14) + 
@@ -423,7 +446,8 @@ plot11 <- ggplot(data = dta %>% filter(nature == "Hospital Surge Beds"), aes(x =
   geom_line()+
   ylab("Beds") + xlab("") +
   geom_hline(yintercept = input$beds_available, linetype = "dashed") +
-  ylim(0, max(simul_baseline$results$med$hospital_surge_beds, simul_interventions$results$med$hospital_surge_beds)) +
+  scale_y_continuous(limits = c(0, max(simul_baseline$results$med$hospital_surge_beds, simul_interventions$results$med$hospital_surge_beds)),
+                     labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   labs(title = "Baseline, Hospital Surge Beds")
 
@@ -431,8 +455,9 @@ plot12 <- ggplot(data = dta %>% filter(nature == "ICU Beds"), aes(x = time, y = 
   geom_line()+
   ylab("Beds") + xlab("") +
   geom_hline(yintercept = input$icu_beds_available, linetype = "dashed") +
-  ylim(0, max(simul_baseline$results$med$icu_beds, simul_interventions$results$med$icu_beds)) +
   coord_cartesian(ylim = c(NA,  max(simul_baseline$results$med$icu_beds, simul_interventions$results$med$icu_beds))) +
+  scale_y_continuous(limits = c(0, max(simul_baseline$results$med$icu_beds, simul_interventions$results$med$icu_beds)),
+                     labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   labs(title = "Baseline, ICU Beds")
 
@@ -440,7 +465,9 @@ plot13 <- ggplot(data = dta %>% filter(nature == "Ventilators"), aes(x = time, y
   geom_line()+
   ylab("Ventilators") + xlab("") +
   geom_hline(yintercept = input$ventilators_available, linetype = "dashed") +
-  ylim(0, max(simul_baseline$results$med$ventilators, simul_interventions$results$med$ventilators)) +
+  scale_y_continuous(
+    limits = c(0, max(simul_baseline$results$med$ventilators, simul_interventions$results$med$ventilators)),
+    labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   labs(title = "Baseline, Ventilators")
 
@@ -455,7 +482,9 @@ plot21 <- ggplot(data = dta %>% filter(nature == "Hospital Surge Beds"), aes(x =
   geom_line()+
   ylab("Beds") + xlab("") +
   geom_hline(yintercept = input$beds_available, linetype = "dashed") +
-  ylim(0, max(simul_baseline$results$med$hospital_surge_beds, simul_interventions$results$med$hospital_surge_beds)) +
+  scale_y_continuous(
+    limits = c(0, max(simul_baseline$results$med$hospital_surge_beds, simul_interventions$results$med$hospital_surge_beds)),
+    labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   labs(title = "Hypothetical Scenario, Hospital Surge Beds")
 
@@ -463,7 +492,9 @@ plot22 <- ggplot(data = dta %>% filter(nature == "ICU Beds"), aes(x = time, y = 
   geom_line()+
   ylab("Beds") + xlab("") +
   geom_hline(yintercept = input$icu_beds_available, linetype = "dashed") +
-  ylim(0, max(simul_baseline$results$med$icu_beds, simul_interventions$results$med$icu_beds)) +
+  scale_y_continuous(
+    limits = c(0, max(simul_baseline$results$med$icu_beds, simul_interventions$results$med$icu_beds)),
+    labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   labs(title = "Hypothetical Scenario, ICU Beds")
 
@@ -471,7 +502,9 @@ plot23 <- ggplot(data = dta %>% filter(nature == "Ventilators"), aes(x = time, y
   geom_line()+
   ylab("Ventilators") + xlab("") +
   geom_hline(yintercept = input$ventilators_available, linetype = "dashed") +
-  ylim(0, max(simul_baseline$results$med$ventilators, simul_interventions$results$med$ventilators)) +
+  scale_y_continuous(
+    limits = c(0, max(simul_baseline$results$med$ventilators, simul_interventions$results$med$ventilators)),
+    labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   labs(title = "Hypothetical Scenario, Ventilators")
 
@@ -509,7 +542,9 @@ plot11 <- ggplot(data = dta %>% filter(nature == "Hospital Surge Beds"), aes(x =
   geom_line()+
   ylab("Beds") + xlab("") +
   geom_hline(yintercept = input$beds_available, linetype = "dashed") +
-  ylim(0, max(simul_baseline$results$med$normal_bed_requirement, simul_interventions$results$med$normal_bed_requirement)) +
+  scale_y_continuous(
+    limits = c(0, max(simul_baseline$results$med$normal_bed_requirement, simul_interventions$results$med$normal_bed_requirement)),
+    labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   labs(title = "Baseline, Hospital Surge Beds")
 
@@ -517,8 +552,7 @@ plot12 <- ggplot(data = dta %>% filter(nature == "ICU Beds"), aes(x = time, y = 
   geom_line()+
   ylab("Beds") + xlab("") +
   geom_hline(yintercept = input$icu_beds_available, linetype = "dashed") +
-  ylim(0, max(simul_baseline$results$med$icu_bed_requirement, simul_interventions$results$med$icu_bed_requirement)) +
-  coord_cartesian(ylim = c(NA,  max(simul_baseline$results$med$icu_bed_requirement, simul_interventions$results$med$icu_bed_requirement))) +
+  scale_y_continuous(limits = c(0, max(simul_baseline$results$med$icu_bed_requirement, simul_interventions$results$med$icu_bed_requirement)), labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   labs(title = "Baseline, ICU Beds")
 
@@ -526,7 +560,9 @@ plot13 <- ggplot(data = dta %>% filter(nature == "Ventilators"), aes(x = time, y
   geom_line()+
   ylab("Ventilators") + xlab("") +
   geom_hline(yintercept = input$ventilators_available, linetype = "dashed") +
-  ylim(0, max(simul_baseline$results$med$icu_ventilator_requirement, simul_interventions$results$med$icu_ventilator_requirement)) +
+  scale_y_continuous(
+    limits = c(0, max(simul_baseline$results$med$icu_ventilator_requirement, simul_interventions$results$med$icu_ventilator_requirement)),
+    labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   labs(title = "Baseline, Ventilators")
 
@@ -541,7 +577,9 @@ plot21 <- ggplot(data = dta %>% filter(nature == "Hospital Surge Beds"), aes(x =
   geom_line()+
   ylab("Beds") + xlab("") +
   geom_hline(yintercept = input$beds_available, linetype = "dashed") +
-  ylim(0, max(simul_baseline$results$med$normal_bed_requirement, simul_interventions$results$med$normal_bed_requirement)) +
+  scale_y_continuous(
+    limits = c(0, max(simul_baseline$results$med$normal_bed_requirement, simul_interventions$results$med$normal_bed_requirement)),
+    labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   labs(title = "Hypothetical Scenario, Hospital Surge Beds")
 
@@ -549,7 +587,9 @@ plot22 <- ggplot(data = dta %>% filter(nature == "ICU Beds"), aes(x = time, y = 
   geom_line()+
   ylab("Beds") + xlab("") +
   geom_hline(yintercept = input$icu_beds_available, linetype = "dashed") +
-  ylim(0, max(simul_baseline$results$med$icu_bed_requirement, simul_interventions$results$med$icu_bed_requirement)) +
+  scale_y_continuous(
+    limits = c(0, max(simul_baseline$results$med$icu_bed_requirement, simul_interventions$results$med$icu_bed_requirement)),
+    labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   labs(title = "Hypothetical Scenario, ICU Beds")
 
@@ -557,7 +597,9 @@ plot23 <- ggplot(data = dta %>% filter(nature == "Ventilators"), aes(x = time, y
   geom_line()+
   ylab("Ventilators") + xlab("") +
   geom_hline(yintercept = input$ventilators_available, linetype = "dashed") +
-  ylim(0, max(simul_baseline$results$med$icu_ventilator_requirement, simul_interventions$results$med$icu_ventilator_requirement)) +
+  scale_y_continuous(
+    limits =c(0, max(simul_baseline$results$med$icu_ventilator_requirement, simul_interventions$results$med$icu_ventilator_requirement)),
+    labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
   theme_minimal(base_size = 14) +
   labs(title = "Hypothetical Scenario, Ventilators")
 
