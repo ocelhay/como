@@ -74,6 +74,6 @@ list(
                    sliderInput("vent_dex", label = "Change in ventilation requirement if given Dex", value = 87, min = 0, max = 100, step = 1, post = "%", ticks = FALSE)
             )
           ),
-          div(class = "closebutton", bsButton("close_interventions_param", "Close (Esc.)", icon("times"), style = "danger", size = "small"))
+          div(class = "closebutton", actionButton("close_interventions_param", label = span(icon('times'), " Close (Esc.)"), class = "btn-danger btn-sm"))
   )
 )
