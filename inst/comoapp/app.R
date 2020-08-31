@@ -8,7 +8,6 @@ if(packageVersion("comoOdeCpp") != "15.3.1" )  stop("Require comoOdeCpp v15.3.1.
 
 library(bsplus)
 library(deSolve)
-library(DT)
 library(gridExtra)
 library(highcharter)
 library(knitr)

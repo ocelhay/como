@@ -33,7 +33,6 @@ Depends:
 Imports:
     bsplus, 
     deSolve,
-    DT, 
     gridExtra, 
     highcharter, 
     knitr, 
