@@ -40,6 +40,7 @@ output$plot_cases_baseline <- renderPlot({
     geom_point(aes(y = cases), color = "red") + 
     coord_cartesian(ylim = c(NA, max_y)) +
     ggtitle("Baseline Cases") + xlab("") + ylab("Daily Cases") +
+    scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
     theme_light(base_size = 14) +
     scale_color_manual(name = "Cases", values = c("Predicted Reported" = "#74c476", "Predicted Reported + Unreported" = "#00441b", "Observed" = "red"))
 })
