@@ -4,8 +4,8 @@
 #' Open browser
 #' @export
 #'
-#' @import bsplus deSolve highcharter lubridate pushbar RColorBrewer readxl 
-#' @import reshape2 scales shiny shinyBS shinycssloaders shinyhelper shinythemes 
+#' @import bsplus deSolve DT gridExtra highcharter knitr lubridate pushbar RColorBrewer readxl 
+#' @import reshape2 scales shiny shinycssloaders shinyhelper shinyjs shinythemes 
 #' @import shinyWidgets tidyverse
 
 comomodel <- function() {
