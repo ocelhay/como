@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v15.3.1"
+version_app <- "v15.3.2"
 code_for_development <- TRUE
 
 
@@ -20,7 +20,7 @@ library(readxl)
 library(reshape2)
 library(scales)
 library(shiny)
-library(shinyBS)
+# library(shinyBS)
 library(shinycssloaders)
 library(shinyhelper)
 library(shinyjs)
