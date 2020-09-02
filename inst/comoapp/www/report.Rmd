@@ -523,9 +523,7 @@ The above graphs show expected hospital occupancy for the baseline and hypotheti
 
 In most simulations, the occupancy for each classification will plateau at the input capacity. A level of flexibility is assumed in the model which allows for the occupancy to exceed capacity in some cases. Especially in the hospital surge category. For this reason, some simulations will predict occupancy exceeding capacity. 
 
-## Hospital demand 
-
-/*PLEASE NOTE THAT THE GRAPH BELOW HASN'T YET BEEN REVIEWED AND COULD BE INCORRECT.*/
+## Hospital demand
 
 ```{r warning = FALSE, dpi = 200, fig.width = 14, fig.height = 12, eval = show}
 nb_time <- length(simul_baseline$results$time)
