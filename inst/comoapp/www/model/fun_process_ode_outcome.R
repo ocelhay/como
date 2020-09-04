@@ -81,21 +81,57 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     
     
     # Calculate mortality ----
-    cinc_mort_H1 <- cumsum(rowSums(parameters["nus"]*parameters["pdeath_h"]*(out_mat[,(Hindex+1)]%*%ifr[,2])))
-    cinc_mort_HC1 <- cumsum(rowSums(parameters["nusc"]*parameters["pdeath_hc"]*(out_mat[,(HCindex+1)]%*%ifr[,2])))
-    cinc_mort_ICU1 <- cumsum(rowSums(parameters["nu_icu"]*parameters["pdeath_icu"]*out_mat[,(ICUindex+1)]%*%ifr[,2]))
-    cinc_mort_ICUC1 <- cumsum(rowSums(parameters["nu_icuc"]*parameters["pdeath_icuc"]*out_mat[,(ICUCindex+1)]%*%ifr[,2]))
-    cinc_mort_ICUCV1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out_mat[,(ICUCVindex+1)]%*%ifr[,2]))
-    cinc_mort_Vent1 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*out_mat[,(Ventindex+1)]%*%ifr[,2]))
-    cinc_mort_VentC1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out_mat[,(VentCindex+1)]%*%ifr[,2]))
+    dexo2_hist <- rep(0,length(times))
+    dexo2c_hist <- rep(0,length(times))
+    dexv_hist <- rep(0,length(times))
+    dexvc_hist <- rep(0,length(times))
+    for (tt in times) {
+      if((tt)<max(times)){
+        if(ss$dex[tt*20+1]) {
+          dexo2_hist[tt+1] <- parameters["dexo2"]
+          dexo2c_hist[tt+1] <- parameters["dexo2c"]
+          dexv_hist[tt+1] <- parameters["dexv"]
+          dexvc_hist[tt+1] <- parameters["dexvc"]
+        } else {
+          dexo2_hist[tt+1] <- 1
+          dexo2c_hist[tt+1] <- 1
+          dexv_hist[tt+1] <- 1
+          dexvc_hist[tt+1] <- 1
+        }
+      } else {
+        dexo2_hist[tt+1] <- dexo2_hist[tt]
+        dexo2c_hist[tt+1] <- dexo2c_hist[tt]
+        dexv_hist[tt+1] <- dexv_hist[tt]
+        dexvc_hist[tt+1] <- dexvc_hist[tt]
+      }
+    }
+    cinc_mort_1 <- cumsum(rowSums(parameters["nus"]*parameters["propo2"]*parameters["pdeath_ho"]*dexo2_hist*(out_r[,(Hindex+1)]%*%ifr[,2])))
+    cinc_mort_2 <- cumsum(rowSums(parameters["nus"]*(1-parameters["propo2"])*parameters["pdeath_h"]*(out_r[,(Hindex+1)]%*%ifr[,2])))
+    cinc_mort_3 <- cumsum(rowSums(parameters["nusc"]*parameters["propo2"]*parameters["pdeath_hco"]*(out_r[,(HCindex+1)]%*%ifr[,2])))
+    cinc_mort_4 <- cumsum(rowSums(parameters["nusc"]*(1-parameters["propo2"])*parameters["pdeath_hc"]*(out_r[,(HCindex+1)]%*%ifr[,2])))
+    cinc_mort_5 <- cumsum(rowSums(parameters["nu_icu"]*parameters["propo2"]*parameters["pdeath_icuo"]*dexo2_hist*(out_r[,(ICUindex+1)]%*%ifr[,2])))
+    cinc_mort_6 <- cumsum(rowSums(parameters["nu_icu"]*(1-parameters["propo2"])*parameters["pdeath_icu"]*(out_r[,(ICUindex+1)]%*%ifr[,2])))
+    cinc_mort_7 <- cumsum(rowSums(parameters["nu_icuc"]*parameters["propo2"]*parameters["pdeath_icuco"]*dexo2c_hist*(out_r[,(ICUCindex+1)]%*%ifr[,2])))
+    cinc_mort_8 <- cumsum(rowSums(parameters["nu_icuc"]*(1-parameters["propo2"])*parameters["pdeath_icuc"]*(out_r[,(ICUCindex+1)]%*%ifr[,2])))
+    cinc_mort_9 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*dexv_hist*(out_r[,(Ventindex+1)]%*%ifr[,2])))
+    cinc_mort_10 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*dexvc_hist*(out_r[,(VentCindex+1)]%*%ifr[,2])))
+    cinc_mort_11 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*dexvc_hist*(out_r[,(ICUCVindex+1)]%*%ifr[,2])))
+    cinc_mort_H1 <- cinc_mort_1 + cinc_mort_2
+    cinc_mort_HC1 <- cinc_mort_3 + cinc_mort_4
+    cinc_mort_ICU1 <- cinc_mort_5 + cinc_mort_6
+    cinc_mort_ICUC1 <- cinc_mort_7 + cinc_mort_8
+    cinc_mort_Vent1 <- cinc_mort_9
+    cinc_mort_VentC1 <- cinc_mort_10
+    cinc_mort_ICUCV1 <- cinc_mort_11
     
-    base_mort_H1 <- cumsum(rowSums(out_mat[,(Hindex+1)]%*%mort))
-    base_mort_HC1 <- cumsum(rowSums(out_mat[,(HCindex+1)]%*%mort))
-    base_mort_ICU1 <- cumsum(rowSums(out_mat[,(ICUindex+1)]%*%mort))
-    base_mort_ICUC1 <- cumsum(rowSums(out_mat[,(ICUCindex+1)]%*%mort))
-    base_mort_ICUCV1 <- cumsum(rowSums(out_mat[,(ICUCVindex+1)]%*%mort))
-    base_mort_Vent1 <- cumsum(rowSums(out_mat[,(Ventindex+1)]%*%mort))
-    base_mort_VentC1 <- cumsum(rowSums(out_mat[,(VentCindex+1)]%*%mort))
+    base_mort_H1 <- cumsum(rowSums(out_r[,(Hindex+1)]%*%mort))
+    base_mort_HC1 <- cumsum(rowSums(out_r[,(HCindex+1)]%*%mort))
+    base_mort_ICU1 <- cumsum(rowSums(out_r[,(ICUindex+1)]%*%mort))
+    base_mort_ICUC1 <- cumsum(rowSums(out_r[,(ICUCindex+1)]%*%mort))
+    base_mort_Vent1 <- cumsum(rowSums(out_r[,(Ventindex+1)]%*%mort))
+    base_mort_VentC1 <- cumsum(rowSums(out_r[,(VentCindex+1)]%*%mort))
+    base_mort_Z1 <- cumsum(rowSums(out_r[,(Zindex+1)]%*%mort))
+    base_mort_V1 <- cumsum(rowSums(out_r[,(Vindex+1)]%*%mort))
     
     base_mort_S1 <- cumsum(rowSums(out_mat[,(Sindex+1)]%*%mort))
     base_mort_E1 <- cumsum(rowSums(out_mat[,(Eindex+1)]%*%mort))
@@ -108,7 +144,6 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     base_mort_QC1 <- cumsum(rowSums(out_mat[,(QCindex+1)]%*%mort))
     base_mort_QR1 <- cumsum(rowSums(out_mat[,(QRindex+1)]%*%mort))
     base_mort_R1 <- cumsum(rowSums(out_mat[,(Rindex+1)]%*%mort))
-    base_mort_V1 <- cumsum(rowSums(out_mat[,(Vindex+1)]%*%mort))
     
 
     # Fill in results
