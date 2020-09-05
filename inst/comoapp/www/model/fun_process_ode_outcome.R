@@ -1,4 +1,4 @@
-process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mort, popstruc){
+process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors){
   # Define object to return ----
   results <- list(
     time = startdate + times
@@ -86,8 +86,8 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     dexv_hist <- rep(0,length(times))
     dexvc_hist <- rep(0,length(times))
     for (tt in times) {
-      if((tt)<max(times)){
-        if(ss$dex[tt*20+1]) {
+      if(tt < max(times)){
+        if(vectors$dex[tt*20+1]) {
           dexo2_hist[tt+1] <- parameters["dexo2"]
           dexo2c_hist[tt+1] <- parameters["dexo2c"]
           dexv_hist[tt+1] <- parameters["dexv"]
@@ -105,17 +105,17 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
         dexvc_hist[tt+1] <- dexvc_hist[tt]
       }
     }
-    cinc_mort_1 <- cumsum(rowSums(parameters["nus"]*parameters["propo2"]*parameters["pdeath_ho"]*dexo2_hist*(out_r[,(Hindex+1)]%*%ifr[,2])))
-    cinc_mort_2 <- cumsum(rowSums(parameters["nus"]*(1-parameters["propo2"])*parameters["pdeath_h"]*(out_r[,(Hindex+1)]%*%ifr[,2])))
-    cinc_mort_3 <- cumsum(rowSums(parameters["nusc"]*parameters["propo2"]*parameters["pdeath_hco"]*(out_r[,(HCindex+1)]%*%ifr[,2])))
-    cinc_mort_4 <- cumsum(rowSums(parameters["nusc"]*(1-parameters["propo2"])*parameters["pdeath_hc"]*(out_r[,(HCindex+1)]%*%ifr[,2])))
-    cinc_mort_5 <- cumsum(rowSums(parameters["nu_icu"]*parameters["propo2"]*parameters["pdeath_icuo"]*dexo2_hist*(out_r[,(ICUindex+1)]%*%ifr[,2])))
-    cinc_mort_6 <- cumsum(rowSums(parameters["nu_icu"]*(1-parameters["propo2"])*parameters["pdeath_icu"]*(out_r[,(ICUindex+1)]%*%ifr[,2])))
-    cinc_mort_7 <- cumsum(rowSums(parameters["nu_icuc"]*parameters["propo2"]*parameters["pdeath_icuco"]*dexo2c_hist*(out_r[,(ICUCindex+1)]%*%ifr[,2])))
-    cinc_mort_8 <- cumsum(rowSums(parameters["nu_icuc"]*(1-parameters["propo2"])*parameters["pdeath_icuc"]*(out_r[,(ICUCindex+1)]%*%ifr[,2])))
-    cinc_mort_9 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*dexv_hist*(out_r[,(Ventindex+1)]%*%ifr[,2])))
-    cinc_mort_10 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*dexvc_hist*(out_r[,(VentCindex+1)]%*%ifr[,2])))
-    cinc_mort_11 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*dexvc_hist*(out_r[,(ICUCVindex+1)]%*%ifr[,2])))
+    cinc_mort_1 <- cumsum(rowSums(parameters["nus"]*parameters["propo2"]*parameters["pdeath_ho"]*dexo2_hist*(out_mat[,(Hindex+1)]%*%ifr[,2])))
+    cinc_mort_2 <- cumsum(rowSums(parameters["nus"]*(1-parameters["propo2"])*parameters["pdeath_h"]*(out_mat[,(Hindex+1)]%*%ifr[,2])))
+    cinc_mort_3 <- cumsum(rowSums(parameters["nusc"]*parameters["propo2"]*parameters["pdeath_hco"]*(out_mat[,(HCindex+1)]%*%ifr[,2])))
+    cinc_mort_4 <- cumsum(rowSums(parameters["nusc"]*(1-parameters["propo2"])*parameters["pdeath_hc"]*(out_mat[,(HCindex+1)]%*%ifr[,2])))
+    cinc_mort_5 <- cumsum(rowSums(parameters["nu_icu"]*parameters["propo2"]*parameters["pdeath_icuo"]*dexo2_hist*(out_mat[,(ICUindex+1)]%*%ifr[,2])))
+    cinc_mort_6 <- cumsum(rowSums(parameters["nu_icu"]*(1-parameters["propo2"])*parameters["pdeath_icu"]*(out_mat[,(ICUindex+1)]%*%ifr[,2])))
+    cinc_mort_7 <- cumsum(rowSums(parameters["nu_icuc"]*parameters["propo2"]*parameters["pdeath_icuco"]*dexo2c_hist*(out_mat[,(ICUCindex+1)]%*%ifr[,2])))
+    cinc_mort_8 <- cumsum(rowSums(parameters["nu_icuc"]*(1-parameters["propo2"])*parameters["pdeath_icuc"]*(out_mat[,(ICUCindex+1)]%*%ifr[,2])))
+    cinc_mort_9 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*dexv_hist*(out_mat[,(Ventindex+1)]%*%ifr[,2])))
+    cinc_mort_10 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*dexvc_hist*(out_mat[,(VentCindex+1)]%*%ifr[,2])))
+    cinc_mort_11 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*dexvc_hist*(out_mat[,(ICUCVindex+1)]%*%ifr[,2])))
     cinc_mort_H1 <- cinc_mort_1 + cinc_mort_2
     cinc_mort_HC1 <- cinc_mort_3 + cinc_mort_4
     cinc_mort_ICU1 <- cinc_mort_5 + cinc_mort_6
@@ -124,15 +124,20 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     cinc_mort_VentC1 <- cinc_mort_10
     cinc_mort_ICUCV1 <- cinc_mort_11
     
-    base_mort_H1 <- cumsum(rowSums(out_r[,(Hindex+1)]%*%mort))
-    base_mort_HC1 <- cumsum(rowSums(out_r[,(HCindex+1)]%*%mort))
-    base_mort_ICU1 <- cumsum(rowSums(out_r[,(ICUindex+1)]%*%mort))
-    base_mort_ICUC1 <- cumsum(rowSums(out_r[,(ICUCindex+1)]%*%mort))
-    base_mort_Vent1 <- cumsum(rowSums(out_r[,(Ventindex+1)]%*%mort))
-    base_mort_VentC1 <- cumsum(rowSums(out_r[,(VentCindex+1)]%*%mort))
-    base_mort_Z1 <- cumsum(rowSums(out_r[,(Zindex+1)]%*%mort))
-    base_mort_V1 <- cumsum(rowSums(out_r[,(Vindex+1)]%*%mort))
+    base_mort_H1 <- cumsum(rowSums(out_mat[,(Hindex+1)]%*%mort))
+    base_mort_HC1 <- cumsum(rowSums(out_mat[,(HCindex+1)]%*%mort))
+    base_mort_ICU1 <- cumsum(rowSums(out_mat[,(ICUindex+1)]%*%mort))
+    base_mort_ICUC1 <- cumsum(rowSums(out_mat[,(ICUCindex+1)]%*%mort))
+    base_mort_ICUCV1 <- cumsum(rowSums(out_mat[,(ICUCVindex+1)]%*%mort))
+    base_mort_Vent1 <- cumsum(rowSums(out_mat[,(Ventindex+1)]%*%mort))
+    base_mort_VentC1 <- cumsum(rowSums(out_mat[,(VentCindex+1)]%*%mort))
+    base_mort_Z1 <- cumsum(rowSums(out_mat[,(Zindex+1)]%*%mort))
+    base_mort_V1 <- cumsum(rowSums(out_mat[,(Vindex+1)]%*%mort))
     
+    # death_sum_1 <- cinc_mort_H1 + cinc_mort_HC1 + cinc_mort_ICU1 + cinc_mort_ICUC1 + cinc_mort_Vent1 + cinc_mort_VentC1 + cinc_mort_ICUCV1
+    # death_sum_2 <- base_mort_H1 + base_mort_HC1 + base_mort_ICU1 + base_mort_ICUC1 + base_mort_ICUCV1 + base_mort_Vent1 + base_mort_VentC1 + base_mort_Z1 + base_mort_V1
+    ## death_sum_1 + death_sum_2 ~= rowSums(out_mat[, CMindex + 1])
+
     base_mort_S1 <- cumsum(rowSums(out_mat[,(Sindex+1)]%*%mort))
     base_mort_E1 <- cumsum(rowSums(out_mat[,(Eindex+1)]%*%mort))
     base_mort_I1 <- cumsum(rowSums(out_mat[,(Iindex+1)]%*%mort))
@@ -147,8 +152,6 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     
 
     # Fill in results
-    results$cum_mortality <- round(rowSums(out_mat[, CMindex + 1]))
-    results$total_reported_deaths_end <- last(results$cum_mortality)
     
     results$hospital_surge_beds <- round(surge_bed_occupancy)
     results$icu_beds <- round(icu_bed_occupancy)
@@ -157,11 +160,35 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     results$icu_bed_requirement <- round(reqicu1)
     results$icu_ventilator_requirement <- round(reqvent1)
     
-    results$death_natural_non_exposed <- round(base_mort_S1+base_mort_V1+base_mort_QS1)
-    results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 +  
-                                             base_mort_QE1 + base_mort_QI1 + base_mort_QC1 + base_mort_QR1 + base_mort_R1+
-                                             base_mort_H1+base_mort_HC1+base_mort_ICU1+base_mort_ICUC1+base_mort_ICUCV1+
-                                             base_mort_Vent1+base_mort_VentC1) 
+    # results$death_natural_non_exposed <- round(base_mort_S1+base_mort_V1+base_mort_QS1)
+    # results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 +  
+    #                                          base_mort_QE1 + base_mort_QI1 + base_mort_QC1 + base_mort_QR1 + base_mort_R1+
+    #                                          base_mort_H1+base_mort_HC1+base_mort_ICU1+base_mort_ICUC1+base_mort_ICUCV1+
+    #                                          base_mort_Vent1+base_mort_VentC1) 
+    results$death_natural_non_exposed <- round( base_mort_S1
+                                              + base_mort_E1
+                                              + base_mort_V1
+                                              + base_mort_QS1
+                                              + base_mort_QE1
+                                              + base_mort_R1
+                                              + base_mort_QR1
+                                              )
+    results$death_natural_exposed <- round( base_mort_I1
+                                          + base_mort_CL1
+                                          + base_mort_X1  
+                                          + base_mort_QI1
+                                          + base_mort_QC1
+                                          + base_mort_H1
+                                          + base_mort_HC1
+                                          + base_mort_ICU1
+                                          + base_mort_ICUC1
+                                          + base_mort_ICUCV1
+                                          + base_mort_Vent1
+                                          + base_mort_VentC1
+                                          + base_mort_Z1
+                                          ) 
+
+    ## Attributable
     results$death_treated_hospital <- round(cinc_mort_H1)
     results$death_treated_icu <- round(cinc_mort_ICU1)
     results$death_treated_ventilator <- round(cinc_mort_Vent1)
@@ -173,7 +200,12 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
       results$death_untreated_hospital + results$death_untreated_icu + results$death_untreated_ventilator
     
     results$attributable_deaths_end <- last(results$attributable_deaths)
+
+    ## Reportable
+    # results$cum_mortality <- round(rowSums(out_mat[, CMindex + 1]))
+    results$cum_mortality <- results$attributable_deaths + results$death_natural_exposed
     
+    ## Total
     results$total_deaths <- results$attributable_deaths + results$death_natural_non_exposed + results$death_natural_exposed
     results$total_deaths_end <- last(results$total_deaths)
     

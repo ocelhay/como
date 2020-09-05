@@ -4,7 +4,7 @@ code_for_development <- TRUE
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "15.3.1" )  stop("Require comoOdeCpp v15.3.1.")
+if(packageVersion("comoOdeCpp") != "15.3.2" )  stop("Require comoOdeCpp v15.3.2.")
 
 library(bsplus)
 library(deSolve)
@@ -684,7 +684,7 @@ server <- function(input, output, session) {
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
-    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
+    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors)
     simul_baseline$baseline_available <- TRUE
     
     showNotification("Displaying results", duration = 3, type = "message")
@@ -703,7 +703,7 @@ server <- function(input, output, session) {
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
-    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
+    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors)
     simul_baseline$baseline_available <- TRUE
     
     showNotification("Displaying results", duration = 3, type = "message")
@@ -726,7 +726,7 @@ server <- function(input, output, session) {
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
-    simul_interventions$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
+    simul_interventions$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors)
     simul_interventions$interventions_available <- TRUE
     
     if(code_for_development) {
