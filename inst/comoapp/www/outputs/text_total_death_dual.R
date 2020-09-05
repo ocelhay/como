@@ -51,9 +51,9 @@ output$text_reported_death_baseline <- renderText({
     as.character(
       div(class = "n_box_baseline",
           conf_interval_deaths(
-            simul_baseline$results$min$cum_mortality[which(simul_baseline$results$min$time == end_date)],
-            simul_baseline$results$med$cum_mortality[which(simul_baseline$results$med$time == end_date)], 
-            simul_baseline$results$max$cum_mortality[which(simul_baseline$results$max$time == end_date)]
+            simul_baseline$results$min$reportable_death[which(simul_baseline$results$min$time == end_date)],
+            simul_baseline$results$med$reportable_death[which(simul_baseline$results$med$time == end_date)], 
+            simul_baseline$results$max$reportable_death[which(simul_baseline$results$max$time == end_date)]
           ),
           p("Covid-19",  strong("reportable"), "deaths from ", input$date_range[1], " to ", strong(end_date))
       )))
@@ -72,9 +72,9 @@ output$text_reported_death_baseline_dup <- renderText({
     as.character(
       div(class = "n_box_baseline",
           conf_interval_deaths(
-            simul_baseline$results$min$cum_mortality[which(simul_baseline$results$min$time == end_date)],
-            simul_baseline$results$med$cum_mortality[which(simul_baseline$results$med$time == end_date)], 
-            simul_baseline$results$max$cum_mortality[which(simul_baseline$results$max$time == end_date)]
+            simul_baseline$results$min$reportable_death[which(simul_baseline$results$min$time == end_date)],
+            simul_baseline$results$med$reportable_death[which(simul_baseline$results$med$time == end_date)], 
+            simul_baseline$results$max$reportable_death[which(simul_baseline$results$max$time == end_date)]
           ),
           p("Covid-19",  strong("reportable"), "deaths from ", input$date_range[1], " to ", strong(end_date))
       )))
@@ -113,17 +113,17 @@ output$text_reported_death_interventions <- renderText({
   end_date <- input$date_range[2]
   if(input$focus_axis_dup == "Observed")  end_date <- cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))]
   
-  reduction <- (simul_interventions$results$med$cum_mortality[which(simul_interventions$results$med$time == end_date)] - 
-                  simul_baseline$results$med$cum_mortality[which(simul_baseline$results$med$time == end_date)])
+  reduction <- (simul_interventions$results$med$reportable_death[which(simul_interventions$results$med$time == end_date)] - 
+                  simul_baseline$results$med$reportable_death[which(simul_baseline$results$med$time == end_date)])
   
   paste0(
     as.character(
       div(class = "n_box_interventions",
           div(class = "icon_box", h3(paste0("(", format(reduction, big.mark = ","), ")"))),
           conf_interval_deaths(
-            simul_interventions$results$min$cum_mortality[which(simul_interventions$results$min$time == end_date)],
-            simul_interventions$results$med$cum_mortality[which(simul_interventions$results$med$time == end_date)], 
-            simul_interventions$results$max$cum_mortality[which(simul_interventions$results$max$time == end_date)]
+            simul_interventions$results$min$reportable_death[which(simul_interventions$results$min$time == end_date)],
+            simul_interventions$results$med$reportable_death[which(simul_interventions$results$med$time == end_date)], 
+            simul_interventions$results$max$reportable_death[which(simul_interventions$results$max$time == end_date)]
           ),
           p("Covid-19",  strong("reportable"), "deaths from ", input$date_range[1], " to ", strong(end_date))
       )))

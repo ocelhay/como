@@ -202,8 +202,8 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     results$attributable_deaths_end <- last(results$attributable_deaths)
 
     ## Reportable
-    # results$cum_mortality <- round(rowSums(out_mat[, CMindex + 1]))
-    results$cum_mortality <- results$attributable_deaths + results$death_natural_exposed
+    # results$reportable_death <- round(rowSums(out_mat[, CMindex + 1]))
+    results$reportable_death <- results$attributable_deaths + results$death_natural_exposed
     
     ## Total
     results$total_deaths <- results$attributable_deaths + results$death_natural_non_exposed + results$death_natural_exposed
@@ -262,7 +262,7 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
   results$death_untreated_hospital <- results$med$death_untreated_hospital
   results$death_untreated_icu <- results$med$death_untreated_icu
   results$death_untreated_ventilator <- results$med$death_untreated_ventilator
-  results$cum_mortality <- results$med$cum_mortality
+  results$reportable_death <- results$med$reportable_death
   
   return(results)
 }

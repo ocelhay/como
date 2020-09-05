@@ -129,9 +129,9 @@ The following graph shows the cumulative mortality data compared with the model 
 
 ```{r warning = FALSE, dpi = 200, fig.width = 12, fig.height = 8, eval = show}
 dta <- left_join(tibble(
-  cum_mortality_min = simul_baseline$results$min$cum_mortality,
-  cum_mortality_med = simul_baseline$results$med$cum_mortality,
-  cum_mortality_max = simul_baseline$results$max$cum_mortality,
+  reportable_death_min = simul_baseline$results$min$reportable_death,
+  reportable_death_med = simul_baseline$results$med$reportable_death,
+  reportable_death_max = simul_baseline$results$max$reportable_death,
   attributable_deaths_min = simul_baseline$results$min$attributable_deaths,
   attributable_deaths_med = simul_baseline$results$med$attributable_deaths,
   attributable_deaths_max = simul_baseline$results$max$attributable_deaths,
@@ -154,8 +154,8 @@ dta2 <- dta %>%
   filter(Date <= max_x)
 
 ggplot(data = dta2, aes(x = Date)) +
-  geom_ribbon(aes(ymin = cum_mortality_min, ymax = cum_mortality_max), fill = "#00441b", alpha = 0.7) +
-  geom_line(aes(y = cum_mortality_med, color = "Reportable"), lwd = 1.2) + 
+  geom_ribbon(aes(ymin = reportable_death_min, ymax = reportable_death_max), fill = "#00441b", alpha = 0.7) +
+  geom_line(aes(y = reportable_death_med, color = "Reportable"), lwd = 1.2) + 
   
   geom_ribbon(aes(ymin = attributable_deaths_min, ymax = attributable_deaths_max), fill = "#74c476", alpha = 0.7) +
   geom_line(aes(y = attributable_deaths_med, color = "Attributable"), lwd = 1.2) + 
@@ -173,7 +173,7 @@ ggplot(data = dta2, aes(x = Date)) +
 For this “baseline scenario” between `r input$date_range[1]` and `r input$date_range[2]`:
 
 - `r simul_baseline$results$med$pct_total_pop_infected[which(simul_baseline$results$med$time == input$date_range[2])]`% of the population is predicted to have experienced the infection (including unreported, mildly symptomatic, and/or asymptomatic infections)
-- `r format(simul_baseline$results$med$attributable_deaths[which(simul_baseline$results$med$time == input$date_range[2])], big.mark = ",")` Covid-19 attributable deaths are expected during the range of simulation of which `r format(simul_baseline$results$med$cum_mortality[which(simul_baseline$results$med$time == input$date_range[2])], big.mark = ",")` would be reported. 
+- `r format(simul_baseline$results$med$attributable_deaths[which(simul_baseline$results$med$time == input$date_range[2])], big.mark = ",")` Covid-19 attributable deaths are expected during the range of simulation of which `r format(simul_baseline$results$med$reportable_death[which(simul_baseline$results$med$time == input$date_range[2])], big.mark = ",")` would be reported. 
 
 # Baseline compared with hypothetical scenario
 
@@ -233,7 +233,7 @@ if(interventions$future_mat %>% nrow() > 0) return({
 For this “hypothetical scenario” between `r input$date_range[1]` and `r input$date_range[2]`:
 
 - `r simul_interventions$results$med$pct_total_pop_infected[which(simul_interventions$results$med$time == input$date_range[2])]`% of the population is predicted to have experienced the infection (including unreported, mildly symptomatic, and/or asymptomatic infections)
-- `r format(simul_interventions$results$med$attributable_deaths[which(simul_interventions$results$med$time == input$date_range[2])], big.mark = ",")` Covid-19 attributable deaths are expected during the range of simulation of which `r format(simul_interventions$results$med$cum_mortality[which(simul_interventions$results$med$time == input$date_range[2])], big.mark = ",")` would be reported. 
+- `r format(simul_interventions$results$med$attributable_deaths[which(simul_interventions$results$med$time == input$date_range[2])], big.mark = ",")` Covid-19 attributable deaths are expected during the range of simulation of which `r format(simul_interventions$results$med$reportable_death[which(simul_interventions$results$med$time == input$date_range[2])], big.mark = ",")` would be reported. 
 
 ## `r input$focus_axis_dup` cases
 
