@@ -2,3 +2,5 @@
 *.dcf
 *.history
 ~$*
+.Rproj.user
+*.Rproj

@@ -1,14 +1,14 @@
 # CoMo COVID-19 App
-version_app <- "v15.3.2"
+version_app <- "v15.4"
 code_for_development <- TRUE
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
+# remotes::install_github("ocelhay/comoOdeCpp", subdir = "comoOdeCpp")
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "15.3.1" )  stop("Require comoOdeCpp v15.3.1.")
+if(packageVersion("comoOdeCpp") != "15.3.2" )  stop("Require comoOdeCpp v15.3.2.")
 
 library(bsplus)
 library(deSolve)
-library(DT)
 library(gridExtra)
 library(highcharter)
 library(knitr)
@@ -685,7 +685,7 @@ server <- function(input, output, session) {
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
-    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
+    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors)
     simul_baseline$baseline_available <- TRUE
     
     showNotification("Displaying results", duration = 3, type = "message")
@@ -704,7 +704,7 @@ server <- function(input, output, session) {
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
-    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
+    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors)
     simul_baseline$baseline_available <- TRUE
     
     showNotification("Displaying results", duration = 3, type = "message")
@@ -727,7 +727,7 @@ server <- function(input, output, session) {
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
-    simul_interventions$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc)
+    simul_interventions$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors)
     simul_interventions$interventions_available <- TRUE
     
     if(code_for_development) {
@@ -781,7 +781,7 @@ server <- function(input, output, session) {
       baseline_death_untreated_hospital_min = simul_baseline$results$min$death_untreated_hospital,
       baseline_death_untreated_icu_min = simul_baseline$results$min$death_untreated_icu,
       baseline_death_untreated_ventilator_min = simul_baseline$results$min$death_untreated_ventilator,
-      baseline_cum_mortality_min = simul_baseline$results$min$cum_mortality,
+      baseline_reportable_death_min = simul_baseline$results$min$reportable_death,
       
       baseline_predicted_reported_med = simul_baseline$results$med$daily_incidence,
       baseline_predicted_reported_and_unreported_med = simul_baseline$results$med$daily_total_cases,
@@ -799,7 +799,7 @@ server <- function(input, output, session) {
       baseline_death_untreated_hospital_med = simul_baseline$results$med$death_untreated_hospital,
       baseline_death_untreated_icu_med = simul_baseline$results$med$death_untreated_icu,
       baseline_death_untreated_ventilator_med = simul_baseline$results$med$death_untreated_ventilator,
-      baseline_cum_mortality_med = simul_baseline$results$med$cum_mortality,
+      baseline_reportable_death_med = simul_baseline$results$med$reportable_death,
       
       baseline_predicted_reported_max = simul_baseline$results$max$daily_incidence,
       baseline_predicted_reported_and_unreported_max = simul_baseline$results$max$daily_total_cases,
@@ -817,7 +817,7 @@ server <- function(input, output, session) {
       baseline_death_untreated_hospital_max = simul_baseline$results$max$death_untreated_hospital,
       baseline_death_untreated_icu_max = simul_baseline$results$max$death_untreated_icu,
       baseline_death_untreated_ventilator_max = simul_baseline$results$max$death_untreated_ventilator,
-      baseline_cum_mortality_max = simul_baseline$results$max$cum_mortality,
+      baseline_reportable_death_max = simul_baseline$results$max$reportable_death,
       
       
       # Hypothetical scenario
@@ -837,7 +837,7 @@ server <- function(input, output, session) {
       hypothetical_death_untreated_hospital_min = simul_interventions$results$min$death_untreated_hospital,
       hypothetical_death_untreated_icu_min = simul_interventions$results$min$death_untreated_icu,
       hypothetical_death_untreated_ventilator_min = simul_interventions$results$min$death_untreated_ventilator,
-      hypothetical_cum_mortality_min = simul_interventions$results$min$cum_mortality,
+      hypothetical_reportable_death_min = simul_interventions$results$min$reportable_death,
       
       hypothetical_predicted_reported_med = simul_interventions$results$med$daily_incidence,
       hypothetical_predicted_reported_and_unreported_med = simul_interventions$results$med$daily_total_cases,
@@ -855,7 +855,7 @@ server <- function(input, output, session) {
       hypothetical_death_untreated_hospital_med = simul_interventions$results$med$death_untreated_hospital,
       hypothetical_death_untreated_icu_med = simul_interventions$results$med$death_untreated_icu,
       hypothetical_death_untreated_ventilator_med = simul_interventions$results$med$death_untreated_ventilator,
-      hypothetical_cum_mortality_med = simul_interventions$results$med$cum_mortality,
+      hypothetical_reportable_death_med = simul_interventions$results$med$reportable_death,
       
       hypothetical_predicted_reported_max = simul_interventions$results$max$daily_incidence,
       hypothetical_predicted_reported_and_unreported_max = simul_interventions$results$max$daily_total_cases,
@@ -873,7 +873,7 @@ server <- function(input, output, session) {
       hypothetical_death_untreated_hospital_max = simul_interventions$results$max$death_untreated_hospital,
       hypothetical_death_untreated_icu_max = simul_interventions$results$max$death_untreated_icu,
       hypothetical_death_untreated_ventilator_max = simul_interventions$results$max$death_untreated_ventilator,
-      hypothetical_cum_mortality_max = simul_interventions$results$max$cum_mortality,
+      hypothetical_reportable_death_max = simul_interventions$results$max$reportable_death,
     )
     
     ## Cases Data ----

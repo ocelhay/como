@@ -2,9 +2,9 @@ output$plot_deaths_baseline <- renderPlot({
   req(simul_baseline$baseline_available)
   
   dta <- left_join(tibble(
-    cum_mortality_min = simul_baseline$results$min$cum_mortality,
-    cum_mortality_med = simul_baseline$results$med$cum_mortality,
-    cum_mortality_max = simul_baseline$results$max$cum_mortality,
+    reportable_death_min = simul_baseline$results$min$reportable_death,
+    reportable_death_med = simul_baseline$results$med$reportable_death,
+    reportable_death_max = simul_baseline$results$max$reportable_death,
     attributable_deaths_min = simul_baseline$results$min$attributable_deaths,
     attributable_deaths_med = simul_baseline$results$med$attributable_deaths,
     attributable_deaths_max = simul_baseline$results$max$attributable_deaths,
@@ -27,8 +27,8 @@ output$plot_deaths_baseline <- renderPlot({
     filter(Date <= max_x)
   
   ggplot(data = dta2, aes(x = Date)) +
-    geom_ribbon(aes(ymin = cum_mortality_min, ymax = cum_mortality_max), fill = "#00441b", alpha = 0.7) +
-    geom_line(aes(y = cum_mortality_med, color = "Reportable"), lwd = 1.2) + 
+    geom_ribbon(aes(ymin = reportable_death_min, ymax = reportable_death_max), fill = "#00441b", alpha = 0.7) +
+    geom_line(aes(y = reportable_death_med, color = "Reportable"), lwd = 1.2) + 
     
     geom_ribbon(aes(ymin = attributable_deaths_min, ymax = attributable_deaths_max), fill = "#74c476", alpha = 0.7) +
     geom_line(aes(y = attributable_deaths_med, color = "Attributable"), lwd = 1.2) + 

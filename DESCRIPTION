@@ -1,7 +1,7 @@
 Package: como
 Type: Package
 Title: A Web Application of the CoMo COVID-19 Model
-Version: 15.3.2
+Version: 15.4
 Authors@R: c(person(given = "Olivier", family = "Celhay", 
                 email = "olivier.celhay@gmail.com", 
                 role = c("aut", "cre"), comment = c(ORCID = "https://orcid.org/0000-0002-2971-9110")),
@@ -33,7 +33,6 @@ Depends:
 Imports:
     bsplus, 
     deSolve,
-    DT, 
     gridExtra, 
     highcharter, 
     knitr, 
@@ -51,7 +50,7 @@ Imports:
     shinyWidgets, 
     tidyverse
 Remotes: 
-    url::https://github.com/ocelhay/comoOdeCpp/releases/download/v15.3.1/comoOdeCpp_15.3.1.tar.gz
+    url::https://github.com/bogaotory/comoOdeCpp/releases/download/v15.3.2/comoOdeCpp_15.3.2.tar.gz
 Suggests:
     oxcovid19
 RoxygenNote: 7.1.1
