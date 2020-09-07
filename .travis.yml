@@ -1,5 +1,10 @@
-language: R
+language: r
 cache: packages
 warnings_are_errors: false
 before_install:
   - sudo apt-get -y install libudunits2-dev libgdal-dev
+global:
+  - R_BUILD_ARGS="--no-build-vignettes --no-manual"
+  - R_CHECK_ARGS="--no-build-vignettes --no-manual"
+r_build_args: --no-build-vignettes --no-manual
+r_check_args: --no-build-vignettes --no-manual
