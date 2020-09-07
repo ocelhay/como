@@ -81,10 +81,10 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     
     
     # Calculate mortality ----
-    dexo2_hist <- rep(0,length(times))
-    dexo2c_hist <- rep(0,length(times))
-    dexv_hist <- rep(0,length(times))
-    dexvc_hist <- rep(0,length(times))
+    dexo2_hist <- rep(1,length(times))
+    dexo2c_hist <- rep(1,length(times))
+    dexv_hist <- rep(1,length(times))
+    dexvc_hist <- rep(1,length(times))
     for (tt in times) {
       if(tt < max(times)){
         if(vectors$dex[tt*20+1]) {
@@ -166,15 +166,13 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     #                                          base_mort_H1+base_mort_HC1+base_mort_ICU1+base_mort_ICUC1+base_mort_ICUCV1+
     #                                          base_mort_Vent1+base_mort_VentC1) 
     results$death_natural_non_exposed <- round( base_mort_S1
-                                              + base_mort_E1
                                               + base_mort_V1
                                               + base_mort_QS1
-                                              + base_mort_QE1
-                                              + base_mort_R1
-                                              + base_mort_QR1
                                               )
     results$death_natural_exposed <- round( base_mort_I1
                                           + base_mort_CL1
+                                          + base_mort_E1
+                                          + base_mort_QE1
                                           + base_mort_X1  
                                           + base_mort_QI1
                                           + base_mort_QC1
@@ -186,6 +184,8 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
                                           + base_mort_Vent1
                                           + base_mort_VentC1
                                           + base_mort_Z1
+                                          + base_mort_R1
+                                          + base_mort_QR1
                                           ) 
 
     ## Attributable
