@@ -31,8 +31,8 @@ output$highchart_deaths_dual_baseline <- renderHighchart({
                    simul_interventions$results$med$death_untreated_icu + simul_interventions$results$med$death_untreated_ventilator)
   }
   
-  hchart(dta, type = "area", name = "Natural Death, Non Exposed", color = "#636363", hcaes(x = time, y = death_natural_non_exposed)) %>%
-    hc_add_series(dta, type = 'area', name = "Natural Death, Exposed", color = "#bdbdbd", hcaes(x = time, y = death_natural_exposed)) %>%
+  hchart(dta, type = "area", name = "Natural Death: Non-reportable", color = "#636363", hcaes(x = time, y = death_natural_non_exposed)) %>%
+    hc_add_series(dta, type = 'area', name = "Natural Death, Reportable", color = "#bdbdbd", hcaes(x = time, y = death_natural_exposed)) %>%
     hc_add_series(dta, type = 'area', name = "Death Treated ICU no Ventilator", color = "#3288bd", hcaes(x = time, y = death_treated_icu)) %>%
     hc_add_series(dta, type = 'area', name = "Death Treated ICU and Ventilator", color = "#5e4fa2", hcaes(x = time, y = death_treated_ventilator)) %>%
     hc_add_series(dta, type = 'area', name = "Death Treated Hospital", color = "#66c2a5", hcaes(x = time, y = death_treated_hospital)) %>%
@@ -82,8 +82,8 @@ output$highchart_deaths_dual_interventions <- renderHighchart({
                    simul_interventions$results$med$death_untreated_icu + simul_interventions$results$med$death_untreated_ventilator)
   }
   
-  hchart(dta, type = "area", name = "Natural Death, Non Exposed", color = "#636363", hcaes(x = time, y = death_natural_non_exposed)) %>%
-    hc_add_series(dta, type = 'area', name = "Natural Death, Exposed", color = "#bdbdbd", hcaes(x = time, y = death_natural_exposed)) %>%
+  hchart(dta, type = "area", name = "Natural Death, Non-reportable", color = "#636363", hcaes(x = time, y = death_natural_non_exposed)) %>%
+    hc_add_series(dta, type = 'area', name = "Natural Death, Reportable", color = "#bdbdbd", hcaes(x = time, y = death_natural_exposed)) %>%
     hc_add_series(dta, type = 'area', name = "Death Treated ICU no Ventilator", color = "#3288bd", hcaes(x = time, y = death_treated_icu)) %>%
     hc_add_series(dta, type = 'area', name = "Death Treated ICU and Ventilator", color = "#5e4fa2", hcaes(x = time, y = death_treated_ventilator)) %>%
     hc_add_series(dta, type = 'area', name = "Death Treated Hospital", color = "#66c2a5", hcaes(x = time, y = death_treated_hospital)) %>%
