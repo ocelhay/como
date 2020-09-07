@@ -1,7 +1,7 @@
 ## Manually prepare data files (.Rda) to be used in the App
 
 # Prolegomenon ----
-setwd("/Users/olivier/Documents/CoMo/como/data_preparation/raw_data/")
+# setwd("/Users/olivier/Documents/CoMo/como/data_preparation/raw_data/")
 library(oxcovid19)
 library(readxl)
 library(tidyverse)
