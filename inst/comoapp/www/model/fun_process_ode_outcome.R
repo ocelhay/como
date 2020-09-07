@@ -168,8 +168,6 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
     results$death_natural_non_exposed <- round( base_mort_S1
                                               + base_mort_V1
                                               + base_mort_QS1
-                                              + base_mort_R1
-                                              + base_mort_QR1
                                               )
     results$death_natural_exposed <- round( base_mort_I1
                                           + base_mort_CL1
@@ -186,6 +184,8 @@ process_ode_outcome <- function(out, parameters, startdate, times, ihr, ifr, mor
                                           + base_mort_Vent1
                                           + base_mort_VentC1
                                           + base_mort_Z1
+                                          + base_mort_R1
+                                          + base_mort_QR1
                                           ) 
 
     ## Attributable
