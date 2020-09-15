@@ -3,7 +3,6 @@
 export(comomodel)
 export(run_app_standalone)
 import(RColorBrewer)
-import(Rcpp)
 import(bsplus)
 import(deSolve)
 import(gridExtra)

@@ -4,7 +4,7 @@
 #' Open browser
 #' @export
 #'
-#' @import bsplus deSolve gridExtra highcharter knitr lubridate pushbar RColorBrewer Rcpp readxl 
+#' @import bsplus deSolve gridExtra highcharter knitr lubridate pushbar RColorBrewer readxl 
 #' @import reshape2 scales shiny shinycssloaders shinyhelper shinyjs shinythemes 
 #' @import shinyWidgets tidyverse
 

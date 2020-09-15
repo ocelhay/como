@@ -29,7 +29,6 @@ Encoding: UTF-8
 Language: en-gb
 LazyData: true
 Depends: 
-    stats (>= 3.1.3),
     R (>= 3.6)
 Imports:
     bsplus, 
@@ -40,7 +39,6 @@ Imports:
     lubridate, 
     pushbar, 
     RColorBrewer, 
-    Rcpp (>= 1.0.4.6),
     readxl, 
     reshape2, 
     scales, 
