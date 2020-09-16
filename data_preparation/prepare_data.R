@@ -22,7 +22,14 @@ cases <- ecdc %>%
          deaths = cumulative_death - lag(cumulative_death)) %>%
   ungroup()
 
-save(cases, file = "/Users/olivier/Documents/CoMo/como/inst/comoapp/www/data/cases.Rda")
+
+# Tests Data from "Our World in Data"
+table_tests <- RCurl::getURL("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/testing/covid-testing-all-observations.csv")
+tests <- read.csv(text = table_tests) %>%
+  transmute(entity = Entity, date = Date, tests = Daily.change.in.cumulative.total)
+
+
+save(cases, tests, file = "/Users/olivier/Documents/CoMo/como/inst/comoapp/www/data/cases.Rda")
 
 
 # Mortality/Severity
