@@ -22,11 +22,11 @@ output$plot_deaths_baseline <- renderPlot({
     max_y <- NA
   }
   
-  dta2 <- dta %>%
+  dta %>%
     rename(Date = time) %>%
-    filter(Date <= max_x)
+    filter(Date <= max_x) %>%
   
-  ggplot(data = dta2, aes(x = Date)) +
+  ggplot(aes(x = Date)) +
     geom_ribbon(aes(ymin = reportable_death_min, ymax = reportable_death_max), fill = "#00441b", alpha = 0.7) +
     geom_line(aes(y = reportable_death_med, color = "Reportable"), lwd = 1.2) + 
     
@@ -37,7 +37,7 @@ output$plot_deaths_baseline <- renderPlot({
     
     geom_point(aes(y = cumulative_death), color = "red") +
     coord_cartesian(ylim = c(NA, max_y)) +
-    ggtitle("Baseline Cumulative Deaths") + xlab("") + ylab("Deaths") +
+    labs(title = "Baseline Cumulative Deaths", x= "", y = "") +
     theme_light(base_size = 14) +
     scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
     scale_color_manual(name = "Cumulative Deaths", values = c("Reportable" = "#00441b", "Attributable" = "#74c476", "Observed" = "red"))
