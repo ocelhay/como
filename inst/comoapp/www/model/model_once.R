@@ -7,6 +7,7 @@ load(file = "./www/data/mort_sever_default.Rda")
 # misc ----
 # choices for dropdowns
 countries_cases <- sort(unique(cases$country))
+entities_tests <- c("_", sort(unique(tests$entity)))
 countries_contact <- names(contact_home)
 countries_demographic <- sort(unique(population$country))
 all_interventions <- c("_",

@@ -11,23 +11,28 @@ output$plot_cases_baseline <- renderPlot({
                    cases_rv$data,
                    by = c("time" = "date"))
   
+  if(input$entity_tests != "_")  dta <- left_join(dta, tests %>% filter(entity == input$entity_tests), by = c("time" = "date"))
+  
   # X/Y scales
   if(input$focus_axis == "Observed")  {
     max_x <- dta$time[last(which(!is.na(dta$cases)))] + 3
-    max_y <- 1.2 * max(dta$cases, na.rm = TRUE)
+    if(input$entity_tests == "_")  max_y <- 1.2 * max(dta$cases, na.rm = TRUE)
+    if(input$entity_tests != "_")  max_y <- 1.2 * max(dta$cases, dta$tests, na.rm = TRUE)
   }
   
   if(input$focus_axis == "Predicted Reported")  {
     max_x <- max(dta$time)
-    max_y <- 1.2 * max(dta$daily_incidence_max, na.rm = TRUE)
+    if(input$entity_tests == "_")  max_y <- 1.2 * max(dta$daily_incidence_max, na.rm = TRUE)
+    if(input$entity_tests != "_")  max_y <- 1.2 * max(dta$daily_incidence_max, dta$tests, na.rm = TRUE)
   }
   
   if(input$focus_axis == "Predicted Reported + Unreported")  {
     max_x <- max(dta$time)
-    max_y <- 1.2 * max(dta$daily_total_cases_max, na.rm = TRUE)
+    if(input$entity_tests == "_")  max_y <- 1.2 * max(dta$daily_total_cases_max, na.rm = TRUE)
+    if(input$entity_tests != "_")  max_y <- 1.2 * max(dta$daily_total_cases_max, dta$tests, na.rm = TRUE)
   }
   
-  dta %>%
+  plot <- dta %>%
     rename(Date = time) %>%
     filter(Date <= max_x) %>%
   ggplot(aes(x = Date)) +
@@ -40,6 +45,10 @@ output$plot_cases_baseline <- renderPlot({
     coord_cartesian(ylim = c(NA, max_y)) +
     labs(title = "Baseline Daily Cases", x= "", y = "") +
     scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
-    theme_light(base_size = 14) +
-    scale_color_manual(name = "Cases", values = c("Predicted Reported" = "#74c476", "Predicted Reported + Unreported" = "#00441b", "Observed" = "red"))
+    theme_light(base_size = 14)
+  
+  if(input$entity_tests == "_")  plot <- plot + scale_color_manual(name = "Cases", values = c("Predicted Reported" = "#74c476", "Predicted Reported + Unreported" = "#00441b", "Observed" = "red"))
+  if(input$entity_tests != "_")  plot <- plot + geom_line(data = tests %>% filter(entity == input$entity_tests), aes(x = date, y = tests, color = "Tests"), lwd = 1.2) + scale_color_manual(name = "Cases", values = c("Predicted Reported" = "#74c476", "Predicted Reported + Unreported" = "#00441b", "Observed" = "red", "Tests" = "grey"))
+  
+  return(plot)
 })
