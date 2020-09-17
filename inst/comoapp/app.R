@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v15.5"
+version_app <- "v15.5.1"
 code_for_development <- TRUE
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
@@ -132,20 +132,34 @@ ui <- function(request) {
                      plotOutput("timevis_baseline", height = 700)
               )
             ),
-            br(), hr(), 
+            br(), hr(),
             a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
-            prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
-                               selected = "Observed", inline = TRUE), br(),
-            fluidRow(
-              column(4, htmlOutput("text_pct_pop_baseline") %>% withSpinner()),
-              column(4, htmlOutput("text_attributable_death_baseline") %>% withSpinner()),
-              column(4, htmlOutput("text_reported_death_baseline") %>% withSpinner())
-            ),
-            plotOutput("plot_cases_baseline", height = "350px") %>% withSpinner(), 
-            plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner(),
-            fluidRow(
-              column(6, plotOutput("plot_total_deaths_age", height = "400px") %>% withSpinner()),
-              column(6, plotOutput("plot_Rt_baseline", height = "400px") %>% withSpinner())
+            shinyjs::hidden(
+              div(id = "results_baseline",
+                  prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
+                                     selected = "Observed", inline = TRUE), br(),
+                  
+                  fluidRow(
+                    column(4, htmlOutput("text_pct_pop_baseline") %>% withSpinner()),
+                    column(4, htmlOutput("text_attributable_death_baseline") %>% withSpinner()),
+                    column(4, htmlOutput("text_reported_death_baseline") %>% withSpinner())
+                  ),
+                  dropdownButton(
+                    div(
+                      p("Select an entity to display daily tests. (Source: Our World in Data)"),
+                      selectInput("entity_tests", label = "Tests Data:", choices = entities_tests,
+                                  selected = "_")
+                    ),
+                    circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px",
+                    tooltip = tooltipOptions(title = "Display tests data")
+                  ),
+                  plotOutput("plot_cases_baseline", height = "350px") %>% withSpinner(), 
+                  plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner(),
+                  fluidRow(
+                    column(6, plotOutput("plot_total_deaths_age", height = "400px") %>% withSpinner()),
+                    column(6, plotOutput("plot_Rt_baseline", height = "400px") %>% withSpinner())
+                  )
+              )
             )
           )
         )
@@ -178,90 +192,97 @@ ui <- function(request) {
           ),
           column(
             10,
-            prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
-                               selected = "Predicted Reported + Unreported", inline = TRUE),
-            fluidRow(
-              column(
-                6,
-                div(class = "box_outputs", h4("Baseline")),
-                htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner(), br(),
-                htmlOutput("text_attributable_death_baseline_dup") %>% withSpinner(), br(),
-                htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()
-              ),
-              column(
-                6,
-                div(class = "box_outputs", h4("Hypothetical Scenario")),
-                htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
-                htmlOutput("text_attributable_death_interventions") %>% withSpinner(), br(), 
-                htmlOutput("text_reported_death_interventions") %>% withSpinner()
+            shinyjs::hidden(
+              div(id = "results_interventions_1",
+                  prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
+                                     selected = "Predicted Reported + Unreported", inline = TRUE),
+                  fluidRow(
+                    column(
+                      6,
+                      div(class = "box_outputs", h4("Baseline")),
+                      htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner(), br(),
+                      htmlOutput("text_attributable_death_baseline_dup") %>% withSpinner(), br(),
+                      htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()
+                    ),
+                    column(
+                      6,
+                      div(class = "box_outputs", h4("Hypothetical Scenario")),
+                      htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
+                      htmlOutput("text_attributable_death_interventions") %>% withSpinner(), br(), 
+                      htmlOutput("text_reported_death_interventions") %>% withSpinner()
+                    )
+                  )
               )
             )
-          )
-        ),
-        
-        fluidRow(
-          column(10, offset = 2,
-                 br(),
-                 materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
-                                status = "danger", right = TRUE, inline = FALSE, width = "100%"),
-                 br(),
-                 a(id = "anchor_cases", style="visibility: hidden", "")
-          )
-        ),
-        fluidRow(
-          column(5, offset = 2,
-                 highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br()
           ),
-          column(5,
-                 highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br()
-          )
-        ),
-        
-        fluidRow(
-          column(10, offset = 2,
-                 a(id = "anchor_deaths", style="visibility: hidden", ""),
-                 prettyRadioButtons("focus_natural_death", label = "Focus on:", 
-                                    choices = c("No Focus", "COVID-19 Deaths"), 
-                                    selected = "No Focus", inline = TRUE)
-          )
-        ),
-        fluidRow(
-          column(5, offset = 2,
-                 highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                 plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br(),
-                 plotOutput("plot_total_deaths_age_baseline") %>% withSpinner(), br(),
-                 plotOutput("plot_mortality_lag_baseline") %>% withSpinner(), br()
-          ),
-          column(5,
-                 highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                 plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br(),
-                 plotOutput("plot_total_deaths_age_interventions") %>% withSpinner(), br(),
-                 plotOutput("plot_mortality_lag_interventions") %>% withSpinner(), br()
-          )
-        ),
-        fluidRow(
-          column(10, offset = 2,
-                 a(id = "anchor_occupancy", style="visibility: hidden", ""),
-                 prettyRadioButtons("focus_requirements", label = "Focus on:", 
-                                    choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
-                                    selected = "No Focus", inline = TRUE)
-          )
-        ),
-        fluidRow(
-          column(5, offset = 2,
-                 highchartOutput("highchart_requirements_dual_baseline", height = "350px") %>% withSpinner(), br(),
-          ),
-          column(5, 
-                 highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
-          )
-        ),
-        fluidRow(
-          column(5, offset = 2,
-                 a(id = "anchor_rt", style="visibility: hidden", ""),
-                 highchartOutput("highchart_Rt_dual_baseline", height = "350px") %>% withSpinner(), br(),
-          ),
-          column(5, 
-                 highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
+          shinyjs::hidden(
+            div(id = "results_interventions_2",
+                fluidRow(
+                  column(10, offset = 2,
+                         br(),
+                         materialSwitch(inputId = "show_all_days", label = span(icon("eye"), 'Display all days', br(), tags$small("You can either display only one data point per week i.e. Wednesday (Default) or display all days in the plots/table (Slower)."), br(), tags$small("Either way, we display daily data.")), value = FALSE,
+                                        status = "danger", right = TRUE, inline = FALSE, width = "100%"),
+                         br(),
+                         a(id = "anchor_cases", style="visibility: hidden", "")
+                  )
+                ),
+                fluidRow(
+                  column(5, offset = 2,
+                         highchartOutput("highchart_cases_dual_baseline", height = "350px") %>% withSpinner(), br()
+                  ),
+                  column(5,
+                         highchartOutput("highchart_cases_dual_interventions", height = "350px") %>% withSpinner(), br()
+                  )
+                ),
+                
+                fluidRow(
+                  column(10, offset = 2,
+                         a(id = "anchor_deaths", style="visibility: hidden", ""),
+                         prettyRadioButtons("focus_natural_death", label = "Focus on:", 
+                                            choices = c("No Focus", "COVID-19 Deaths"), 
+                                            selected = "No Focus", inline = TRUE)
+                  )
+                ),
+                fluidRow(
+                  column(5, offset = 2,
+                         highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                         plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br(),
+                         plotOutput("plot_total_deaths_age_baseline") %>% withSpinner(), br(),
+                         plotOutput("plot_mortality_lag_baseline") %>% withSpinner(), br()
+                  ),
+                  column(5,
+                         highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                         plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br(),
+                         plotOutput("plot_total_deaths_age_interventions") %>% withSpinner(), br(),
+                         plotOutput("plot_mortality_lag_interventions") %>% withSpinner(), br()
+                  )
+                ),
+                fluidRow(
+                  column(10, offset = 2,
+                         a(id = "anchor_occupancy", style="visibility: hidden", ""),
+                         prettyRadioButtons("focus_requirements", label = "Focus on:", 
+                                            choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
+                                            selected = "No Focus", inline = TRUE)
+                  )
+                ),
+                fluidRow(
+                  column(5, offset = 2,
+                         highchartOutput("highchart_requirements_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                  ),
+                  column(5, 
+                         highchartOutput("highchart_requirements_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                  )
+                ),
+                fluidRow(
+                  column(5, offset = 2,
+                         a(id = "anchor_rt", style="visibility: hidden", ""),
+                         highchartOutput("highchart_Rt_dual_baseline", height = "350px") %>% withSpinner(), br(),
+                  ),
+                  column(5, 
+                         highchartOutput("highchart_Rt_dual_interventions", height = "350px") %>% withSpinner(), br(),
+                  )
+                )
+            )
           )
         )
       )
@@ -669,6 +690,7 @@ server <- function(input, output, session) {
     hideTab(inputId = "tabs", target = "tab_modelpredictions")
     updateNavbarPage(session, "tabs", selected = "tab_visualfit")
     
+    shinyjs::hide(id = "results_baseline", anim = FALSE)
     updateSliderInput(session, "iterations", value = 1)
   })
   
@@ -689,6 +711,9 @@ server <- function(input, output, session) {
     simul_baseline$baseline_available <- TRUE
     
     showNotification("Displaying results", duration = 3, type = "message")
+    shinyjs::show(id = "results_baseline", anim = FALSE)
+    # need a small pause 
+    Sys.sleep(1)
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
   
@@ -708,6 +733,8 @@ server <- function(input, output, session) {
     simul_baseline$baseline_available <- TRUE
     
     showNotification("Displaying results", duration = 3, type = "message")
+    # need a small pause 
+    Sys.sleep(1)
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
   
@@ -735,7 +762,11 @@ server <- function(input, output, session) {
       shiny_simul_interventions <<- simul_interventions$results
     }
     
-    showNotification("Displaying results (~ 5 secs.)", duration = 4, type = "message")
+    showNotification("Displaying results", duration = 3, type = "message")
+    shinyjs::show(id = "results_interventions_1", anim = FALSE)
+    shinyjs::show(id = "results_interventions_2", anim = FALSE)
+    # need a small pause 
+    Sys.sleep(1)
     runjs('document.getElementById("anchor_summary").scrollIntoView();')
   })
   
