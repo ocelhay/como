@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v15.5"
+version_app <- "v15.5.1"
 code_for_development <- TRUE
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
@@ -146,10 +146,9 @@ ui <- function(request) {
                   ),
                   dropdownButton(
                     div(
-                      p("Select an entity to display daily tests."),
+                      p("Select an entity to display daily tests. (Source: Our World in Data)"),
                       selectInput("entity_tests", label = "Tests Data:", choices = entities_tests,
-                                  selected = "_"),
-                      em("Only a limited number of options are available.")
+                                  selected = "_")
                     ),
                     circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px",
                     tooltip = tooltipOptions(title = "Display tests data")
