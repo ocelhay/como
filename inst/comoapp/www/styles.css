@@ -11,8 +11,14 @@
 }
 
 #logo { 
-  margin-top: 5px;
-  width: 100%;
+  width: 55%;
+  float:left;
+}
+
+#logo-top {
+   height: 40px;
+   position: relative;
+   top: -10px
 }
 
 #map {
