@@ -52,3 +52,96 @@ output$plot_cases_baseline <- renderPlot({
   
   return(plot)
 })
+
+
+output$download_cases_baseline <- downloadHandler(filename = "cases_baseline.csv", content = function(file) {
+  req(simul_baseline$baseline_available)
+  
+  dta <- left_join(tibble(daily_incidence_min = simul_baseline$results$min$daily_incidence,
+                          daily_incidence_med = simul_baseline$results$med$daily_incidence,
+                          daily_incidence_max = simul_baseline$results$max$daily_incidence,
+                          daily_total_cases_min = simul_baseline$results$min$daily_total_cases,
+                          daily_total_cases_med = simul_baseline$results$med$daily_total_cases,
+                          daily_total_cases_max = simul_baseline$results$max$daily_total_cases,
+                          time = simul_baseline$results$time),
+                   cases_rv$data,
+                   by = c("time" = "date"))
+  
+  dta <- dta %>% transmute(
+    date = time,
+    predicted_reported_min = daily_incidence_min,
+    predicted_reported_med = daily_incidence_med,
+    predicted_reported_max = daily_incidence_max,
+    predicted_rep_unrep_min = daily_total_cases_min,
+    predicted_rep_unrep_med = daily_total_cases_med,
+    predicted_rep_unrep_max = daily_total_cases_max,
+    observed = cases
+  )
+  
+  if(input$entity_tests != "_")  {
+    dta <- left_join(dta, tests %>% filter(entity == input$entity_tests), by = "date") %>% select(-entity)
+  }
+  
+  write.csv(dta, file, row.names = FALSE)
+})
+
+output$highchart_cases_baseline <- renderHighchart({
+  req(simul_baseline$baseline_available)
+  
+  dta <- left_join(tibble(daily_incidence_min = simul_baseline$results$min$daily_incidence,
+                          daily_incidence_med = simul_baseline$results$med$daily_incidence,
+                          daily_incidence_max = simul_baseline$results$max$daily_incidence,
+                          daily_total_cases_min = simul_baseline$results$min$daily_total_cases,
+                          daily_total_cases_med = simul_baseline$results$med$daily_total_cases,
+                          daily_total_cases_max = simul_baseline$results$max$daily_total_cases,
+                          time = simul_baseline$results$time),
+                   cases_rv$data,
+                   by = c("time" = "date"))
+  
+  if(input$entity_tests != "_")  dta <- left_join(dta, tests %>% filter(entity == input$entity_tests), by = c("time" = "date"))
+  
+  # X/Y scales
+  if(input$focus_axis == "Observed")  {
+    max_x <- dta$time[last(which(!is.na(dta$cases)))] + 3
+    if(input$entity_tests == "_")  max_y <- 1.2 * max(dta$cases, na.rm = TRUE)
+    if(input$entity_tests != "_")  max_y <- 1.2 * max(dta$cases, dta$tests, na.rm = TRUE)
+  }
+  
+  if(input$focus_axis == "Predicted Reported")  {
+    max_x <- max(dta$time)
+    if(input$entity_tests == "_")  max_y <- 1.2 * max(dta$daily_incidence_max, na.rm = TRUE)
+    if(input$entity_tests != "_")  max_y <- 1.2 * max(dta$daily_incidence_max, dta$tests, na.rm = TRUE)
+  }
+  
+  if(input$focus_axis == "Predicted Reported + Unreported")  {
+    max_x <- max(dta$time)
+    if(input$entity_tests == "_")  max_y <- 1.2 * max(dta$daily_total_cases_max, na.rm = TRUE)
+    if(input$entity_tests != "_")  max_y <- 1.2 * max(dta$daily_total_cases_max, dta$tests, na.rm = TRUE)
+  }
+  
+  
+  hc <- hchart(dta, "line", name = "Observed", hcaes(x = time, y = cases), color = "red") %>% 
+      hc_add_series(dta, type = "line", hcaes(x = time, y = daily_incidence_med), id = "reported", name = "Predicted Reported", color = "#74c476") %>%
+      hc_add_series(dta, type = 'arearange', name = "Predicted Reported", color = "#74c476", 
+                    hcaes(x = time, low = daily_incidence_min, high = daily_incidence_max), 
+                    linkedTo = "reported") %>%
+      hc_add_series(dta, type = "line", hcaes(x = time, y = daily_total_cases_med), id = "pred_reported", name = "Predicted Reported + Unreported", color = "#00441b") %>%
+      hc_add_series(dta, type = 'arearange', name = "Predicted Reported + Unreported", color = "#00441b", 
+                    hcaes(x= time,  low = daily_total_cases_min, high = daily_total_cases_max), 
+                    linkedTo = "pred_reported") %>%
+      hc_title(text = "Baseline Cases") %>%
+      hc_yAxis(max = max_y, title = "Cases") %>%
+      hc_xAxis(title = "") %>%
+      hc_exporting(enabled = TRUE, buttons = list(contextButton = list(menuItems = hc_export_items)))
+  
+  if(input$entity_tests == "_")  {hc <- hc %>% hc_tooltip(shared = TRUE)}
+  
+  if(input$entity_tests != "_")  {
+    hc <- hc %>%
+      hc_add_series(dta, type = "line", hcaes(x = time, y = tests), name = "Tests", color = "grey") %>%
+      hc_tooltip(shared = TRUE)
+  }
+  
+  return(hc)
+})
+
