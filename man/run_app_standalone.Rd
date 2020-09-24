@@ -6,6 +6,9 @@
 \usage{
 run_app_standalone(options = list())
 }
+\arguments{
+\item{options}{Named options that should be passed to the runApp call.}
+}
 \value{
 Open browser
 }
