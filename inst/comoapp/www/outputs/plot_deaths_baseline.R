@@ -1,5 +1,6 @@
 output$plot_deaths_baseline <- renderPlot({
   req(simul_baseline$baseline_available)
+  req(!input$dynamic_deaths_baseline)
   
   dta <- left_join(tibble(
     reportable_death_min = simul_baseline$results$min$reportable_death,
@@ -41,4 +42,50 @@ output$plot_deaths_baseline <- renderPlot({
     theme_light(base_size = 14) +
     scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
     scale_color_manual(name = "Cumulative Deaths", values = c("Reportable" = "#00441b", "Attributable" = "#74c476", "Observed" = "red"))
+})
+
+
+output$highchart_deaths_baseline <- renderHighchart({
+  req(simul_baseline$baseline_available)
+  req(input$dynamic_deaths_baseline)
+  
+  dta <- left_join(tibble(
+    reportable_death_min = simul_baseline$results$min$reportable_death,
+    reportable_death_med = simul_baseline$results$med$reportable_death,
+    reportable_death_max = simul_baseline$results$max$reportable_death,
+    attributable_deaths_min = simul_baseline$results$min$attributable_deaths,
+    attributable_deaths_med = simul_baseline$results$med$attributable_deaths,
+    attributable_deaths_max = simul_baseline$results$max$attributable_deaths,
+    time = simul_baseline$results$time), 
+    cases_rv$data, # cumulative_death
+    by = c("time" = "date"))
+  
+  # X/Y scales
+  if(input$focus_axis == "Observed")  {
+    max_x <- dta$time[last(which(!is.na(dta$cumulative_death)))] + 3
+    max_y <- 1.2 * max(dta$cumulative_death, na.rm = TRUE)
+  }
+  if(input$focus_axis == "Predicted Reported" | input$focus_axis == "Predicted Reported + Unreported")  {
+    max_x <- max(dta$time)
+    max_y <- NA
+  }
+  
+  dta <- dta %>%
+    rename(Date = time) %>%
+    filter(Date <= max_x)
+  
+  
+  hchart(dta, "line", name = "Observed", hcaes(x = Date, y = cumulative_death), color = "red") %>% 
+    hc_add_series(dta, type = "line", hcaes(x = Date, y = reportable_death_med), id = "reportable", name = "Reportable", color = "#00441b") %>%
+    hc_add_series(dta, type = 'arearange', name = "Reportable", color = "#00441b", 
+                  hcaes(x = Date, low = reportable_death_min, high = reportable_death_max), 
+                  linkedTo = "reportable") %>%
+    hc_add_series(dta, type = "line", hcaes(x = Date, y = attributable_deaths_med), id = "attributable", name = "Attributable", color = "#74c476") %>%
+    hc_add_series(dta, type = 'arearange', name = "Attributable", color = "#74c476", 
+                  hcaes(x= Date,  low = attributable_deaths_min, high = attributable_deaths_max), 
+                  linkedTo = "attributable") %>%
+    hc_title(text = "Baseline Cumulative Deaths") %>%
+    hc_yAxis(min = 0, max = max_y, title = "") %>%
+    hc_xAxis(title = "") %>%
+    hc_exporting(enabled = TRUE, buttons = list(contextButton = list(menuItems = hc_export_items)))
 })

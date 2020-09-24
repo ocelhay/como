@@ -142,22 +142,44 @@ ui <- function(request) {
                     column(4, htmlOutput("text_attributable_death_baseline") %>% withSpinner()),
                     column(4, htmlOutput("text_reported_death_baseline") %>% withSpinner())
                   ),
+                  br(),
                   fluidRow(
-                    column(8, dropdownButton(
-                      div(
-                        p("Select an entity to display daily tests. (Source: Our World in Data)"),
-                        selectInput("entity_tests", label = "Tests Data:", choices = entities_tests,
-                                    selected = "_")
-                      ),
-                      circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px",
-                      tooltip = tooltipOptions(title = "Display tests data")
-                    )
+                    column(1, 
+                           dropdownButton(
+                             div(
+                               prettySwitch("dynamic_cases_baseline", value = FALSE, label = "Dynamic Plot"),
+                               p("Select an entity to display daily tests. (Source: Our World in Data)"),
+                               selectInput("entity_tests", label = "Tests Data:", choices = entities_tests,
+                                           selected = "_")
+                             ),
+                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px",
+                             tooltip = tooltipOptions(title = "Settings for Baseline Daily Cases plot")
+                           )
                     ),
-                    column(4, downloadButton("download_cases_baseline", "Download Plot Data", class = "btn btn-primary btn-sm"))
+                    column(11,
+                           conditionalPanel("! input.dynamic_cases_baseline",
+                                            plotOutput("plot_cases_baseline", height = "350px") %>% withSpinner()), 
+                           conditionalPanel("input.dynamic_cases_baseline",
+                                            highchartOutput("highchart_cases_baseline") %>% withSpinner())
+                    )
                   ),
-                  plotOutput("plot_cases_baseline", height = "350px") %>% withSpinner(), 
-                  highchartOutput("highchart_cases_baseline") %>% withSpinner(),
-                  plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner(),
+                  fluidRow(
+                    column(1, 
+                           dropdownButton(
+                             div(
+                               prettySwitch("dynamic_deaths_baseline", value = FALSE, label = "Dynamic Plot")
+                             ),
+                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px",
+                             tooltip = tooltipOptions(title = "Settings for Baseline Cumulative Deaths plot")
+                           )
+                    ),
+                    column(11,
+                           conditionalPanel("! input.dynamic_deaths_baseline",
+                                            plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner()), 
+                           conditionalPanel("input.dynamic_deaths_baseline",
+                                            highchartOutput("highchart_deaths_baseline") %>% withSpinner())
+                    )
+                  ),
                   fluidRow(
                     column(6, plotOutput("plot_total_deaths_age", height = "400px") %>% withSpinner()),
                     column(6, plotOutput("plot_Rt_baseline", height = "400px") %>% withSpinner())
