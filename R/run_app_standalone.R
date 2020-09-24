@@ -1,5 +1,6 @@
 #' Run the standalone version
-#'
+#' 
+#' @param options Named options that should be passed to the runApp call.
 #' @return
 #' Open browser
 #' @export

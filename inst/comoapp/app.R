@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v15.5.1"
+version_app <- "v15.5.2"
 code_for_development <- TRUE
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
@@ -45,17 +45,15 @@ ui <- function(request) {
     source("./www/ui/pushbar_generate_uncertainty.R", local = TRUE)[1],
     
     navbarPage(
-      NULL, id = "tabs", windowTitle = "CoMo COVID-19 App", collapsible = TRUE, inverse = FALSE,
-      tabPanel(span("CoMo Consortium | COVID-19 App ", version_app), value = "tab_welcome",
-               div(class = "box_outputs", h4(paste0("CoMo Consortium | COVID-19 App ", version_app))),
-               a(span("Source Code Respository", icon("external-link-alt")), href = "https://github.com/ocelhay/como", target = "_blank"),
+      title = div(a(img(src = "CoMo-logo-medium-white_resized.png", id = "logo-top"), href = "./")),
+      id = "tabs", windowTitle = "CoMo Consortium | COVID-19 App", collapsible = TRUE, inverse = FALSE,
+      tabPanel("Welcome", value = "tab_welcome",
+               h4(paste0("App ", version_app)),
                fluidRow(
                  column(6,
-                        fluidRow(
-                          column(4, img(src = "./como_logo.png", id = "logo")),
-                          column(8, br(), p("The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level."))
-                        ),
-                        br(),
+                        span(img(src = "./CoMo-logo-medium.png", id = "logo"),
+                             "The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level."),
+                        br(), br(), br(),
                         h5("CoMo Consortium member countries’ stages of engagement with policymakers — August 21, 2020") %>%
                           helper(content = "stages_countries", colour = "red"),
                         tags$img(src = "./como_policy_makers.png", id = "map")
@@ -66,10 +64,10 @@ ui <- function(request) {
                           bs_append(title = "Important Disclaimer", content = includeMarkdown("./www/markdown/disclaimer.md")) %>%
                           bs_append(title = "License", content = includeMarkdown("./www/markdown/readable_license.md")) %>%
                           bs_append(title = "Countries Data", content = includeMarkdown("./www/markdown/about_country_data.md")) %>%
-                          bs_append(title = "Epidemiological Data", content = includeMarkdown("./www/markdown/about_data.md"))
-                 )
-               ),
-               
+                          bs_append(title = "Epidemiological Data", content = includeMarkdown("./www/markdown/about_data.md")) %>%
+                          bs_append(title = "Source Code", content = a(span("Source Code Respository", icon("external-link-alt")), href = "https://github.com/ocelhay/como", target = "_blank"))
+                 ),
+               )
       ),
       tabPanel(
         "Visual Calibration", value = "tab_visualfit",
@@ -144,17 +142,44 @@ ui <- function(request) {
                     column(4, htmlOutput("text_attributable_death_baseline") %>% withSpinner()),
                     column(4, htmlOutput("text_reported_death_baseline") %>% withSpinner())
                   ),
-                  dropdownButton(
-                    div(
-                      p("Select an entity to display daily tests. (Source: Our World in Data)"),
-                      selectInput("entity_tests", label = "Tests Data:", choices = entities_tests,
-                                  selected = "_")
+                  br(),
+                  fluidRow(
+                    column(1, 
+                           dropdownButton(
+                             div(
+                               prettySwitch("dynamic_cases_baseline", value = FALSE, label = "Dynamic Plot"),
+                               p("Select an entity to display daily tests. (Source: Our World in Data)"),
+                               selectInput("entity_tests", label = "Tests Data:", choices = entities_tests,
+                                           selected = "_")
+                             ),
+                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px",
+                             tooltip = tooltipOptions(title = "Settings for Baseline Daily Cases plot")
+                           )
                     ),
-                    circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px",
-                    tooltip = tooltipOptions(title = "Display tests data")
+                    column(11,
+                           conditionalPanel("! input.dynamic_cases_baseline",
+                                            plotOutput("plot_cases_baseline", height = "350px") %>% withSpinner()), 
+                           conditionalPanel("input.dynamic_cases_baseline",
+                                            highchartOutput("highchart_cases_baseline") %>% withSpinner())
+                    )
                   ),
-                  plotOutput("plot_cases_baseline", height = "350px") %>% withSpinner(), 
-                  plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner(),
+                  fluidRow(
+                    column(1, 
+                           dropdownButton(
+                             div(
+                               prettySwitch("dynamic_deaths_baseline", value = FALSE, label = "Dynamic Plot")
+                             ),
+                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px",
+                             tooltip = tooltipOptions(title = "Settings for Baseline Cumulative Deaths plot")
+                           )
+                    ),
+                    column(11,
+                           conditionalPanel("! input.dynamic_deaths_baseline",
+                                            plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner()), 
+                           conditionalPanel("input.dynamic_deaths_baseline",
+                                            highchartOutput("highchart_deaths_baseline") %>% withSpinner())
+                    )
+                  ),
                   fluidRow(
                     column(6, plotOutput("plot_total_deaths_age", height = "400px") %>% withSpinner()),
                     column(6, plotOutput("plot_Rt_baseline", height = "400px") %>% withSpinner())

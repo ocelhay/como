@@ -1,6 +1,9 @@
 
 **Choosing a "Number of model runs" greater than 1 will generate uncertainty as described below. If you decide to do so, we recommend to go for a minimum of 10 runs. Simulation running time can amount to 1 second per run and 30 seconds to aggregate results (irrespective of the number of runs).**
 
+<br>
+<br>
+<br>
 
 Users of the CoMo Collaborative COVID-19 model need to comprehend and effectively communicate the multiple uncertainties involved in making quantitative projections about evolving outbreaks.  To assist in this "propagation of uncertainty", the model development team has created a way for users to specify a level of parametric (Gaussian) "white noise"" to **all of the model parameters listed below**.  If implemented by the user, this means that the chosen point value for each of these parameters will become the midpoint for a range defined by the standard deviation selected on the **Noise** slider bar.  With each modeling run, these parameters are then sampled from the resulting Gaussian distribution with mean given by the chosen parameter value.
 
