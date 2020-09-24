@@ -1,12 +1,8 @@
 list(
   pushbar(id = "pushbar_generate_uncertainty", from = "right",
           br(),
-          fluidRow(
-            column(
-              width = 12,
-              sliderInput("iterations", "Number of model runs:", value = 1, min = 1, max = 100, post = " runs", ticks = FALSE)
-            )
-          ),
+          sliderInput("iterations", "Number of model runs:", value = 1, min = 1, max = 10000, post = " runs", 
+                      ticks = FALSE, width = "100%"),
           conditionalPanel(
             "input.iterations > 1", 
             fluidRow(
