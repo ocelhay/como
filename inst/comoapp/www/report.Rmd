@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ```{r out.width = "30%"}
-knitr::include_graphics("como_logo.png")
+knitr::include_graphics("CoMo-logo-medium.png")
 ```
 
 
