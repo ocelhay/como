@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v15.5.2"
+version_app <- "v15.5.3"
 code_for_development <- TRUE
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
