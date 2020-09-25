@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v15.5.2"
+version_app <- "v15.5.3"
 code_for_development <- TRUE
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
@@ -16,6 +16,7 @@ library(lubridate)
 library(pushbar)
 library(readxl)
 library(reshape2)
+library(rmarkdown)
 library(scales)
 library(shiny)
 library(shinycssloaders)
@@ -45,13 +46,13 @@ ui <- function(request) {
     source("./www/ui/pushbar_generate_uncertainty.R", local = TRUE)[1],
     
     navbarPage(
-      title = div(a(img(src = "CoMo-logo-medium-white_resized.png", id = "logo-top"), href = "./")),
+      title = div(a(img(src = "CoMo-logo-medium-white_resized.png", id = "logo-top"))),
       id = "tabs", windowTitle = "CoMo Consortium | COVID-19 App", collapsible = TRUE, inverse = FALSE,
       tabPanel("Welcome", value = "tab_welcome",
                h4(paste0("App ", version_app)),
                fluidRow(
                  column(6,
-                        span(img(src = "./CoMo-logo-medium.png", id = "logo"),
+                        span(img(src = "./como_logo.png", id = "logo"),
                              "The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level."),
                         br(), br(), br(),
                         h5("CoMo Consortium member countries’ stages of engagement with policymakers — August 21, 2020") %>%
@@ -568,8 +569,7 @@ server <- function(input, output, session) {
             tags$li(a("Rt", href = '#anchor_rt'))
           ),
           br(), 
-          downloadButton("report", label = "Generate Report"), br(),
-          tags$small("Report in .docx format based on current simulation."), br(),
+          uiOutput("report_generation"), br(),
           downloadButton("download_data", "Download Data") %>% helper(type = "markdown", content = "help_legend_csv", colour = "red", size = "l"), 
           tags$small("Simulation results in .csv format."),
           hr(),
@@ -797,6 +797,14 @@ server <- function(input, output, session) {
   
   
   # Generate Report ----
+  output$report_generation <- renderUI({
+    ifelse(pandoc_available(),
+           tagList(downloadLink("report", label = span(icon("file-word"), "Generate Report Based on Current Simulation (.docx)"))),
+           tagList(span("To generate a report", a("install pandoc", href = "https://pandoc.org/installing.html", target = "_blank"), " and restart the app."))
+    )
+  })
+  
+  
   output$report <- downloadHandler(
     filename = "CoMo Report.docx",
     content = function(file) {
