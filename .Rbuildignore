@@ -6,7 +6,6 @@
 ^appveyor\.yml$
 ^LICENSE\.txt$
 ^docs$
-^icons$
 ^misc$
 ^.*\.Rproj$
 ^\.Rproj\.user$
