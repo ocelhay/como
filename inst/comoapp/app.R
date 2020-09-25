@@ -52,7 +52,7 @@ ui <- function(request) {
                h4(paste0("App ", version_app)),
                fluidRow(
                  column(6,
-                        span(img(src = "./CoMo-logo-medium.png", id = "logo"),
+                        span(img(src = "./como_logo.png", id = "logo"),
                              "The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level."),
                         br(), br(), br(),
                         h5("CoMo Consortium member countries’ stages of engagement with policymakers — August 21, 2020") %>%
