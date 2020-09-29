@@ -50,6 +50,8 @@ ui <- function(request) {
       id = "tabs", windowTitle = "CoMo Consortium | COVID-19 App", collapsible = TRUE, inverse = FALSE,
       tabPanel("Welcome", value = "tab_welcome",
                h4(paste0("App ", version_app)),
+               # for debugging purposes, TODO: remove in prod
+               textOutput("diagnosis_platform"),
                fluidRow(
                  column(6,
                         span(img(src = "./como_logo.png", id = "logo"),
@@ -318,6 +320,12 @@ ui <- function(request) {
 
 # Define server ----
 server <- function(input, output, session) {
+  
+  output$diagnosis_platform <- renderText({
+    paste0("pandoc_available: ", pandoc_available(), "\n",
+           "Sys.getenv('PATH'): ", Sys.getenv("PATH"))
+  })
+  
   # triggers the modal dialogs when the user clicks an icon
   observe_helpers(help_dir = "./www/markdown")
   
