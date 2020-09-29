@@ -51,7 +51,8 @@ ui <- function(request) {
       tabPanel("Welcome", value = "tab_welcome",
                h4(paste0("App ", version_app)),
                # for debugging purposes, TODO: remove in prod
-               htmlOutput("diagnosis_platform"),
+               # htmlOutput("diagnosis_platform"),
+               
                fluidRow(
                  column(6,
                         span(img(src = "./como_logo.png", id = "logo"),
@@ -321,11 +322,12 @@ ui <- function(request) {
 # Define server ----
 server <- function(input, output, session) {
   
-  output$diagnosis_platform <- renderText({
-    paste0("pandoc_available: ", pandoc_available(), "</br>",
-           "Sys.getenv('PATH'): ", Sys.getenv("PATH"), "</br>",
-           "find_pandoc(dir = '/usr/local/bin/')", find_pandoc(dir = "/usr/local/bin/")$version)
-  })
+  # for debugging purposes, TODO: remove in prod
+  # output$diagnosis_platform <- renderText({
+  #   paste0("pandoc_available: ", pandoc_available(), "</br>",
+  #          "Sys.getenv('PATH'): ", Sys.getenv("PATH"), "</br>",
+  #          "find_pandoc(dir = '/usr/local/bin/')", find_pandoc(dir = "/usr/local/bin/")$version)
+  # })
   
   # triggers the modal dialogs when the user clicks an icon
   observe_helpers(help_dir = "./www/markdown")
