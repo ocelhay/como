@@ -2,6 +2,11 @@
 version_app <- "v15.5.3"
 code_for_development <- TRUE
 
+# ensure that the R session has access to pandoc / macOS
+if (Sys.info()["sysname"] == "Darwin") {
+  Sys.setenv(PATH = paste("/usr/local/bin", Sys.getenv("PATH"), sep = ":"))
+}
+
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
 # remotes::install_github("ocelhay/comoOdeCpp", subdir = "comoOdeCpp")
 library(comoOdeCpp)
