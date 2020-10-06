@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v15.5.3"
+version_app <- "v16.2.0"
 code_for_development <- TRUE
 
 # for macOS standalone app
