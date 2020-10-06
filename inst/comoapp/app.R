@@ -2,8 +2,8 @@
 version_app <- "v16.2.0"
 code_for_development <- TRUE
 
-# for macOS standalone app
-# ensure that the R session has access to pandoc installed in "/usr/local/bin"
+# To generate report with macOS standalone app (shinybox),
+# ensure that the R session has access to pandoc installed in "/usr/local/bin".
 if (Sys.info()["sysname"] == "Darwin" & 
     !grepl("/usr/local/bin", Sys.getenv("PATH"), fixed = TRUE)) {
   Sys.setenv(PATH = paste("/usr/local/bin", Sys.getenv("PATH"), sep = ":"))
@@ -35,7 +35,7 @@ library(shinythemes)
 library(shinyWidgets)
 library(tidyverse)
 
-# Load packages and data
+# Load data and define elements used by model.
 source("./www/model/model_once.R")
 
 # Define UI ----
@@ -453,7 +453,7 @@ server <- function(input, output, session) {
                 input$baseline_coverage_27, input$baseline_coverage_28,
                 input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
-                              intervention == "Mass Testing" ~ " tests", 
+                              intervention == "Mass Testing" ~ "000 tests", 
                               TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_baseline, intervention != "_")
     
@@ -748,7 +748,9 @@ server <- function(input, output, session) {
     source("./www/model/model_repeat.R", local = TRUE)
     parameters["iterations"] <- 1
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
+                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
+                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
@@ -770,7 +772,9 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model/model_repeat.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
+                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
+                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
@@ -795,7 +799,9 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model/model_repeat.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, 
+                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
+                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
@@ -974,14 +980,18 @@ server <- function(input, output, session) {
                      interventions$future_mat %>% mutate(`Apply to` = "Hypothetical Scenario")) %>%
       rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
     
-    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
+    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
+                       age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
+                       age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
     vectors0_cbind <- do.call(cbind, vectors0)
     vectors0_reduced <- vectors0_cbind[seq(from=0,to=nrow(vectors0_cbind),by=20),]
     vectors0_reduced <- as.data.frame(rbind(rep(0,ncol(vectors0_reduced)),vectors0_reduced))
     vectors0_reduced <- vectors0_reduced[,1:10] #subsetting only the coverages
     names(vectors0_reduced) <- paste0("interventions_baseline_",names(vectors0_reduced))
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, 
+                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
+                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
     vectors_cbind <- do.call(cbind, vectors)
     vectors_reduced <- vectors_cbind[seq(from=0,to=nrow(vectors_cbind),by=20),]
     vectors_reduced <- as.data.frame(rbind(rep(0,ncol(vectors_reduced)),vectors_reduced))
