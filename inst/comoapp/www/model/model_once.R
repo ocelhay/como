@@ -1,11 +1,10 @@
-# load data ----
+# Load Data.
 load(file = "./www/data/cases.Rda")
 load(file = "./www/data/contacts.Rda")
 load(file = "./www/data/demog.Rda")
 load(file = "./www/data/mort_sever_default.Rda")
 
-# misc ----
-# choices for dropdowns
+# Choices for dropdowns.
 countries_cases <- sort(unique(cases$country))
 entities_tests <- c("_", sort(unique(tests$entity)))
 countries_contact <- names(contact_home)
@@ -23,19 +22,20 @@ all_interventions <- c("_",
                        
                        "Vaccination",
                        "(*Vaccination) Age Vaccine Minimum",
+                       "(*Vaccination) Age Vaccine Maximum",
                        "Mass Testing",
                        "(*Mass Testing) Age Testing Minimum",
                        "(*Mass Testing) Age Testing Maximum",
                        "Mask Wearing",
                        "Dexamethasone")
 
-# default values for interventions
+# Default values for interventions.
 nb_interventions_max <- 30
 new_intervention_value <- "_"
 new_daterange_value <- c(as.Date("2020-01-01"), as.Date("2020-12-31"))
 new_coverage_value <- 0
 
-# highchart export options
+# highchart export options.
 hc_export_items <- c("downloadPNG", "downloadCSV", "downloadXLS")
 
 # model variable that are independent of inputs ----
