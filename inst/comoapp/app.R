@@ -48,6 +48,7 @@ ui <- function(request) {
     chooseSliderSkin('HTML5'),
     title = "CoMo Consortium | COVID-19 App",
     
+    source("./www/ui/pushbar_parameters_reporting.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_country.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_virus.R", local = TRUE)[1],
@@ -61,7 +62,6 @@ ui <- function(request) {
                h4(paste0("App ", version_app)),
                # for debugging purposes, TODO: remove in prod
                # htmlOutput("diagnosis_platform"),
-               
                fluidRow(
                  column(6,
                         span(img(src = "./como_logo.png", id = "logo"),
@@ -89,13 +89,13 @@ ui <- function(request) {
             width = 2,
             div(class = "float_bottom_left",
                 hr(),
-                sliderInput("p", label = "Probability of infection given contact:", min = 0.01, max = 0.08, step = 0.001,
+                sliderInput("p", label = "Prob. of infection given contact:", min = 0.01, max = 0.08, step = 0.001,
                             value = 0.049, ticks = FALSE, width = "75%"),
-                sliderInput("report", label = span("Percentage of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
+                sliderInput("report", label = span("% of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
                             value = 2.5, post = "%", ticks = FALSE, width = "75%"),
-                sliderInput("reportc", label = span("Percentage of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
+                sliderInput("reportc", label = span("% of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
                             value = 5, post = "%", ticks = FALSE, width = "75%"),
-                sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
+                sliderInput("reporth", label = span("% of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
                             value = 100, post = "%", ticks = FALSE, width = "75%"),
                 
                 
@@ -108,38 +108,38 @@ ui <- function(request) {
             width = 10,
             div(class = "box_outputs", h4("Global Simulations Parameters")),
             fluidRow(
-              column(
-                5, fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE)  %>% 
+              column(5, 
+                    h4(icon("angle-down"), "Set with Template"),
+                     fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE)  %>% 
                   helper(type = "markdown", content = "help_upload_template", colour = "red", size = "s"),
-              )
-            ),
-            hr(),
-            fluidRow(
-              column(4,
-                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year")
               ),
-              column(6, offset = 2,
+              column(6, offset = 1,
+                     h4(icon("angle-down"), "Set Manually"),
+                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year"),
                      fluidRow(column(6, 
-                                     actionButton("open_country_param", label = span(icon('cog'), " Country"), class = "btn-primary", width = "70%"),
-                                     htmlOutput("feedback_choices")),
-                              column(6, 
-                                     actionButton("open_interventions_param", label = span(icon('cog'), " Interventions"), class = "btn-primary", width = "70%"), br(), br(),
-                                     actionButton("open_virus_param", label = span(icon('cog'), " Virus"), class = "btn-primary", width = "70%"), br(), br(),
-                                     actionButton("open_hospital_param", label = span(icon('cog'), " Hospital"), class = "btn-primary", width = "70%")
-                              )
+                                     actionButton("open_country_param", label = span(icon('cog'), " Country"), class = "btn-primary", width = "80%"),
+                                     htmlOutput("feedback_choices"),
+                                     actionButton("open_reporting_param", label = span(icon('cog'), " Reporting"), class = "btn-primary", width = "80%"), br(), br()
+                     ),
+                     column(6, 
+                            actionButton("open_interventions_param", label = span(icon('cog'), " Interventions"), class = "btn-primary", width = "80%"), br(), br(),
+                            actionButton("open_virus_param", label = span(icon('cog'), " Virus"), class = "btn-primary", width = "80%"), br(), br(),
+                            actionButton("open_hospital_param", label = span(icon('cog'), " Hospital"), class = "btn-primary", width = "80%")
+                     )
                      )
               )
             ),
+            use_bs_accordion_sidebar(),
             br(),
             fluidRow(
               column(6,
-                     div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
+                     div(class = "box_outputs", h4("Interventions for Baseline")),
                      sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 30, value = 0, step = 1, ticks = FALSE),
                      htmlOutput("text_feedback_interventions_baseline"),
                      source("./www/ui/interventions_baseline.R", local = TRUE)$value
               ),
               column(6,
-                     div(class = "box_outputs", h4("Timeline")),
+                     div(class = "box_outputs", h4("Timeline of Interventions")),
                      plotOutput("timevis_baseline", height = 700)
               )
             ),
@@ -217,7 +217,7 @@ ui <- function(request) {
                  source("./www/ui/interventions_future.R", local = TRUE)$value
           ),
           column(5,
-                 div(class = "box_outputs", h4("Timeline")),
+                 div(class = "box_outputs", h4("Timeline of Interventions")),
                  plotOutput("timevis_future", height = 700)
           )
         ),
@@ -346,6 +346,8 @@ server <- function(input, output, session) {
   
   # Pushbar for parameters ----
   setup_pushbar(overlay = TRUE, blur = TRUE)
+  observeEvent(input$open_reporting_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_reporting"))  
+  observeEvent(input$close_reporting_param, pushbar_close())
   observeEvent(input$open_interventions_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_interventions"))  
   observeEvent(input$close_interventions_param, pushbar_close())
   observeEvent(input$open_country_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_country"))  
