@@ -98,7 +98,7 @@ parameters <- reactiveValuesToList(input)[
     "report_cv", "report_vr", "report_cvr", "report_r", "report_cr", "reporth_ICU",
     "report_death_HC", "pdeath_vent_hc", "pdeath_icu_hc", "pdeath_icu_hco",
     "reporth_g", "seroneg",
-    "vaccine_eff_r", "age_vaccine_max"
+    "vaccine_eff_r", "age_vaccine_max", "pre"
     )] %>% 
   unlist()
 
@@ -191,6 +191,7 @@ parameters["report_natdeathI"]<-parameters["report_natdeathI"]/100
 parameters["report_natdeathCL"]<-parameters["report_natdeathCL"]/100
 parameters["report_death_HC"]<-parameters["report_death_HC"]/100
 parameters["reporth_ICU"]<-parameters["reporth_ICU"]/100
+parameters["pre"]<-parameters["pre"]/100
 parameters["pdeath_vent_hc"]<-parameters["pdeath_vent_hc"]/100
 parameters["pdeath_icu_hc"]<-parameters["pdeath_icu_hc"]/100
 parameters["pdeath_icu_hco"]<-parameters["pdeath_icu_hco"]/100
