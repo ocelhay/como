@@ -25,7 +25,11 @@ list(
                    sliderInput("pdeath_icuco", label = "Probability of dying when admission to ICU denied if req. O2:", value = 75, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
                    
                    sliderInput("pdeath_vent", label = "Probability of dying when ventilated:", value = 80, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
-                   sliderInput("pdeath_ventc", label = "Probability of dying when ventilator denied:", value = 95, min = 0, max = 100, step = 1, post = "%", ticks = FALSE)
+                   sliderInput("pdeath_ventc", label = "Probability of dying when ventilator denied:", value = 95, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
+                   
+                   sliderInput("pdeath_vent_hc", label = "Probability of dying when ventilator required and not going to hospital:", value = 95, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE),
+                   sliderInput("pdeath_icu_hc", label = "Probability of dying when icu required (not O2) and not going to hospital:", value = 95, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE),
+                   sliderInput("pdeath_icu_hco", label = "Probability of dying when icu required (req O2) and not going to hospital:", value = 95, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE),
             ),
             column(4,
                    sliderInput("nus", label = "Duration of hospitalised infection:", value = 24, min = 1, max = 30, step = 0.5, post = " days", ticks = FALSE),

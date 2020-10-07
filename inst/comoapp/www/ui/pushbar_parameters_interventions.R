@@ -28,13 +28,21 @@ list(
                    div(class = "box_interventions", h4(icon("plane"), " International Travel Ban")),
                    sliderInput("travelban_eff", label = "Efficacy of travel ban:", value = 50, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),
+                   
                    div(class = "box_interventions", h4(icon("syringe"), "Vaccination")),
                    sliderInput("vac_campaign", label = "Time to reach target coverage:", value = 4, min = 1, max = 52,
                                step = 1, post = " weeks", ticks = FALSE),
-                   sliderInput("age_vaccine_min", label = "Minimum age for vaccination:", value = 60, min = 0, max = 100,
+                   sliderInput("age_vaccine_min", label = "Minimum age for vaccination:", value = 10, min = 0, max = 100,
                                step = 1, post = " years", ticks = FALSE),
+                   sliderInput("age_vaccine_max", label = "Maximum age for vaccination:", value = 60, min = 0, max = 100,
+                               step = 1, post = " years", ticks = FALSE),
+                   sliderInput("vac_dur", label = "Duration of efficacious period", value = 100, min = 0, max = 100, step = 0.1, post = " years", ticks = FALSE, width = "75%"),
+                   sliderInput("vac_dur_r", label = "Duration of efficacious period if previously infected", value = 100, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE, width = "75%"),
                    sliderInput("vaccine_eff", label = "Efficacy of vaccine:", value = 0, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),
+                   sliderInput("vaccine_eff_r", label = "Efficacy if previously infected", value = 100, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE, width = "75%"),
+                   
+                   
                    div(class = "box_interventions", h4(icon("house-user"), 'Shielding the Elderly')),
                    sliderInput("cocoon_eff", label = "Efficacy of elderly shielding:", value = 95, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),

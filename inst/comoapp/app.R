@@ -95,10 +95,6 @@ ui <- function(request) {
                             value = 2.5, post = "%", ticks = FALSE, width = "75%"),
                 sliderInput("reportc", label = span("% of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
                             value = 5, post = "%", ticks = FALSE, width = "75%"),
-                sliderInput("reporth", label = span("% of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
-                            value = 100, post = "%", ticks = FALSE, width = "75%"),
-                
-                
                 uiOutput("conditional_run_baseline"), br(),
                 uiOutput("conditional_validate_baseline"),
                 hr()
