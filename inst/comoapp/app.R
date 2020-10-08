@@ -105,9 +105,9 @@ ui <- function(request) {
             div(class = "box_outputs", h4("Global Simulations Parameters")),
             fluidRow(
               column(5, 
-                    h4("Set Parameters with Template"),
-                     fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE)  %>% 
-                  helper(type = "markdown", content = "help_upload_template", colour = "red", size = "s"),
+                     h4("Set Parameters with Template"),
+                     fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE),
+                     includeMarkdown("./www/markdown/help_upload_template.md")
               ),
               column(6, offset = 1,
                      h4("Set Parameters On The Spot"),
@@ -130,7 +130,7 @@ ui <- function(request) {
             fluidRow(
               column(6,
                      div(class = "box_outputs", h4("Interventions for Baseline")),
-                     sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 30, value = 0, step = 1, ticks = FALSE),
+                     sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 50, value = 0, step = 1, ticks = FALSE),
                      htmlOutput("text_feedback_interventions_baseline"),
                      source("./www/ui/interventions_baseline.R", local = TRUE)$value
               ),
@@ -208,7 +208,7 @@ ui <- function(request) {
           ),
           column(5,
                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario")),
-                 sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 30,  value = 0, step = 1, ticks = FALSE),
+                 sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 50,  value = 0, step = 1, ticks = FALSE),
                  htmlOutput("text_feedback_interventions_future"),
                  source("./www/ui/interventions_future.R", local = TRUE)$value
           ),
@@ -752,7 +752,8 @@ server <- function(input, output, session) {
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
-    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors)
+    simul_baseline$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
+                                                  ifr, mort, popstruc, intv_vector = vectors)
     simul_baseline$baseline_available <- TRUE
     
     showNotification("Displaying results", duration = 3, type = "message")
@@ -776,7 +777,8 @@ server <- function(input, output, session) {
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
-    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors)
+    simul_baseline$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
+                                                  ifr, mort, popstruc, intv_vector = vectors)
     simul_baseline$baseline_available <- TRUE
     
     showNotification("Displaying results", duration = 3, type = "message")
@@ -803,7 +805,8 @@ server <- function(input, output, session) {
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
-    simul_interventions$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors)
+    simul_interventions$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
+                                                       ifr, mort, popstruc, intv_vector = vectors)
     simul_interventions$interventions_available <- TRUE
     
     if(code_for_development) {

@@ -3,6 +3,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   
   # Define objects to store results ----
   results <- list()
+  
   nb_times <- length(times)
   nb_col <- length(Y) + 1
   aux <- array(0, dim = c(nb_times, nb_col, parameters["iterations"]))
@@ -16,8 +17,9 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
 
   # Define spline function ----
   # the parameters give and beds_available have no noise added to them
-  beds <- parameters["beds_available"]
-  fH <- splinefun(c(0, (1 + parameters["give"]) * beds / 2, (3 - parameters["give"]) * beds / 2, 2 * beds), 
+  fH <- splinefun(c(0, 
+                    (1 + parameters["give"]) * parameters["beds_available"] / 2, 
+                    (3 - parameters["give"]) * parameters["beds_available"] / 2, 2 * parameters["beds_available"]), 
                   c(1, (1 + parameters["give"]) / 2, (1 - parameters["give"]) / 2, 0), 
                   method = "hyman")
   
