@@ -105,12 +105,12 @@ ui <- function(request) {
             div(class = "box_outputs", h4("Global Simulations Parameters")),
             fluidRow(
               column(5, 
-                    h4(icon("angle-down"), "Set with Template"),
+                    h4("Set Parameters with Template"),
                      fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE)  %>% 
                   helper(type = "markdown", content = "help_upload_template", colour = "red", size = "s"),
               ),
               column(6, offset = 1,
-                     h4(icon("angle-down"), "Set Manually"),
+                     h4("Set Parameters On The Spot"),
                      dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year"),
                      fluidRow(column(6, 
                                      actionButton("open_country_param", label = span(icon('cog'), " Country"), class = "btn-primary", width = "80%"),
