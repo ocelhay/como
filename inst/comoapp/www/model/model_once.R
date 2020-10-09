@@ -30,7 +30,7 @@ all_interventions <- c("_",
                        "Dexamethasone")
 
 # Default values for interventions.
-nb_interventions_max <- 30
+nb_interventions_max <- 50
 new_intervention_value <- "_"
 new_daterange_value <- c(as.Date("2020-01-01"), as.Date("2020-12-31"))
 new_coverage_value <- 0
