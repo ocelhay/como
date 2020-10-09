@@ -1,6 +1,5 @@
 # CoMo COVID-19 App
 version_app <- "v16.2.0"
-code_for_development <- TRUE
 
 # To generate report with macOS standalone app (shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -683,11 +682,6 @@ server <- function(input, output, session) {
                                                        ifr, mort, popstruc, intv_vector = vectors)
     simul_interventions$interventions_available <- TRUE
     
-    if(code_for_development) {
-      shiny_simul_baseline <<- simul_baseline$results
-      shiny_simul_interventions <<- simul_interventions$results
-    }
-    
     showNotification("Displaying results", duration = 3, type = "message")
     shinyjs::show(id = "results_interventions_1", anim = FALSE)
     shinyjs::show(id = "results_interventions_2", anim = FALSE)
@@ -707,7 +701,7 @@ server <- function(input, output, session) {
   
   
   output$report <- downloadHandler(
-    filename = "CoMo Report.docx",
+    filename = "CoMo_Model_Report.docx",
     content = function(file) {
       showNotification(HTML("Generating report (~ 15 secs.)"), duration = NULL, type = "message", id = "report_generation", session = session)
       
