@@ -11,7 +11,8 @@
 | International Travel Ban              | %                 |
 | Vaccination                           | %                 |
 | (*Vaccination) Age Vaccine Minimum    | y.o.              |
-| Mass Testing                          | tests             |
+| (*Vaccination) Age Vaccine Maximum    | y.o.              |
+| Mass Testing                          | thousands tests   |
 | (*Mass Testing) Age Testing Minimum   | y.o.              |
 | (*Mass Testing) Age Testing Maximum   | y.o.              |
 | Mask Wearing                          | %                 |
