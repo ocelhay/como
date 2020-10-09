@@ -45,6 +45,7 @@ electrify(
   permission = TRUE)
 
 
+# copy from /Library/Frameworks/R.framework/Versions/4.0/Resources/library
 app_root_path <- file.path("/Users/olivier/Desktop/2020-09-29_154844/", app_name)
 
 run_build_release(nodejs_path = nodejs_path,
