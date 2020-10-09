@@ -43,9 +43,9 @@ dta <- interventions$baseline_mat %>%
 
 # showing all "real" interventions
 dta <- bind_rows(
-  dta, 
-  tibble(intervention = setdiff(all_interventions[-c(1, 12, 14, 15)], dta$intervention))) %>%
-  filter(intervention %in% all_interventions[-c(1, 12, 14, 15)])
+    dta, 
+    tibble(intervention = setdiff(real_interventions, dta$intervention))) %>%
+    filter(intervention %in% real_interventions)
 
 if(interventions$baseline_mat %>% nrow() == 0) return({
   plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
@@ -191,9 +191,9 @@ dta <- interventions$future_mat %>%
 
 # showing all "real" interventions
 dta <- bind_rows(
-  dta, 
-  tibble(intervention = setdiff(all_interventions[-c(1, 12, 14, 15)], dta$intervention))) %>%
-  filter(intervention %in% all_interventions[-c(1, 12, 14, 15)])
+    dta, 
+    tibble(intervention = setdiff(real_interventions, dta$intervention))) %>%
+    filter(intervention %in% real_interventions)
 
 if(interventions$future_mat %>% nrow() == 0) return({
   plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
@@ -645,53 +645,108 @@ The above graphs show the model prediction of the reproduction number over time,
 
 # Appendix: full parameter table
 
-| Category                        | Parameter                                                        | Value                           |
-|---------------------------------|------------------------------------------------------------------|---------------------------------|
-| General                         | Probability of infection given contact: (0 to 0.2)               | `r input$p`                     |
-| General                         | Percentage of all asymptomatic infections that are reported:     | `r input$report`                |
-| General                         | Percentage of all symptomatic infections that are reported:      | `r input$reportc`               |
-| General                         | Percentage of all hospitalisations that are reported:            | `r input$reporth`               |
-| Country/Area                    | Social Contacts Data:                                            | `r input$country_contact`       |
-| Country/Area                    | Mean Household size:                                             | `r input$household_size`        |
-| Country/Area                    | Mean number of infectious migrants per day:                      | `r input$mean_imports`          |
-| Virus                           | Relative infectiousness of incubation phase:                     | `r input$rho`                   |
-| Virus                           | Average incubation period: (1 to 7 days)                         | `r input$gamma`                 |
-| Virus                           | Average duration of symptomatic infection period: (1 to 7 days)  | `r input$nui`                   |
-| Virus                           | Month of peak infectivity of the virus: (1, 2, …, 12)            | `r input$phi`                   |
-| Virus                           | Annual variation in infectivity of the virus:                    | `r input$amp`                   |
-| Virus                           | Average duration of immunity: (0.5 to 150)                       | `r input$omega`                 |
-| Virus                           | Probability upon infection of developing clinical symptoms:      | `r input$pclin`                 |
-| Virus                           | Probability upon hospitalisation of requiring ICU admission:     | `r input$prob_icu`              |
-| Virus                           | Probability upon admission to the ICU of requiring a ventilator: | `r input$prob_vent`             |
-| Hospitalisation                 | Maximum number of hospital surge beds                            | `r input$beds_available`        |
-| Hospitalisation                 | Maximum number of ICU beds without ventilators                   | `r input$icu_beds_available`    |
-| Hospitalisation                 | Maximum number of ICU beds with ventilators                      | `r input$ventilators_available` |
-| Hospitalisation                 | Relative percentage of regular daily contacts when hospitalised: | `r input$rhos`                  |
-| Hospitalisation                 | Scaling factor for infection hospitalisation rate: (0.5 to 4)    | `r input$ihr_scaling`           |
-| Hospitalisation                 | Probability of dying when hospitalised:                          | `r input$pdeath_h`              |
-| Hospitalisation                 | Probability of dying when denied hospitalisation:                | `r input$pdeath_hc`             |
-| Hospitalisation                 | Probability of dying when admitted to ICU:                       | `r input$pdeath_icu`            |
-| Hospitalisation                 | Probability of dying when admission to ICU denied:               | `r input$pdeath_icuc`           |
-| Hospitalisation                 | Probability of dying when ventilated:                            | `r input$pdeath_vent`           |
-| Hospitalisation                 | Probability of dying when ventilator denied:                     | `r input$pdeath_ventc`          |
-| Hospitalisation                 | Duration of hospitalised infection: (1 to 30)                    | `r input$nus`                   |
-| Hospitalisation                 | Duration of ICU infection: (1 to 30)                             | `r input$nu_icu`                |
-| Hospitalisation                 | Duration of ventilated infection: (1 to 30)                      | `r input$nu_vent`               |
-| Self-isolation if Symptomatic   | Adherence:                                                       | `r input$selfis_eff`            |
-| Screening (when S.I.)           | Overdispersion: (1, 2, 3, 4 or 5)                                | `r input$screen_overdispersion` |
-| Screening (when S.I.)           | Test Sensitivity:                                                | `r input$screen_test_sens`      |
-| Household Isolation (when S.I.) | Days in isolation for average person:                            | `r input$quarantine_days`       |
-| Household Isolation (when S.I.) | Days to implement maximum quarantine coverage: (1 to 5)          | `r input$quarantine_effort`     |
-| Household Isolation (when S.I.) | Decrease in the number of other contacts when quarantined:       | `r input$quarantine_eff_other`  |
-| Household Isolation (when S.I.) | Increase in the number of contacts at home when quarantined:     | `r input$quarantine_eff_home`   |
-| Social Distancing               | Adherence:                                                       | `r input$dist_eff`              |
-| Handwashing                     | Efficacy: (0-25%)                                                | `r input$hand_eff`              |
-| Working at Home                 | Efficacy:                                                        | `r input$work_eff`              |
-| Working at Home                 | Home contacts inflation due to working from home:                | `r input$w2h`                   |
-| School Closures                 | Efficacy:                                                        | `r input$school_eff`            |
-| School Closures                 | Home contacts inflation due to school closure:                   | `r input$s2h`                   |
-| Shielding the Elderly           | Efficacy:                                                        | `r input$cocoon_eff`            |
-| Shielding the Elderly           | Minimum age for elderly shielding: (0 to 100)                    | `r input$age_cocoon`            |
-| International Travel Ban        | Efficacy:                                                        | `r input$travelban_eff`         |
-| Vaccination                     | Time to reach target coverage: (1 to 52)                         | `r input$vac_campaign`          |
-| Vaccination                     | Efficacy:                                                        | `r input$vaccine_eff`           |
+| Category                              | Parameter                                                                                                         | Value                            |
+|---------------------------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------|
+| General                               | Date range of simulation - START                                                                                  | `r input$date_range_simul_start` |
+| General                               | Date range of simulation - END                                                                                    | `r input$date_range_simul_end`   |
+| General                               | (v16.2) Density of exposed people at start date (expressed as 1/X)                                                | `r input$init`                   |
+| General                               | (v16.2) Proportion of population with partial immunity at the start date                                          | `r input$pre`                    |
+| General                               | Probability of infection given contact (0 to 0.2)                                                                 | `r input$p`                      |
+| General                               | Percentage of all asymptomatic infections that are reported                                                       | `r input$report`                 |
+| General                               | Percentage of all symptomatic infections that are reported                                                        | `r input$reportc`                |
+| General                               | (v16.2) Percentage of denied hospitalisations that are reported                                                   | `r input$reporth_g`              |
+| General                               | (v16.2) Percentage of non-severe hospitalisations that are appropriately treated                                  | `r input$reporth`                |
+| General                               | (v16.2) Percentage of severe hospitalisations that are appropriately treated                                      | `r input$reporth_ICU`            |
+| General                               | (v16.2) Percentage of all asymptomatic infections in previously vaccinated people that are reported               | `r input$report_v`               |
+| General                               | (v16.2) Percentage of all asymptomatic infections in previously vaccinated and exposed people that are reported   | `r input$report_vr`              |
+| General                               | (v16.2) Percentage of all asymptomatic infections in previously infected people that are reported                 | `r input$report_r`               |
+| General                               | (v16.2) Percentage of all symptomatic infections in previously vaccinated people that are reported                | `r input$report_cv`              |
+| General                               | (v16.2) Percentage of all symptomatic infections in previously vaccinated and exposed people that are reported    | `r input$report_cvr`             |
+| General                               | (v16.2) Percentage of all symptomatic infections in previously infected people that are reported                  | `r input$report_cr`              |
+| General                               | (v16.2) Percentage of all people dying outside the hospital with asymptomatic infections reported as covid-deaths | `r input$report_natdeathI`       |
+| General                               | (v16.2) Percentage of all people dying outside the hospital with symptomatic infections reported as covid-deaths  | `r input$report_natdeathCL`      |
+| General                               | (v16.2) Percentage of all people dying outside the hospital with severe infections reported as covid-deaths       | `r input$report_death_HC`        |
+| General                               | Iterations (1 to 10,000)                                                                                          | `r input$iterations`             |
+| General                               | Noise (0.01 to 0.2)                                                                                               | `r input$noise`                  |
+| General                               | Confidence (5 to 25)                                                                                              | `r input$confidence`             |
+| Country Area                          | Social Contacts Data                                                                                              | `r input$country_contact`        |
+| Country Area                          | Mean Household size                                                                                               | `r input$household_size`         |
+| Country Area                          | Mean number of infectious migrants per day                                                                        | `r input$mean_imports`           |
+| Virus                                 | Relative infectiousness of incubation phase                                                                       | `r input$rho`                    |
+| Virus                                 | Average incubation period (1 to 7 days)                                                                           | `r input$gamma`                  |
+| Virus                                 | Average duration of symptomatic infection period (1 to 7 days)                                                    | `r input$nui`                    |
+| Virus                                 | Month of peak infectivity of the virus (1, 2, …, 12)                                                              | `r input$phi`                    |
+| Virus                                 | Annual variation in infectivity of the virus                                                                      | `r input$amp`                    |
+| Virus                                 | Average duration of immunity (0.5 to 150)                                                                         | `r input$omega`                  |
+| Virus                                 | Probability upon infection of developing clinical symptoms                                                        | `r input$pclin`                  |
+| Virus                                 | Probability upon hospitalisation of requiring ICU admission                                                       | `r input$prob_icu`               |
+| Virus                                 | Probability upon admission to the ICU of requiring a ventilator                                                   | `r input$prob_vent`              |
+| Virus                                 | Proportion of hospitalised patients needing O2                                                                    | `r input$propo2`                 |
+| Virus                                 | (v16.2) Probability upon infection of developing clinical symptoms if previously vaccinated                       | `r input$pclin_v`                |
+| Virus                                 | (v16.2) Probability upon infection of developing clinical symptoms if previously vaccinated and exposed           | `r input$pclin_vr`               |
+| Virus                                 | (v16.2) Probability upon infection of developing clinical symptoms if previously infected                         | `r input$pclin_r`                |
+| Virus                                 | (v16.2) Probability upon hospitalisation of requiring ICU admission if previously vaccinated                      | `r input$prob_icu_v`             |
+| Virus                                 | (v16.2) Probability upon hospitalisation of requiring ICU admission if previously vaccinated and exposed          | `r input$prob_icu_vr`            |
+| Virus                                 |  (v16.2) Probability upon hospitalisation of requiring ICU admission if previously infected                       | `r input$prob_icu_r`             |
+| Virus                                 | (v16.2) Probability upon admission to the ICU of requiring a ventilator if previously vaccinated                  | `r input$prob_v_v`               |
+| Virus                                 | (v16.2) Probability upon admission to the ICU of requiring a ventilator if previously vaccinated and exposed      | `r input$prob_v_vr`              |
+| Virus                                 | (v16.2) Probability upon admission to the ICU of requiring a ventilator if previously infected                    | `r input$prob_v_r`               |
+| Virus                                 | (v16.2) Probability of infection of people that have recovered from a previous infection                          | `r input$sigmaR`                 |
+| Virus                                 | (v16.2) Change in probability of requiring hospitalisation if previously vaccinated                               | `r input$sigmaEV`                |
+| Virus                                 | (v16.2) Change in probability of requiring hospitalisation if previously infected                                 | `r input$sigmaER`                |
+| Virus                                 | (v16.2) Change in probability of requiring hospitalisation if previously infected and vaccinated                  | `r input$sigmaEVR`               |
+| Virus                                 | (v16.2) Days from seropositve to seronegative                                                                     | `r input$seroneg`                |
+| Hospitalisation                       | Maximum number of hospital surge beds                                                                             | `r input$beds_available`         |
+| Hospitalisation                       | Maximum number of ICU beds without ventilators                                                                    | `r input$icu_beds_available`     |
+| Hospitalisation                       | Maximum number of ICU beds with ventilators                                                                       | `r input$ventilators_available`  |
+| Hospitalisation                       | Relative percentage of regular daily contacts when hospitalised:                                                  | `r input$rhos`                   |
+| Hospitalisation                       | Scaling factor for infection hospitalisation rate: (0.1 to 5)                                                     | `r input$ihr_scaling`            |
+| Hospitalisation                       | Probability of dying when hospitalised (not req O2):                                                              | `r input$pdeath_h`               |
+| Hospitalisation                       | Probability of dying when hospitalised if req O2:                                                                 | `r input$pdeath_ho`              |
+| Hospitalisation                       | Probability of dying when denied hospitalisation (not req O2):                                                    | `r input$pdeath_hc`              |
+| Hospitalisation                       | Probability of dying when denied hospitalisation if req O2:                                                       | `r input$pdeath_hco`             |
+| Hospitalisation                       | Probability of dying when admitted to ICU (not req O2):                                                           | `r input$pdeath_icu`             |
+| Hospitalisation                       | Probability of dying when admitted to ICU if req O2:                                                              | `r input$pdeath_icuo`            |
+| Hospitalisation                       | Probability of dying when admission to ICU denied (not req O2):                                                   | `r input$pdeath_icuc`            |
+| Hospitalisation                       | Probability of dying when admission to ICU denied if req O2:                                                      | `r input$pdeath_icuco`           |
+| Hospitalisation                       | Probability of dying when ventilated:                                                                             | `r input$pdeath_vent`            |
+| Hospitalisation                       | Probability of dying when ventilator denied:                                                                      | `r input$pdeath_ventc`           |
+| Hospitalisation                       | (v16.2) Probability of dying when ventilator required and not going to hospital:                                  | `r input$pdeath_vent_hc`         |
+| Hospitalisation                       | (v16.2) Probability of dying when icu required (not O2) and not going to hospital:                                | `r input$pdeath_icu_hc`          |
+| Hospitalisation                       | (v16.2) Probability of dying when icu required (req O2) and not going to hospital:                                | `r input$pdeath_icu_hco`         |
+| Hospitalisation                       | Duration of hospitalised infection: (1 to 30)                                                                     | `r input$nus`                    |
+| Hospitalisation                       | Duration of ICU infection: (1 to 30)                                                                              | `r input$nu_icu`                 |
+| Hospitalisation                       | Duration of ventilated infection: (1 to 30)                                                                       | `r input$nu_vent`                |
+| Self-isolation if Symptomatic         | Adherence:                                                                                                        | `r input$selfis_eff`             |
+| (*Self-isolation) Screening           | Overdispersion: (1, 2, 3, 4 or 5)                                                                                 | `r input$screen_overdispersion`  |
+| (*Self-isolation) Screening           | Test Sensitivity:                                                                                                 | `r input$screen_test_sens`       |
+| (*Self-isolation) Household Isolation | Days in isolation for average person:                                                                             | `r input$quarantine_days`        |
+| (*Self-isolation) Household Isolation | Days to implement maximum quarantine coverage: (1 to 5)                                                           | `r input$quarantine_effort`      |
+| (*Self-isolation) Household Isolation | Decrease in the number of other contacts when quarantined:                                                        | `r input$quarantine_eff_other`   |
+| (*Self-isolation) Household Isolation | Increase in the number of contacts at home when quarantined:                                                      | `r input$quarantine_eff_home`    |
+| Social Distancing                     | Adherence:                                                                                                        | `r input$dist_eff`               |
+| Handwashing                           | Efficacy: (0-25%)                                                                                                 | `r input$hand_eff`               |
+| Mask Wearing                          | Efficacy: (0-35%)                                                                                                 | `r input$mask_eff`               |
+| Working at Home                       | Efficacy:                                                                                                         | `r input$work_eff`               |
+| Working at Home                       | Home contacts inflation due to working from home:                                                                 | `r input$w2h`                    |
+| School Closures                       | Efficacy:                                                                                                         | `r input$school_eff`             |
+| School Closures                       | Home contacts inflation due to school closure:                                                                    | `r input$s2h`                    |
+| Shielding the Elderly                 | Efficacy:                                                                                                         | `r input$cocoon_eff`             |
+| Shielding the Elderly                 | Minimum age for elderly shielding: (0 to 100)                                                                     | `r input$age_cocoon`             |
+| International Travel Ban              | Efficacy:                                                                                                         | `r input$travelban_eff`          |
+| Vaccination                           | Time to reach target coverage (1 to 52)                                                                           | `r input$vac_campaign`           |
+| Vaccination                           | Minimum age for vaccination                                                                                       | `r input$age_vaccine_min`        |
+| Vaccination                           | (v16.2) Maximum Age for vaccination                                                                               | `r input$age_vaccine_max`        |
+| Vaccination                           | (v16.2) Duration of efficacious period                                                                            | `r input$vac_dur`                |
+| Vaccination                           | (v16.2) Duration of efficacious period if previously infected                                                     | `r input$vac_dur_r`              |
+| Vaccination                           | Efficacy                                                                                                          | `r input$vaccine_eff`            |
+| Vaccination                           | (v16.2) Efficacy if previously infected                                                                           | `r input$vaccine_eff_r`          |
+| Mass Testing                          | Sensitivity                                                                                                       | `r input$mass_test_sens`         |
+| Mass Testing                          | Isolation days                                                                                                    | `r input$isolation_days`         |
+| Mass Testing                          | Minimum age for mass testing (0 to 100)                                                                           | `r input$age_testing_min`        |
+| Mass Testing                          | Maximum age for mass testing (0 to 100)                                                                           | `r input$age_testing_max`        |
+| Dexamethasone                         | Relative risk of dying if needing O2 and taking Dex                                                               | `r input$dexo2`                  |
+| Dexamethasone                         | Relative risk of dying if needing ventilation and taking Dex                                                      | `r input$dexv`                   |
+| Dexamethasone                         | Relative risk of dying if needing  but not receiving O2 and taking Dex                                            | `r input$dexo2c`                 |
+| Dexamethasone                         | Relative risk of dying if needing but not receiving ventilation and taking Dex                                    | `r input$dexvc`                  |
+| Dexamethasone                         | Change in ventilation requirement if given Dex                                                                    | `r input$vent_dex`               |

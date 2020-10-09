@@ -1,11 +1,19 @@
 # CoMo COVID-19 App
-version_app <- "v15.5.3"
-code_for_development <- TRUE
+version_app <- "v16.2.0"
+
+# To generate report with macOS standalone app (shinybox),
+# ensure that the R session has access to pandoc installed in "/usr/local/bin".
+if (Sys.info()["sysname"] == "Darwin" & 
+    !grepl("/usr/local/bin", Sys.getenv("PATH"), fixed = TRUE)) {
+  Sys.setenv(PATH = paste("/usr/local/bin", Sys.getenv("PATH"), sep = ":"))
+}
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
-# remotes::install_github("ocelhay/comoOdeCpp", subdir = "comoOdeCpp")
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "15.3.3" )  stop("Require comoOdeCpp v15.3.3.")
+if(packageVersion("comoOdeCpp") != "16.2.0" )  stop("
+Running the app requires to install the v16.2.0 of the R package comoOdeCpp.
+Run:  remotes::install_github('bogaotory/comoOdeCpp@v16.2.0', subdir = 'comoOdeCpp')
+in the R console to install it.")
 
 library(bsplus)
 library(deSolve)
@@ -26,7 +34,7 @@ library(shinythemes)
 library(shinyWidgets)
 library(tidyverse)
 
-# Load packages and data
+# Load data and define elements used by model.
 source("./www/model/model_once.R")
 
 # Define UI ----
@@ -35,10 +43,11 @@ ui <- function(request) {
     theme = shinytheme("flatly"),
     includeCSS("./www/styles.css"),
     pushbar_deps(),
-    shinyjs::useShinyjs(),
+    useShinyjs(),
     chooseSliderSkin('HTML5'),
     title = "CoMo Consortium | COVID-19 App",
     
+    source("./www/ui/pushbar_parameters_reporting.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_country.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_virus.R", local = TRUE)[1],
@@ -50,6 +59,8 @@ ui <- function(request) {
       id = "tabs", windowTitle = "CoMo Consortium | COVID-19 App", collapsible = TRUE, inverse = FALSE,
       tabPanel("Welcome", value = "tab_welcome",
                h4(paste0("App ", version_app)),
+               # for debugging purposes, TODO: remove in prod
+               # htmlOutput("diagnosis_platform"),
                fluidRow(
                  column(6,
                         span(img(src = "./como_logo.png", id = "logo"),
@@ -77,16 +88,12 @@ ui <- function(request) {
             width = 2,
             div(class = "float_bottom_left",
                 hr(),
-                sliderInput("p", label = "Probability of infection given contact:", min = 0.01, max = 0.08, step = 0.001,
+                sliderInput("p", label = "Prob. of infection given contact:", min = 0.01, max = 0.08, step = 0.001,
                             value = 0.049, ticks = FALSE, width = "75%"),
-                sliderInput("report", label = span("Percentage of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
+                sliderInput("report", label = span("% of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
                             value = 2.5, post = "%", ticks = FALSE, width = "75%"),
-                sliderInput("reportc", label = span("Percentage of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
+                sliderInput("reportc", label = span("% of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
                             value = 5, post = "%", ticks = FALSE, width = "75%"),
-                sliderInput("reporth", label = span("Percentage of all hospitalisations reported:"), min = 0, max = 100, step = 0.1,
-                            value = 100, post = "%", ticks = FALSE, width = "75%"),
-                
-                
                 uiOutput("conditional_run_baseline"), br(),
                 uiOutput("conditional_validate_baseline"),
                 hr()
@@ -96,38 +103,38 @@ ui <- function(request) {
             width = 10,
             div(class = "box_outputs", h4("Global Simulations Parameters")),
             fluidRow(
-              column(
-                5, fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE)  %>% 
-                  helper(type = "markdown", content = "help_upload_template", colour = "red", size = "s"),
-              )
-            ),
-            hr(),
-            fluidRow(
-              column(4,
-                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year")
+              column(5, 
+                     h4("Set Parameters with Template"),
+                     fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE),
+                     includeMarkdown("./www/markdown/help_upload_template.md")
               ),
-              column(6, offset = 2,
+              column(6, offset = 1,
+                     h4("Set Parameters On The Spot"),
+                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year"),
                      fluidRow(column(6, 
-                                     actionButton("open_country_param", label = span(icon('cog'), " Country"), class = "btn-primary", width = "70%"),
-                                     htmlOutput("feedback_choices")),
-                              column(6, 
-                                     actionButton("open_interventions_param", label = span(icon('cog'), " Interventions"), class = "btn-primary", width = "70%"), br(), br(),
-                                     actionButton("open_virus_param", label = span(icon('cog'), " Virus"), class = "btn-primary", width = "70%"), br(), br(),
-                                     actionButton("open_hospital_param", label = span(icon('cog'), " Hospital"), class = "btn-primary", width = "70%")
-                              )
+                                     actionButton("open_country_param", label = span(icon('cog'), " Country"), class = "btn-primary", width = "80%"),
+                                     htmlOutput("feedback_choices"),
+                                     actionButton("open_reporting_param", label = span(icon('cog'), " Reporting"), class = "btn-primary", width = "80%"), br(), br()
+                     ),
+                     column(6, 
+                            actionButton("open_interventions_param", label = span(icon('cog'), " Interventions"), class = "btn-primary", width = "80%"), br(), br(),
+                            actionButton("open_virus_param", label = span(icon('cog'), " Virus"), class = "btn-primary", width = "80%"), br(), br(),
+                            actionButton("open_hospital_param", label = span(icon('cog'), " Hospital"), class = "btn-primary", width = "80%")
+                     )
                      )
               )
             ),
+            use_bs_accordion_sidebar(),
             br(),
             fluidRow(
               column(6,
-                     div(class = "box_outputs", h4("Interventions for Baseline (Calibration)")),
-                     sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 30, value = 0, step = 1, ticks = FALSE),
+                     div(class = "box_outputs", h4("Interventions for Baseline")),
+                     sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 50, value = 0, step = 1, ticks = FALSE),
                      htmlOutput("text_feedback_interventions_baseline"),
                      source("./www/ui/interventions_baseline.R", local = TRUE)$value
               ),
               column(6,
-                     div(class = "box_outputs", h4("Timeline")),
+                     div(class = "box_outputs", h4("Timeline of Interventions")),
                      plotOutput("timevis_baseline", height = 700)
               )
             ),
@@ -200,12 +207,12 @@ ui <- function(request) {
           ),
           column(5,
                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario")),
-                 sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 30,  value = 0, step = 1, ticks = FALSE),
+                 sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 50,  value = 0, step = 1, ticks = FALSE),
                  htmlOutput("text_feedback_interventions_future"),
                  source("./www/ui/interventions_future.R", local = TRUE)$value
           ),
           column(5,
-                 div(class = "box_outputs", h4("Timeline")),
+                 div(class = "box_outputs", h4("Timeline of Interventions")),
                  plotOutput("timevis_future", height = 700)
           )
         ),
@@ -318,6 +325,14 @@ ui <- function(request) {
 
 # Define server ----
 server <- function(input, output, session) {
+  
+  # for debugging purposes, TODO: remove in prod
+  # output$diagnosis_platform <- renderText({
+  #   paste0("pandoc_available: ", pandoc_available(), "</br>",
+  #          "Sys.getenv('PATH'): ", Sys.getenv("PATH"), "</br>",
+  #          "find_pandoc(dir = '/usr/local/bin/')", find_pandoc(dir = "/usr/local/bin/")$version)
+  # })
+  
   # triggers the modal dialogs when the user clicks an icon
   observe_helpers(help_dir = "./www/markdown")
   
@@ -326,6 +341,8 @@ server <- function(input, output, session) {
   
   # Pushbar for parameters ----
   setup_pushbar(overlay = TRUE, blur = TRUE)
+  observeEvent(input$open_reporting_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_reporting"))  
+  observeEvent(input$close_reporting_param, pushbar_close())
   observeEvent(input$open_interventions_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_interventions"))  
   observeEvent(input$close_interventions_param, pushbar_close())
   observeEvent(input$open_country_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_country"))  
@@ -358,160 +375,34 @@ server <- function(input, output, session) {
   
   
   observe({
-    # Create interventions tibble
+    # Create baseline interventions tibble ----
     interventions$baseline_mat <- tibble(
-      index = 1:30,
-      intervention = c(input$baseline_intervention_1, input$baseline_intervention_2,
-                       input$baseline_intervention_3, input$baseline_intervention_4,
-                       input$baseline_intervention_5, input$baseline_intervention_6,
-                       input$baseline_intervention_7, input$baseline_intervention_8,
-                       input$baseline_intervention_9, input$baseline_intervention_10,
-                       
-                       input$baseline_intervention_11, input$baseline_intervention_12,
-                       input$baseline_intervention_13, input$baseline_intervention_14,
-                       input$baseline_intervention_15, input$baseline_intervention_16,
-                       input$baseline_intervention_17, input$baseline_intervention_18,
-                       input$baseline_intervention_19, input$baseline_intervention_20,
-                       
-                       input$baseline_intervention_21, input$baseline_intervention_22,
-                       input$baseline_intervention_23, input$baseline_intervention_24,
-                       input$baseline_intervention_25, input$baseline_intervention_26,
-                       input$baseline_intervention_27, input$baseline_intervention_28,
-                       input$baseline_intervention_29, input$baseline_intervention_30),
-      
-      date_start = c(input$baseline_daterange_1[1], input$baseline_daterange_2[1],
-                     input$baseline_daterange_3[1], input$baseline_daterange_4[1],
-                     input$baseline_daterange_5[1], input$baseline_daterange_6[1],
-                     input$baseline_daterange_7[1], input$baseline_daterange_8[1],
-                     input$baseline_daterange_9[1], input$baseline_daterange_10[1],
-                     
-                     input$baseline_daterange_11[1], input$baseline_daterange_12[1],
-                     input$baseline_daterange_13[1], input$baseline_daterange_14[1],
-                     input$baseline_daterange_15[1], input$baseline_daterange_16[1],
-                     input$baseline_daterange_17[1], input$baseline_daterange_18[1],
-                     input$baseline_daterange_19[1], input$baseline_daterange_20[1],
-                     
-                     input$baseline_daterange_21[1], input$baseline_daterange_22[1],
-                     input$baseline_daterange_23[1], input$baseline_daterange_24[1],
-                     input$baseline_daterange_25[1], input$baseline_daterange_26[1],
-                     input$baseline_daterange_27[1], input$baseline_daterange_28[1],
-                     input$baseline_daterange_29[1], input$baseline_daterange_30[1]),
-      
-      date_end = c(input$baseline_daterange_1[2], input$baseline_daterange_2[2],
-                   input$baseline_daterange_3[2], input$baseline_daterange_4[2],
-                   input$baseline_daterange_5[2], input$baseline_daterange_6[2],
-                   input$baseline_daterange_7[2], input$baseline_daterange_8[2],
-                   input$baseline_daterange_9[2], input$baseline_daterange_10[2],
-                   
-                   input$baseline_daterange_11[2], input$baseline_daterange_12[2],
-                   input$baseline_daterange_13[2], input$baseline_daterange_14[2],
-                   input$baseline_daterange_15[2], input$baseline_daterange_16[2],
-                   input$baseline_daterange_17[2], input$baseline_daterange_18[2],
-                   input$baseline_daterange_19[2], input$baseline_daterange_20[2],
-                   
-                   input$baseline_daterange_21[2], input$baseline_daterange_22[2],
-                   input$baseline_daterange_23[2], input$baseline_daterange_24[2],
-                   input$baseline_daterange_25[2], input$baseline_daterange_26[2],
-                   input$baseline_daterange_27[2], input$baseline_daterange_28[2],
-                   input$baseline_daterange_29[2], input$baseline_daterange_30[2]),
-      
-      value = c(input$baseline_coverage_1, input$baseline_coverage_2,
-                input$baseline_coverage_3, input$baseline_coverage_4,
-                input$baseline_coverage_5, input$baseline_coverage_6,
-                input$baseline_coverage_7, input$baseline_coverage_8,
-                input$baseline_coverage_9, input$baseline_coverage_10,
-                
-                input$baseline_coverage_11, input$baseline_coverage_12,
-                input$baseline_coverage_13, input$baseline_coverage_14,
-                input$baseline_coverage_15, input$baseline_coverage_16,
-                input$baseline_coverage_17, input$baseline_coverage_18,
-                input$baseline_coverage_19, input$baseline_coverage_20,
-                
-                input$baseline_coverage_21, input$baseline_coverage_22,
-                input$baseline_coverage_23, input$baseline_coverage_24,
-                input$baseline_coverage_25, input$baseline_coverage_26,
-                input$baseline_coverage_27, input$baseline_coverage_28,
-                input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
-      mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
-                              intervention == "Mass Testing" ~ " tests", 
+      index = 1:nb_interventions_max,
+      intervention = unlist(reactiveValuesToList(input)[paste0("baseline_intervention_", 1:nb_interventions_max)]),
+      # same as: intervention = c(input$baseline_intervention_1, input$baseline_intervention_2, ... , input$baseline_intervention_50)
+      date_start = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)],
+      # same as: intervention = c(input$baseline_daterange_1[1],  input$baseline_daterange_2[1], ... , )
+      date_end = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(2, 2*nb_interventions_max, by = 2)],
+      value = unlist(reactiveValuesToList(input)[paste0("baseline_coverage_", 1:nb_interventions_max)])) %>%
+            mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
+                              intervention == "Mass Testing" ~ " thousands tests", 
                               TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_baseline, intervention != "_")
     
+    tibble(
+      index = 1:50,
+      date_start = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)]
+    )
+    
+    # Create hypothetical scenario interventions tibble ----
     interventions$future_mat <- tibble(
-      index = 1:30,
-      intervention = c(input$future_intervention_1, input$future_intervention_2,
-                       input$future_intervention_3, input$future_intervention_4,
-                       input$future_intervention_5, input$future_intervention_6,
-                       input$future_intervention_7, input$future_intervention_8,
-                       input$future_intervention_9, input$future_intervention_10,
-                       
-                       input$future_intervention_11, input$future_intervention_12,
-                       input$future_intervention_13, input$future_intervention_14,
-                       input$future_intervention_15, input$future_intervention_16,
-                       input$future_intervention_17, input$future_intervention_18,
-                       input$future_intervention_19, input$future_intervention_20,
-                       
-                       input$future_intervention_21, input$future_intervention_22,
-                       input$future_intervention_23, input$future_intervention_24,
-                       input$future_intervention_25, input$future_intervention_26,
-                       input$future_intervention_27, input$future_intervention_28,
-                       input$future_intervention_29, input$future_intervention_30),
-      
-      date_start = c(input$future_daterange_1[1], input$future_daterange_2[1],
-                     input$future_daterange_3[1], input$future_daterange_4[1],
-                     input$future_daterange_5[1], input$future_daterange_6[1],
-                     input$future_daterange_7[1], input$future_daterange_8[1],
-                     input$future_daterange_9[1], input$future_daterange_10[1],
-                     
-                     input$future_daterange_11[1], input$future_daterange_12[1],
-                     input$future_daterange_13[1], input$future_daterange_14[1],
-                     input$future_daterange_15[1], input$future_daterange_16[1],
-                     input$future_daterange_17[1], input$future_daterange_18[1],
-                     input$future_daterange_19[1], input$future_daterange_20[1],
-                     
-                     input$future_daterange_21[1], input$future_daterange_22[1],
-                     input$future_daterange_23[1], input$future_daterange_24[1],
-                     input$future_daterange_25[1], input$future_daterange_26[1],
-                     input$future_daterange_27[1], input$future_daterange_28[1],
-                     input$future_daterange_29[1], input$future_daterange_30[1]),
-      
-      date_end = c(input$future_daterange_1[2], input$future_daterange_2[2],
-                   input$future_daterange_3[2], input$future_daterange_4[2],
-                   input$future_daterange_5[2], input$future_daterange_6[2],
-                   input$future_daterange_7[2], input$future_daterange_8[2],
-                   input$future_daterange_9[2], input$future_daterange_10[2],
-                   
-                   input$future_daterange_11[2], input$future_daterange_12[2],
-                   input$future_daterange_13[2], input$future_daterange_14[2],
-                   input$future_daterange_15[2], input$future_daterange_16[2],
-                   input$future_daterange_17[2], input$future_daterange_18[2],
-                   input$future_daterange_19[2], input$future_daterange_20[2],
-                   
-                   input$future_daterange_21[2], input$future_daterange_22[2],
-                   input$future_daterange_23[2], input$future_daterange_24[2],
-                   input$future_daterange_25[2], input$future_daterange_26[2],
-                   input$future_daterange_27[2], input$future_daterange_28[2],
-                   input$future_daterange_29[2], input$future_daterange_30[2]),
-      
-      value = c(input$future_coverage_1, input$future_coverage_2,
-                input$future_coverage_3, input$future_coverage_4,
-                input$future_coverage_5, input$future_coverage_6,
-                input$future_coverage_7, input$future_coverage_8,
-                input$future_coverage_9, input$future_coverage_10,
-                
-                input$future_coverage_11, input$future_coverage_12,
-                input$future_coverage_13, input$future_coverage_14,
-                input$future_coverage_15, input$future_coverage_16,
-                input$future_coverage_17, input$future_coverage_18,
-                input$future_coverage_19, input$future_coverage_20,
-                
-                input$future_coverage_21, input$future_coverage_22,
-                input$future_coverage_23, input$future_coverage_24,
-                input$future_coverage_25, input$future_coverage_26,
-                input$future_coverage_27, input$future_coverage_28,
-                input$future_coverage_29, input$future_coverage_30)) %>% 
+      index = 1:nb_interventions_max,
+      intervention = unlist(reactiveValuesToList(input)[paste0("future_intervention_", 1:nb_interventions_max)]),
+      date_start = do.call("c", reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)],
+      date_end = do.call("c", reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)])[seq(2, 2*nb_interventions_max, by = 2)],
+      value = unlist(reactiveValuesToList(input)[paste0("future_coverage_", 1:nb_interventions_max)])) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
-                              intervention == "Mass Testing" ~ " tests", 
+                              intervention == "Mass Testing" ~ " thousands tests", 
                               TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_future, intervention != "_")
     
@@ -728,11 +619,14 @@ server <- function(input, output, session) {
     source("./www/model/model_repeat.R", local = TRUE)
     parameters["iterations"] <- 1
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
+                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
+                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
-    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors)
+    simul_baseline$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
+                                                  ifr, mort, popstruc, intv_vector = vectors)
     simul_baseline$baseline_available <- TRUE
     
     showNotification("Displaying results", duration = 3, type = "message")
@@ -750,11 +644,14 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model/model_repeat.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
+                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
+                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
-    simul_baseline$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors)
+    simul_baseline$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
+                                                  ifr, mort, popstruc, intv_vector = vectors)
     simul_baseline$baseline_available <- TRUE
     
     showNotification("Displaying results", duration = 3, type = "message")
@@ -775,17 +672,15 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model/model_repeat.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, 
+                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
+                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
-    simul_interventions$results <- process_ode_outcome(results, parameters, startdate, times, ihr, ifr, mort, popstruc, vectors)
+    simul_interventions$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
+                                                       ifr, mort, popstruc, intv_vector = vectors)
     simul_interventions$interventions_available <- TRUE
-    
-    if(code_for_development) {
-      shiny_simul_baseline <<- simul_baseline$results
-      shiny_simul_interventions <<- simul_interventions$results
-    }
     
     showNotification("Displaying results", duration = 3, type = "message")
     shinyjs::show(id = "results_interventions_1", anim = FALSE)
@@ -806,7 +701,7 @@ server <- function(input, output, session) {
   
   
   output$report <- downloadHandler(
-    filename = "CoMo Report.docx",
+    filename = "CoMo_Model_Report.docx",
     content = function(file) {
       showNotification(HTML("Generating report (~ 15 secs.)"), duration = NULL, type = "message", id = "report_generation", session = session)
       
@@ -954,14 +849,18 @@ server <- function(input, output, session) {
                      interventions$future_mat %>% mutate(`Apply to` = "Hypothetical Scenario")) %>%
       rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
     
-    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
+    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
+                       age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
+                       age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
     vectors0_cbind <- do.call(cbind, vectors0)
     vectors0_reduced <- vectors0_cbind[seq(from=0,to=nrow(vectors0_cbind),by=20),]
     vectors0_reduced <- as.data.frame(rbind(rep(0,ncol(vectors0_reduced)),vectors0_reduced))
     vectors0_reduced <- vectors0_reduced[,1:10] #subsetting only the coverages
     names(vectors0_reduced) <- paste0("interventions_baseline_",names(vectors0_reduced))
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, age_testing_min = 0, age_testing_max = 0, age_vaccine_min = 0)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, 
+                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
+                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
     vectors_cbind <- do.call(cbind, vectors)
     vectors_reduced <- vectors_cbind[seq(from=0,to=nrow(vectors_cbind),by=20),]
     vectors_reduced <- as.data.frame(rbind(rep(0,ncol(vectors_reduced)),vectors_reduced))
