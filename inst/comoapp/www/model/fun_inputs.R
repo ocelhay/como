@@ -1,10 +1,9 @@
 inputs <- function(inp, run, times, startdate, stopdate, 
                    age_testing_min, age_testing_max, 
                    age_vaccine_min, age_vaccine_max){
-  # cap intervention start dates with simulation end date
-  inp$`Date Start` = pmin(stopdate, inp$`Date Start`)
   
-  # cap intervention end dates with simulation end date
+  # cap intervention start and end dates with simulation end date
+  inp$`Date Start` = pmin(stopdate, inp$`Date Start`)
   inp$`Date End` = pmin(stopdate, inp$`Date End`)
   
   inp <- inp %>% arrange(`Date Start`)
@@ -21,7 +20,6 @@ inputs <- function(inp, run, times, startdate, stopdate,
   cte<-intersect(which(inp$Intervention=="Shielding the Elderly"),tv)
   q<-intersect(which(inp$Intervention=="(*Self-isolation) Household Isolation"),tv)
   tb<-intersect(which(inp$Intervention=="International Travel Ban"),tv)
-  
   mt<-intersect(which(inp$Intervention=="Mass Testing"),tv)
   minas<-intersect(which(inp$Intervention=="(*Mass Testing) Age Testing Minimum"),tv)
   maxas<-intersect(which(inp$Intervention=="(*Mass Testing) Age Testing Maximum"),tv)
@@ -57,9 +55,9 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        si_vector<-c(si_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        si_vector<-c(si_vector,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         si_vector<-c(si_vector,rep(inp$`Value`[si[i]],(f[i*2]-f[i*2-1])*20))
-        isolation<-c(isolation,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        isolation<-c(isolation,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         isolation<-c(isolation,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(si) && f[i*2]<tail(times,1)){
@@ -91,9 +89,9 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        sd_vector<-c(sd_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        sd_vector<-c(sd_vector,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         sd_vector<-c(sd_vector,rep(inp$`Value`[sd[i]],(f[i*2]-f[i*2-1])*20))
-        distancing<-c(distancing,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        distancing<-c(distancing,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         distancing<-c(distancing,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(sd)&& f[i*2]<tail(times,1)){
@@ -125,9 +123,9 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        scr_vector<-c(scr_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        scr_vector<-c(scr_vector,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         scr_vector<-c(scr_vector,rep(inp$`Value`[scr[i]],(f[i*2]-f[i*2-1])*20))
-        screen<-c(screen,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        screen<-c(screen,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         screen<-c(screen,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(scr)&& f[i*2]<tail(times,1)){
@@ -159,9 +157,9 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        hw_vector<-c(hw_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        hw_vector<-c(hw_vector,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         hw_vector<-c(hw_vector,rep(inp$`Value`[hw[i]],(f[i*2]-f[i*2-1])*20))
-        handwash<-c(handwash,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        handwash<-c(handwash,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         handwash<-c(handwash,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(hw)&& f[i*2]<tail(times,1)){
@@ -193,9 +191,9 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        msk_vector<-c(msk_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        msk_vector<-c(msk_vector,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         msk_vector<-c(msk_vector,rep(inp$`Value`[msk[i]],(f[i*2]-f[i*2-1])*20))
-        masking<-c(masking,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        masking<-c(masking,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         masking<-c(masking,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(msk)&& f[i*2]<tail(times,1)){
@@ -223,7 +221,7 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        dex<-c(dex,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        dex<-c(dex,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         dex<-c(dex,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(dx)&& f[i*2]<tail(times,1)){
@@ -253,9 +251,9 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        wah_vector<-c(wah_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        wah_vector<-c(wah_vector,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         wah_vector<-c(wah_vector,rep(inp$`Value`[wah[i]],(f[i*2]-f[i*2-1])*20))
-        workhome<-c(workhome,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        workhome<-c(workhome,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         workhome<-c(workhome,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(wah)&& f[i*2]<tail(times,1)){
@@ -287,9 +285,9 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        sc_vector<-c(sc_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        sc_vector<-c(sc_vector,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         sc_vector<-c(sc_vector,rep(inp$`Value`[sc[i]],(f[i*2]-f[i*2-1])*20))
-        schoolclose<-c(schoolclose,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        schoolclose<-c(schoolclose,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         schoolclose<-c(schoolclose,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(sc)&& f[i*2]<tail(times,1)){
@@ -321,9 +319,9 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        cte_vector<-c(cte_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        cte_vector<-c(cte_vector,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         cte_vector<-c(cte_vector,rep(inp$`Value`[cte[i]],(f[i*2]-f[i*2-1])*20))
-        cocoon<-c(cocoon,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        cocoon<-c(cocoon,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         cocoon<-c(cocoon,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(cte)&& f[i*2]<tail(times,1)){
@@ -355,9 +353,9 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        q_vector<-c(q_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        q_vector<-c(q_vector,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         q_vector<-c(q_vector,rep(inp$`Value`[q[i]],(f[i*2]-f[i*2-1])*20))
-        quarantine<-c(quarantine,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        quarantine<-c(quarantine,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         quarantine<-c(quarantine,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(q)&& f[i*2]<tail(times,1)){
@@ -389,9 +387,9 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        tb_vector<-c(tb_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        tb_vector<-c(tb_vector,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         tb_vector<-c(tb_vector,rep(inp$`Value`[tb[i]],(f[i*2]-f[i*2-1])*20))
-        travelban<-c(travelban,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        travelban<-c(travelban,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         travelban<-c(travelban,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(tb)&& f[i*2]<tail(times,1)){
@@ -423,9 +421,9 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        mt_vector<-c(mt_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        mt_vector<-c(mt_vector,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         mt_vector<-c(mt_vector,rep(inp$`Value`[mt[i]],(f[i*2]-f[i*2-1])*20))
-        masstesting<-c(masstesting,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        masstesting<-c(masstesting,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         masstesting<-c(masstesting,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(mt)&& f[i*2]<tail(times,1)){
@@ -452,7 +450,7 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        minas_vector<-c(minas_vector,rep(age_testing_min,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        minas_vector<-c(minas_vector,rep(age_testing_min,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         minas_vector<-c(minas_vector,rep(inp$`Value`[minas[i]],(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(minas)&& f[i*2]<tail(times,1)){
@@ -477,7 +475,7 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        maxas_vector<-c(maxas_vector,rep(age_testing_max,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        maxas_vector<-c(maxas_vector,rep(age_testing_max,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         maxas_vector<-c(maxas_vector,rep(inp$`Value`[maxas[i]],(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(maxas)&& f[i*2]<tail(times,1)){
@@ -507,9 +505,9 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        vc_vector<-c(vc_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        vc_vector<-c(vc_vector,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         vc_vector<-c(vc_vector,rep(inp$`Value`[vc[i]],(f[i*2]-f[i*2-1])*20))
-        vaccine<-c(vaccine,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        vaccine<-c(vaccine,rep(0,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         vaccine<-c(vaccine,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(vc)&& f[i*2]<tail(times,1)){
@@ -536,7 +534,7 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        minav_vector<-c(minav_vector,rep(age_vaccine_min,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        minav_vector<-c(minav_vector,rep(age_vaccine_min,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         minav_vector<-c(minav_vector,rep(inp$`Value`[minav[i]],(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(minav)&& f[i*2]<tail(times,1)){
@@ -561,7 +559,7 @@ inputs <- function(inp, run, times, startdate, stopdate,
         }
       }
       else{
-        maxav_vector<-c(maxav_vector,rep(age_vaccine_max,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        maxav_vector<-c(maxav_vector,rep(age_vaccine_max,(f[(i-1)*2+1]-(f[(i-1)*2]+1))*20))
         maxav_vector<-c(maxav_vector,rep(inp$`Value`[maxav[i]],(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(maxav)&& f[i*2]<tail(times,1)){
