@@ -6,8 +6,8 @@ output$timevis_future <- renderPlot(execOnResize = TRUE, {
   # showing all "real" interventions
   dta <- bind_rows(
     dta, 
-    tibble(intervention = setdiff(all_interventions[-c(1, 12, 14, 15)], dta$intervention))) %>%
-    filter(intervention %in% all_interventions[-c(1, 12, 14, 15)])
+    tibble(intervention = setdiff(real_interventions, dta$intervention))) %>%
+    filter(intervention %in% real_interventions)
   
   if(interventions$future_mat %>% nrow() == 0) return({
     plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')

@@ -29,6 +29,8 @@ all_interventions <- c("_",
                        "Mask Wearing",
                        "Dexamethasone")
 
+real_interventions <- all_interventions[-c(1, 12:13, 15:16)]
+
 # Default values for interventions.
 nb_interventions_max <- 50
 new_intervention_value <- "_"
