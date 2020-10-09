@@ -14,7 +14,7 @@ library(shinybox)
 # como::run_app_standalone()
 
 app_name <- "CoMo"
-semantic_version <- "15.5.3"  # must be x.y.z with three levels!
+semantic_version <- "16.2.0"  # must be x.y.z with three levels!
 
 # Build the path
 time <- format(Sys.time(), "%Y-%m-%d_%H%M%S")
@@ -45,8 +45,9 @@ electrify(
   permission = TRUE)
 
 
+# remotes::install_github("ocelhay/como@v16.2", upgrade = "never")
 # copy from /Library/Frameworks/R.framework/Versions/4.0/Resources/library
-app_root_path <- file.path("/Users/olivier/Desktop/2020-09-29_154844/", app_name)
+app_root_path <- file.path("/Users/olivier/Documents/CoMo/como_standalone_R_4.02", app_name)
 
 run_build_release(nodejs_path = nodejs_path,
                   app_path = app_root_path,
