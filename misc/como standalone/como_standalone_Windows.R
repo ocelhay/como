@@ -17,7 +17,9 @@ library(shinybox)
 # make sure that Rtools in the PATH
 # https://stackoverflow.com/questions/47539125/how-to-add-rtools-bin-to-the-system-path-in-r
 
-build_path <- "C:/Users/olivi/Desktop"
+time <- format(Sys.time(), "%Y-%m-%d_%H%M%S")
+build_path <- paste0("C:/Users/olivi/Desktop/", time)
+dir.create(build_path)
 app_version <- "16.2.0"  # must be x.y.z with three levels!
 nodejs_path <- "C:/Program Files/nodejs/"
 nodejs_version <- "v14.7.0"
