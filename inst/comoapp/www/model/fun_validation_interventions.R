@@ -95,7 +95,7 @@ fun_validation_interventions <- function(dta, all_possible_interventions = all_i
   test <- dta  %>%
     arrange(intervention, date_start, date_end) %>% 
     group_by(intervention) %>%
-    summarise(overlapping = any(date_start <= lag(date_end, 
+    summarise(overlapping = any(date_start < lag(date_end, 
                                                   default = first(date_end)) & row_number() != 1), .groups = "drop")
   
   if(any(test$overlapping)) {
