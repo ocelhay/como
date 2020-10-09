@@ -376,160 +376,29 @@ server <- function(input, output, session) {
   
   
   observe({
-    # Create interventions tibble
+    # Create baseline interventions tibble ----
     interventions$baseline_mat <- tibble(
-      index = 1:30,
-      intervention = c(input$baseline_intervention_1, input$baseline_intervention_2,
-                       input$baseline_intervention_3, input$baseline_intervention_4,
-                       input$baseline_intervention_5, input$baseline_intervention_6,
-                       input$baseline_intervention_7, input$baseline_intervention_8,
-                       input$baseline_intervention_9, input$baseline_intervention_10,
-                       
-                       input$baseline_intervention_11, input$baseline_intervention_12,
-                       input$baseline_intervention_13, input$baseline_intervention_14,
-                       input$baseline_intervention_15, input$baseline_intervention_16,
-                       input$baseline_intervention_17, input$baseline_intervention_18,
-                       input$baseline_intervention_19, input$baseline_intervention_20,
-                       
-                       input$baseline_intervention_21, input$baseline_intervention_22,
-                       input$baseline_intervention_23, input$baseline_intervention_24,
-                       input$baseline_intervention_25, input$baseline_intervention_26,
-                       input$baseline_intervention_27, input$baseline_intervention_28,
-                       input$baseline_intervention_29, input$baseline_intervention_30),
-      
-      date_start = c(input$baseline_daterange_1[1], input$baseline_daterange_2[1],
-                     input$baseline_daterange_3[1], input$baseline_daterange_4[1],
-                     input$baseline_daterange_5[1], input$baseline_daterange_6[1],
-                     input$baseline_daterange_7[1], input$baseline_daterange_8[1],
-                     input$baseline_daterange_9[1], input$baseline_daterange_10[1],
-                     
-                     input$baseline_daterange_11[1], input$baseline_daterange_12[1],
-                     input$baseline_daterange_13[1], input$baseline_daterange_14[1],
-                     input$baseline_daterange_15[1], input$baseline_daterange_16[1],
-                     input$baseline_daterange_17[1], input$baseline_daterange_18[1],
-                     input$baseline_daterange_19[1], input$baseline_daterange_20[1],
-                     
-                     input$baseline_daterange_21[1], input$baseline_daterange_22[1],
-                     input$baseline_daterange_23[1], input$baseline_daterange_24[1],
-                     input$baseline_daterange_25[1], input$baseline_daterange_26[1],
-                     input$baseline_daterange_27[1], input$baseline_daterange_28[1],
-                     input$baseline_daterange_29[1], input$baseline_daterange_30[1]),
-      
-      date_end = c(input$baseline_daterange_1[2], input$baseline_daterange_2[2],
-                   input$baseline_daterange_3[2], input$baseline_daterange_4[2],
-                   input$baseline_daterange_5[2], input$baseline_daterange_6[2],
-                   input$baseline_daterange_7[2], input$baseline_daterange_8[2],
-                   input$baseline_daterange_9[2], input$baseline_daterange_10[2],
-                   
-                   input$baseline_daterange_11[2], input$baseline_daterange_12[2],
-                   input$baseline_daterange_13[2], input$baseline_daterange_14[2],
-                   input$baseline_daterange_15[2], input$baseline_daterange_16[2],
-                   input$baseline_daterange_17[2], input$baseline_daterange_18[2],
-                   input$baseline_daterange_19[2], input$baseline_daterange_20[2],
-                   
-                   input$baseline_daterange_21[2], input$baseline_daterange_22[2],
-                   input$baseline_daterange_23[2], input$baseline_daterange_24[2],
-                   input$baseline_daterange_25[2], input$baseline_daterange_26[2],
-                   input$baseline_daterange_27[2], input$baseline_daterange_28[2],
-                   input$baseline_daterange_29[2], input$baseline_daterange_30[2]),
-      
-      value = c(input$baseline_coverage_1, input$baseline_coverage_2,
-                input$baseline_coverage_3, input$baseline_coverage_4,
-                input$baseline_coverage_5, input$baseline_coverage_6,
-                input$baseline_coverage_7, input$baseline_coverage_8,
-                input$baseline_coverage_9, input$baseline_coverage_10,
-                
-                input$baseline_coverage_11, input$baseline_coverage_12,
-                input$baseline_coverage_13, input$baseline_coverage_14,
-                input$baseline_coverage_15, input$baseline_coverage_16,
-                input$baseline_coverage_17, input$baseline_coverage_18,
-                input$baseline_coverage_19, input$baseline_coverage_20,
-                
-                input$baseline_coverage_21, input$baseline_coverage_22,
-                input$baseline_coverage_23, input$baseline_coverage_24,
-                input$baseline_coverage_25, input$baseline_coverage_26,
-                input$baseline_coverage_27, input$baseline_coverage_28,
-                input$baseline_coverage_29, input$baseline_coverage_30)) %>% 
-      mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
-                              intervention == "Mass Testing" ~ "000 tests", 
+      index = 1:nb_interventions_max,
+      intervention = unlist(reactiveValuesToList(input)[paste0("baseline_intervention_", 1:nb_interventions_max)], use.names = FALSE),
+      # same as: intervention = c(input$baseline_intervention_1, input$baseline_intervention_2, ... , input$baseline_intervention_50)
+      date_start = unlist(reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)], use.names = FALSE)[seq(1, (nb_interventions_max - 1), by = 2)],
+      # same as: intervention = c(input$baseline_daterange_1[1],  input$baseline_daterange_2[1], ... , )
+      date_end = unlist(reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)], use.names = FALSE)[seq(2, nb_interventions_max, by = 2)],
+      value = unlist(reactiveValuesToList(input)[paste0("baseline_coverage_", 1:nb_interventions_max)], use.names = FALSE)) %>%
+            mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
+                              intervention == "Mass Testing" ~ " thousands tests", 
                               TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_baseline, intervention != "_")
     
+    # Create hypothetical scenario interventions tibble ----
     interventions$future_mat <- tibble(
-      index = 1:30,
-      intervention = c(input$future_intervention_1, input$future_intervention_2,
-                       input$future_intervention_3, input$future_intervention_4,
-                       input$future_intervention_5, input$future_intervention_6,
-                       input$future_intervention_7, input$future_intervention_8,
-                       input$future_intervention_9, input$future_intervention_10,
-                       
-                       input$future_intervention_11, input$future_intervention_12,
-                       input$future_intervention_13, input$future_intervention_14,
-                       input$future_intervention_15, input$future_intervention_16,
-                       input$future_intervention_17, input$future_intervention_18,
-                       input$future_intervention_19, input$future_intervention_20,
-                       
-                       input$future_intervention_21, input$future_intervention_22,
-                       input$future_intervention_23, input$future_intervention_24,
-                       input$future_intervention_25, input$future_intervention_26,
-                       input$future_intervention_27, input$future_intervention_28,
-                       input$future_intervention_29, input$future_intervention_30),
-      
-      date_start = c(input$future_daterange_1[1], input$future_daterange_2[1],
-                     input$future_daterange_3[1], input$future_daterange_4[1],
-                     input$future_daterange_5[1], input$future_daterange_6[1],
-                     input$future_daterange_7[1], input$future_daterange_8[1],
-                     input$future_daterange_9[1], input$future_daterange_10[1],
-                     
-                     input$future_daterange_11[1], input$future_daterange_12[1],
-                     input$future_daterange_13[1], input$future_daterange_14[1],
-                     input$future_daterange_15[1], input$future_daterange_16[1],
-                     input$future_daterange_17[1], input$future_daterange_18[1],
-                     input$future_daterange_19[1], input$future_daterange_20[1],
-                     
-                     input$future_daterange_21[1], input$future_daterange_22[1],
-                     input$future_daterange_23[1], input$future_daterange_24[1],
-                     input$future_daterange_25[1], input$future_daterange_26[1],
-                     input$future_daterange_27[1], input$future_daterange_28[1],
-                     input$future_daterange_29[1], input$future_daterange_30[1]),
-      
-      date_end = c(input$future_daterange_1[2], input$future_daterange_2[2],
-                   input$future_daterange_3[2], input$future_daterange_4[2],
-                   input$future_daterange_5[2], input$future_daterange_6[2],
-                   input$future_daterange_7[2], input$future_daterange_8[2],
-                   input$future_daterange_9[2], input$future_daterange_10[2],
-                   
-                   input$future_daterange_11[2], input$future_daterange_12[2],
-                   input$future_daterange_13[2], input$future_daterange_14[2],
-                   input$future_daterange_15[2], input$future_daterange_16[2],
-                   input$future_daterange_17[2], input$future_daterange_18[2],
-                   input$future_daterange_19[2], input$future_daterange_20[2],
-                   
-                   input$future_daterange_21[2], input$future_daterange_22[2],
-                   input$future_daterange_23[2], input$future_daterange_24[2],
-                   input$future_daterange_25[2], input$future_daterange_26[2],
-                   input$future_daterange_27[2], input$future_daterange_28[2],
-                   input$future_daterange_29[2], input$future_daterange_30[2]),
-      
-      value = c(input$future_coverage_1, input$future_coverage_2,
-                input$future_coverage_3, input$future_coverage_4,
-                input$future_coverage_5, input$future_coverage_6,
-                input$future_coverage_7, input$future_coverage_8,
-                input$future_coverage_9, input$future_coverage_10,
-                
-                input$future_coverage_11, input$future_coverage_12,
-                input$future_coverage_13, input$future_coverage_14,
-                input$future_coverage_15, input$future_coverage_16,
-                input$future_coverage_17, input$future_coverage_18,
-                input$future_coverage_19, input$future_coverage_20,
-                
-                input$future_coverage_21, input$future_coverage_22,
-                input$future_coverage_23, input$future_coverage_24,
-                input$future_coverage_25, input$future_coverage_26,
-                input$future_coverage_27, input$future_coverage_28,
-                input$future_coverage_29, input$future_coverage_30)) %>% 
+      index = 1:nb_interventions_max,
+      intervention = unlist(reactiveValuesToList(input)[paste0("future_intervention_", 1:nb_interventions_max)], use.names = FALSE),
+      date_start = unlist(reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)], use.names = FALSE)[seq(1, (nb_interventions_max - 1), by = 2)],
+      date_end = unlist(reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)], use.names = FALSE)[seq(2, nb_interventions_max, by = 2)],
+      value = unlist(reactiveValuesToList(input)[paste0("future_coverage_", 1:nb_interventions_max)], use.names = FALSE)) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
-                              intervention == "Mass Testing" ~ " tests", 
+                              intervention == "Mass Testing" ~ " thousands tests", 
                               TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_future, intervention != "_")
     
