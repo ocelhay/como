@@ -379,24 +379,29 @@ server <- function(input, output, session) {
     # Create baseline interventions tibble ----
     interventions$baseline_mat <- tibble(
       index = 1:nb_interventions_max,
-      intervention = unlist(reactiveValuesToList(input)[paste0("baseline_intervention_", 1:nb_interventions_max)], use.names = FALSE),
+      intervention = unlist(reactiveValuesToList(input)[paste0("baseline_intervention_", 1:nb_interventions_max)]),
       # same as: intervention = c(input$baseline_intervention_1, input$baseline_intervention_2, ... , input$baseline_intervention_50)
-      date_start = unlist(reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)], use.names = FALSE)[seq(1, (nb_interventions_max - 1), by = 2)],
+      date_start = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)],
       # same as: intervention = c(input$baseline_daterange_1[1],  input$baseline_daterange_2[1], ... , )
-      date_end = unlist(reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)], use.names = FALSE)[seq(2, nb_interventions_max, by = 2)],
-      value = unlist(reactiveValuesToList(input)[paste0("baseline_coverage_", 1:nb_interventions_max)], use.names = FALSE)) %>%
+      date_end = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(2, 2*nb_interventions_max, by = 2)],
+      value = unlist(reactiveValuesToList(input)[paste0("baseline_coverage_", 1:nb_interventions_max)])) %>%
             mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
                               TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_baseline, intervention != "_")
     
+    tibble(
+      index = 1:50,
+      date_start = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)]
+    )
+    
     # Create hypothetical scenario interventions tibble ----
     interventions$future_mat <- tibble(
       index = 1:nb_interventions_max,
-      intervention = unlist(reactiveValuesToList(input)[paste0("future_intervention_", 1:nb_interventions_max)], use.names = FALSE),
-      date_start = unlist(reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)], use.names = FALSE)[seq(1, (nb_interventions_max - 1), by = 2)],
-      date_end = unlist(reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)], use.names = FALSE)[seq(2, nb_interventions_max, by = 2)],
-      value = unlist(reactiveValuesToList(input)[paste0("future_coverage_", 1:nb_interventions_max)], use.names = FALSE)) %>%
+      intervention = unlist(reactiveValuesToList(input)[paste0("future_intervention_", 1:nb_interventions_max)]),
+      date_start = do.call("c", reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)],
+      date_end = do.call("c", reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)])[seq(2, 2*nb_interventions_max, by = 2)],
+      value = unlist(reactiveValuesToList(input)[paste0("future_coverage_", 1:nb_interventions_max)])) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
                               TRUE ~ "%")) %>%
