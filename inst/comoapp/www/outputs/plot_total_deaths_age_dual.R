@@ -4,7 +4,7 @@ output$plot_total_deaths_age_baseline <- renderPlot({
   
   dta <- simul_baseline$results$med$tc %>%
     group_by(age_cat) %>%
-    summarise(total_deaths = round(sum(value))) %>% 
+    summarise(total_deaths = round(sum(value)), .groups = "drop") %>% 
     mutate(freq = round(100 * total_deaths / sum(total_deaths), 1))
   
   ggplot(data = dta, aes(x = age_cat, y = total_deaths, fill = age_cat))+ 
