@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v16.2.2"
+version_app <- "v16.2.3"
 
 # To generate report with macOS standalone app (shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".

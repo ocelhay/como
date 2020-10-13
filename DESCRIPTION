@@ -1,7 +1,7 @@
 Package: como
 Type: Package
 Title: A Web Application of the CoMo COVID-19 Model
-Version: 16.2.2
+Version: 16.2.3
 Authors@R: c(person(given = "Olivier", family = "Celhay", 
                 email = "olivier.celhay@gmail.com", 
                 role = c("aut", "cre"), comment = c(ORCID = "https://orcid.org/0000-0002-2971-9110")),
