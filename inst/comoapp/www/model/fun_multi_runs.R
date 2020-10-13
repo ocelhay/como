@@ -3,7 +3,6 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   
   # Define objects to store results ----
   results <- list()
-  
   nb_times <- length(times)
   nb_col <- length(Y) + 1
   aux <- array(0, dim = c(nb_times, nb_col, parameters["iterations"]))
@@ -17,11 +16,16 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
 
   # Define spline function ----
   # the parameters give and beds_available have no noise added to them
-  fH <- splinefun(c(0, 
-                    (1 + parameters["give"]) * parameters["beds_available"] / 2, 
-                    (3 - parameters["give"]) * parameters["beds_available"] / 2, 2 * parameters["beds_available"]), 
-                  c(1, (1 + parameters["give"]) / 2, (1 - parameters["give"]) / 2, 0), 
-                  method = "hyman")
+  f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0)
+  KH<-parameters["beds_available"]
+  KICU<- parameters["icu_beds_available"]+parameters["ventilators_available"]
+  Kvent<- parameters["ventilators_available"]
+  x.H <- c(0,(1+parameters["give"])*KH/2,(3-parameters["give"])*KH/2,2*KH)
+  x.ICU <- c(0,(1+parameters["give"])*KICU/2,(3-parameters["give"])*KICU/2,2*KICU)
+  x.Vent <- c(0,(1+parameters["give"])*Kvent/2,(3-parameters["give"])*Kvent/2,2*Kvent)
+  fH <- splinefun(x.H, f, method = "hyman")
+  fICU <- splinefun(x.ICU, f, method = "hyman")
+  fVent<- splinefun(x.Vent, f, method = "hyman")
   
   parameters_dup <- parameters  # duplicate parameters to add noise 
   
@@ -45,34 +49,75 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     aux[, , i] <- mat_ode
     
     # Use spline function
-    critH <- NULL
-    for (t in 1:nb_times) {
-      critH[t] <- min(1, 
-                      1 - fH(sum(mat_ode[t,(Hindex+1)]) + sum(mat_ode[t,(ICUCindex+1)]) + sum(mat_ode[t,(ICUCVindex+1)]))
-        )
-    }
+    critH<-c()
+    crit<-c()
+    critV<-c()
     
+    for (t in 1:length(times)){
+      critH[t]<-min(1-fH((sum(mat_ode[t,(Hindex+1)]))+sum(mat_ode[t,(ICUCindex+1)])+sum(mat_ode[t,(ICUCVindex+1)])),1)
+      crit[t]<-min(1-fICU((sum(mat_ode[t,(ICUindex+1)]))+(sum(mat_ode[t,(Ventindex+1)]))+(sum(mat_ode[t,(VentCindex+1)]))))
+      critV[t]<-min(1-fVent((sum(mat_ode[t,(Ventindex+1)]))),1)
+    }
+
     # daily incidence
-    incidence <- parameters_dup["report"]*parameters_dup["gamma"]*(1-parameters_dup["pclin"])*mat_ode[,(Eindex+1)]%*%(1-ihr[,2])+
+    incidence<-parameters_dup["report"]*parameters_dup["gamma"]*(1-parameters_dup["pclin"])*mat_ode[,(Eindex+1)]%*%(1-ihr[,2])+
       parameters_dup["reportc"]*parameters_dup["gamma"]*parameters_dup["pclin"]*mat_ode[,(Eindex+1)]%*%(1-ihr[,2])+
       parameters_dup["report"]*parameters_dup["gamma"]*(1-parameters_dup["pclin"])*mat_ode[,(QEindex+1)]%*%(1-ihr[,2])+
-      parameters_dup["reportc"]*parameters_dup["gamma"]*parameters_dup["pclin"]*mat_ode[,(QEindex+1)]%*%(1-ihr[,2])
+      parameters_dup["reportc"]*parameters_dup["gamma"]*parameters_dup["pclin"]*mat_ode[,(QEindex+1)]%*%(1-ihr[,2])+
+      parameters_dup["report_v"]*parameters_dup["gamma"]*(1-parameters_dup["pclin_v"])*mat_ode[,(EVindex+1)]%*%(1-parameters_dup["sigmaEV"]*ihr[,2])+
+      parameters_dup["report_cv"]*parameters_dup["gamma"]*parameters_dup["pclin_v"]*mat_ode[,(EVindex+1)]%*%(1-parameters_dup["sigmaEV"]*ihr[,2])+
+      parameters_dup["report_vr"]*parameters_dup["gamma"]*(1-parameters_dup["pclin_vr"])*mat_ode[,(EVRindex+1)]%*%(1-parameters_dup["sigmaEVR"]*ihr[,2])+
+      parameters_dup["report_cvr"]*parameters_dup["gamma"]*parameters_dup["pclin_vr"]*mat_ode[,(EVRindex+1)]%*%(1-parameters_dup["sigmaEVR"]*ihr[,2])+
+      parameters_dup["report_r"]*parameters_dup["gamma"]*(1-parameters_dup["pclin_r"])*mat_ode[,(ERindex+1)]%*%(1-parameters_dup["sigmaER"]*ihr[,2])+
+      parameters_dup["report_cr"]*parameters_dup["gamma"]*parameters_dup["pclin_r"]*mat_ode[,(ERindex+1)]%*%(1-parameters_dup["sigmaER"]*ihr[,2])
     
-    incidenceh <- parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*parameters_dup["reporth"]+
-      parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*(1-parameters_dup["reporth"])+
-      parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])+
-      parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*critH*parameters_dup["reporth"]*(1-parameters_dup["prob_icu"])+
-      parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*critH*parameters_dup["reporth"]*(1-parameters_dup["prob_icu"])+
-      parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*parameters_dup["prob_icu"]+
-      parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*parameters_dup["prob_icu"]
+    incidenceh<- parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*parameters_dup["reporth"]+
+      parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*(1-parameters_dup["reporth"])*parameters_dup["reporth_g"]+
+      parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*parameters_dup["reporth"]+
+      parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*(1-parameters_dup["reporth"])*parameters_dup["reporth_g"]+
+      parameters_dup["gamma"]*parameters_dup["sigmaEV"]*mat_ode[,(EVindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu_v"])*parameters_dup["reporth"]+
+      parameters_dup["gamma"]*parameters_dup["sigmaEVR"]*mat_ode[,(EVRindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu_vr"])*parameters_dup["reporth"]+
+      parameters_dup["gamma"]*parameters_dup["sigmaER"]*mat_ode[,(ERindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu_r"])*parameters_dup["reporth"]+
+      parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*critH*parameters_dup["reporth_g"]*(1-parameters_dup["prob_icu"])+
+      parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*critH*parameters_dup["reporth_g"]*(1-parameters_dup["prob_icu"])+
+      parameters_dup["gamma"]*parameters_dup["sigmaEV"]*mat_ode[,(EVindex+1)]%*%ihr[,2]*critH*parameters_dup["reporth_g"]*(1-parameters_dup["prob_icu_v"])+
+      parameters_dup["gamma"]*parameters_dup["sigmaEVR"]*mat_ode[,(EVRindex+1)]%*%ihr[,2]*critH*parameters_dup["reporth_g"]*(1-parameters_dup["prob_icu_vr"])+
+      parameters_dup["gamma"]*parameters_dup["sigmaER"]*mat_ode[,(ERindex+1)]%*%ihr[,2]*critH*parameters_dup["reporth_g"]*(1-parameters_dup["prob_icu_r"])+
+      #ICU
+      parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*parameters_dup["prob_icu"]*(1-crit)*parameters_dup["reporth_ICU"]+
+      parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*parameters_dup["prob_icu"]*(1-crit)*parameters_dup["reporth_ICU"]+
+      parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*parameters_dup["prob_icu"]*crit*parameters_dup["reporth_ICU"]*parameters_dup["reporth_g"]+
+      parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*parameters_dup["prob_icu"]*crit*parameters_dup["reporth_ICU"]*parameters_dup["reporth_g"]+
+      parameters_dup["gamma"]*parameters_dup["sigmaEV"]*mat_ode[,(EVindex+1)]%*%ihr[,2]*(1-crit)*parameters_dup["prob_icu_v"]*parameters_dup["reporth_ICU"]+
+      parameters_dup["gamma"]*parameters_dup["sigmaEVR"]*mat_ode[,(EVRindex+1)]%*%ihr[,2]*(1-crit)*parameters_dup["prob_icu_vr"]*parameters_dup["reporth_ICU"]+
+      parameters_dup["gamma"]*parameters_dup["sigmaER"]*mat_ode[,(ERindex+1)]%*%ihr[,2]*(1-crit)*parameters_dup["prob_icu_r"]*parameters_dup["reporth_ICU"]+
+      parameters_dup["gamma"]*parameters_dup["sigmaEV"]*mat_ode[,(EVindex+1)]%*%ihr[,2]*crit*parameters_dup["prob_icu_v"]*parameters_dup["reporth_ICU"]*parameters_dup["reporth_g"]+
+      parameters_dup["gamma"]*parameters_dup["sigmaEVR"]*mat_ode[,(EVRindex+1)]%*%ihr[,2]*crit*parameters_dup["prob_icu_vr"]*parameters_dup["reporth_ICU"]*parameters_dup["reporth_g"]+
+      parameters_dup["gamma"]*parameters_dup["sigmaER"]*mat_ode[,(ERindex+1)]%*%ihr[,2]*crit*parameters_dup["prob_icu_r"]*parameters_dup["reporth_ICU"]*parameters_dup["reporth_g"]+
+      parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*parameters_dup["prob_icu"]*(1-parameters_dup["reporth_ICU"])*parameters_dup["reporth_g"]+
+      parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*parameters_dup["prob_icu"]*(1-parameters_dup["reporth_ICU"])*parameters_dup["reporth_g"]+
+      parameters_dup["gamma"]*parameters_dup["sigmaEV"]*mat_ode[,(EVindex+1)]%*%ihr[,2]*parameters_dup["prob_icu_v"]*(1-parameters_dup["reporth_ICU"])*parameters_dup["reporth_g"]+
+      parameters_dup["gamma"]*parameters_dup["sigmaEVR"]*mat_ode[,(EVRindex+1)]%*%ihr[,2]*parameters_dup["prob_icu_vr"]*(1-parameters_dup["reporth_ICU"])*parameters_dup["reporth_g"]+
+      parameters_dup["gamma"]*parameters_dup["sigmaER"]*mat_ode[,(ERindex+1)]%*%ihr[,2]*parameters_dup["prob_icu_r"]*(1-parameters_dup["reporth_ICU"])*parameters_dup["reporth_g"]
+    
     
     cases[,i] <- rowSums(incidence) + rowSums(incidenceh)           # daily incidence cases
     cum_cases[,i] <- colSums(incidence) + colSums(incidenceh)         # cumulative incidence cases
     day_infections[,i]<- round(rowSums(parameters_dup["gamma"]*mat_ode[,(Eindex+1)]+
-                                         parameters_dup["gamma"]*mat_ode[,(QEindex+1)]))
+                                         parameters_dup["gamma"]*mat_ode[,(QEindex+1)]+
+                                         parameters_dup["gamma"]*mat_ode[,(EVindex+1)]+
+                                         parameters_dup["gamma"]*mat_ode[,(EVRindex+1)]+
+                                         parameters_dup["gamma"]*mat_ode[,(ERindex+1)])
+                               )
     
     # overtime proportion of the  population that is infected
-    infections[, i] <- round(100 * cumsum(rowSums(parameters_dup["gamma"]*mat_ode[,(Eindex+1)])) / sum(popstruc[,2]), 1)
+    infections[, i] <- round(100 * cumsum(
+      rowSums(parameters_dup["gamma"]*mat_ode[,(Eindex+1)]+
+                parameters_dup["gamma"]*mat_ode[,(QEindex+1)]+
+                parameters_dup["gamma"]*mat_ode[,(EVindex+1)]+
+                parameters_dup["gamma"]*mat_ode[,(EVRindex+1)]+
+                parameters_dup["gamma"]*mat_ode[,(ERindex+1)])
+    ) / sum(popstruc[,2]), 1)
     
     for (w in (ceiling(1/parameters_dup["nui"])+1):nb_times){
       Rt_aux[w,i]<-cumsum(sum(parameters_dup["gamma"]*mat_ode[w,(Eindex+1)]))/cumsum(sum(parameters_dup["gamma"]*mat_ode[(w-1/parameters_dup["nui"]),(Eindex+1)]))
