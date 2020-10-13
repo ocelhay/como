@@ -14,7 +14,7 @@ library(shinybox)
 # como::run_app_standalone()
 
 app_name <- "CoMo"
-semantic_version <- "16.2.2"  # must be x.y.z with three levels!
+semantic_version <- "16.2.3"  # must be x.y.z with three levels!
 
 # Build the path
 time <- format(Sys.time(), "%Y-%m-%d_%H%M%S")

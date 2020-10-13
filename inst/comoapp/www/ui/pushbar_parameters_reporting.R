@@ -5,7 +5,7 @@ list(
             column(6,
                    numericInput("init", label = "Density of exposed people at start date (expressed as 1/X)", value = 5000000, min = 1, max = NA, width = "50%"),
                    sliderInput("pre", label = "Proportion of population with partial immunity at the start date", value = 25, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE),
-                   sliderInput("report_hg", label = "Percentage of denied hospitalisations that are reported", value = 10, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE, width = "75%"),
+                   sliderInput("reporth_g", label = "Percentage of denied hospitalisations that are reported", value = 10, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE, width = "75%"),
                    
                    sliderInput("reporth", label = "Percentage of non-severe hospitalisations that are appropriately treated", value = 90, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE, width = "75%"),
                    sliderInput("reporth_ICU", label = "Percentage of severe hospitalisations that are appropriately treated", value = 90, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE, width = "75%"),
