@@ -14,7 +14,7 @@ library(shinybox)
 # como::run_app_standalone()
 
 app_name <- "CoMo"
-semantic_version <- "16.2.2"  # must be x.y.z with three levels!
+semantic_version <- "16.2.3"  # must be x.y.z with three levels!
 
 # Build the path
 time <- format(Sys.time(), "%Y-%m-%d_%H%M%S")
@@ -38,7 +38,7 @@ electrify(
   local_package_path = NULL,
   package_install_opts = list(type = "binary"),
   rtools_path_win = NULL,
-  run_build = FALSE,
+  run_build = TRUE,
   nodejs_version = nodejs_version,
   mac_url = "https://mac.r-project.org/high-sierra/R-4.0-branch/x86_64/R-4.0-branch.tar.gz",
   permission = TRUE)
