@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v16.2.3"
+version_app <- "v16.2.4"
 
 # To generate report with macOS standalone app (shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -160,8 +160,7 @@ ui <- function(request) {
                                selectInput("entity_tests", label = "Tests Data:", choices = entities_tests,
                                            selected = "_")
                              ),
-                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px",
-                             tooltip = tooltipOptions(title = "Settings for Baseline Daily Cases plot")
+                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px"
                            )
                     ),
                     column(11,
@@ -177,8 +176,7 @@ ui <- function(request) {
                              div(
                                prettySwitch("dynamic_deaths_baseline", value = FALSE, label = "Dynamic Plot")
                              ),
-                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px",
-                             tooltip = tooltipOptions(title = "Settings for Baseline Cumulative Deaths plot")
+                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px"
                            )
                     ),
                     column(11,
@@ -186,6 +184,24 @@ ui <- function(request) {
                                             plotOutput("plot_deaths_baseline", height = "350px") %>% withSpinner()), 
                            conditionalPanel("input.dynamic_deaths_baseline",
                                             highchartOutput("highchart_deaths_baseline") %>% withSpinner())
+                    )
+                  ),
+                  fluidRow(
+                    column(1, 
+                           dropdownButton(
+                             div(
+                               prettySwitch("dynamic_requirements_baseline", value = FALSE, label = "Dynamic Plot"),
+                               prettyRadioButtons("focus_requirements_baseline", label = "Focus on:", 
+                                                  choices = c("No Focus", "Hospital Beds", "ICU Beds", "Ventilators"), 
+                                                  selected = "No Focus", inline = TRUE)
+                             ),
+                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px")
+                           ),
+                    column(11,
+                           conditionalPanel("! input.dynamic_requirements_baseline",
+                                            plotOutput("plot_requirements_baseline", height = "350px") %>% withSpinner()), 
+                           conditionalPanel("input.dynamic_requirements_baseline",
+                                            highchartOutput("highchart_requirements_baseline") %>% withSpinner())
                     )
                   ),
                   fluidRow(

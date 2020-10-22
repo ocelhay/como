@@ -13,9 +13,6 @@ library(shinybox)
 # remotes::install_github("ocelhay/como", ref = "dev")
 # como::run_app_standalone()
 
-app_name <- "CoMo"
-semantic_version <- "16.2.3"  # must be x.y.z with three levels!
-
 # Build the path
 time <- format(Sys.time(), "%Y-%m-%d_%H%M%S")
 (build_path <- paste0("/Users/olivier/Desktop/", time))
@@ -26,9 +23,9 @@ nodejs_version <- system("node -v", intern = TRUE)
 
 
 electrify(
-  app_name = app_name,
+  app_name = "CoMo",
   short_description = "CoMo Consortium | COVID-19 App",
-  semantic_version = semantic_version, 
+  semantic_version = "16.2.4", 
   build_path = build_path,
   mran_date = "2020-09-30",
   # cran_like_url = "https://cran.r-project.org/",
@@ -44,6 +41,6 @@ electrify(
   permission = TRUE)
 
 
-run_build_release(nodejs_path = nodejs_path,
-                  app_path = paste0(build_path, "/CoMo"),
-                  nodejs_version = nodejs_version)
+# run_build_release(nodejs_path = nodejs_path,
+#                   app_path = paste0(build_path, "/CoMo"),
+#                   nodejs_version = nodejs_version)
