@@ -30,7 +30,7 @@ tests <- read.csv(text = table_tests) %>%
   filter(tests > 0)
 
 
-save(cases, tests, file = "/Users/olivier/Documents/CoMo/como/inst/comoapp/www/data/cases.Rda")
+save(cases, tests, file = "/Users/olivier/Documents/Projets/CoMo/como/inst/comoapp/www/data/cases.Rda")
 
 
 # Mortality/Severity
