@@ -17,6 +17,7 @@ in the R console to install it.")
 
 library(bsplus)
 library(deSolve)
+library(glue)
 library(gridExtra)
 library(highcharter)
 library(knitr)
