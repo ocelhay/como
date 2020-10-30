@@ -111,7 +111,7 @@ ui <- function(request) {
               ),
               column(6, offset = 1,
                      h4("Set Parameters On The Spot"),
-                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year"),
+                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2021-06-30", startview = "year"),
                      fluidRow(column(6, 
                                      actionButton("open_country_param", label = span(icon('cog'), " Country"), class = "btn-primary", width = "80%"),
                                      htmlOutput("feedback_choices"),
