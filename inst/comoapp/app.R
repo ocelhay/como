@@ -639,6 +639,9 @@ server <- function(input, output, session) {
     vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
                       age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
                       age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    
+    check_parameters_list_for_na(parameters_list = parameters)
+    
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
@@ -664,6 +667,9 @@ server <- function(input, output, session) {
     vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
                       age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
                       age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    
+    check_parameters_list_for_na(parameters_list = parameters)
+    
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
@@ -692,6 +698,9 @@ server <- function(input, output, session) {
     vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, 
                       age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
                       age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    
+    check_parameters_list_for_na(parameters_list = parameters)
+    
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
