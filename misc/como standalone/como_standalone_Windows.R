@@ -20,19 +20,18 @@ library(shinybox)
 time <- format(Sys.time(), "%Y-%m-%d_%H%M%S")
 build_path <- paste0("C:/Users/olivi/Desktop/", time)
 dir.create(build_path)
-app_version <- "16.2.0"  # must be x.y.z with three levels!
+app_version <- "16.2.4"  # must be x.y.z with three levels!
 nodejs_path <- "C:/Program Files/nodejs/"
 nodejs_version <- "v14.7.0"
-app_name <- "CoMo"
 
 # Remove any folder 'app_name' on build_path.
 
 electrify(
-  app_name = app_name,
+  app_name = "CoMo",
   short_description = "CoMo Consortium | COVID-19 App",
   semantic_version = app_version, 
   build_path = build_path,
-  mran_date = "2020-09-01",
+  mran_date = "2020-09-30",
   function_name = "run_app_standalone",
   git_host = "github",
   git_repo = "ocelhay/como@dev",
@@ -44,7 +43,7 @@ electrify(
   permission = TRUE)
 
 
-## Build the release.
+ ## Build the release.
 # run_build_release(
 #   nodejs_path = nodejs_path,
 #   app_path = file.path(build_path, app_name),

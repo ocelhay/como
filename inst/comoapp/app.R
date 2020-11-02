@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v16.2.4"
+version_app <- "v16.2.5"
 
 # To generate report with macOS standalone app (shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -17,6 +17,7 @@ in the R console to install it.")
 
 library(bsplus)
 library(deSolve)
+library(glue)
 library(gridExtra)
 library(highcharter)
 library(knitr)
@@ -110,7 +111,7 @@ ui <- function(request) {
               ),
               column(6, offset = 1,
                      h4("Set Parameters On The Spot"),
-                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2020-09-01", startview = "year"),
+                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2021-06-30", startview = "year"),
                      fluidRow(column(6, 
                                      actionButton("open_country_param", label = span(icon('cog'), " Country"), class = "btn-primary", width = "80%"),
                                      htmlOutput("feedback_choices"),
@@ -638,6 +639,9 @@ server <- function(input, output, session) {
     vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
                       age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
                       age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    
+    check_parameters_list_for_na(parameters_list = parameters)
+    
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
@@ -663,6 +667,9 @@ server <- function(input, output, session) {
     vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
                       age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
                       age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    
+    check_parameters_list_for_na(parameters_list = parameters)
+    
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
@@ -691,6 +698,9 @@ server <- function(input, output, session) {
     vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, 
                       age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
                       age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    
+    check_parameters_list_for_na(parameters_list = parameters)
+    
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other)
