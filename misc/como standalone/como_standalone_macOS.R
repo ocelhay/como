@@ -4,7 +4,7 @@
 rm(list = ls())
 remove.packages("shinybox")
 detach("package:shinybox", unload = TRUE)
-remotes::install_github("ocelhay/shinybox", auth_token = "82b805c2e3d9032d569b228c4f9507f6d13bdd4c")
+remotes::install_github("ocelhay/shinybox", auth_token = "")
 library(shinybox)
 
 # Check that the package is working.
