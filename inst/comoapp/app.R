@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v16.2.5"
+version_app <- "v17-beta.1"
 
 # To generate report with macOS standalone app (shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -126,19 +126,12 @@ ui <- function(request) {
               )
             ),
             use_bs_accordion_sidebar(),
-            br(),
-            fluidRow(
-              column(6,
-                     div(class = "box_outputs", h4("Interventions for Baseline")),
-                     sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 50, value = 0, step = 1, ticks = FALSE),
-                     htmlOutput("text_feedback_interventions_baseline"),
-                     source("./www/ui/interventions_baseline.R", local = TRUE)$value
-              ),
-              column(6,
-                     div(class = "box_outputs", h4("Timeline of Interventions")),
-                     plotOutput("timevis_baseline", height = 700)
-              )
-            ),
+            div(class = "box_outputs", h4("Interventions for Baseline")),
+            
+            htmlOutput("text_feedback_interventions_baseline"),
+            source("./www/ui/interventions_baseline.R", local = TRUE)$value,
+            div(class = "box_outputs", h4("Timeline of Interventions")),
+            plotOutput("timevis_baseline", height = 700),
             br(), hr(),
             a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
             shinyjs::hidden(
@@ -197,7 +190,7 @@ ui <- function(request) {
                                                   selected = "No Focus", inline = TRUE)
                              ),
                              circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px")
-                           ),
+                    ),
                     column(11,
                            conditionalPanel("! input.dynamic_requirements_baseline",
                                             plotOutput("plot_requirements_baseline", height = "350px") %>% withSpinner()), 
@@ -343,7 +336,7 @@ ui <- function(request) {
 # Define server ----
 server <- function(input, output, session) {
   
-  # for debugging purposes, TODO: remove in prod
+  # look for PANDOC for debugging purposes - can be removed in prod
   # output$diagnosis_platform <- renderText({
   #   paste0("pandoc_available: ", pandoc_available(), "</br>",
   #          "Sys.getenv('PATH'): ", Sys.getenv("PATH"), "</br>",
@@ -356,7 +349,7 @@ server <- function(input, output, session) {
   # Hide tabs on app launch ----
   hideTab(inputId = "tabs", target = "tab_modelpredictions")
   
-  # Pushbar for parameters ----
+  # Pushbars for parameters/generation of uncertainty ----
   setup_pushbar(overlay = TRUE, blur = TRUE)
   observeEvent(input$open_reporting_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_reporting"))  
   observeEvent(input$close_reporting_param, pushbar_close())
@@ -368,8 +361,6 @@ server <- function(input, output, session) {
   observeEvent(input$close_virus_param, pushbar_close())
   observeEvent(input$open_hospital_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_hospitalisation"))  
   observeEvent(input$close_hospital_param, pushbar_close())
-  
-  # Pushbar for uncertainty ----
   observeEvent(input$open_generate_uncertainty, ignoreInit = TRUE, pushbar_open(id = "pushbar_generate_uncertainty"))  
   observeEvent(input$close_generate_uncertainty, pushbar_close())
   
@@ -381,7 +372,6 @@ server <- function(input, output, session) {
   simul_baseline <- reactiveValues(results = NULL, baseline_available = FALSE)
   simul_interventions <- reactiveValues(results = NULL, interventions_available = FALSE)
   
-  
   # Management of interventions ----
   interventions <- reactiveValues(baseline_mat = tibble(NULL), 
                                   future_mat = tibble(NULL),
@@ -392,26 +382,18 @@ server <- function(input, output, session) {
   
   
   observe({
-    # Create baseline interventions tibble ----
+    # Create interventions tibble ----
     interventions$baseline_mat <- tibble(
       index = 1:nb_interventions_max,
       intervention = unlist(reactiveValuesToList(input)[paste0("baseline_intervention_", 1:nb_interventions_max)]),
-      # same as: intervention = c(input$baseline_intervention_1, input$baseline_intervention_2, ... , input$baseline_intervention_50)
       date_start = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)],
-      # same as: intervention = c(input$baseline_daterange_1[1],  input$baseline_daterange_2[1], ... , )
       date_end = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(2, 2*nb_interventions_max, by = 2)],
       value = unlist(reactiveValuesToList(input)[paste0("baseline_coverage_", 1:nb_interventions_max)])) %>%
-            mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
+      mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
                               TRUE ~ "%")) %>%
-      filter(index <= input$nb_interventions_baseline, intervention != "_")
+      filter(intervention != "_")
     
-    tibble(
-      index = 1:50,
-      date_start = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)]
-    )
-    
-    # Create hypothetical scenario interventions tibble ----
     interventions$future_mat <- tibble(
       index = 1:nb_interventions_max,
       intervention = unlist(reactiveValuesToList(input)[paste0("future_intervention_", 1:nb_interventions_max)]),
@@ -423,16 +405,13 @@ server <- function(input, output, session) {
                               TRUE ~ "%")) %>%
       filter(index <= input$nb_interventions_future, intervention != "_")
     
-    # Validation of interventions, Baseline (Calibration)
+    # Validation of interventions ----
     validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, 
                                                         simul_start_date = input$date_range[1], 
                                                         simul_end_date= input$date_range[2])
     interventions$valid_baseline_interventions <- validation_baseline$validation_interventions
     interventions$message_baseline_interventions <- validation_baseline$message_interventions
     
-    
-    
-    # Validation of interventions, Hypothetical Scenario
     validation_future <- fun_validation_interventions(dta = interventions$future_mat, 
                                                       simul_start_date = input$date_range[1], 
                                                       simul_end_date= input$date_range[2])
@@ -504,9 +483,25 @@ server <- function(input, output, session) {
   
   # Process on uploading a template ----
   observeEvent(input$own_data, {
+    # file_path <- "/Users/olivier/Documents/Projets/CoMo/como/misc/Template_CoMoCOVID-19App_v17.xlsx"
     file_path <- input$own_data$datapath
     
-    # Cases
+    # Validation of template format
+    version <- read_excel(file_path, sheet = 1)
+    version_template <- names(version)[1]
+    
+    if(! is.character(version_template)) {
+      showNotification("The uploaded file isn't in the right format.", type = "error", duration = 8)
+      return(NULL)
+    }
+    
+    if(version_template != "Template v17") {
+      showNotification(HTML("The format of the file is not recognised. </br> Upload a 'v17 template' to change defaults paramaters."), type = "error", duration = 8)
+      return(NULL)
+    }
+    
+    
+    # Cases Sheet
     dta <- read_excel(file_path, sheet = "Cases")
     names(dta) <- c("date", "cases", "deaths")
     
@@ -518,7 +513,7 @@ server <- function(input, output, session) {
     updatePickerInput(session, inputId = "country_demographic", choices = c("-- Own Value ---", countries_demographic), selected = "-- Own Value ---")
     
     
-    # Severity/Mortality
+    # Severity/Mortality Sheet
     dta <- read_excel(file_path, sheet = "Severity-Mortality") 
     names(dta) <- c("age_category",	"ifr",	"ihr")
     
@@ -526,7 +521,7 @@ server <- function(input, output, session) {
       mutate(ihr = ihr/100) %>%  # starting unit should be % - scaling to a value between 0 and 1
       mutate(ifr = ifr/max(ifr))  # starting unit should be % - scaling to a value between 0 and 1
     
-    # Population
+    # Population Sheet
     dta <- read_excel(file_path, sheet = "Population")
     names(dta) <- c("age_category",	"pop",	"birth",	"death")
     
@@ -536,7 +531,7 @@ server <- function(input, output, session) {
     updatePickerInput(session, inputId = "country_demographic", selected = "-- Own Value ---")
     
     
-    # Parameters
+    # Parameters Sheets
     param <- bind_rows(read_excel(file_path, sheet = "Parameters"),
                        read_excel(file_path, sheet = "Country Area Param"),
                        read_excel(file_path, sheet = "Virus Param"),
@@ -573,25 +568,18 @@ server <- function(input, output, session) {
       updatePickerInput(session, inputId = "country_contact", selected = param$Value_Country[param$Parameter == "country_contact"])
     }
     
-    # Update interventions
+    # Update list of interventions
     interventions_excel <- read_excel(file_path, sheet = "Interventions") %>%
+      filter(!is.na(Intervention)) %>%
       mutate(`Date Start` = as.Date(`Date Start`),
              `Date End` = as.Date(`Date End`))
     
-    names(interventions_excel) <- c("intervention", "date_start", "date_end", "value", "unit", "apply_to")
+    names(interventions_excel) <- c("intervention", "date_start", "date_end", "value", "unit", "age_group", "apply_to")
     
-    interventions_excel_baseline <- interventions_excel %>% 
-      filter(apply_to == "Baseline (Calibration)")
-    
-    interventions_excel_future <- interventions_excel %>% 
-      filter(apply_to == "Hypothetical Scenario")
-    
+    # / Baseline
+    interventions_excel_baseline <- interventions_excel %>% filter(apply_to == "Baseline (Calibration)")
+
     nb_interventions_baseline <- interventions_excel_baseline %>% nrow()
-    nb_interventions_future <- interventions_excel_future %>% nrow()
-    
-    updateSliderInput(session, inputId = "nb_interventions_baseline", value = nb_interventions_baseline)
-    updateSliderInput(session, inputId = "nb_interventions_future", value = nb_interventions_future)
-    
     if(nb_interventions_baseline > 0) {
       for (i in 1:nb_interventions_baseline) {
         updateSelectInput(session, paste0("baseline_intervention_", i), selected = interventions_excel_baseline[[i, "intervention"]])
@@ -599,9 +587,13 @@ server <- function(input, output, session) {
                              start = interventions_excel_baseline[[i, "date_start"]], 
                              end = interventions_excel_baseline[[i, "date_end"]])
         updateSliderInput(session, paste0("baseline_coverage_", i), value = interventions_excel_baseline[[i, "value"]])
+        updatePickerInput(session, paste0("baseline_age_group_", i), selected = vec_age_categories[parse_age_group(interventions_excel_baseline$age_group[i])])
       }
     }
     
+    # / Future
+    interventions_excel_future <- interventions_excel %>% filter(apply_to == "Hypothetical Scenario")
+    nb_interventions_future <- interventions_excel_future %>% nrow()
     if(nb_interventions_future > 0) {
       for (i in 1:nb_interventions_future) {
         updateSelectInput(session, paste0("future_intervention_", i), selected = interventions_excel_future[[i, "intervention"]])
@@ -609,6 +601,7 @@ server <- function(input, output, session) {
                              start = interventions_excel_future[[i, "date_start"]], 
                              end = interventions_excel_future[[i, "date_end"]])
         updateSliderInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "value"]])
+        updatePickerInput(session, paste0("future_age_group_", i), selected = vec_age_categories[parse_age_group(interventions_excel_future$age_group[i])])
       }
     }
   })
@@ -729,7 +722,7 @@ server <- function(input, output, session) {
   output$report <- downloadHandler(
     filename = "CoMo_Model_Report.docx",
     content = function(file) {
-      showNotification(HTML("Generating report (~ 15 secs.)"), duration = NULL, type = "message", id = "report_generation", session = session)
+      showNotification(HTML("Generating report."), duration = NULL, type = "message", id = "report_generation", session = session)
       
       tempReport <- file.path(tempdir(), "report.Rmd")
       tempLogo <- file.path(tempdir(), "como_logo.png")
