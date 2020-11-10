@@ -104,12 +104,12 @@ ui <- function(request) {
             width = 10,
             div(class = "box_outputs", h4("Global Simulations Parameters")),
             fluidRow(
-              column(5, 
+              column(4, 
                      h4("Set Parameters with Template"),
                      fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE),
                      includeMarkdown("./www/markdown/help_upload_template.md")
               ),
-              column(6, offset = 1,
+              column(7, offset = 1,
                      h4("Set Parameters On The Spot"),
                      dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2021-06-30", startview = "year"),
                      fluidRow(column(6, 
@@ -128,10 +128,11 @@ ui <- function(request) {
             use_bs_accordion_sidebar(),
             div(class = "box_outputs", h4("Interventions for Baseline")),
             
-            htmlOutput("text_feedback_interventions_baseline"),
             source("./www/ui/interventions_baseline.R", local = TRUE)$value,
-            div(class = "box_outputs", h4("Timeline of Interventions")),
-            plotOutput("timevis_baseline", height = 700),
+            # div(class = "box_outputs", h4("Timeline of Interventions")),
+            # plotOutput("timevis_baseline", height = 700),
+            htmlOutput("text_feedback_interventions_baseline"),
+            highchartOutput("timevis_baseline_hc"),
             br(), hr(),
             a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
             shinyjs::hidden(
