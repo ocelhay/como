@@ -1,9 +1,9 @@
-output$timevis_baseline_hc <- renderHighchart({
+output$timevis_future_hc <- renderHighchart({
   
-  if(interventions$baseline_mat %>% nrow() == 0) return(NULL)
+  if(interventions$future_mat %>% nrow() == 0) return(NULL)
   
-  if(interventions$baseline_mat %>% nrow() > 0) return({
-    dta <- interventions$baseline_mat %>%
+  if(interventions$future_mat %>% nrow() > 0) return({
+    dta <- interventions$future_mat %>%
       filter(intervention %in% real_interventions) %>%
       mutate(date_end = date_end + 1,
              label = paste0(intervention, ": ", value, unit, " for ", difftime(date_end, date_start, units = "days") - 1, " days"))

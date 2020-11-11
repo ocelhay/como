@@ -132,7 +132,22 @@ ui <- function(request) {
             # div(class = "box_outputs", h4("Timeline of Interventions")),
             # plotOutput("timevis_baseline", height = 700),
             htmlOutput("text_feedback_interventions_baseline"),
-            highchartOutput("timevis_baseline_hc"),
+            fluidRow(
+              column(1, 
+                     dropdownButton(
+                       div(
+                         prettySwitch("dynamic_timevis_baseline", value = TRUE, label = "Dynamic Plot")
+                       ),
+                       circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px"
+                     )
+              ),
+              column(11,
+                     conditionalPanel("! input.dynamic_timevis_baseline",
+                                      plotOutput("timevis_baseline", height = "800px") %>% withSpinner()), 
+                     conditionalPanel("input.dynamic_timevis_baseline",
+                                      highchartOutput("timevis_baseline_hc") %>% withSpinner())
+              )
+            ),
             br(), hr(),
             a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
             shinyjs::hidden(
@@ -216,15 +231,28 @@ ui <- function(request) {
                  actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success"), br(), br(),
                  uiOutput("conditional_run_future")
           ),
-          column(5,
+          column(10,
                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario")),
-                 sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 50,  value = 0, step = 1, ticks = FALSE),
+                 source("./www/ui/interventions_future.R", local = TRUE)$value,
+                 # div(class = "box_outputs", h4("Timeline of Interventions")),
+                 # plotOutput("timevis_future", height = 700),
                  htmlOutput("text_feedback_interventions_future"),
-                 source("./www/ui/interventions_future.R", local = TRUE)$value
-          ),
-          column(5,
-                 div(class = "box_outputs", h4("Timeline of Interventions")),
-                 plotOutput("timevis_future", height = 700)
+                 fluidRow(
+                   column(1, 
+                          dropdownButton(
+                            div(
+                              prettySwitch("dynamic_timevis_future", value = TRUE, label = "Dynamic Plot")
+                            ),
+                            circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px"
+                          )
+                   ),
+                   column(11,
+                          conditionalPanel("! input.dynamic_timevis_future",
+                                           plotOutput("timevis_future", height = "800px") %>% withSpinner()), 
+                          conditionalPanel("input.dynamic_timevis_future",
+                                           highchartOutput("timevis_future_hc") %>% withSpinner())
+                   )
+                 )
           )
         ),
         br(), br(), 
@@ -395,6 +423,8 @@ server <- function(input, output, session) {
                               TRUE ~ "%")) %>%
       filter(intervention != "_")
     
+    
+    # print(nb_interventions_max)
     interventions$future_mat <- tibble(
       index = 1:nb_interventions_max,
       intervention = unlist(reactiveValuesToList(input)[paste0("future_intervention_", 1:nb_interventions_max)]),
@@ -404,7 +434,7 @@ server <- function(input, output, session) {
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
                               TRUE ~ "%")) %>%
-      filter(index <= input$nb_interventions_future, intervention != "_")
+      filter(intervention != "_")
     
     # Validation of interventions ----
     validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, 
@@ -579,7 +609,7 @@ server <- function(input, output, session) {
     
     # / Baseline
     interventions_excel_baseline <- interventions_excel %>% filter(apply_to == "Baseline (Calibration)")
-
+    
     nb_interventions_baseline <- interventions_excel_baseline %>% nrow()
     if(nb_interventions_baseline > 0) {
       for (i in 1:nb_interventions_baseline) {
