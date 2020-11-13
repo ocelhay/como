@@ -729,11 +729,9 @@ The above graphs show the model prediction of the reproduction number over time,
 | Mask Wearing                          | Efficacy: (0-35%)                                                                                                 | `r input$mask_eff`               |
 | Working at Home                       | Efficacy:                                                                                                         | `r input$work_eff`               |
 | Working at Home                       | Home contacts inflation due to working from home:                                                                 | `r input$w2h`                    |
-| School Closures                       | Efficacy:                                                                                                         | `r input$school_eff`             |
 | School Closures                       | Home contacts inflation due to school closure:                                                                    | `r input$s2h`                    |
 | Shielding the Elderly                 | Efficacy:                                                                                                         | `r input$cocoon_eff`             |
 | Shielding the Elderly                 | Minimum age for elderly shielding: (0 to 100)                                                                     | `r input$age_cocoon`             |
-| International Travel Ban              | Efficacy:                                                                                                         | `r input$travelban_eff`          |
 | Vaccination                           | Time to reach target coverage (1 to 52)                                                                           | `r input$vac_campaign`           |
 | Vaccination                           | Minimum age for vaccination                                                                                       | `r input$age_vaccine_min`        |
 | Vaccination                           | (v16.2) Maximum Age for vaccination                                                                               | `r input$age_vaccine_max`        |

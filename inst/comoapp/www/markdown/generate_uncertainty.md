@@ -32,7 +32,6 @@ Users of the CoMo Collaborative COVID-19 model need to comprehend and effectivel
 | Handwashing                     	| Efficacy: (0-25%)                                                	| hand_eff              	|
 | Working at Home                 	| Efficacy:                                                        	| work_eff              	|
 | Working at Home                 	| Home contacts inflation due to working from home:                	| w2h                   	|
-| School Closures                 	| Efficacy:                                                        	| school_eff            	|
 | School Closures                 	| Home contacts inflation due to school closure:                   	| s2h                   	|
 | Shielding the Elderly           	| Efficacy:                                                        	| cocoon_eff            	|
 | Wearing Mask                     	| Efficacy:                                                        	| mask_eff              	|

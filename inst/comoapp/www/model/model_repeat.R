@@ -80,7 +80,7 @@ parameters <- reactiveValuesToList(input)[
     "pdeath_vent", "pdeath_ventc", "ihr_scaling", "nus", 
     "nu_icu", "nu_vent", "rhos", "amp", 
     "pclin", "prob_icu", "prob_vent", "selfis_eff", "dist_eff", "hand_eff", 
-    "work_eff", "w2h", "school_eff", "s2h", "cocoon_eff", "age_cocoon", 
+    "work_eff", "w2h", "s2h", "cocoon_eff", "age_cocoon", 
     "vaccine_eff", "vac_campaign", "mean_imports", "screen_test_sens", 
     "screen_overdispersion", "quarantine_days", "quarantine_effort", 
     "quarantine_eff_home", "quarantine_eff_other", "household_size", 
@@ -126,7 +126,6 @@ parameters["dist_eff"] <- parameters["dist_eff"] / 100
 parameters["hand_eff"] <- parameters["hand_eff"] / 100
 parameters["work_eff"] <- parameters["work_eff"] / 100
 parameters["w2h"] <- parameters["w2h"] / 100
-parameters["school_eff"] <- parameters["school_eff"] / 100
 parameters["s2h"] <- parameters["s2h"] / 100
 parameters["cocoon_eff"] <- parameters["cocoon_eff"] / 100
 parameters["age_cocoon"] <- floor((parameters["age_cocoon"] / 5) + 1)

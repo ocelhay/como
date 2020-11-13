@@ -15,8 +15,6 @@ list(
                    sliderInput("w2h", label = "Home contacts inflation due to working from home:", value = 10, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),
                    div(class = "box_interventions", h4(icon("school"), "School Closures")),
-                   sliderInput("school_eff", label = "Efficacy of school closure:", value = 85, min = 0, max = 100,
-                               step = 1, post = "%", ticks = FALSE),
                    sliderInput("s2h", label = "Home contacts inflation due to school closure:", value = 20, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),
                    div(class = "box_interventions", h4("Social Distancing")),
@@ -24,11 +22,6 @@ list(
                                step = 1, post = "%", ticks = FALSE)
                    ),
             column(3,
-                   
-                   div(class = "box_interventions", h4(icon("plane"), " International Travel Ban")),
-                   sliderInput("travelban_eff", label = "Efficacy of travel ban:", value = 50, min = 0, max = 100,
-                               step = 1, post = "%", ticks = FALSE),
-                   
                    div(class = "box_interventions", h4(icon("syringe"), "Vaccination")),
                    sliderInput("vac_campaign", label = "Time to reach target coverage:", value = 4, min = 1, max = 52,
                                step = 1, post = " weeks", ticks = FALSE),

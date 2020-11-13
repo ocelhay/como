@@ -83,7 +83,7 @@ aci <- floor((ageindcase / 5) + 1)
 # those should have noise added when user decide to
 parameters_noise <- c("p", "rho", "omega", "gamma", "nui", "ihr_scaling", "nus", 
   "nu_icu", "nu_vent", "rhos", "selfis_eff", "dist_eff", "hand_eff", "work_eff", 
-  "w2h", "school_eff", "s2h", "cocoon_eff", "mean_imports", "screen_overdispersion", 
+  "w2h", "s2h", "cocoon_eff", "mean_imports", "screen_overdispersion", 
   "quarantine_effort", "quarantine_eff_home", "quarantine_eff_other", "mask_eff")
 
 # per year ageing matrix
