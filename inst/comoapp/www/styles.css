@@ -69,11 +69,9 @@
     text-align: center;
     position:fixed;
     opacity: 1;
-    bottom: calc(5%);
+    bottom: calc(40%);
     left: calc(45%);
 }
-
-
 
 
 .interventions {
