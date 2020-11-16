@@ -110,6 +110,11 @@ parameters <- c(
   phi = which(month.name == input$phi))
 
 
+# TODO, remove on production
+parameters <- c(parameters,
+                school_eff = 0)
+
+
 # Transform/scale parameters ----
 parameters["rho"] <- parameters["rho"] / 100
 parameters["omega"] <- (1 / (parameters["omega"] * 365))

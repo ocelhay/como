@@ -4,12 +4,6 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date) 
     validation_interventions = TRUE, 
     message_interventions = NULL)
   
-  # Test interventions date range versus simulation date range
-  if(any(dta$date_start < simul_start_date | dta$date_end > simul_end_date)) {
-    validation$message_interventions <- paste0(validation$message_interventions, 
-                                               "Please note that some intervention(s) date range are outside the date range of simulation. ")
-  }
-  
   # Test if some interventions of the same nature overlap
   test <- dta  %>%
     arrange(intervention, date_start, date_end) %>% 
@@ -19,8 +13,16 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date) 
   
   if(any(test$overlapping)) {
     validation$validation_interventions <- FALSE
-    validation$message_interventions <- paste0(validation$message_interventions, 
-                                               "Some interventions of the same nature are overlapping. Needs resolution. ")
+    validation$message_interventions <- paste0(validation$message_interventions,
+                                               "<span class = 'redbold'>NEEDS RESOLUTION: some interventions of the same nature are overlapping.</span>",
+                                               br())
+  }
+  
+  # Test interventions date range versus simulation date range
+  if(any(dta$date_start < simul_start_date | dta$date_end > simul_end_date)) {
+    validation$message_interventions <- paste0(validation$message_interventions,
+                                               "<span class = 'warn'>Take note that some intervention(s) date range are outside the date range of simulation.</span>",
+                                               br())
   }
   
   # Test if dependent intervention dates are within the range of the referent intervention
@@ -47,7 +49,7 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date) 
     }
     
     
-    if(!all(dates_dep %in% dates_ref)) return(glue("'{dependant}' has no effect unless '{reference}' is selected. "))
+    if(!all(dates_dep %in% dates_ref)) return(glue("<span class = 'warn'>Take note that <em>{dependant}</em> has no effect unless <em>{reference}</em> is selected.</span><br>"))
   }
   
   validation$message_interventions <- paste0(validation$message_interventions, 

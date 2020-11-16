@@ -36,6 +36,9 @@
   margin-left: 2px;
   bottom: calc(1%);;
   left: calc(2%);;
+  background-color: #ecf0f1;
+  border: 2px solid #7f8c8d;
+  padding: 10px;
   z-index: 999;
   position: fixed;
 }

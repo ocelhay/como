@@ -88,16 +88,14 @@ ui <- function(request) {
           column(
             width = 2,
             div(class = "float_bottom_left",
-                hr(),
                 sliderInput("p", label = "Prob. of infection given contact:", min = 0.01, max = 0.08, step = 0.001,
-                            value = 0.049, ticks = FALSE, width = "75%"),
+                            value = 0.049, ticks = FALSE),
                 sliderInput("report", label = span("% of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
-                            value = 2.5, post = "%", ticks = FALSE, width = "75%"),
+                            value = 2.5, post = "%", ticks = FALSE),
                 sliderInput("reportc", label = span("% of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
-                            value = 5, post = "%", ticks = FALSE, width = "75%"),
+                            value = 5, post = "%", ticks = FALSE),
                 uiOutput("conditional_run_baseline"), br(),
-                uiOutput("conditional_validate_baseline"),
-                hr()
+                uiOutput("conditional_validate_baseline")
             )
           ),
           column(
@@ -476,7 +474,6 @@ server <- function(input, output, session) {
   output$conditional_float_results <- renderUI({
     if(simul_interventions$interventions_available){
       div(class = "float_bottom_left",
-          hr(),
           p("Go to:"),
           tags$ul(
             tags$li(a("Building Interventions", href = '#anchor_interventions')),
@@ -488,9 +485,7 @@ server <- function(input, output, session) {
           ),
           br(), 
           uiOutput("report_generation"), br(),
-          downloadButton("download_data", "Download Data") %>% helper(type = "markdown", content = "help_legend_csv", colour = "red", size = "l"), 
-          tags$small("Simulation results in .csv format."),
-          hr(),
+          downloadButton("download_data", "Download Data") %>% helper(type = "markdown", content = "help_legend_csv", colour = "red", size = "l")
       )
     }
   })
