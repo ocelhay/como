@@ -63,15 +63,15 @@ ui <- function(request) {
                # for debugging purposes, TODO: remove in prod
                # htmlOutput("diagnosis_platform"),
                fluidRow(
-                 column(6,
+                 column(8,
                         span(img(src = "./como_logo.png", id = "logo"),
                              "The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level."),
-                        br(), br(), br(),
-                        h5("CoMo Consortium member countries’ stages of engagement with policymakers — August 21, 2020") %>%
+                        br(), br(), br(), br(),
+                        strong("CoMo Consortium member countries’ stages of engagement with policymakers") %>%
                           helper(content = "stages_countries", colour = "red"),
                         tags$img(src = "./como_policy_makers.png", id = "map")
                  ),
-                 column(6,
+                 column(4,
                         bs_accordion(id = "about") %>%
                           bs_set_opts(panel_type = "default", use_heading_link = TRUE) %>%
                           bs_append(title = "Important Disclaimer", content = includeMarkdown("./www/markdown/disclaimer.md")) %>%
