@@ -11,7 +11,7 @@
 }
 
 #logo { 
-  width: 50%;
+  width: 40%;
   float:left;
 }
 
@@ -22,7 +22,7 @@
 }
 
 #map {
-  margin-top: 15px;
+  margin-top: 5px;
   margin-bottom: 5px;
   width: 100%;
   border: 1px solid black;
@@ -48,6 +48,19 @@
   font-weight: bold;
 }
 
+.app-version {
+  font-size: 1.1em;
+  font-weight: bold;
+  background-color: #FFFF00;
+  color: #EC6568;
+  border-radius: 5px;
+  position:absolute;
+  top: 10px;
+  right: 20px;
+  padding: 5px;
+  z-index: 1000;
+}
+
 .buttons_interventions {
   text-align: right;
 }
@@ -68,12 +81,11 @@
 
 .shiny-notification {
     margin: auto;
-    width: 400px;
-    text-align: center;
+    width: 500px;
     position:fixed;
     opacity: 1;
     bottom: calc(40%);
-    left: calc(45%);
+    left: calc(35%);
 }
 
 

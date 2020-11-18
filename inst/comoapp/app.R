@@ -1,7 +1,7 @@
 # CoMo COVID-19 App
 version_app <- "v17-beta.1"
 
-# To generate report with macOS standalone app (shinybox),
+# To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
 if (Sys.info()["sysname"] == "Darwin" & 
     !grepl("/usr/local/bin", Sys.getenv("PATH"), fixed = TRUE)) {
@@ -59,14 +59,14 @@ ui <- function(request) {
       title = div(a(img(src = "CoMo-logo-medium-white_resized.png", id = "logo-top"))),
       id = "tabs", windowTitle = "CoMo Consortium | COVID-19 App", collapsible = TRUE, inverse = FALSE,
       tabPanel("Welcome", value = "tab_welcome",
-               h4(paste0("App ", version_app)),
+               span(class = "app-version", version_app),
                # for debugging purposes, TODO: remove in prod
                # htmlOutput("diagnosis_platform"),
                fluidRow(
                  column(8,
                         span(img(src = "./como_logo.png", id = "logo"),
-                             "The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level."),
-                        br(), br(), br(), br(),
+                             includeMarkdown("./www/markdown/welcome.md")),
+                        br(), 
                         strong("CoMo Consortium member countries’ stages of engagement with policymakers") %>%
                           helper(content = "stages_countries", colour = "red"),
                         tags$img(src = "./como_policy_makers.png", id = "map")
@@ -566,31 +566,51 @@ server <- function(input, output, session) {
       mutate(Value_Date = as.Date(Value_Date)) %>%
       drop_na(Parameter)
     
+    msg_update_param <- "The following Global Simulations Parameters were updated: <br>"
+    
     # Update all sliders
     if(!is_empty(param$Parameter[param$Type == 'slider'])) {
       for (input_excel in param$Parameter[param$Type == 'slider']){
+        if(param$Value[param$Parameter == input_excel] != input[[input_excel]]) {
+          msg_update_param <- glue("{msg_update_param} <strong>{input_excel}</strong>: from {input[[input_excel]]} to {param$Value[param$Parameter == input_excel]} ; ")
+        }
         updateSliderInput(session = session, inputId = input_excel, value = param$Value[param$Parameter == input_excel])
       }}
     
     # Update all numeric values
     if(!is_empty(param$Parameter[param$Type == 'numeric'])) {
       for (input_excel in param$Parameter[param$Type == 'numeric']){
+        if(param$Value[param$Parameter == input_excel] != input[[input_excel]]) {
+          msg_update_param <- glue("{msg_update_param} <strong>{input_excel}</strong>: from {input[[input_excel]]} to {param$Value[param$Parameter == input_excel]} ; ")
+        }
         updateNumericInput(session = session, inputId = input_excel, value = param$Value[param$Parameter == input_excel])
       }}
     
     # Update month text slider
     if(!is_empty(param$Parameter[param$Parameter == 'phi'])) {
+      if(param$Value[param$Parameter == 'phi'] != input[['phi']]) {
+        msg_update_param <- glue("{msg_update_param} <strong>phi</strong>: from {input[['phi']]} to {param$Value[param$Parameter == 'phi']} ; ")
+      }
       updateSliderTextInput(session = session, inputId = "phi", selected = month.name[param$Value[param$Parameter == "phi"]])
     }
     
     # Update date range of simulation
     if(!is_empty(param$Parameter[param$Type == 'date_range_simul'])) {
+      if(param$Value_Date[param$Parameter == 'date_range_simul_start'] != input[['date_range']][1]) {
+        msg_update_param <- glue("{msg_update_param} <strong>date_range_simul_start</strong>: from {input[['date_range']][1]} to {param$Value_Date[param$Parameter == 'date_range_simul_start']} ; ")
+      }
+      if(param$Value_Date[param$Parameter == 'date_range_simul_end'] != input[['date_range']][2]) {
+        msg_update_param <- glue("{msg_update_param} <strong>date_range_simul_end</strong>: from {input[['date_range']][2]} to {param$Value_Date[param$Parameter == 'date_range_simul_end']} ; ")
+      }
       updateDateRangeInput(session, inputId = "date_range", start = param$Value_Date[param$Parameter == "date_range_simul_start"], 
                            end = param$Value_Date[param$Parameter == "date_range_simul_end"])
     }
     
     # Update social contact
     if(!is_empty(param$Parameter[param$Type == 'picker'])) {
+      if(param$Value_Country[param$Parameter == 'country_contact'] != input[['country_contact']]) {
+        msg_update_param <- glue("{msg_update_param} <strong>country_contact</strong>: from {input[['country_contact']]} to {param$Value_Country[param$Parameter == 'country_contact']} ; ")
+      }
       updatePickerInput(session, inputId = "country_contact", selected = param$Value_Country[param$Parameter == "country_contact"])
     }
     
@@ -601,6 +621,10 @@ server <- function(input, output, session) {
              `Date End` = as.Date(`Date End`))
     
     names(interventions_excel) <- c("intervention", "date_start", "date_end", "value", "unit", "age_group", "apply_to")
+    
+    if(msg_update_param != "The following Global Simulations Parameters were updated: <br>") {
+      showNotification(HTML(msg_update_param), duration = NULL)
+    }
     
     # / Baseline
     interventions_excel_baseline <- interventions_excel %>% filter(apply_to == "Baseline (Calibration)")
