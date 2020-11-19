@@ -397,7 +397,9 @@ server <- function(input, output, session) {
   
   # Management of interventions ----
   interventions <- reactiveValues(baseline_mat = tibble(NULL), 
+                                  baseline_age_groups = list(),
                                   future_mat = tibble(NULL),
+                                  future_age_groups = list(),
                                   valid_baseline_interventions = TRUE, 
                                   message_baseline_interventions = NULL,
                                   valid_future_interventions = TRUE, 
@@ -407,28 +409,44 @@ server <- function(input, output, session) {
   observe({
     # Create interventions tibble ----
     interventions$baseline_mat <- tibble(
-      index = 1:nb_interventions_max,
       intervention = unlist(reactiveValuesToList(input)[paste0("baseline_intervention_", 1:nb_interventions_max)]),
       date_start = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)],
       date_end = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(2, 2*nb_interventions_max, by = 2)],
-      value = unlist(reactiveValuesToList(input)[paste0("baseline_coverage_", 1:nb_interventions_max)])) %>%
+      value = unlist(reactiveValuesToList(input)[paste0("baseline_coverage_", 1:nb_interventions_max)]),
+      age_group = "1-21",
+      Target = 1:nb_interventions_max) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
                               TRUE ~ "%")) %>%
       filter(intervention != "_")
     
+    # Fill list of age groups
+    vec <- interventions$baseline_mat$age_group
+    if(length(vec) > 0) {
+      for (i in 1:length(vec)) {
+        interventions$baseline_age_groups[[i]] <- parse_age_group(vec[i])
+      }
+    }
     
-    # print(nb_interventions_max)
     interventions$future_mat <- tibble(
-      index = 1:nb_interventions_max,
       intervention = unlist(reactiveValuesToList(input)[paste0("future_intervention_", 1:nb_interventions_max)]),
       date_start = do.call("c", reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)],
       date_end = do.call("c", reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)])[seq(2, 2*nb_interventions_max, by = 2)],
-      value = unlist(reactiveValuesToList(input)[paste0("future_coverage_", 1:nb_interventions_max)])) %>%
+      value = unlist(reactiveValuesToList(input)[paste0("future_coverage_", 1:nb_interventions_max)]),
+      age_group = "1-21",
+      Target = 1:nb_interventions_max) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
                               TRUE ~ "%")) %>%
       filter(intervention != "_")
+    
+    # Fill list of age groups
+    vec <- interventions$future_age_groups$age_group
+    if(length(vec) > 0) {
+      for (i in 1:length(vec)) {
+        interventions$future_age_groups[[i]] <- parse_age_group(vec[i])
+      }
+    }
     
     # Validation of interventions ----
     validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, 
@@ -613,18 +631,21 @@ server <- function(input, output, session) {
     
     # Update list of interventions
     interventions_excel <- read_excel(file_path, sheet = "Interventions") %>%
-      filter(!is.na(Intervention)) %>%
-      mutate(`Date Start` = as.Date(`Date Start`),
-             `Date End` = as.Date(`Date End`))
-    
+      filter(!is.na(Intervention))
     names(interventions_excel) <- c("intervention", "date_start", "date_end", "value", "unit", "age_group", "apply_to")
+
+    # interventions_excel$Target <- 1:nrow(interventions_excel)
     
+    if(all(interventions_excel$intervention %in% valid_interventions_v17)) message("Okay, all interventions are valid.")
+    if(! all(interventions_excel$intervention %in% valid_interventions_v17)) stop("Stop, some interventions are not valid.")
+
     if(msg_update_param != "The following Global Simulations Parameters were updated: <br>") {
       showNotification(HTML(msg_update_param), duration = NULL)
     }
     
     # / Baseline
-    interventions_excel_baseline <- interventions_excel %>% filter(apply_to == "Baseline (Calibration)")
+    interventions_excel_baseline <- interventions_excel %>% 
+    filter(apply_to == "Baseline (Calibration)")
     
     nb_interventions_baseline <- interventions_excel_baseline %>% nrow()
     if(nb_interventions_baseline > 0) {
@@ -639,7 +660,8 @@ server <- function(input, output, session) {
     }
     
     # / Future
-    interventions_excel_future <- interventions_excel %>% filter(apply_to == "Hypothetical Scenario")
+    interventions_excel_future <- interventions_excel %>% 
+    filter(apply_to == "Hypothetical Scenario")
     nb_interventions_future <- interventions_excel_future %>% nrow()
     if(nb_interventions_future > 0) {
       for (i in 1:nb_interventions_future) {
@@ -676,15 +698,14 @@ server <- function(input, output, session) {
     source("./www/model/model_repeat.R", local = TRUE)
     parameters["iterations"] <- 1
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
-                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
-                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     
     check_parameters_list_for_na(parameters_list = parameters)
     
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
-                          contact_work = contact_work, contact_other = contact_other)
+                          contact_work = contact_work, contact_other = contact_other, 
+                          age_group_vectors = interventions$baseline_age_groups)
     simul_baseline$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
                                                   ifr, mort, popstruc, intv_vector = vectors)
     simul_baseline$baseline_available <- TRUE
@@ -704,15 +725,14 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model/model_repeat.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
-                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
-                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     
     check_parameters_list_for_na(parameters_list = parameters)
     
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
-                          contact_work = contact_work, contact_other = contact_other)
+                          contact_work = contact_work, contact_other = contact_other, 
+                          age_group_vectors = interventions$baseline_age_groups)
     simul_baseline$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
                                                   ifr, mort, popstruc, intv_vector = vectors)
     simul_baseline$baseline_available <- TRUE
@@ -735,15 +755,14 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model/model_repeat.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, 
-                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
-                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
     
     check_parameters_list_for_na(parameters_list = parameters)
     
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
-                          contact_work = contact_work, contact_other = contact_other)
+                          contact_work = contact_work, contact_other = contact_other,
+                          age_group_vectors = interventions$future_age_groups)
     simul_interventions$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
                                                        ifr, mort, popstruc, intv_vector = vectors)
     simul_interventions$interventions_available <- TRUE
@@ -915,18 +934,14 @@ server <- function(input, output, session) {
                      interventions$future_mat %>% mutate(`Apply to` = "Hypothetical Scenario")) %>%
       rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
     
-    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
-                       age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
-                       age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     vectors0_cbind <- do.call(cbind, vectors0)
     vectors0_reduced <- vectors0_cbind[seq(from=0,to=nrow(vectors0_cbind),by=20),]
     vectors0_reduced <- as.data.frame(rbind(rep(0,ncol(vectors0_reduced)),vectors0_reduced))
     vectors0_reduced <- vectors0_reduced[,1:10] #subsetting only the coverages
     names(vectors0_reduced) <- paste0("interventions_baseline_",names(vectors0_reduced))
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, 
-                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
-                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
     vectors_cbind <- do.call(cbind, vectors)
     vectors_reduced <- vectors_cbind[seq(from=0,to=nrow(vectors_cbind),by=20),]
     vectors_reduced <- as.data.frame(rbind(rep(0,ncol(vectors_reduced)),vectors_reduced))

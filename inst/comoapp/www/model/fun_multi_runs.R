@@ -1,5 +1,6 @@
 multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc, popbirth, ageing,
-                       contact_home, contact_school, contact_work, contact_other){
+                       contact_home, contact_school, contact_work, contact_other,
+                       age_group_vectors){
   
   # Define objects to store results ----
   results <- list()
@@ -41,8 +42,8 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     covidOdeCpp_reset()
     mat_ode <- ode(
       y = Y, times = times, method = "euler", hini = 0.05,
-      func = covidOdeCpp, parms = param_vector,
-      input = ss, A = A,
+      func = covidOdeCpp, parms = parameters_dup,
+      input = input, A = A,
       contact_home = contact_home,
       contact_school = contact_school,
       contact_work = contact_work,
@@ -131,6 +132,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
                 parameters_dup["gamma"]*mat_ode[,(ERindex+1)])
     ) / sum(popstruc[,2]), 1)
     
+    browser()  # Last error - 2020-11-19
     for (w in (ceiling(1/parameters_dup["nui"])+1):nb_times){
       Rt_aux[w,i]<-cumsum(sum(parameters_dup["gamma"]*mat_ode[w,(Eindex+1)]))/cumsum(sum(parameters_dup["gamma"]*mat_ode[(w-1/parameters_dup["nui"]),(Eindex+1)]))
       if(Rt_aux[w,i] >= 7) {Rt_aux[w,i]  <- NA}

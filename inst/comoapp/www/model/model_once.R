@@ -42,7 +42,7 @@ A <- length(age_categories)
 ageing <- t(diff(diag(rep(1, A)), lag = 1) / (5 * 365.25))
 ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
 
-# Indices for each variable.
+# Define the indices for each variable
 Sindex<-1:A
 Eindex<-(A+1):(2*A)
 Iindex<-(2*A+1):(3*A)
@@ -84,10 +84,10 @@ ageindcase <- 20
 aci <- floor((ageindcase / 5) + 1)
 
 # those should have noise added when user decide to
-parameters_noise <- c("p", "rho", "omega", "gamma", "nui", "ihr_scaling", "nus", 
-  "nu_icu", "nu_vent", "rhos", "selfis_eff", "dist_eff", "hand_eff", "work_eff", 
-  "w2h", "s2h", "cocoon_eff", "mean_imports", "screen_overdispersion", 
-  "quarantine_effort", "quarantine_eff_home", "quarantine_eff_other", "mask_eff")
+parameters_noise <- c("p", "rho", "omega", "gamma", "nui", "ihr_scaling","nus", "nu_icu","nu_vent",
+                      "rhos", "selfis_eff", "dist_eff", "hand_eff", "mask_eff", "work_eff", 
+                      "w2h", "school_eff", "s2h", "cocoon_eff", "mean_imports", "screen_overdispersion", 
+                      "quarantine_effort", "quarantine_eff_home", "quarantine_eff_other")
 
 source("./www/model/fun_validation_interventions.R")
 source("./www/model/fun_inputs.R")
