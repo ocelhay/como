@@ -1,26 +1,16 @@
 parse_age_group <- function(vec) {
-
   regx_str <- "^(([0]*([1-9]|1[0-9]|2[0-1]))[\\,\\:])*([0]*([1-9]|1[0-9]|2[0-1]))$"
-  output <- rep(FALSE, 21)
-  
-  if (is.na(vec)) {
+  output <- rep(0, 21)
+  vec <- stringr::str_replace_all(vec, "-", ":")
+  vec <- stringr::str_replace_all(vec, ";", ",")
+  vec <- stringr::str_replace_all(vec, "[:space:]", "")
+  vec <- stringr::str_replace_all(vec, "[:alpha:]", "")
+  if (!stringr::str_detect(vec, regx_str)) {
     return(output)
   }
-  
-  vec <- str_replace_all(vec, "-", ":")
-  vec <- str_replace_all(vec, ";", ",")
-
-  vec <- str_replace_all(vec, "[:space:]", "")
-  vec <- str_replace_all(vec, "[:alpha:]", "")
-
-  if (!str_detect(vec, regx_str)) {
-    return(output)
-  }
-  
   vec <- paste0("c(", vec, ")")
   vec2 <- eval(parse(text = vec))
-  
-  output[vec2] <- TRUE
+  output[vec2] <- 1
   return(output)
 }
 
