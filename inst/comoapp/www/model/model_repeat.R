@@ -24,7 +24,6 @@ c_home <- contact_home[[input$country_contact]] %>% as.matrix()
 c_school <- contact_school[[input$country_contact]] %>% as.matrix()
 c_work <- contact_work[[input$country_contact]] %>% as.matrix()
 c_other <- contact_other[[input$country_contact]] %>% as.matrix()
-
 nce <- A - length(c_home[1, ])
 
 contact_home <- matrix(0, nrow = A, ncol = A)

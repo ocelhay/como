@@ -36,8 +36,11 @@ new_coverage_value <- 0
 # highchart export options.
 hc_export_items <- c("downloadPNG", "downloadCSV", "downloadXLS")
 
-# Model elements that are independants of inputs. 
+# Model elements that are independants of inputs ----
 A <- length(age_categories)
+# per year ageing matrix
+ageing <- t(diff(diag(rep(1, A)), lag = 1) / (5 * 365.25))
+ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
 
 # Indices for each variable.
 Sindex<-1:A
@@ -85,10 +88,6 @@ parameters_noise <- c("p", "rho", "omega", "gamma", "nui", "ihr_scaling", "nus",
   "nu_icu", "nu_vent", "rhos", "selfis_eff", "dist_eff", "hand_eff", "work_eff", 
   "w2h", "s2h", "cocoon_eff", "mean_imports", "screen_overdispersion", 
   "quarantine_effort", "quarantine_eff_home", "quarantine_eff_other", "mask_eff")
-
-# per year ageing matrix
-ageing <- t(diff(diag(rep(1, A)), lag = 1) / (5 * 365.25))
-ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
 
 source("./www/model/fun_validation_interventions.R")
 source("./www/model/fun_inputs.R")
