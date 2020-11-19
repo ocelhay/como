@@ -634,7 +634,7 @@ server <- function(input, output, session) {
                              start = interventions_excel_baseline[[i, "date_start"]], 
                              end = interventions_excel_baseline[[i, "date_end"]])
         updateSliderInput(session, paste0("baseline_coverage_", i), value = interventions_excel_baseline[[i, "value"]])
-        updatePickerInput(session, paste0("baseline_age_group_", i), selected = vec_age_categories[parse_age_group(interventions_excel_baseline$age_group[i])])
+        updatePickerInput(session, paste0("baseline_age_group_", i), selected = vec_age_categories[as.logical(parse_age_group(interventions_excel_baseline$age_group[i])]))
       }
     }
     
@@ -648,7 +648,7 @@ server <- function(input, output, session) {
                              start = interventions_excel_future[[i, "date_start"]], 
                              end = interventions_excel_future[[i, "date_end"]])
         updateSliderInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "value"]])
-        updatePickerInput(session, paste0("future_age_group_", i), selected = vec_age_categories[parse_age_group(interventions_excel_future$age_group[i])])
+        updatePickerInput(session, paste0("future_age_group_", i), selected = vec_age_categories[as.logical(parse_age_group(interventions_excel_future$age_group[i])]))
       }
     }
   })
