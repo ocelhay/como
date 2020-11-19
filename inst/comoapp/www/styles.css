@@ -81,7 +81,7 @@
 
 .shiny-notification {
     margin: auto;
-    width: 500px;
+    width: 650px;
     position:fixed;
     opacity: 1;
     bottom: calc(40%);

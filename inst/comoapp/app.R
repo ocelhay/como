@@ -93,7 +93,7 @@ ui <- function(request) {
                 sliderInput("report", label = span("% of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
                             value = 2.5, post = "%", ticks = FALSE),
                 sliderInput("reportc", label = span("% of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
-                            value = 5, post = "%", ticks = FALSE),
+                            value = 10, post = "%", ticks = FALSE),
                 uiOutput("conditional_run_baseline"), br(),
                 uiOutput("conditional_validate_baseline")
             )
@@ -109,7 +109,7 @@ ui <- function(request) {
               ),
               column(7, offset = 1,
                      h4("Set Parameters On The Spot"),
-                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2021-06-30", startview = "year"),
+                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-01", end = "2021-06-30", startview = "year"),
                      fluidRow(column(6, 
                                      actionButton("open_country_param", label = span(icon('cog'), " Country"), class = "btn-primary", width = "80%"),
                                      htmlOutput("feedback_choices"),
@@ -566,7 +566,7 @@ server <- function(input, output, session) {
       mutate(Value_Date = as.Date(Value_Date)) %>%
       drop_na(Parameter)
     
-    msg_update_param <- "The following Global Simulations Parameters were updated: <br>"
+    msg_update_param <- "The following Global Simulations Parameters were updated: <br><br>"
     
     # Update all sliders
     if(!is_empty(param$Parameter[param$Type == 'slider'])) {
@@ -588,8 +588,8 @@ server <- function(input, output, session) {
     
     # Update month text slider
     if(!is_empty(param$Parameter[param$Parameter == 'phi'])) {
-      if(param$Value[param$Parameter == 'phi'] != input[['phi']]) {
-        msg_update_param <- glue("{msg_update_param} <strong>phi</strong>: from {input[['phi']]} to {param$Value[param$Parameter == 'phi']} ; ")
+      if(param$Value[param$Parameter == 'phi'] != which(month.name == input[['phi']])) {
+        msg_update_param <- glue("{msg_update_param} <strong>phi</strong>: from {which(month.name == input[['phi']])} to {param$Value[param$Parameter == 'phi']} ; ")
       }
       updateSliderTextInput(session = session, inputId = "phi", selected = month.name[param$Value[param$Parameter == "phi"]])
     }

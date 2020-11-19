@@ -31,7 +31,7 @@ list(
                                step = 1, post = " years", ticks = FALSE),
                    sliderInput("vac_dur", label = "Duration of efficacious period", value = 100, min = 0, max = 100, step = 0.1, post = " years", ticks = FALSE, width = "75%"),
                    sliderInput("vac_dur_r", label = "Duration of efficacious period if previously infected", value = 100, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE, width = "75%"),
-                   sliderInput("vaccine_eff", label = "Efficacy of vaccine:", value = 0, min = 0, max = 100,
+                   sliderInput("vaccine_eff", label = "Efficacy of vaccine:", value = 100, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),
                    sliderInput("vaccine_eff_r", label = "Efficacy if previously infected", value = 100, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE, width = "75%"),
                    
