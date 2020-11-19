@@ -39,12 +39,24 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     }
     
     covidOdeCpp_reset()
-    mat_ode <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, 
-                   parms = parameters_dup, input = input, A = A,
-                   contact_home=contact_home, contact_school=contact_school,
-                   contact_work=contact_work, contact_other=contact_other,
-                   popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
-                   ageing=ageing, ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
+    mat_ode <- ode(
+      y = Y, times = times, method = "euler", hini = 0.05,
+      func = covidOdeCpp, parms = param_vector,
+      input = ss, A = A,
+      contact_home = contact_home,
+      contact_school = contact_school,
+      contact_work = contact_work,
+      contact_other = contact_other,
+      popbirth_col2 = popbirth[, 2],
+      popstruc_col2 = popstruc[, 2],
+      ageing = ageing,
+      ifr_col2 = ifr[, 2],
+      ihr_col2 = ihr[, 2],
+      mort_col = mort,
+      age_group_vectors = age_group_vectors
+    )
+    
+    
     
     aux[, , i] <- mat_ode
     

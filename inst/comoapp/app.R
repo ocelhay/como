@@ -10,9 +10,9 @@ if (Sys.info()["sysname"] == "Darwin" &
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "16.2.1" )  stop("
-Running the app requires to install the v16.2.1 of the R package comoOdeCpp.
-Run:  remotes::install_github('bogaotory/comoOdeCpp@v16.2.1', subdir = 'comoOdeCpp')
+if(packageVersion("comoOdeCpp") != "16.4.0" )  stop("
+Running the app requires to install the v16.4.0 of the R package comoOdeCpp.
+Run:  remotes::install_github('bogaotory/comoOdeCpp@v16.4.0', subdir = 'comoOdeCpp')
 in the R console to install it.")
 
 library(bsplus)
@@ -127,8 +127,6 @@ ui <- function(request) {
             div(class = "box_outputs", h4("Interventions for Baseline")),
             
             source("./www/ui/interventions_baseline.R", local = TRUE)$value,
-            # div(class = "box_outputs", h4("Timeline of Interventions")),
-            # plotOutput("timevis_baseline", height = 700),
             htmlOutput("text_feedback_interventions_baseline"),
             fluidRow(
               column(1, 
@@ -232,8 +230,6 @@ ui <- function(request) {
           column(10,
                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario")),
                  source("./www/ui/interventions_future.R", local = TRUE)$value,
-                 # div(class = "box_outputs", h4("Timeline of Interventions")),
-                 # plotOutput("timevis_future", height = 700),
                  htmlOutput("text_feedback_interventions_future"),
                  fluidRow(
                    column(1, 
@@ -522,7 +518,8 @@ server <- function(input, output, session) {
     }
     
     if(version_template != "Template v17") {
-      showNotification(HTML("The format of the file is not recognised. </br> Upload a 'v17 template' to change defaults paramaters."), type = "error", duration = 8)
+      showNotification(HTML("The format of the file is not recognised. </br> Upload a 'v17 template' to change defaults parameters."), 
+                       type = "error", duration = 8)
       return(NULL)
     }
     
