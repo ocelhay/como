@@ -11,8 +11,8 @@
 }
 
 #logo { 
-  width: 40%;
-  float:left;
+  width: 30%;
+  float:right;
 }
 
 #logo-top {
@@ -23,9 +23,8 @@
 
 #map {
   margin-top: 5px;
-  margin-bottom: 5px;
   width: 100%;
-  border: 1px solid black;
+  border: 1px solid grey;
 }
 
 
@@ -81,8 +80,9 @@
 
 .shiny-notification {
     margin: auto;
-    width: 650px;
+    width: 600px;
     position:fixed;
+    text-align: center;
     opacity: 1;
     bottom: calc(40%);
     left: calc(35%);

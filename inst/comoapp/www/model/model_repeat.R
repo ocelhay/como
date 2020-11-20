@@ -171,12 +171,10 @@ parameters["nu_ventc"]<-1/parameters["nu_ventc"]
 parameters["pclin"]<-parameters["pclin"]/100
 parameters["prob_icu"]<-parameters["prob_icu"]/100
 parameters["prob_vent"]<-parameters["prob_vent"]/100
-iterations<-parameters["iterations"]
-noise<-parameters["noise"]
-confidence<-parameters["confidence"]/100
+
+parameters["confidence"]<-parameters["confidence"]/100
 parameters["mass_test_sens"]<-parameters["mass_test_sens"]/100
-age_testing_min<-(parameters["age_testing_min"])
-age_testing_max<-(parameters["age_testing_max"])
+
 parameters["isolation_days"]<-parameters["isolation_days"]
 parameters["propo2"]<-parameters["propo2"]/100
 parameters["dexo2"]<-parameters["dexo2"]/100

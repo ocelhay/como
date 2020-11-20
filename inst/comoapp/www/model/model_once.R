@@ -37,7 +37,7 @@ new_coverage_value <- 0
 hc_export_items <- c("downloadPNG", "downloadCSV", "downloadXLS")
 
 # Model elements that are independants of inputs ----
-A <- length(age_categories)
+A <- 21
 # per year ageing matrix
 ageing <- t(diff(diag(rep(1, A)), lag = 1) / (5 * 365.25))
 ageing <- cbind(ageing, 0 * seq(1:A)) # no ageing from last compartment
@@ -86,7 +86,7 @@ aci <- floor((ageindcase / 5) + 1)
 # those should have noise added when user decide to
 parameters_noise <- c("p", "rho", "omega", "gamma", "nui", "ihr_scaling","nus", "nu_icu","nu_vent",
                       "rhos", "selfis_eff", "dist_eff", "hand_eff", "mask_eff", "work_eff", 
-                      "w2h", "school_eff", "s2h", "cocoon_eff", "mean_imports", "screen_overdispersion", 
+                      "w2h", "s2h", "cocoon_eff", "mean_imports", "screen_overdispersion", 
                       "quarantine_effort", "quarantine_eff_home", "quarantine_eff_other")
 
 source("./www/model/fun_validation_interventions.R")

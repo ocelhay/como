@@ -31,7 +31,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   parameters_dup <- parameters  # duplicate parameters to add noise 
   
   for (i in 1:parameters["iterations"]) {
-    showNotification(paste("Run", i, "of", parameters["iterations"]), duration = 3, type = "message")
+    showNotification(id = "msg_run", paste("Run", i, "of", parameters["iterations"]), type = "message", duration = 3)
     
     # Add noise to parameters only if there are several iterations
     if (parameters["iterations"] > 1) {
@@ -40,7 +40,6 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     }
     
     covidOdeCpp_reset()
-    
     mat_ode <- ode(
       y = Y, times = times, method = "euler", hini = 0.05,
       func = covidOdeCpp, parms = parameters_dup,
@@ -57,9 +56,6 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
       mort_col = mort,
       age_group_vectors = age_group_vectors
     )
-    
-    
-    
     aux[, , i] <- mat_ode
     
     # Use spline function
@@ -140,8 +136,6 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     }
   }
   
-  if (parameters["iterations"] > 1)  showNotification("Aggregation of results. This step can take up to 30 seconds.", duration = NULL, type = "message", id = "aggregation_results")
-  
   if (parameters["iterations"] == 1) {
     results$mean_infections <- infections
     results$min_infections <- infections
@@ -169,6 +163,8 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   }
   
   if (parameters["iterations"] > 1) {
+    showNotification(HTML("Aggregation of results. <br>This step may take several minutes."), duration = NULL, type = "message", id = "aggregation_results")
+
     results$mean_infections <- apply(infections, 1, quantile, probs = 0.5)
     results$min_infections <- apply(infections, 1, quantile, probs = parameters["confidence"])
     results$max_infections <- apply(infections, 1, quantile, probs = (1 - parameters["confidence"]))
@@ -185,12 +181,11 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     results$min_Rt <- apply(Rt_aux, 1, quantile, probs = parameters["confidence"], na.rm = TRUE)
     results$max_Rt <- apply(Rt_aux, 1, quantile, probs = (1 - parameters["confidence"]), na.rm = TRUE)
     
-    # runs in 37 sec with 10 runs / 205 days
     results$mean <- apply(aux, 1:2, quantile, probs = 0.5)
     results$min <- apply(aux, 1:2, quantile, probs = parameters["confidence"])
     results$max <- apply(aux, 1:2, quantile, probs = (1 - parameters["confidence"]))
+
+    removeNotification(id = "aggregation_results")
   }
-  
-  if (parameters["iterations"] > 1)  removeNotification(id = "aggregation_results")
   return(results)
 }

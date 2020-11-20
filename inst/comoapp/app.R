@@ -66,7 +66,6 @@ ui <- function(request) {
                  column(8,
                         span(img(src = "./como_logo.png", id = "logo"),
                              includeMarkdown("./www/markdown/welcome.md")),
-                        br(), 
                         strong("CoMo Consortium member countries’ stages of engagement with policymakers") %>%
                           helper(content = "stages_countries", colour = "red"),
                         tags$img(src = "./como_policy_makers.png", id = "map")
@@ -224,8 +223,12 @@ ui <- function(request) {
         a(id = "anchor_interventions", style = "visibility: hidden", ""),
         fluidRow(
           column(2, br(),
+                 div(class = "float_bottom_left",
                  actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success"), br(), br(),
-                 uiOutput("conditional_run_future")
+                 uiOutput("conditional_run_future"),
+                 br(),
+                 uiOutput("conditional_float_results")
+                 )
           ),
           column(10,
                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario")),
@@ -253,13 +256,14 @@ ui <- function(request) {
         fluidRow(
           column(
             2, 
-            uiOutput("conditional_float_results"),
-            a(id = "anchor_summary", style="visibility: hidden", "")
+            # uiOutput("conditional_float_results"),
+            # a(id = "anchor_summary", style="visibility: hidden", "")
           ),
           column(
             10,
             shinyjs::hidden(
               div(id = "results_interventions_1",
+                  a(id = "anchor_summary", style="visibility: hidden", ""),
                   prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
                                      selected = "Predicted Reported + Unreported", inline = TRUE),
                   fluidRow(
@@ -484,13 +488,13 @@ server <- function(input, output, session) {
   
   output$conditional_run_future <- renderUI({
     if(interventions$valid_future_interventions) {
-      actionButton("run_interventions", "Run Hypothetical Scenario", class = "btn btn-success")
+      actionButton("run_interventions", "Run Hypoth. Scenario", class = "btn btn-success")
     }
   })
   
   output$conditional_float_results <- renderUI({
     if(simul_interventions$interventions_available){
-      div(class = "float_bottom_left",
+      div(
           p("Go to:"),
           tags$ul(
             tags$li(a("Building Interventions", href = '#anchor_interventions')),
@@ -643,7 +647,7 @@ server <- function(input, output, session) {
     if(! all(interventions_excel$intervention %in% valid_interventions_v17)) stop("Stop, some interventions are not valid.")
 
     if(msg_update_param != "The following Global Simulations Parameters were updated: <br>") {
-      showNotification(HTML(msg_update_param), duration = NULL)
+      showNotification(HTML(msg_update_param), duration = NULL, type = "message")
     }
     
     # / Baseline
@@ -709,14 +713,18 @@ server <- function(input, output, session) {
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other, 
                           age_group_vectors = interventions$baseline_age_groups)
+    
+    showNotification("Processing results", duration = NULL, id = "msg_processing", type = "message")
     simul_baseline$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
                                                   ifr, mort, popstruc, intv_vector = vectors)
+    removeNotification(id = "msg_processing")
+    
     simul_baseline$baseline_available <- TRUE
     
     showNotification("Displaying results", duration = 3, type = "message")
     shinyjs::show(id = "results_baseline", anim = FALSE)
     # need a small pause 
-    Sys.sleep(1)
+    Sys.sleep(0.2)
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
   
@@ -740,9 +748,9 @@ server <- function(input, output, session) {
                                                   ifr, mort, popstruc, intv_vector = vectors)
     simul_baseline$baseline_available <- TRUE
     
-    showNotification("Displaying results", duration = 3, type = "message")
+    showNotification("Displaying results", duration = 5, type = "message")
     # need a small pause 
-    Sys.sleep(1)
+    Sys.sleep(0.2)
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
   
@@ -770,11 +778,11 @@ server <- function(input, output, session) {
                                                        ifr, mort, popstruc, intv_vector = vectors)
     simul_interventions$interventions_available <- TRUE
     
-    showNotification("Displaying results", duration = 3, type = "message")
+    showNotification("Displaying results", duration = 5, type = "message")
     shinyjs::show(id = "results_interventions_1", anim = FALSE)
     shinyjs::show(id = "results_interventions_2", anim = FALSE)
     # need a small pause 
-    Sys.sleep(1)
+    Sys.sleep(0.2)
     runjs('document.getElementById("anchor_summary").scrollIntoView();')
   })
   

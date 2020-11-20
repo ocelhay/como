@@ -6,17 +6,21 @@ list(
                    div(class = "box_interventions", h4(icon("hand-paper"), " Handwashing")),
                    sliderInput("hand_eff", label = "Efficacy of handwashing:", value = 20, min = 0, max = 25,
                                step = 1, post = "%", ticks = FALSE),
+
                    div(class = "box_interventions", h4("Mask Wearing")),
                    sliderInput("mask_eff", label = "Efficacy of mask wearing:", value = 15, min = 0, max = 35,
                                step = 1, post = "%", ticks = FALSE),
+                               
                    div(class = "box_interventions", h4(icon("house-user"), "Working at Home")),
                    sliderInput("work_eff", label = "Efficacy of working from home:", value = 85, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),
                    sliderInput("w2h", label = "Home contacts inflation due to working from home:", value = 10, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),
+
                    div(class = "box_interventions", h4(icon("school"), "School Closures")),
                    sliderInput("s2h", label = "Home contacts inflation due to school closure:", value = 20, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),
+
                    div(class = "box_interventions", h4("Social Distancing")),
                    sliderInput("dist_eff", label = "Adherence to social distancing:", value = 100, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE)
@@ -25,10 +29,6 @@ list(
                    div(class = "box_interventions", h4(icon("syringe"), "Vaccination")),
                    sliderInput("vac_campaign", label = "Time to reach target coverage:", value = 4, min = 1, max = 52,
                                step = 1, post = " weeks", ticks = FALSE),
-                   sliderInput("age_vaccine_min", label = "Minimum age for vaccination:", value = 10, min = 0, max = 100,
-                               step = 1, post = " years", ticks = FALSE),
-                   sliderInput("age_vaccine_max", label = "Maximum age for vaccination:", value = 60, min = 0, max = 100,
-                               step = 1, post = " years", ticks = FALSE),
                    sliderInput("vac_dur", label = "Duration of efficacious period", value = 100, min = 0, max = 100, step = 0.1, post = " years", ticks = FALSE, width = "75%"),
                    sliderInput("vac_dur_r", label = "Duration of efficacious period if previously infected", value = 100, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE, width = "75%"),
                    sliderInput("vaccine_eff", label = "Efficacy of vaccine:", value = 100, min = 0, max = 100,
@@ -46,6 +46,7 @@ list(
                    div(class = "box_interventions", h4("Self-isolation if Symptomatic")),
                    sliderInput("selfis_eff", label = "Adherence to self-isolation:", value = 50, min = 0, max = 100,
                                step = 1, post = "%", ticks = FALSE),
+
                    div(class = "box_interventions", h4("(*Self-isolation) Screening")),
                    sliderInput("screen_overdispersion", label = "Overdispersion of cases around index case. If  1 likelihood same as general population:", value = 4, min = 1, max = 5,
                                step = 0.2, ticks = FALSE),
@@ -53,9 +54,7 @@ list(
                                step = 1, post = "%", ticks = FALSE),
                    div(class = "box_interventions", h4("Mass Testing")),
                    sliderInput("mass_test_sens", label = "Sensitivity", value = 80, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
-                   sliderInput("isolation_days", label = "Isolation days", value = 14, min = 0, max = 100, step = 1, post = " days", ticks = FALSE),
-                   sliderInput("age_testing_min", label = "Minimum age for mass testing (0 to 100)", value = 20, min = 0, max = 100, step = 1, post = " y.o.", ticks = FALSE),
-                   sliderInput("age_testing_max", label = "Maximum age for mass testing (0 to 100)", value = 60, min = 0, max = 100, step = 1, post = " y.o.", ticks = FALSE),
+                   sliderInput("isolation_days", label = "Isolation days", value = 14, min = 0, max = 100, step = 1, post = " days", ticks = FALSE)
                    ),
             column(3, 
                    div(class = "box_interventions", h4("(*Self-isolation) Household Isolation")),
@@ -67,6 +66,7 @@ list(
                                min = 0, max = 100, step = 5, post = "%", ticks = FALSE),
                    sliderInput("quarantine_eff_home", label = "Increase in the number of contacts at home when quarantined:", value = 100, 
                                min = 0, max = 100, step = 5, post = "%", ticks = FALSE),
+
                    div(class = "box_interventions", h4("Dexamethasone")),
                    sliderInput("dexo2", label = "Relative risk of dying if needing O2 and taking Dex", value =  82, min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
                    sliderInput("dexv", label = "Relative risk of dying if needing ventilation and taking Dex", value = 64 , min = 0, max = 100, step = 1, post = "%", ticks = FALSE),
