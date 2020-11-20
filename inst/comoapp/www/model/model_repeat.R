@@ -79,13 +79,13 @@ parameters <- reactiveValuesToList(input)[
     "pdeath_vent", "pdeath_ventc", "ihr_scaling", "nus", 
     "nu_icu", "nu_vent", "rhos", "amp", 
     "pclin", "prob_icu", "prob_vent", "selfis_eff", "dist_eff", "hand_eff", 
-    "work_eff", "w2h", "s2h", "cocoon_eff", "age_cocoon", 
+    "work_eff", "w2h", "school_eff", "s2h", "cocoon_eff", "age_cocoon", 
     "vaccine_eff", "vac_campaign", "mean_imports", "screen_test_sens", 
     "screen_overdispersion", "quarantine_days", "quarantine_effort", 
     "quarantine_eff_home", "quarantine_eff_other", "household_size", 
     "noise", "iterations", "confidence",
     # additions in v14.14:
-    "age_vaccine_min", "mass_test_sens", "isolation_days", "age_testing_min", "age_testing_max",
+    "mass_test_sens", "isolation_days",
     # additions in v15.1:
     "pdeath_ho", "pdeath_hco", "pdeath_icuo", "pdeath_icuco",
     "propo2", "dexo2", "dexo2c", "dexv", "dexvc", "vent_dex",
@@ -97,15 +97,19 @@ parameters <- reactiveValuesToList(input)[
     "report_cv", "report_vr", "report_cvr", "report_r", "report_cr", "reporth_ICU",
     "report_death_HC", "pdeath_vent_hc", "pdeath_icu_hc", "pdeath_icu_hco",
     "reporth_g", "seroneg",
-    "vaccine_eff_r", "age_vaccine_max", "pre"
-    )] %>% 
+    "vaccine_eff_r", "pre",
+    # addition in v17:
+    "init"
+  )] %>% 
   unlist()
 
 
 parameters <- c(
   parameters, 
   give = 95, 
-  nusc = input$nus, nu_icuc = input$nu_icu, nu_ventc = input$nu_vent, 
+  nusc = input$nus, 
+  nu_icuc = input$nu_icu, 
+  nu_ventc = input$nu_vent, 
   phi = which(month.name == input$phi))
 
 ihr[,2]<- parameters["ihr_scaling"]*ihr[,2]   
@@ -249,9 +253,12 @@ initS<-popstruc[,2]-initE-initI-initCL-initR-initX-initZ-initV-initH-initHC-init
   initQS-initQE-initQI-initQR-initQC-initEV-initER-initEVR-initVR-initQV-initQEV-initQEVR-initQER-initQVR-
   initHCICU-initHCV # Susceptible (non-immune)
 
-  inp <- read_excel(file_path, sheet = "Interventions") %>%
-  filter(! is.na(Intervention))
 
-  # names(inp) <- c("intervention", "date_start", "date_end", "value", "unit", "age_group", "apply_to")
+
+# Define dataframe of interventions ----
+inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (Calibration)"),
+                 interventions$future_mat %>% mutate(`Apply to` = "Hypothetical Scenario")) %>%
+  rename(apply_to = `Apply to`)
+
 
 Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, initICUC, initICUCV, initVent, initVentC, initCMC,initZ, initEV, initER, initEVR, initVR, initQV,initQEV,initQEVR,initQER,initQVR,initHCICU,initHCV,initAb) # initial conditions for the main solution vector

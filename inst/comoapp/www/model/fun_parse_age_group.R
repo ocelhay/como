@@ -1,6 +1,9 @@
 parse_age_group <- function(vec) {
   regx_str <- "^(([0]*([1-9]|1[0-9]|2[0-1]))[\\,\\:])*([0]*([1-9]|1[0-9]|2[0-1]))$"
   output <- rep(0, 21)
+  
+  if(is.na(vec))  return(output)  # added for the app
+  
   vec <- stringr::str_replace_all(vec, "-", ":")
   vec <- stringr::str_replace_all(vec, ";", ",")
   vec <- stringr::str_replace_all(vec, "[:space:]", "")

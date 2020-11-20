@@ -407,18 +407,20 @@ server <- function(input, output, session) {
   
   
   observe({
-    # Create interventions tibble ----
+    # Create interventions tibble with input from UI ----
     interventions$baseline_mat <- tibble(
       intervention = unlist(reactiveValuesToList(input)[paste0("baseline_intervention_", 1:nb_interventions_max)]),
       date_start = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)],
       date_end = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(2, 2*nb_interventions_max, by = 2)],
       value = unlist(reactiveValuesToList(input)[paste0("baseline_coverage_", 1:nb_interventions_max)]),
-      age_group = "1-21",
+      age_group = unlist(map(reactiveValuesToList(input)[paste0("baseline_age_group_", 1:nb_interventions_max)], 
+                             ~ paste(str_sub(.x, 1, 2), collapse = ","))),
       Target = 1:nb_interventions_max) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
                               TRUE ~ "%")) %>%
       filter(intervention != "_")
+    
     
     # Fill list of age groups
     vec <- interventions$baseline_mat$age_group
@@ -433,7 +435,8 @@ server <- function(input, output, session) {
       date_start = do.call("c", reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)],
       date_end = do.call("c", reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)])[seq(2, 2*nb_interventions_max, by = 2)],
       value = unlist(reactiveValuesToList(input)[paste0("future_coverage_", 1:nb_interventions_max)]),
-      age_group = "1-21",
+      age_group = unlist(map(reactiveValuesToList(input)[paste0("future_age_group_", 1:nb_interventions_max)], 
+                             ~ paste(str_sub(.x, 1, 2), collapse = ","))),
       Target = 1:nb_interventions_max) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
@@ -701,7 +704,7 @@ server <- function(input, output, session) {
     vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     
     check_parameters_list_for_na(parameters_list = parameters)
-    
+
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other, 

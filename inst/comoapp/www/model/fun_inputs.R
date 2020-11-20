@@ -1,5 +1,9 @@
 inputs <- function(inp, run, times, startdate, stopdate){
-  
+  inp  <- inp %>% rename(Intervention = intervention, 
+                         `Date Start` = date_start, 
+                         `Date End` = date_end, Value = value,
+                         `Apply to` = apply_to)
+
   # cap intervention start and end dates with simulation end date
   # inp$`Date Start` = pmin(stopdate, inp$`Date Start`)
   # inp$`Date End` = pmin(stopdate, inp$`Date End`)

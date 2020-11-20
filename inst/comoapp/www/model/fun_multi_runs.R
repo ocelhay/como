@@ -40,6 +40,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     }
     
     covidOdeCpp_reset()
+    
     mat_ode <- ode(
       y = Y, times = times, method = "euler", hini = 0.05,
       func = covidOdeCpp, parms = parameters_dup,
@@ -132,14 +133,14 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
                 parameters_dup["gamma"]*mat_ode[,(ERindex+1)])
     ) / sum(popstruc[,2]), 1)
     
-    browser()  # Last error - 2020-11-19
+    
     for (w in (ceiling(1/parameters_dup["nui"])+1):nb_times){
       Rt_aux[w,i]<-cumsum(sum(parameters_dup["gamma"]*mat_ode[w,(Eindex+1)]))/cumsum(sum(parameters_dup["gamma"]*mat_ode[(w-1/parameters_dup["nui"]),(Eindex+1)]))
       if(Rt_aux[w,i] >= 7) {Rt_aux[w,i]  <- NA}
     }
   }
   
-  if (parameters["iterations"] > 1)  showNotification("Aggregation of results (~ 30 secs.)", duration = NULL, type = "message", id = "aggregation_results")
+  if (parameters["iterations"] > 1)  showNotification("Aggregation of results. This step can take up to 30 seconds.", duration = NULL, type = "message", id = "aggregation_results")
   
   if (parameters["iterations"] == 1) {
     results$mean_infections <- infections
