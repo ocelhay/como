@@ -46,7 +46,12 @@ ui <- function(request) {
     pushbar_deps(),
     useShinyjs(),
     chooseSliderSkin('HTML5'),
+    
     title = "CoMo Consortium | COVID-19 App",
+    tags$head(tags$link(rel = "shortcut icon", href = "favicon.ico")),
+    # tags$head(tags$link(rel="icon", 
+    #                     href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAC5VBMVEUaI0McK0grYWw3iIYsYmwcLEkbJkUnUGA2hoQwcXcfNE4bJkU1g4JO2rxQ4sFO27w3ioccLEkbJUUtZ3BL0LVQ4sFP378/pZgeMUwfNlBIxK1N2Ls5kowvbXQ1goFJybFO3L0qXWkgOlJJyrFO27w9npQzfH44jopL0LVP3r4rYGsjQ1hIxq5Q4cBP3786lY4eMUwaI0McKUcxdHhN17pQ4cBCsaAfNE4aI0MaI0MaI0MeMUw1goE+oZY4joo6k40wcXYeMU0bKEYrX2o5j4o0fn8iPlUaI0MdLEkvb3U7lo86lI4+oZY4j4sgN1AaJEMaJEQzfX5O3L1Q4sFM1LgpWGYcK0hCsqFO2rwnUmIcKUdBrZ5N1rkmTF4aI0MtZW9L0rdQ4sFP3r46k40cK0gcKUcrYWw5kYwxc3geM00bJkUtaHFIxa45koweMEwaJEQxdXlN2LtP3788m5IdLEkdLko7mpInUWEdL0tEuaZM1bklSl0dLko7mpEnUGEdL0tEuaZN1rklSl0bJkUtZ3BIxa45kIsdL0saJEQydnpO2rxP4L88nJMdLEkaI0MsZG5L0bZQ4sFP3b45kYwcK0gcKkgrYGs3i4gwcHYfNE4cKUdBrJ1M1rklS14cK0hDsqJO27wnUmIaJEQzfH5O3b1Q4sFM1bgpWWYdLUovbnQ7mZE7lo8+pJg4j4sfNU8aI0MaI0MaJEQaJEQeM001g4I9n5U5j4s6lY4xc3geMEsbJ0YrX2s5kow1gYEhPFMaI0MjQ1hIxa5Q4cBP3r45koweMEsaI0MbKEYwc3hN1rlQ4cBBr58fNE4gOlJJyrFO2rw8m5I0f4A4jYlKz7RP3r4rYGsfNlBIxa5N2bs5kowtZm80gIBJy7JO3L0qXWkbJkU1hINO3L1O3L03i4cdLUkbJkUuaXFL0rZQ4sFP4MA/ppkeMUwcLEkrYGsze30sYWwdLEkbJkUnUmIzenwvbXQfNk8aI0Py3illAAABoklEQVQ4y73TVzjQURzG8TcVGt6iHaHQnhpCZtlJu7QHGorKJls7s6yMFO1Bpb13Ce3SMpLRsMe1ax1/l87t9/Oc5/zOcw7QoauTTOcuXQHIysl3695G79FTgb16K0KpT99+/QcMFMGgwSSVVYaoqpFUHyqCYRokNbWGjxhJctRoEYwZO47jJ0ycpD15CqdO02kdp+vq6c8wMDQyNgFgOnOWmblFq25pZW0z23aOndR8c+fN54KFi6QvYPESkkvtpcGy5SRXrJQGq1avWbtuvQMAODpt2LhJFJudt2x1AQDXbdu5w81dFB6eXgAAbx+Svn4i2OkfAAAIDCIZHCL00LBdu/cAwN59+3ngYPj/PSIyKjrm0GEAiI2LT0gUNjiSRDI5RXrM1KMk045Jg+PpGTxx8lQ7j+30mbPnzl+4mCktsi5dvpJ99dr1GzcB3Lp95+69+yJ68PARHz95+uz5i5fMeZUrgrx8kq/fvH33nuSHjyL49JlkwZev376T/FEogqLiEv4s/YWy8orK33/+tnHSf1XVNbUA6uobGpuaO+7DtgA7s3l4lmqeNgAAAABJRU5ErkJggg==", 
+    #                     type="image/x-icon")),
     
     source("./www/ui/pushbar_parameters_reporting.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
@@ -448,7 +453,7 @@ server <- function(input, output, session) {
       filter(intervention != "_")
     
     # Fill list of age groups
-    vec <- interventions$future_age_groups$age_group
+    vec <- interventions$future_mat$age_group
     if(length(vec) > 0) {
       for (i in 1:length(vec)) {
         interventions$future_age_groups[[i]] <- parse_age_group(vec[i])
