@@ -84,6 +84,7 @@ ageindcase <- 20
 aci <- floor((ageindcase / 5) + 1)
 
 # those should have noise added when user decide to
+# generate_uncertainty.md contains a table listing these parameters
 parameters_noise <- c("p", "rho", "omega", "gamma", "nui", "ihr_scaling","nus", "nu_icu","nu_vent",
                       "rhos", "selfis_eff", "dist_eff", "hand_eff", "mask_eff", "work_eff", 
                       "w2h", "s2h", "cocoon_eff", "mean_imports", "screen_overdispersion", 

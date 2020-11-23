@@ -19,7 +19,7 @@ output$timevis_future_hc <- renderHighchart({
     cat_interventions <-  dta %>% pull(intervention) %>% unique()
     
     hchart(dta, "xrange",
-           hcaes(x = date_start, x2 = date_end, y = intervention_num, partialFill = value/100),
+           hcaes(x = date_start, x2 = date_end, y = intervention_num), # partialFill = value/100),
            dataLabels = list(enabled = TRUE, format = "{point.value}")) %>% 
       hc_tooltip(pointFormat = "{point.label}") %>%
       hc_xAxis(title = FALSE, type = "datetime") %>% 
