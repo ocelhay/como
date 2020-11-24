@@ -154,11 +154,21 @@ ui <- function(request) {
               div(id = "results_baseline",
                   prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
                                      selected = "Observed", inline = TRUE), br(),
-                  
                   fluidRow(
-                    column(4, htmlOutput("text_pct_pop_baseline") %>% withSpinner()),
-                    column(4, htmlOutput("text_attributable_death_baseline") %>% withSpinner()),
-                    column(4, htmlOutput("text_reported_death_baseline") %>% withSpinner())
+                    column(6, h4("Predicted Reported")),
+                    column(6, h4("Predicted Reported + Unreported (Total)"))
+                  ),
+                  fluidRow(
+                    column(
+                      6, 
+                      htmlOutput("text_pct_observed_baseline") %>% withSpinner(),
+                      htmlOutput("text_death_observed_baseline") %>% withSpinner()
+                    ),
+                    column(
+                      6, 
+                      htmlOutput("text_pct_total_baseline") %>% withSpinner(),
+                      htmlOutput("text_death_total_baseline") %>% withSpinner()
+                      )
                   ),
                   br(),
                   fluidRow(
@@ -259,11 +269,7 @@ ui <- function(request) {
         ),
         br(), br(), 
         fluidRow(
-          column(
-            2, 
-            # uiOutput("conditional_float_results"),
-            # a(id = "anchor_summary", style="visibility: hidden", "")
-          ),
+          column(2, ),
           column(
             10,
             shinyjs::hidden(
@@ -275,16 +281,49 @@ ui <- function(request) {
                     column(
                       6,
                       div(class = "box_outputs", h4("Baseline")),
-                      htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner(), br(),
-                      htmlOutput("text_attributable_death_baseline_dup") %>% withSpinner(), br(),
-                      htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()
+                      fluidRow(
+                        column(6, h4("Predicted Reported")),
+                        column(6, h4("Predicted Reported + Unreported (Total)")),
+                      ),
+                      fluidRow(
+                        column(
+                          6, 
+                          htmlOutput("text_pct_observed_baseline_dup") %>% withSpinner(),
+                          htmlOutput("text_death_observed_baseline_dup") %>% withSpinner()
+                        ),
+                        column(
+                          6, 
+                          htmlOutput("text_pct_total_baseline_dup") %>% withSpinner(),
+                          htmlOutput("text_death_total_baseline_dup") %>% withSpinner()
+                        ),
+
+                      )
+                      # htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner(), br(),
+                      # htmlOutput("text_attributable_death_baseline_dup") %>% withSpinner(), br(),
+                      # htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()
                     ),
                     column(
                       6,
                       div(class = "box_outputs", h4("Hypothetical Scenario")),
-                      htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
-                      htmlOutput("text_attributable_death_interventions") %>% withSpinner(), br(), 
-                      htmlOutput("text_reported_death_interventions") %>% withSpinner()
+                      # htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
+                      # htmlOutput("text_attributable_death_interventions") %>% withSpinner(), br(), 
+                      # htmlOutput("text_reported_death_interventions") %>% withSpinner()
+                      fluidRow(
+                        column(6, h4("Predicted Reported")),
+                        column(6, h4("Predicted Reported + Unreported (Total)"))
+                      ),
+                      fluidRow(
+                        column(
+                          6, 
+                          htmlOutput("text_pct_observed_future") %>% withSpinner(),
+                          htmlOutput("text_death_observed_future") %>% withSpinner()
+                        ),
+                        column(
+                          6, 
+                          htmlOutput("text_pct_total_future") %>% withSpinner(),
+                          htmlOutput("text_death_total_future") %>% withSpinner()
+                        )
+                      )
                     )
                   )
               )
@@ -485,7 +524,7 @@ server <- function(input, output, session) {
   output$conditional_validate_baseline <- renderUI({
     if(simul_baseline$baseline_available){
       div(
-        actionButton("open_generate_uncertainty", span(icon("random"), " Generate Uncertainty"), class = "btn btn-success"),br(), br(),
+        actionButton("open_generate_uncertainty", "Generate Uncertainty", class = "btn btn-success"),br(), br(),
         actionButton("validate_baseline", span(icon("thumbs-up"), " Validate the Baseline"), class = "btn btn-success")
       )
     }
@@ -554,9 +593,9 @@ server <- function(input, output, session) {
     }
     
     
-    # Cases Sheet
-    dta <- read_excel(file_path, sheet = "Cases")
-    names(dta) <- c("date", "cases", "deaths")
+    # Epidemiology Sheet
+    dta <- read_excel(file_path, sheet = "Epidemiology")
+    names(dta) <- c("date", "cases", "deaths", "serology")
     
     cases_rv$data <- dta %>%
       mutate(date = as.Date(date), cumulative_death = cumsum(deaths)) %>%
@@ -652,7 +691,7 @@ server <- function(input, output, session) {
     if(! all(interventions_excel$intervention %in% valid_interventions_v17)) stop("Stop, some interventions are not valid.")
 
     if(msg_update_param != "The following Global Simulations Parameters were updated: <br>") {
-      showNotification(HTML(msg_update_param), duration = NULL, type = "message")
+      showNotification(HTML(msg_update_param), duration = NULL)
     }
     
     # / Baseline
@@ -719,14 +758,14 @@ server <- function(input, output, session) {
                           contact_work = contact_work, contact_other = contact_other, 
                           age_group_vectors = interventions$baseline_age_groups)
     
-    showNotification("Processing results", duration = NULL, id = "msg_processing", type = "message")
+    showNotification("Processing results", duration = NULL, id = "msg_processing")
     simul_baseline$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
                                                   ifr, mort, popstruc, intv_vector = vectors)
     removeNotification(id = "msg_processing")
     
     simul_baseline$baseline_available <- TRUE
     
-    showNotification("Displaying results", duration = 3, type = "message")
+    showNotification("Displaying results", duration = 7)
     shinyjs::show(id = "results_baseline", anim = FALSE)
     # need a small pause 
     Sys.sleep(0.2)
@@ -749,11 +788,14 @@ server <- function(input, output, session) {
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other, 
                           age_group_vectors = interventions$baseline_age_groups)
+    
+    showNotification("Processing results", duration = NULL, id = "msg_processing")
     simul_baseline$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
                                                   ifr, mort, popstruc, intv_vector = vectors)
     simul_baseline$baseline_available <- TRUE
     
-    showNotification("Displaying results", duration = 5, type = "message")
+    removeNotification(id = "msg_processing")
+    showNotification("Displaying results", duration = 7)
     # need a small pause 
     Sys.sleep(0.2)
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
@@ -779,11 +821,14 @@ server <- function(input, output, session) {
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other,
                           age_group_vectors = interventions$future_age_groups)
+    
+    showNotification("Processing results", duration = NULL, id = "msg_processing")
     simul_interventions$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
                                                        ifr, mort, popstruc, intv_vector = vectors)
     simul_interventions$interventions_available <- TRUE
     
-    showNotification("Displaying results", duration = 5, type = "message")
+    removeNotification(id = "msg_processing")
+    showNotification("Displaying results", duration = 7)
     shinyjs::show(id = "results_interventions_1", anim = FALSE)
     shinyjs::show(id = "results_interventions_2", anim = FALSE)
     # need a small pause 

@@ -31,7 +31,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   parameters_dup <- parameters  # duplicate parameters to add noise 
   
   for (i in 1:parameters["iterations"]) {
-    showNotification(id = "msg_run", paste("Run", i, "of", parameters["iterations"]), type = "message", duration = 3)
+    showNotification(id = "msg_run", paste("Run", i, "of", parameters["iterations"]), duration = 3)
     
     # Add noise to parameters only if there are several iterations
     if (parameters["iterations"] > 1) {
@@ -163,7 +163,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   }
   
   if (parameters["iterations"] > 1) {
-    showNotification(HTML("Aggregation of results. <br>This step may take several minutes."), duration = NULL, type = "message", id = "aggregation_results")
+    showNotification(HTML("Aggregation of results. <br>This step may take several minutes."), duration = NULL, id = "aggregation_results")
 
     results$mean_infections <- apply(infections, 1, quantile, probs = 0.5)
     results$min_infections <- apply(infections, 1, quantile, probs = parameters["confidence"])

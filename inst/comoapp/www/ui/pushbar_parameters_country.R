@@ -7,7 +7,9 @@ list(
                    pickerInput("country_demographic", label = "Demographic Data:", choices = countries_demographic,
                                selected = "Afghanistan", options = pickerOptions(liveSearch = TRUE)),
                    pickerInput("country_cases", label = "Cases/Deaths:", choices = countries_cases,
-                               selected = "Afghanistan", options = pickerOptions(liveSearch = TRUE))
+                               selected = "Afghanistan", options = pickerOptions(liveSearch = TRUE)),
+                   br(),
+                   p("To provide serology data, fill the Epidemiology sheet of the template and upload it.")
             ),
             column(4,
                    pickerInput("country_contact", label = "Social Contacts Data:", choices = countries_contact,

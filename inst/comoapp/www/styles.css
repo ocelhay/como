@@ -122,18 +122,41 @@ h4 {
   border-radius: 6px;
 }
 
-.n_box_baseline {
-  border: 4px solid #bae4bc;
+
+.n_box_baseline_total {
+  border: 4px solid white;
+  background-color: #74c476;
+  color: black;
   padding: 0 0 5px 5px;
   margin: 4px;
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
-.n_box_interventions {
-  border: 4px solid #3182bd;
+.n_box_baseline_observed {
+  border: 4px solid white;
+  background-color: #00441b;
+  color: #DCDCDC;
   padding: 0 0 5px 5px;
   margin: 4px;
-  border-radius: 6px;
+  border-radius: 10px;
+}
+
+.n_box_interventions_total {
+  border: 4px solid white;
+  background-color: #6baed6;
+  color: black;
+  padding: 0 0 5px 5px;
+  margin: 4px;
+  border-radius: 10px;
+}
+
+.n_box_interventions_observed {
+  border: 4px solid white;
+  background-color: #08306b;
+  color: #DCDCDC;
+  padding: 0 0 5px 5px;
+  margin: 4px;
+  border-radius: 10px;
 }
 
 .icon_box {
