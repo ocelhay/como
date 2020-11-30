@@ -79,7 +79,7 @@ parameters <- reactiveValuesToList(input)[
     "pdeath_vent", "pdeath_ventc", "ihr_scaling", "nus", 
     "nu_icu", "nu_vent", "rhos", "amp", 
     "pclin", "prob_icu", "prob_vent", "selfis_eff", "dist_eff", "hand_eff", 
-    "work_eff", "w2h", "school_eff", "s2h", "cocoon_eff", "age_cocoon", 
+    "work_eff", "w2h", "s2h", "cocoon_eff", "age_cocoon", 
     "vaccine_eff", "vac_campaign", "mean_imports", "screen_test_sens", 
     "screen_overdispersion", "quarantine_days", "quarantine_effort", 
     "quarantine_eff_home", "quarantine_eff_other", "household_size", 
@@ -137,7 +137,6 @@ parameters["hand_eff"]<-parameters["hand_eff"]/100
 parameters["mask_eff"]<-parameters["mask_eff"]/100
 parameters["work_eff"]<-parameters["work_eff"]/100
 parameters["w2h"]<-parameters["w2h"]/100
-# parameters["school_eff"]<-parameters["school_eff"]/100
 parameters["s2h"]<-parameters["s2h"]/100
 parameters["cocoon_eff"]<-parameters["cocoon_eff"]/100
 parameters["age_cocoon"]<-floor((parameters["age_cocoon"]/5)+1)
@@ -171,10 +170,12 @@ parameters["nu_ventc"]<-1/parameters["nu_ventc"]
 parameters["pclin"]<-parameters["pclin"]/100
 parameters["prob_icu"]<-parameters["prob_icu"]/100
 parameters["prob_vent"]<-parameters["prob_vent"]/100
-
-parameters["confidence"]<-parameters["confidence"]/100
+# iterations<-parameters["iterations"]
+# noise<-parameters["noise"]
+# confidence<-parameters["confidence"]/100
 parameters["mass_test_sens"]<-parameters["mass_test_sens"]/100
-
+# age_testing_min<-(parameters["age_testing_min"])
+# age_testing_max<-(parameters["age_testing_max"])
 parameters["isolation_days"]<-parameters["isolation_days"]
 parameters["propo2"]<-parameters["propo2"]/100
 parameters["dexo2"]<-parameters["dexo2"]/100
@@ -259,4 +260,6 @@ inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (C
   rename(apply_to = `Apply to`)
 
 
-Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, initICUC, initICUCV, initVent, initVentC, initCMC,initZ, initEV, initER, initEVR, initVR, initQV,initQEV,initQEVR,initQER,initQVR,initHCICU,initHCV,initAb) # initial conditions for the main solution vector
+Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, 
+     initICUC, initICUCV, initVent, initVentC, initCMC,initZ, initEV, initER, initEVR, initVR, 
+     initQV,initQEV,initQEVR,initQER,initQVR,initHCICU,initHCV,initAb) # initial conditions for the main solution vector

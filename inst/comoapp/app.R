@@ -10,10 +10,10 @@ if (Sys.info()["sysname"] == "Darwin" &
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "16.4.0" )  stop("
-Running the app requires to install the v16.4.0 of the R package comoOdeCpp.
-Run:  remotes::install_github('bogaotory/comoOdeCpp@v16.4.0', subdir = 'comoOdeCpp')
-in the R console to install it.")
+# if(packageVersion("comoOdeCpp") != "16.6.0" )  stop("
+# Running the app requires to install the v16.6.0 of the R package comoOdeCpp.
+# Run:  remotes::install_github('bogaotory/comoOdeCpp@v16.6.0', subdir = 'comoOdeCpp')
+# in the R console to install it.")
 
 library(bsplus)
 library(deSolve)
@@ -41,18 +41,13 @@ source("./www/model/model_once.R")
 # Define UI ----
 ui <- function(request) {
   fluidPage(
+    title = "CoMo Consortium | COVID-19 App",
     theme = shinytheme("flatly"),
     includeCSS("./www/styles.css"),
     pushbar_deps(),
     useShinyjs(),
     chooseSliderSkin('HTML5'),
-    
-    title = "CoMo Consortium | COVID-19 App",
-    # tags$head(tags$link(rel = "shortcut icon", href = "favicon.ico")),
-    # tags$head(tags$link(rel="icon",
-    #                     href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAC5VBMVEUaI0McK0grYWw3iIYsYmwcLEkbJkUnUGA2hoQwcXcfNE4bJkU1g4JO2rxQ4sFO27w3ioccLEkbJUUtZ3BL0LVQ4sFP378/pZgeMUwfNlBIxK1N2Ls5kowvbXQ1goFJybFO3L0qXWkgOlJJyrFO27w9npQzfH44jopL0LVP3r4rYGsjQ1hIxq5Q4cBP3786lY4eMUwaI0McKUcxdHhN17pQ4cBCsaAfNE4aI0MaI0MaI0MeMUw1goE+oZY4joo6k40wcXYeMU0bKEYrX2o5j4o0fn8iPlUaI0MdLEkvb3U7lo86lI4+oZY4j4sgN1AaJEMaJEQzfX5O3L1Q4sFM1LgpWGYcK0hCsqFO2rwnUmIcKUdBrZ5N1rkmTF4aI0MtZW9L0rdQ4sFP3r46k40cK0gcKUcrYWw5kYwxc3geM00bJkUtaHFIxa45koweMEwaJEQxdXlN2LtP3788m5IdLEkdLko7mpInUWEdL0tEuaZM1bklSl0dLko7mpEnUGEdL0tEuaZN1rklSl0bJkUtZ3BIxa45kIsdL0saJEQydnpO2rxP4L88nJMdLEkaI0MsZG5L0bZQ4sFP3b45kYwcK0gcKkgrYGs3i4gwcHYfNE4cKUdBrJ1M1rklS14cK0hDsqJO27wnUmIaJEQzfH5O3b1Q4sFM1bgpWWYdLUovbnQ7mZE7lo8+pJg4j4sfNU8aI0MaI0MaJEQaJEQeM001g4I9n5U5j4s6lY4xc3geMEsbJ0YrX2s5kow1gYEhPFMaI0MjQ1hIxa5Q4cBP3r45koweMEsaI0MbKEYwc3hN1rlQ4cBBr58fNE4gOlJJyrFO2rw8m5I0f4A4jYlKz7RP3r4rYGsfNlBIxa5N2bs5kowtZm80gIBJy7JO3L0qXWkbJkU1hINO3L1O3L03i4cdLUkbJkUuaXFL0rZQ4sFP4MA/ppkeMUwcLEkrYGsze30sYWwdLEkbJkUnUmIzenwvbXQfNk8aI0Py3illAAABoklEQVQ4y73TVzjQURzG8TcVGt6iHaHQnhpCZtlJu7QHGorKJls7s6yMFO1Bpb13Ce3SMpLRsMe1ax1/l87t9/Oc5/zOcw7QoauTTOcuXQHIysl3695G79FTgb16K0KpT99+/QcMFMGgwSSVVYaoqpFUHyqCYRokNbWGjxhJctRoEYwZO47jJ0ycpD15CqdO02kdp+vq6c8wMDQyNgFgOnOWmblFq25pZW0z23aOndR8c+fN54KFi6QvYPESkkvtpcGy5SRXrJQGq1avWbtuvQMAODpt2LhJFJudt2x1AQDXbdu5w81dFB6eXgAAbx+Svn4i2OkfAAAIDCIZHCL00LBdu/cAwN59+3ngYPj/PSIyKjrm0GEAiI2LT0gUNjiSRDI5RXrM1KMk045Jg+PpGTxx8lQ7j+30mbPnzl+4mCktsi5dvpJ99dr1GzcB3Lp95+69+yJ68PARHz95+uz5i5fMeZUrgrx8kq/fvH33nuSHjyL49JlkwZev376T/FEogqLiEv4s/YWy8orK33/+tnHSf1XVNbUA6uobGpuaO+7DtgA7s3l4lmqeNgAAAABJRU5ErkJggg==",
-    #                     type="image/x-icon")),
-    
+
     source("./www/ui/pushbar_parameters_reporting.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_country.R", local = TRUE)[1],
@@ -298,16 +293,10 @@ ui <- function(request) {
                         ),
 
                       )
-                      # htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner(), br(),
-                      # htmlOutput("text_attributable_death_baseline_dup") %>% withSpinner(), br(),
-                      # htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()
                     ),
                     column(
                       6,
                       div(class = "box_outputs", h4("Hypothetical Scenario")),
-                      # htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
-                      # htmlOutput("text_attributable_death_interventions") %>% withSpinner(), br(), 
-                      # htmlOutput("text_reported_death_interventions") %>% withSpinner()
                       fluidRow(
                         column(6, h4("Predicted Reported")),
                         column(6, h4("Predicted Reported + Unreported (Total)"))
@@ -582,14 +571,15 @@ server <- function(input, output, session) {
     version_template <- names(version)[1]
     
     if(! is.character(version_template)) {
-      showNotification("The uploaded file isn't in the right format.", type = "error", duration = 8)
-      return(NULL)
+      showNotification("The uploaded file isn't in the right format.", 
+            type = "error", duration = 10)
+      return(NULL)  # exit
     }
     
     if(version_template != "Template v17") {
       showNotification(HTML("The format of the file is not recognised. </br> Upload a 'v17 template' to change defaults parameters."), 
-                       type = "error", duration = 8)
-      return(NULL)
+                       type = "error", duration = 10)
+      return(NULL)  # exit
     }
     
     
@@ -679,22 +669,22 @@ server <- function(input, output, session) {
       }
       updatePickerInput(session, inputId = "country_contact", selected = param$Value_Country[param$Parameter == "country_contact"])
     }
-    
-    # Update list of interventions
-    interventions_excel <- read_excel(file_path, sheet = "Interventions") %>%
-      filter(!is.na(Intervention))
-    names(interventions_excel) <- c("intervention", "date_start", "date_end", "value", "unit", "age_group", "apply_to")
-
-    # interventions_excel$Target <- 1:nrow(interventions_excel)
-    
-    if(all(interventions_excel$intervention %in% valid_interventions_v17)) message("Okay, all interventions are valid.")
-    if(! all(interventions_excel$intervention %in% valid_interventions_v17)) stop("Stop, some interventions are not valid.")
 
     if(msg_update_param != "The following Global Simulations Parameters were updated: <br>") {
       showNotification(HTML(msg_update_param), duration = NULL)
     }
     
-    # / Baseline
+    # Update interventions in the UI: read "Interventions" sheet and validate
+    interventions_excel <- read_excel(file_path, sheet = "Interventions") %>%
+      filter(!is.na(Intervention))
+    names(interventions_excel) <- c("intervention", "date_start", "date_end", "value", "unit", "age_group", "apply_to")
+    
+    if(all(interventions_excel$intervention %in% valid_interventions_v17)) message("Okay, all interventions are valid.")
+    if(! all(interventions_excel$intervention %in% valid_interventions_v17)) stop("Stop, some interventions are not valid.")
+
+    
+    
+    # Update interventions in the UI: baseline interventions
     interventions_excel_baseline <- interventions_excel %>% 
     filter(apply_to == "Baseline (Calibration)")
     
@@ -710,7 +700,7 @@ server <- function(input, output, session) {
       }
     }
     
-    # / Future
+    # Update interventions in the UI: future interventions
     interventions_excel_future <- interventions_excel %>% 
     filter(apply_to == "Hypothetical Scenario")
     nb_interventions_future <- interventions_excel_future %>% nrow()

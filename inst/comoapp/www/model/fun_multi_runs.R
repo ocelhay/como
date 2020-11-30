@@ -63,11 +63,11 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     crit<-c()
     critV<-c()
     
-    for (t in 1:length(times)){
-      critH[t]<-min(1-fH((sum(mat_ode[t,(Hindex+1)]))+sum(mat_ode[t,(ICUCindex+1)])+sum(mat_ode[t,(ICUCVindex+1)])),1)
-      crit[t]<-min(1-fICU((sum(mat_ode[t,(ICUindex+1)]))+(sum(mat_ode[t,(Ventindex+1)]))+(sum(mat_ode[t,(VentCindex+1)]))))
-      critV[t]<-min(1-fVent((sum(mat_ode[t,(Ventindex+1)]))),1)
-    }
+    for (ii in 1:length(times)){
+        critH[ii]<-min(1-fH((sum(mat_ode[ii,(Hindex+1)]))+sum(mat_ode[ii,(ICUCindex+1)])+sum(mat_ode[ii,(ICUCVindex+1)])),1)
+        crit[ii]<-min(1-fICU((sum(mat_ode[ii,(ICUindex+1)]))+(sum(mat_ode[ii,(Ventindex+1)]))+(sum(mat_ode[ii,(VentCindex+1)]))),1)
+        critV[ii]<-min(1-fVent((sum(mat_ode[ii,(Ventindex+1)]))),1)
+      }
 
     # daily incidence
     incidence<-parameters_dup["report"]*parameters_dup["gamma"]*(1-parameters_dup["pclin"])*mat_ode[,(Eindex+1)]%*%(1-ihr[,2])+
@@ -80,7 +80,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
       parameters_dup["report_cvr"]*parameters_dup["gamma"]*parameters_dup["pclin_vr"]*mat_ode[,(EVRindex+1)]%*%(1-parameters_dup["sigmaEVR"]*ihr[,2])+
       parameters_dup["report_r"]*parameters_dup["gamma"]*(1-parameters_dup["pclin_r"])*mat_ode[,(ERindex+1)]%*%(1-parameters_dup["sigmaER"]*ihr[,2])+
       parameters_dup["report_cr"]*parameters_dup["gamma"]*parameters_dup["pclin_r"]*mat_ode[,(ERindex+1)]%*%(1-parameters_dup["sigmaER"]*ihr[,2])
-    
+      
     incidenceh<- parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*parameters_dup["reporth"]+
       parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*(1-parameters_dup["reporth"])*parameters_dup["reporth_g"]+
       parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*parameters_dup["reporth"]+
@@ -121,6 +121,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
                                )
     
     # overtime proportion of the  population that is infected
+    # different from covidage_v16.5.R
     infections[, i] <- round(100 * cumsum(
       rowSums(parameters_dup["gamma"]*mat_ode[,(Eindex+1)]+
                 parameters_dup["gamma"]*mat_ode[,(QEindex+1)]+
