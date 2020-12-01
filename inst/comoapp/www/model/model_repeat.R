@@ -198,6 +198,8 @@ parameters["pdeath_icu_hco"]<-parameters["pdeath_icu_hco"]/100
 parameters["reporth_g"]<-parameters["reporth_g"]/100
 parameters["seroneg"]<-(1/parameters["seroneg"])
 
+parameters["school_eff"] <- 0
+
 ihr[,2] <- parameters["ihr_scaling"] * ihr[,2]
 
 # Define dataframe of interventions ----

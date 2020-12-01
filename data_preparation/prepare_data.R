@@ -3,6 +3,7 @@
 # Prolegomenon ----
 # setwd("/Users/olivier/Documents/CoMo/como/data_preparation/raw_data/")
 library(oxcovid19)
+library(RCurl)
 library(readxl)
 library(tidyverse)
 

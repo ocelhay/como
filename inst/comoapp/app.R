@@ -8,12 +8,17 @@ if (Sys.info()["sysname"] == "Darwin" &
   Sys.setenv(PATH = paste("/usr/local/bin", Sys.getenv("PATH"), sep = ":"))
 }
 
-# Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
+# Bug in 16.2.5
+# remove.packages("comoOdeCpp")
+# library(devtools)
+# devtools::install_github('bogaotory/comoOdeCpp@v16.2.2', subdir = 'comoOdeCpp')
+
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "16.2.0" )  stop("
-Running the app requires to install the v16.2.0 of the R package comoOdeCpp.
-Run:  remotes::install_github('bogaotory/comoOdeCpp@v16.2.0', subdir = 'comoOdeCpp')
+if(packageVersion("comoOdeCpp") != "16.2.2" )  stop("
+Running the app requires to install the v16.2.2 of the R package comoOdeCpp.
+Run:   devtools::install_github('bogaotory/comoOdeCp/comoOdeCppp@v16.2.2')
 in the R console to install it.")
+
 
 library(bsplus)
 library(deSolve)
