@@ -132,7 +132,7 @@ h4 {
   border-radius: 10px;
 }
 
-.n_box_baseline_observed {
+.n_box_baseline_reported {
   border: 4px solid white;
   background-color: #00441b;
   color: #DCDCDC;
@@ -150,7 +150,7 @@ h4 {
   border-radius: 10px;
 }
 
-.n_box_interventions_observed {
+.n_box_interventions_reported {
   border: 4px solid white;
   background-color: #08306b;
   color: #DCDCDC;

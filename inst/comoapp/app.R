@@ -156,8 +156,8 @@ ui <- function(request) {
                   fluidRow(
                     column(
                       6, 
-                      htmlOutput("text_pct_observed_baseline") %>% withSpinner(),
-                      htmlOutput("text_death_observed_baseline") %>% withSpinner()
+                      htmlOutput("text_pct_reported_baseline") %>% withSpinner(),
+                      htmlOutput("text_death_reported_baseline") %>% withSpinner()
                     ),
                     column(
                       6, 
@@ -283,8 +283,8 @@ ui <- function(request) {
                       fluidRow(
                         column(
                           6, 
-                          htmlOutput("text_pct_observed_baseline_dup") %>% withSpinner(),
-                          htmlOutput("text_death_observed_baseline_dup") %>% withSpinner()
+                          htmlOutput("text_pct_reported_baseline_dup") %>% withSpinner(),
+                          htmlOutput("text_death_reported_baseline_dup") %>% withSpinner()
                         ),
                         column(
                           6, 
@@ -304,8 +304,8 @@ ui <- function(request) {
                       fluidRow(
                         column(
                           6, 
-                          htmlOutput("text_pct_observed_future") %>% withSpinner(),
-                          htmlOutput("text_death_observed_future") %>% withSpinner()
+                          htmlOutput("text_pct_reported_future") %>% withSpinner(),
+                          htmlOutput("text_death_reported_future") %>% withSpinner()
                         ),
                         column(
                           6, 

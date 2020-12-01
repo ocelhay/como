@@ -284,7 +284,7 @@
     # End snippet v16.5 lines 1863-1893 ----
     
     # Start bridge v16.5 ----
-    # Beds/ventilators occupancies
+  
     results$reportable_deaths <- results$attributable_deaths + results$death_natural_exposed
     results$total_reportable_deaths_end <- last(results$total_reportable_deaths)
     results$total_cm_deaths_end <- round(last(results$cum_mortality))
