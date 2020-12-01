@@ -157,7 +157,7 @@ ui <- function(request) {
                     column(
                       6, 
                       htmlOutput("text_pct_reported_baseline") %>% withSpinner(),
-                      htmlOutput("text_death_reported_baseline") %>% withSpinner()
+                      # htmlOutput("text_death_reported_baseline") %>% withSpinner()
                     ),
                     column(
                       6, 
@@ -284,7 +284,7 @@ ui <- function(request) {
                         column(
                           6, 
                           htmlOutput("text_pct_reported_baseline_dup") %>% withSpinner(),
-                          htmlOutput("text_death_reported_baseline_dup") %>% withSpinner()
+                          # htmlOutput("text_death_reported_baseline_dup") %>% withSpinner()
                         ),
                         column(
                           6, 
@@ -305,7 +305,7 @@ ui <- function(request) {
                         column(
                           6, 
                           htmlOutput("text_pct_reported_future") %>% withSpinner(),
-                          htmlOutput("text_death_reported_future") %>% withSpinner()
+                          # htmlOutput("text_death_reported_future") %>% withSpinner()
                         ),
                         column(
                           6, 
@@ -349,13 +349,13 @@ ui <- function(request) {
                 fluidRow(
                   column(5, offset = 2,
                          highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                         plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br(),
+                         # plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br(),
                          plotOutput("plot_total_deaths_age_baseline") %>% withSpinner(), br(),
                          plotOutput("plot_mortality_lag_baseline") %>% withSpinner(), br()
                   ),
                   column(5,
                          highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                         plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br(),
+                         # plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br(),
                          plotOutput("plot_total_deaths_age_interventions") %>% withSpinner(), br(),
                          plotOutput("plot_mortality_lag_interventions") %>% withSpinner(), br()
                   )

@@ -19,11 +19,15 @@ process_ode_outcome <- function(out, param_used, startdate, times, ihr, ifr, mor
   results$min$pct_total_pop_infected <- out$min_infections
   results$max$pct_total_pop_infected <- out$max_infections
   
-  
   # Daily incidence
   ifelse(is.null(dim(out$mean_cases)), results$med$daily_incidence <- round(out$mean_cases), results$med$daily_incidence <- round(out$mean_cases[, 1]))
   ifelse(is.null(dim(out$min_cases)), results$min$daily_incidence <- round(out$min_cases), results$min$daily_incidence <- round(out$min_cases[, 1]))
   ifelse(is.null(dim(out$max_cases)), results$max$daily_incidence <- round(out$max_cases), results$max$daily_incidence <- round(out$max_cases[, 1]))
+  
+  # overtime proportion of the population that has been reported infected (cumulative)
+  results$med$pct_reported_pop_infected <- round(100 * cumsum(results$med$daily_incidence) / results$med$N, 1)
+  results$min$pct_reported_pop_infected <- round(100 * cumsum(results$min$daily_incidence) / results$min$N, 1)
+  results$max$pct_reported_pop_infected <- round(100 * cumsum(results$max$daily_incidence) / results$max$N, 1)
   
   # Daily total cases
   ifelse(is.null(dim(out$mean_daily_infection)), results$med$daily_total_cases <- round(out$mean_daily_infection), results$med$daily_total_cases <- round(out$mean_daily_infection[, 1]))
