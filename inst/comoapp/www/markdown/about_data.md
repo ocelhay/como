@@ -5,7 +5,7 @@
 
 **Tests Data:**
 
-<a href="https://ourworldindata.org/coronavirus-testing" target="_blank">Our Wold in Data</a>. Last updated: 2020-11-02.
+<a href="https://ourworldindata.org/coronavirus-testing" target="_blank">Our World in Data</a>. Last updated: 2020-12-01.
 
 
 **Severity/Mortality by Age Category:**
