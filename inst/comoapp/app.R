@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v17-beta.1"
+version_app <- "v17-beta.2"
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -981,22 +981,21 @@ server <- function(input, output, session) {
     startdate <- input$date_range[1]
     stopdate <- input$date_range[2]
     times <- seq(0, as.numeric(stopdate - startdate))
-    inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (Calibration)"),
-                     interventions$future_mat %>% mutate(`Apply to` = "Hypothetical Scenario")) %>%
-      rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
+    inp <- bind_rows(interventions$baseline_mat %>% mutate(apply_to = "Baseline (Calibration)"),
+                     interventions$future_mat %>% mutate(apply_to = "Hypothetical Scenario"))
     
     vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     vectors0_cbind <- do.call(cbind, vectors0)
     vectors0_reduced <- vectors0_cbind[seq(from=0,to=nrow(vectors0_cbind),by=20),]
     vectors0_reduced <- as.data.frame(rbind(rep(0,ncol(vectors0_reduced)),vectors0_reduced))
-    vectors0_reduced <- vectors0_reduced[,1:10] #subsetting only the coverages
+    vectors0_reduced <- vectors0_reduced[,1:12] #subsetting only the coverages - total of 12 different interventions
     names(vectors0_reduced) <- paste0("interventions_baseline_",names(vectors0_reduced))
     
     vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
     vectors_cbind <- do.call(cbind, vectors)
     vectors_reduced <- vectors_cbind[seq(from=0,to=nrow(vectors_cbind),by=20),]
     vectors_reduced <- as.data.frame(rbind(rep(0,ncol(vectors_reduced)),vectors_reduced))
-    vectors_reduced <- vectors_reduced[,1:10] #subsetting only the coverages
+    vectors_reduced <- vectors_reduced[,1:12] #subsetting only the coverages - total of 12 different interventions
     names(vectors_reduced) <- paste0("interventions_hypothetical_",names(vectors_reduced))
     
     intv_vectors <- as_tibble(cbind(date=simul_baseline$results$time, vectors0_reduced, vectors_reduced))

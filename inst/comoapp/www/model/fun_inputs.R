@@ -1,4 +1,4 @@
-inputs <- function(inp, run, times, startdate, stopdate){
+inputs <- function(inp, run, times, startdate, stopdate) {
   inp  <- inp %>% rename(Intervention = intervention, 
                          `Date Start` = date_start, 
                          `Date End` = date_end, Value = value,
