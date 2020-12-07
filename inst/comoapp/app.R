@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v17-beta.2"
+version_app <- "v17-beta.3"
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -222,7 +222,8 @@ ui <- function(request) {
                   fluidRow(
                     column(6, plotOutput("plot_total_deaths_age", height = "400px") %>% withSpinner()),
                     column(6, plotOutput("plot_Rt_baseline", height = "400px") %>% withSpinner())
-                  )
+                  ),
+                  plotOutput("plot_seroprev_baseline", height = "400px") %>% withSpinner()
               )
             )
           )
@@ -234,7 +235,7 @@ ui <- function(request) {
         fluidRow(
           column(2, br(),
                  div(class = "float_bottom_left",
-                 actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success"), br(), br(),
+                 actionButton("reset_baseline", span(icon("eraser"), "Reset Baseline"), class="btn btn-success"), br(), br(),
                  uiOutput("conditional_run_future"),
                  br(),
                  uiOutput("conditional_float_results")
@@ -514,14 +515,14 @@ server <- function(input, output, session) {
     if(simul_baseline$baseline_available){
       div(
         actionButton("open_generate_uncertainty", "Generate Uncertainty", class = "btn btn-success"),br(), br(),
-        actionButton("validate_baseline", span(icon("thumbs-up"), " Validate the Baseline"), class = "btn btn-success")
+        actionButton("validate_baseline", span(icon("thumbs-up"), " Validate Baseline"), class = "btn btn-success")
       )
     }
   })
   
   output$conditional_run_future <- renderUI({
     if(interventions$valid_future_interventions) {
-      actionButton("run_interventions", "Run Hypoth. Scenario", class = "btn btn-success")
+      actionButton("run_interventions", "Run Scenario", class = "btn btn-success")
     }
   })
   
