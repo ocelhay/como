@@ -5,6 +5,7 @@ rm(list = ls())
 remove.packages("shinybox")
 detach("package:shinybox", unload = TRUE)
 remotes::install_github("ocelhay/shinybox", auth_token = "")
+
 library(shinybox)
 
 # Check that the package is working.
@@ -30,12 +31,12 @@ shinybox(
   app_name = "CoMo",
   author = "CoMo Condortium",
   description = "Model from the Covid-19 International Modelling Consortium",
-  semantic_version = "v16.2.6", 
+  semantic_version = "v17.1.0", # important to respect the format v.x.y.z
   mran_date = "2020-09-30",
   cran_like_url = NULL,
   mac_url = NULL,
   git_host = "github",
-  git_repo = "ocelhay/como@master",
+  git_repo = "ocelhay/como@dev",
   function_name = "run_app_standalone",
   local_package_path = NULL,
   package_install_opts = list(type = "binary"),
