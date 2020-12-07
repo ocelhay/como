@@ -16,7 +16,7 @@ output$plot_total_deaths_age <- renderPlot({
     geom_text(aes(label = paste0(format(total_deaths, big.mark = ",", scientific = FALSE), " (", freq, "%)")), vjust = -0.2, size = 4) + 
     scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
     scale_fill_brewer(palette = "BrBG") + 
-    ylab("Total Deaths") + xlab("") +
+    ylab("") + xlab("") +
     theme_minimal(base_size = 14) + 
     theme(legend.title = element_blank(), legend.position = "bottom") + 
     labs(title = "Total Covid-19 Deaths per Age Category", subtitle = "Baseline")
