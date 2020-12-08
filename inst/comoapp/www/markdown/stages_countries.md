@@ -1,4 +1,4 @@
-**Updated on November 17, 2020.**
+**Updated on December 8, 2020.**
 
 Stage 1: Preliminary analyses and model calibration to explore optimal containment strategies
 
@@ -21,13 +21,13 @@ Stage 1: Preliminary analyses and model calibration to explore optimal containme
 
 Stage 2: Have engaged with local Ministries of Health (MoH) or relevant policymakers and are in the process of analysing the different strategies under consideration
 
-* Argentina
 * Bangladesh
 * Philippines 
 * Portugal
 
 Stage 3: Have on at least one occasion presented CoMo Consortium model results to the local MoH or relevant policymakers
 
+* Argentina
 * Cameroon
 * Haiti
 * Iran
