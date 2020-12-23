@@ -45,7 +45,7 @@ list(
                    
                    sliderInput("sigmaER", label = "Change in probability of requiring hospitalisation if previously infected", value = 0, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE, width = "75%"),
                    sliderInput("sigmaEVR", label = "Change in probability of requiring hospitalisation if previously infected and vaccinated", value = 0, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE, width = "75%"),
-                   sliderInput("seroneg", label = "Days from seropositve to seronegative", value = 100, min = 0, max = 100, step = 0.1, post = "%", ticks = FALSE, width = "75%")
+                   sliderInput("seroneg", label = "Days from seropositve to seronegative", value = 100, min = 0, max = 1000, step = 10, post = " days", ticks = FALSE, width = "75%")
             )
           ),
           div(class = "closebutton", actionButton("close_virus_param", label = span(icon('times'), " Close (Esc.)"), class = "btn-danger btn-sm"))
