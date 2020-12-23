@@ -20,9 +20,7 @@ output$plot_seroprev_baseline <- renderPlot({
     aux<-c(aux, num.inf.samp / samp.sizes)
   }
   
-  se<-0.75
-  sp<-0.97
-  ab$Ab<-se*aux+(1-sp)*(1-aux)
+  ab$Ab <- (input$se/100) * aux + (1 - (input$sp/100))*(1 - aux)
   
   ab %>%
     filter(mday(Time) %in% c(1, 15)) %>%
@@ -33,7 +31,7 @@ output$plot_seroprev_baseline <- renderPlot({
     geom_boxplot() +
     scale_x_date(date_labels =  "%b %Y") +
     labs(title = "Seroprevalence", 
-         subtitle = "The plot shows the expected seroprevalence at predetermined times\nif we were to sample a user-defined number of individuals and perform an antibody test on them.\nThe prevalence levels shown are corrected for test sensitivity/specificity (resp. 75/97%).", 
+         subtitle = glue("The plot shows the expected seroprevalence at predetermined times\nif we were to sample a user-defined number of individuals and perform an antibody test on them.\nThe prevalence levels shown are corrected for test sensitivity/specificity (resp. {input$se}/{input$sp}%)."), 
          x= "", y = "%") +
     theme_light(base_size = 14)
 })

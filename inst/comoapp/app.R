@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v17-beta.3"
+version_app <- "v17-beta.4"
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -223,7 +223,17 @@ ui <- function(request) {
                     column(6, plotOutput("plot_total_deaths_age", height = "400px") %>% withSpinner()),
                     column(6, plotOutput("plot_Rt_baseline", height = "400px") %>% withSpinner())
                   ),
-                  plotOutput("plot_seroprev_baseline", height = "400px") %>% withSpinner()
+                  fluidRow(
+                    column(1, 
+                           dropdownButton(
+                             div(
+                               sliderInput("se", "Test Sensitivity:", 0, 100, value = 75, post = "%", ticks = FALSE),
+                               sliderInput("sp", "Test Specificty:", 0, 100, value = 97, post = "%", ticks = FALSE)
+                             ),
+                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px")
+                    ),
+                    column(11, plotOutput("plot_seroprev_baseline", height = "400px") %>% withSpinner())
+                  )
               )
             )
           )
@@ -623,7 +633,7 @@ server <- function(input, output, session) {
       mutate(Value_Date = as.Date(Value_Date)) %>%
       drop_na(Parameter)
     
-    msg_update_param <- "The following Global Simulations Parameters were updated: <br><br>"
+    msg_update_param <- "The following 'Global Simulations Parameters' were updated: <br><br>"
     
     # Update all sliders
     if(!is_empty(param$Parameter[param$Type == 'slider'])) {
@@ -671,8 +681,12 @@ server <- function(input, output, session) {
       updatePickerInput(session, inputId = "country_contact", selected = param$Value_Country[param$Parameter == "country_contact"])
     }
 
-    if(msg_update_param != "The following Global Simulations Parameters were updated: <br>") {
+    if(msg_update_param != "The following 'Global Simulations Parameters' were updated: <br><br>") {
       showNotification(HTML(msg_update_param), duration = NULL)
+    }
+    
+    if(msg_update_param == "The following 'Global Simulations Parameters' were updated: <br><br>") {
+      showNotification(HTML("No 'Global Simulations Parameter' was updated."), duration = NULL)
     }
     
     # Update interventions in the UI: read "Interventions" sheet and validate
