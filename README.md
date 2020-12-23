@@ -5,7 +5,8 @@
 [![DOI](https://zenodo.org/badge/251726959.svg)](https://zenodo.org/badge/latestdoi/251726959)
 <!-- badges: end -->
 
-The COVID-19 International Modelling Consortium (CoMo Consortium) was created by researchers at the University of Oxford together with academic colleagues at Cornell University and is partnering with infectious disease modellers and other public health experts from more than 40 countries across Africa, Asia, and South and North America.
+
+[The COVID-19 International Modelling Consortium (CoMo Consortium)](https://como.bmj.com) was created by researchers at the University of Oxford together with academic colleagues at Cornell University and is partnering with infectious disease modellers and other public health experts from more than 40 countries across Africa, Asia, and South and North America.
 
 A model framework was developed by researchers from the University of Oxford and Cornell. The model continues to evolve based on ideas from all members of the Consortium and implemented by the CoMo technical team. The CoMo Consortium has developed an age-structured, compartmental SEIRS (susceptible-exposed-infectious-recovered-susceptible) model to estimate the trajectory of COVID-19 based on different scenarios, and assess the potential impact of the various behavioural change strategies as well as treatment and vaccines, when they become available. 
 The model is continually being updated and refined based on feedback from members of the CoMo Consortium and the developing analytical needs. 
@@ -15,7 +16,7 @@ The model is continually being updated and refined based on feedback from member
 - The latest stable release from the app can be accessed online at https://comomodel.net
 - Standalone versions of the app for Windows and macOS are available: [standalone stable releases](https://github.com/ocelhay/como/releases/latest).
 
-(Experimental.) Pre-releases can be accessed [here](https://github.com/ocelhay/como/releases). 
+(Experimental.) The latest development version is available [as a standalone app](https://github.com/ocelhay/como/releases) or [an online app](https://livedataoxford.shinyapps.io/comoappdev/).
 
 (Advanced.) The app can also run as an R package:
 
