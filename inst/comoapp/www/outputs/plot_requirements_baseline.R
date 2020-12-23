@@ -30,6 +30,7 @@ output$plot_requirements_baseline <- renderPlot({
                                                                "ICU Beds" = "#3288bd", "Ventilators" = "#5e4fa2")) +
       labs(y = NULL, x = NULL, title = "Hospital Occupancy") +
       scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
+      scale_x_date(date_labels =  "%b %Y") +
       theme_light(base_size = 14)
   )
   
@@ -43,6 +44,7 @@ output$plot_requirements_baseline <- renderPlot({
                                                                "ICU Beds" = "#3288bd", "Ventilators" = "#5e4fa2")) +
       labs(y = NULL, x = NULL, title = "Hospital Occupancy") +
       scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
+      scale_x_date(date_labels =  "%b %Y") +
       theme_light(base_size = 14)
   )
   
@@ -56,6 +58,7 @@ output$plot_requirements_baseline <- renderPlot({
                                                                "ICU Beds" = "#3288bd", "Ventilators" = "#5e4fa2")) +
       labs(y = NULL, x = NULL, title = "Hospital Occupancy") +
       scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
+      scale_x_date(date_labels =  "%b %Y") +
       theme_light(base_size = 14)
   )
   
@@ -69,6 +72,7 @@ output$plot_requirements_baseline <- renderPlot({
                                                                "ICU Beds" = "#3288bd", "Ventilators" = "#5e4fa2")) +
       labs(y = NULL, x = NULL, title = "Hospital Occupancy") +
       scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
+      scale_x_date(date_labels =  "%b %Y") +
       theme_light(base_size = 14)
   )
 })

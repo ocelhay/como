@@ -46,6 +46,7 @@ output$plot_cases_baseline <- renderPlot({
     coord_cartesian(ylim = c(NA, max_y)) +
     labs(title = "Baseline Daily Cases", x= "", y = "") +
     scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
+    scale_x_date(date_labels =  "%b %Y") +
     theme_light(base_size = 14)
   
   if(input$entity_tests == "_")  plot <- plot + scale_color_manual(name = "Cases", values = c("Predicted Reported" = "#00441b", 

@@ -41,6 +41,7 @@ output$plot_deaths_baseline <- renderPlot({
     labs(title = "Baseline Cumulative Deaths", x= "", y = "") +
     theme_light(base_size = 14) +
     scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
+    scale_x_date(date_labels =  "%b %Y") +
     scale_color_manual(name = "Cumulative Deaths", values = c("Predicted Reported + Unreported" = "#74c476", "Observed" = "red"))
 })
 
