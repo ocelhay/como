@@ -3,9 +3,10 @@ output$plot_deaths_baseline <- renderPlot({
   req(!input$dynamic_deaths_baseline)
   
   dta <- left_join(tibble(
-    reportable_death_min = simul_baseline$results$min$reportable_death,
-    reportable_death_med = simul_baseline$results$med$reportable_death,
-    reportable_death_max = simul_baseline$results$max$reportable_death,
+    # change 2020-12-29
+    reportable_death_min = simul_baseline$results$min$cum_mortality,
+    reportable_death_med = simul_baseline$results$med$cum_mortality,
+    reportable_death_max = simul_baseline$results$max$cum_mortality,
     # attributable_deaths_min = simul_baseline$results$min$attributable_deaths,
     # attributable_deaths_med = simul_baseline$results$med$attributable_deaths,
     # attributable_deaths_max = simul_baseline$results$max$attributable_deaths,
@@ -28,8 +29,8 @@ output$plot_deaths_baseline <- renderPlot({
     filter(Date <= max_x) %>%
   
   ggplot(aes(x = Date)) +
-    geom_ribbon(aes(ymin = reportable_death_min, ymax = reportable_death_max), fill = "#74c476", alpha = 0.7) +
-    geom_line(aes(y = reportable_death_med, color = "Predicted Reported + Unreported"), lwd = 1.2) + 
+    geom_ribbon(aes(ymin = reportable_death_min, ymax = reportable_death_max), fill = "#00441b", alpha = 0.7) +
+    geom_line(aes(y = reportable_death_med, color = "Predicted Reported"), lwd = 1.2) + 
     
     # geom_ribbon(aes(ymin = attributable_deaths_min, ymax = attributable_deaths_max), fill = "#74c476", alpha = 0.7) +
     # geom_line(aes(y = attributable_deaths_med, color = "Attributable"), lwd = 1.2) + 
@@ -42,7 +43,7 @@ output$plot_deaths_baseline <- renderPlot({
     theme_light(base_size = 14) +
     scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
     scale_x_date(date_labels =  "%b %Y") +
-    scale_color_manual(name = "Cumulative Deaths", values = c("Predicted Reported + Unreported" = "#74c476", "Observed" = "red"))
+    scale_color_manual(name = "Cumulative Deaths", values = c("Predicted Reported" = "#00441b", "Observed" = "red"))
 })
 
 
@@ -51,9 +52,10 @@ output$highchart_deaths_baseline <- renderHighchart({
   req(input$dynamic_deaths_baseline)
   
   dta <- left_join(tibble(
-    reportable_death_min = simul_baseline$results$min$reportable_death,
-    reportable_death_med = simul_baseline$results$med$reportable_death,
-    reportable_death_max = simul_baseline$results$max$reportable_death,
+    # change 2020-12-29
+    reportable_death_min = simul_baseline$results$min$cum_mortality,
+    reportable_death_med = simul_baseline$results$med$cum_mortality,
+    reportable_death_max = simul_baseline$results$max$cum_mortality,
     # attributable_deaths_min = simul_baseline$results$min$attributable_deaths,
     # attributable_deaths_med = simul_baseline$results$med$attributable_deaths,
     # attributable_deaths_max = simul_baseline$results$max$attributable_deaths,
@@ -77,8 +79,8 @@ output$highchart_deaths_baseline <- renderHighchart({
   
   
   hchart(dta, "line", name = "Observed", hcaes(x = Date, y = cumulative_death), color = "red") %>% 
-    hc_add_series(dta, type = "line", hcaes(x = Date, y = reportable_death_med), id = "reportable", name = "Predicted Reported + Unreported", color = "#74c476") %>%
-    hc_add_series(dta, type = 'arearange', name = "Predicted Reported + Unreported", color = "#74c476", 
+    hc_add_series(dta, type = "line", hcaes(x = Date, y = reportable_death_med), id = "reportable", name = "Predicted Reported", color = "#74c476") %>%
+    hc_add_series(dta, type = 'arearange', name = "Predicted Reported", color = "#00441b", 
                   hcaes(x = Date, low = reportable_death_min, high = reportable_death_max), 
                   linkedTo = "reportable") %>%
     # hc_add_series(dta, type = "line", hcaes(x = Date, y = attributable_deaths_med), id = "attributable", name = "Attributable", color = "#74c476") %>%
