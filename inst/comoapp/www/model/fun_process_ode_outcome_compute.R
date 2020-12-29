@@ -162,7 +162,7 @@
     results$ab<-ab_age
     # End snippet v16.5 lines 1764-1772 ----
 
-    # Start snippet v16.5 lines 1782-1825 ----
+    # Start snippet v16.5 lines 1782-1825 (Part 1) ----
     # changes: replaced out_mean with out_mat; replaced out with our_mat; replaced parameters with param_used
     # Hospital requirements
     previcureq1<-rowSums(out_mat[,(Hindex+1)])+ rowSums(out_mat[,(ICUCindex+1)])+rowSums(out_mat[,(ICUCVindex+1)]) # surge beds occupancy
@@ -184,8 +184,13 @@
     
     ### MORTALITY
     results$cum_mortality <- round(rowSums(out_mat[,(CMindex+1)]))       # cumulative mortality
-    results$deaths_from_covid<-last(cinc_mort_all)
-    results$deaths_with_covid<-last(nat_deaths_inf)
+    
+    # End Snippet (Part 1) ----
+    
+    results$deaths_from_covid <- round(cinc_mort_all)
+    results$deaths_with_covid <- round(nat_deaths_inf)
+    
+    # Start Snippet (Part 2) ----
     results$death_natural_non_exposed <- round(base_mort_S1+base_mort_V1+base_mort_QS1)
     results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 + 
                                              base_mort_R1+ base_mort_ER1 + base_mort_EV1+  base_mort_EVR1+   
@@ -205,7 +210,7 @@
     results$total_deaths <- results$attributable_deaths + results$death_natural_non_exposed + results$death_natural_exposed
     results$total_deaths_end <- last(results$total_deaths)
     results$total_reported_deaths_end <- last(results$cum_mortality)
-    # End snippet v16.5 lines 1764-1825 ----
+    # End snippet v16.5 lines 1764-1825 (Part 2) ----
     
     # Start snippet v16.5 lines 1826-1857 ----
     # changes: replaced out_mean with out_mat; replaced parameters with param_used
@@ -284,7 +289,7 @@
     # End snippet v16.5 lines 1863-1893 ----
     
     # Start bridge v16.5 ----
-  
+    results$total_covid_deaths <- results$deaths_from_covid + results$deaths_with_covid
     results$reportable_deaths <- results$attributable_deaths + results$death_natural_exposed
     results$total_reportable_deaths_end <- last(results$total_reportable_deaths)
     results$total_cm_deaths_end <- round(last(results$cum_mortality))
