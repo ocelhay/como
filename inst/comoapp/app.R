@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v17-beta.4"
+version_app <- "v17-beta.5"
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
