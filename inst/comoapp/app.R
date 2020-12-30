@@ -574,7 +574,6 @@ server <- function(input, output, session) {
   
   # Process on uploading a template ----
   observeEvent(input$own_data, {
-    # file_path <- "/Users/olivier/Documents/Projets/CoMo/como/misc/Template_CoMoCOVID-19App_v17.xlsx"
     file_path <- input$own_data$datapath
     
     # Validation of template format
@@ -596,7 +595,7 @@ server <- function(input, output, session) {
     
     # Epidemiology Sheet
     dta <- read_excel(file_path, sheet = "Epidemiology")
-    names(dta) <- c("date", "cases", "deaths", "serology")
+    names(dta) <- c("date", "cases", "deaths", "seroprevalence")
     
     cases_rv$data <- dta %>%
       mutate(date = as.Date(date), cumulative_death = cumsum(deaths)) %>%

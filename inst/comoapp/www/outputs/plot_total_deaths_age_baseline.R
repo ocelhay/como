@@ -1,6 +1,7 @@
 output$plot_total_deaths_age <- renderPlot({
   req(simul_baseline$baseline_available)
-
+  req(FALSE)
+  
   # end date is the date of the last data point if the focus is "Observed", otherwise it is the last day of the simulation otherwise
   end_date <- input$date_range[2]
   if(input$focus_axis == "Observed")  end_date <- cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))]
@@ -19,5 +20,5 @@ output$plot_total_deaths_age <- renderPlot({
     ylab("") + xlab("") +
     theme_minimal(base_size = 14) + 
     theme(legend.title = element_blank(), legend.position = "bottom") + 
-    labs(title = "Total Covid-19 Deaths per Age Category", subtitle = "Baseline")
+    labs(title = "Total Reported Covid-19 Deaths per Age Category", subtitle = "Baseline")
 })

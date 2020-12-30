@@ -15,7 +15,7 @@ ecdc <- get_table(con = con, tbl_name = "epidemiology") %>%
   collect()
 
 cases <- ecdc %>%
-  transmute(country, date, cumulative_cases = confirmed, cumulative_death = dead) %>%
+  transmute(country, date, cumulative_cases = confirmed, cumulative_death = dead, seroprevalence = NA) %>%
   group_by(country) %>%
   arrange(date) %>%
   mutate(cases = cumulative_cases - lag(cumulative_cases),
