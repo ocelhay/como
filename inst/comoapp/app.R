@@ -127,6 +127,9 @@ ui <- function(request) {
             
             source("./www/ui/interventions_baseline.R", local = TRUE)$value,
             htmlOutput("text_feedback_interventions_baseline"),
+            conditionalPanel(condition = paste0("!([", 
+                                                paste0("input.baseline_intervention_", 1:100, collapse = ", "), 
+                                                "].every( (val) => { return val === '_';} ))"),
             fluidRow(
               column(1, 
                      dropdownButton(
@@ -142,6 +145,7 @@ ui <- function(request) {
                      conditionalPanel("input.dynamic_timevis_baseline",
                                       highchartOutput("timevis_baseline_hc") %>% withSpinner())
               )
+            )
             ),
             br(), hr(),
             a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
@@ -255,6 +259,9 @@ ui <- function(request) {
                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario")),
                  source("./www/ui/interventions_future.R", local = TRUE)$value,
                  htmlOutput("text_feedback_interventions_future"),
+                 conditionalPanel(condition = paste0("!([", 
+                                                     paste0("input.future_intervention_", 1:100, collapse = ", "), 
+                                                     "].every( (val) => { return val === '_';} ))"),
                  fluidRow(
                    column(1, 
                           dropdownButton(
@@ -270,6 +277,7 @@ ui <- function(request) {
                           conditionalPanel("input.dynamic_timevis_future",
                                            highchartOutput("timevis_future_hc") %>% withSpinner())
                    )
+                 )
                  )
           )
         ),

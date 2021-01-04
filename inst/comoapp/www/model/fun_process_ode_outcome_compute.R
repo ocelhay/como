@@ -4,7 +4,7 @@
     # snippet v16.5 lines 1615-1627 already in fun_multi_runs.R
     
     # Start snippet v16.5 lines 1629-1642 ----
-    # changes: replaced out_mean with out_mat
+    # changes: replaced out$mean with out_mat
     # total population
     pop1<-out_mat[,(Sindex+1)]+out_mat[,(Eindex+1)]+out_mat[,(Iindex+1)]+out_mat[,(CLindex+1)]+out_mat[,(Rindex+1)]+
       out_mat[,(Xindex+1)]+out_mat[,(Vindex+1)]+out_mat[,(Zindex+1)]+out_mat[,(EVindex+1)]+out_mat[,(ERindex+1)]+out_mat[,(EVRindex+1)]+
@@ -54,7 +54,7 @@
     # End snippet https://github.com/bogaotory/comoOdeCpp/blob/master/comoOdeCpp/tests/testthat/v16.4.core.mod.16.6.R----
     
     # Start snippet v16.5 lines 1669-1763 ----
-    # changes: replaced out_mean with out_mat; replaced parameters with param_used
+    # changes: replaced out$mean with out_mat; replaced parameters with param_used
     cinc_mort_1 <- cumsum(rowSums(param_used["nus"]*param_used["propo2"]*param_used["pdeath_ho"]*dexo2_hist*(out_mat[,(Hindex+1)]%*%ifr[,2])))
     cinc_mort_2 <- cumsum(rowSums(param_used["nus"]*(1-param_used["propo2"])*param_used["pdeath_h"]*(out_mat[,(Hindex+1)]%*%ifr[,2])))
     
@@ -70,12 +70,12 @@
     cinc_mort_10 <- cumsum(rowSums(param_used["nu_ventc"]*param_used["pdeath_ventc"]*dexvc_hist*(out_mat[,(VentCindex+1)]%*%ifr[,2])))
     cinc_mort_11 <- cumsum(rowSums(param_used["nu_ventc"]*param_used["pdeath_ventc"]*dexvc_hist*(out_mat[,(ICUCVindex+1)]%*%ifr[,2])))
     
-    cinc_mort_12 <- cumsum(rowSums(param_used["nu_icuc"]*param_used["report_death_HC"]*param_used["propo2"]*param_used["pdeath_icu_hco"]*(out_mat[,(HCICUindex+1)]%*%ifr[,2])))
-    cinc_mort_13 <- cumsum(rowSums(param_used["nu_icuc"]*param_used["report_death_HC"]*(1-param_used["propo2"])*param_used["pdeath_icu_hc"]*(out_mat[,(HCICUindex+1)]%*%ifr[,2])))
+    cinc_mort_12 <- cumsum(rowSums(param_used["nusc"]*param_used["report_death_HC"]*param_used["propo2"]*param_used["pdeath_icu_hco"]*(out_mat[,(HCICUindex+1)]%*%ifr[,2])))
+    cinc_mort_13 <- cumsum(rowSums(param_used["nusc"]*param_used["report_death_HC"]*(1-param_used["propo2"])*param_used["pdeath_icu_hc"]*(out_mat[,(HCICUindex+1)]%*%ifr[,2])))
     cinc_mort_14 <- cumsum(rowSums(param_used["nu_ventc"]*param_used["report_death_HC"]*param_used["pdeath_vent_hc"]*(out_mat[,(HCVindex+1)]%*%ifr[,2])))
     
-    cinc_mort_121 <- cumsum(rowSums(param_used["nu_icuc"]*param_used["propo2"]*param_used["pdeath_icu_hco"]*(out_mat[,(HCICUindex+1)]%*%ifr[,2])))
-    cinc_mort_131 <- cumsum(rowSums(param_used["nu_icuc"]*(1-param_used["propo2"])*param_used["pdeath_icu_hc"]*(out_mat[,(HCICUindex+1)]%*%ifr[,2])))
+    cinc_mort_121 <- cumsum(rowSums(param_used["nusc"]*param_used["propo2"]*param_used["pdeath_icu_hco"]*(out_mat[,(HCICUindex+1)]%*%ifr[,2])))
+    cinc_mort_131 <- cumsum(rowSums(param_used["nusc"]*(1-param_used["propo2"])*param_used["pdeath_icu_hc"]*(out_mat[,(HCICUindex+1)]%*%ifr[,2])))
     cinc_mort_141 <- cumsum(rowSums(param_used["nu_ventc"]*param_used["pdeath_vent_hc"]*(out_mat[,(HCVindex+1)]%*%ifr[,2])))
     
     
@@ -163,7 +163,7 @@
     # End snippet v16.5 lines 1764-1772 ----
 
     # Start snippet v16.5 lines 1782-1825 (Part 1) ----
-    # changes: replaced out_mean with out_mat; replaced out with our_mat; replaced parameters with param_used
+    # changes: replaced out$mean with out_mat; replaced out with our_mat; replaced parameters with param_used
     # Hospital requirements
     previcureq1<-rowSums(out_mat[,(Hindex+1)])+ rowSums(out_mat[,(ICUCindex+1)])+rowSums(out_mat[,(ICUCVindex+1)]) # surge beds occupancy
     previcureq21<-rowSums(out_mat[,(ICUindex+1)])+rowSums(out_mat[,(VentCindex+1)])   # icu beds occupancy
@@ -213,37 +213,53 @@
     # End snippet v16.5 lines 1764-1825 (Part 2) ----
     
     # Start snippet v16.5 lines 1826-1857 ----
-    # changes: replaced out_mean with out_mat; replaced parameters with param_used
-    cinc_mort_H1 <- param_used["nus"]*param_used["propo2"]*param_used["pdeath_ho"]*dexo2_hist*(out_mat[,(Hindex+1)]%*%ifr[,2])+
-      param_used["nus"]*(1-param_used["propo2"])*param_used["pdeath_h"]*(out_mat[,(Hindex+1)]%*%ifr[,2])
-    cinc_mort_HC1 <- param_used["nusc"]*param_used["report_death_HC"]*param_used["propo2"]*param_used["pdeath_hco"]*(out_mat[,(HCindex+1)]%*%ifr[,2])+
-      param_used["nusc"]*param_used["report_death_HC"]*(1-param_used["propo2"])*param_used["pdeath_hc"]*(out_mat[,(HCindex+1)]%*%ifr[,2])
-    cinc_mort_ICU1 <- param_used["nu_icu"]*param_used["propo2"]*param_used["pdeath_icuo"]*dexo2_hist*(out_mat[,(ICUindex+1)]%*%ifr[,2])+
-      param_used["nu_icu"]*(1-param_used["propo2"])*param_used["pdeath_icu"]*(out_mat[,(ICUindex+1)]%*%ifr[,2])
-    cinc_mort_ICUC1 <- param_used["nu_icuc"]*param_used["propo2"]*param_used["pdeath_icuco"]*dexo2c_hist*(out_mat[,(ICUCindex+1)]%*%ifr[,2])+
-      param_used["nu_icuc"]*(1-param_used["propo2"])*param_used["pdeath_icuc"]*(out_mat[,(ICUCindex+1)]%*%ifr[,2])
-    cinc_mort_Vent1  <- param_used["nu_vent"]*param_used["pdeath_vent"]*dexv_hist*(out_mat[,(Ventindex+1)]%*%ifr[,2])
-    cinc_mort_VentC1 <- param_used["nu_ventc"]*param_used["pdeath_ventc"]*dexvc_hist*(out_mat[,(VentCindex+1)]%*%ifr[,2])
-    cinc_mort_ICUCV1 <- param_used["nu_ventc"]*param_used["pdeath_ventc"]*dexvc_hist*(out_mat[,(ICUCVindex+1)]%*%ifr[,2])
-    cinc_mort_HCICU1 <- param_used["nu_icuc"]*param_used["report_death_HC"]*param_used["propo2"]*param_used["pdeath_icu_hco"]*(out_mat[,(HCICUindex+1)]%*%ifr[,2])+
-      param_used["nu_icuc"]*param_used["report_death_HC"]*(1-param_used["propo2"])*param_used["pdeath_icu_hc"]*(out_mat[,(HCICUindex+1)]%*%ifr[,2])
-    cinc_mort_HCV1 <- param_used["nu_ventc"]*param_used["report_death_HC"]*param_used["pdeath_vent_hc"]*(out_mat[,(HCVindex+1)]%*%ifr[,2])
+    # changes: replaced out$mean with out_mat; replaced parameters with param_used
+    cinc_mort_H1 <- param_used["nus"]*param_used["propo2"]*param_used["pdeath_ho"]*dexo2_hist*(out_mat[,(Hindex+1)])+
+      param_used["nus"]*(1-param_used["propo2"])*param_used["pdeath_h"]*(out_mat[,(Hindex+1)])
+    cinc_mort_HC1 <- param_used["nusc"]*param_used["report_death_HC"]*param_used["propo2"]*param_used["pdeath_hco"]*(out_mat[,(HCindex+1)])+
+      param_used["nusc"]*param_used["report_death_HC"]*(1-param_used["propo2"])*param_used["pdeath_hc"]*(out_mat[,(HCindex+1)])
+    cinc_mort_ICU1 <- param_used["nu_icu"]*param_used["propo2"]*param_used["pdeath_icuo"]*dexo2_hist*(out_mat[,(ICUindex+1)])+
+      param_used["nu_icu"]*(1-param_used["propo2"])*param_used["pdeath_icu"]*(out_mat[,(ICUindex+1)])
+    cinc_mort_ICUC1 <- param_used["nu_icuc"]*param_used["propo2"]*param_used["pdeath_icuco"]*dexo2c_hist*(out_mat[,(ICUCindex+1)] )+
+      param_used["nu_icuc"]*(1-param_used["propo2"])*param_used["pdeath_icuc"]*(out_mat[,(ICUCindex+1)] )
+    cinc_mort_Vent1  <- param_used["nu_vent"]*param_used["pdeath_vent"]*dexv_hist*(out_mat[,(Ventindex+1)] )
+    cinc_mort_VentC1 <- param_used["nu_ventc"]*param_used["pdeath_ventc"]*dexvc_hist*(out_mat[,(VentCindex+1)] )
+    cinc_mort_ICUCV1 <- param_used["nu_ventc"]*param_used["pdeath_ventc"]*dexvc_hist*(out_mat[,(ICUCVindex+1)] )
+    cinc_mort_HCICU1 <- param_used["nusc"]*param_used["report_death_HC"]*param_used["propo2"]*param_used["pdeath_icu_hco"]*(out_mat[,(HCICUindex+1)] )+
+      param_used["nusc"]*param_used["report_death_HC"]*(1-param_used["propo2"])*param_used["pdeath_icu_hc"]*(out_mat[,(HCICUindex+1)] )
+    cinc_mort_HCV1 <- param_used["nu_ventc"]*param_used["report_death_HC"]*param_used["pdeath_vent_hc"]*(out_mat[,(HCVindex+1)] )
     
     totage1<-as.data.frame(cinc_mort_H1+cinc_mort_HC1+cinc_mort_ICU1+cinc_mort_ICUC1+
                              cinc_mort_Vent1+cinc_mort_VentC1+cinc_mort_ICUCV1+cinc_mort_HCICU1+cinc_mort_HCV1)
     
     
     basemort_H1<-(out_mat[,(Hindex+1)])
-    basemort_HC1<-(out_mat[,(HCindex+1)])
+    basemort_HC1<-param_used["report_death_HC"]*(out_mat[,(HCindex+1)])
     basemort_ICU1<-(out_mat[,(ICUindex+1)])
     basemort_ICUC1<-(out_mat[,(ICUCindex+1)])
     basemort_ICUCV1<-(out_mat[,(ICUCVindex+1)])
     basemort_Vent1<-(out_mat[,(Ventindex+1)])
     basemort_VentC1<-(out_mat[,(VentCindex+1)])
-    basemort_HCICU1<-(out_mat[,(HCICUindex+1)])
-    basemort_HCV1<-(out_mat[,(HCVindex+1)])
+    basemort_HCICU1<-param_used["report_death_HC"]*(out_mat[,(HCICUindex+1)])
+    basemort_HCV1<-param_used["report_death_HC"]*(out_mat[,(HCVindex+1)])
+    basemort_I<-param_used["report_natdeathI"]*(out_mat[,(Iindex+1)])
+    basemort_QI<-param_used["report_natdeathI"]*(out_mat[,(QIindex+1)])
+    basemort_E<-param_used["report_natdeathI"]*(out_mat[,(Eindex+1)])
+    basemort_QE<-param_used["report_natdeathI"]*(out_mat[,(QEindex+1)])
+    basemort_EV<-param_used["report_natdeathI"]*(out_mat[,(EVindex+1)])
+    basemort_EVR<-param_used["report_natdeathI"]*(out_mat[,(EVRindex+1)])
+    basemort_ER<-param_used["report_natdeathI"]*(out_mat[,(ERindex+1)])
+    basemort_QEV<-param_used["report_natdeathI"]*(out_mat[,(QEVindex+1)])
+    basemort_QEVR<-param_used["report_natdeathI"]*(out_mat[,(QEVRindex+1)])
+    basemort_QER<-param_used["report_natdeathI"]*(out_mat[,(QERindex+1)])
+    basemort_CL<-param_used["report_natdeathCL"]*(out_mat[,(CLindex+1)])
+    basemort_QC<-param_used["report_natdeathCL"]*(out_mat[,(QCindex+1)])
+    basemort_X<-param_used["report_natdeathCL"]*(out_mat[,(Xindex+1)])
+    
     totbase1<-as.data.frame(basemort_H1+basemort_HC1+basemort_ICU1+basemort_ICUC1+basemort_ICUCV1+
-                              basemort_Vent1+basemort_VentC1+basemort_HCICU1+basemort_HCV1)
+                              basemort_Vent1+basemort_VentC1+basemort_HCICU1+basemort_HCV1+ 
+                              basemort_I+basemort_QI+basemort_E+basemort_QE+basemort_EV+basemort_EVR+
+                              basemort_ER+basemort_QEV+basemort_QEVR+basemort_QER+basemort_CL+basemort_QC+basemort_X)
     # End snippet lines 1826-1857 ----
     
     tc <- NULL

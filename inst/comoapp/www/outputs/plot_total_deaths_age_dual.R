@@ -1,7 +1,6 @@
 output$plot_total_deaths_age_baseline <- renderPlot({
   req(simul_baseline$baseline_available)
   req(simul_interventions$interventions_available)
-  req(FALSE)
   
   dta <- simul_baseline$results$med$tc %>%
     group_by(age_cat) %>%
@@ -21,7 +20,6 @@ output$plot_total_deaths_age_baseline <- renderPlot({
 
 output$plot_total_deaths_age_interventions <- renderPlot({
   req(simul_interventions$interventions_available)
-  req(FALSE)
   
   dta <- simul_interventions$results$med$tc %>%
     group_by(age_cat) %>%
