@@ -260,18 +260,15 @@
                               basemort_Vent1+basemort_VentC1+basemort_HCICU1+basemort_HCV1+ 
                               basemort_I+basemort_QI+basemort_E+basemort_QE+basemort_EV+basemort_EVR+
                               basemort_ER+basemort_QEV+basemort_QEVR+basemort_QER+basemort_CL+basemort_QC+basemort_X)
-    # End snippet lines 1826-1857 ----
     
-    tc <- NULL
-    for (i in 1:length(times)) {
-      for (j in 1:length(Hindex)) {
-        tc<-rbind(tc, c(i, j, totage1[i, 1] * ifr[j,2] + totbase1[i, 1] * mort[j]))
+    
+    tc<-c()
+    for (i in 1:dim(cinc_mort_H1)[1]) {
+      for (j in 1:dim(cinc_mort_H1)[2]) {
+        # print(totage1[i,j]*ifr[j,2]+totbase1[i,j]*mort[j])
+        tc<-rbind(tc,c(i, j, totage1[i,j]*ifr[j,2]+totbase1[i,j]*mort[j]))
       }
     }
-    
-    tc<-as.data.frame(tc)
-    
-    # Start snippet lines 1863-1893----
     tc<-as.data.frame(tc)
     colnames(tc)<-c("Day","Age","value")
     results$tc <- tc %>%
@@ -285,7 +282,6 @@
                Age >=  15  ~ ">= 70 y.o.")) %>%
       mutate(age_cat = factor(age_cat, levels = rev(c("<= 30 y.o.", "30-40 y.o.",
                                                       "40-50 y.o.", "50-60 y.o.", "60-70 y.o.", ">= 70 y.o."))))
-    
     
     mortality_lag <- data.frame(Age = popstruc$agefloor)
     if(nrow(out_mat) >= 30)  mortality_lag <- bind_cols(mortality_lag,
@@ -310,6 +306,10 @@
     results$total_reportable_deaths_end <- last(results$total_reportable_deaths)
     results$total_cm_deaths_end <- round(last(results$cum_mortality))
     # End bridge v16.5 ----
-
+    
+    # to compare scripts and app
+    # browser()
+    # results_app <<- results
+    
     return(results)
   }

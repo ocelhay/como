@@ -5,7 +5,6 @@ output$plot_total_deaths_age <- renderPlot({
   end_date <- input$date_range[2]
   if(input$focus_axis == "Observed")  end_date <- cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))]
   
-  browser()
   
   dta <- simul_baseline$results$med$tc %>%
     filter(Date <= end_date) %>%
