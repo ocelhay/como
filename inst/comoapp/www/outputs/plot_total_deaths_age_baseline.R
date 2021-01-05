@@ -10,11 +10,12 @@ output$plot_total_deaths_age <- renderPlot({
     filter(Date <= end_date) %>%
     group_by(age_cat) %>%
     summarise(total_deaths = round(sum(value)), .groups = "drop") %>% 
-    mutate(freq = round(100 * total_deaths / sum(total_deaths), 1))
+    mutate(freq = round(100 * total_deaths / sum(total_deaths), 0))
   
   ggplot(data = dta, aes(x = age_cat, y = total_deaths, fill = age_cat))+ 
     geom_bar(stat = "identity") +
-    geom_text(aes(label = paste0(format(total_deaths, big.mark = ",", scientific = FALSE), " (", freq, "%)")), vjust = -0.2, size = 4) + 
+    geom_text(aes(label = paste0(format(total_deaths, big.mark = ",", scientific = FALSE), " (", freq, "%)")), 
+              size = 4, fontface= 2, vjust = -0.2) + 
     scale_y_continuous(labels=function(x) format(x, big.mark = ",", decimal.mark = ".", scientific = FALSE)) +
     scale_fill_brewer(palette = "BrBG") + 
     ylab("") + xlab("") +
