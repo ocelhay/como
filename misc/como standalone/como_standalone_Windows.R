@@ -1,10 +1,12 @@
 # Perform (once per machine) a manual installation of nodejs (https://nodejs.org/en/).
 
 # Install latest version of shinybox.
+if(FALSE){
 rm(list = ls())
 remove.packages("shinybox")
 detach("package:shinybox", unload = TRUE)
 remotes::install_github("ocelhay/shinybox", auth_token = "")
+}
 
 library(shinybox)
 
@@ -32,7 +34,7 @@ shinybox(
   author = "CoMo Condortium",
   description = "Model from the Covid-19 International Modelling Consortium",
   semantic_version = "v17.0.5", # important to respect the format v.x.y.z
-  mran_date = "2020-09-30",
+  mran_date = "2020-12-01",
   cran_like_url = NULL,
   mac_url = NULL,
   git_host = "github",
