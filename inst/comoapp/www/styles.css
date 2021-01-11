@@ -164,3 +164,9 @@ h4 {
   font-size: 30px;
   margin-right: 5px;
 }
+
+.important_focus{
+  padding: 5px;
+  background-color: #FCE205;
+  border: 2px solid #c49102;
+}
