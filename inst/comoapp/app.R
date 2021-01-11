@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v17-beta.5"
+version_app <- "v17-beta.6"
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -47,7 +47,7 @@ ui <- function(request) {
     pushbar_deps(),
     useShinyjs(),
     chooseSliderSkin('HTML5'),
-
+    
     source("./www/ui/pushbar_parameters_reporting.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_country.R", local = TRUE)[1],
@@ -130,29 +130,36 @@ ui <- function(request) {
             conditionalPanel(condition = paste0("!([", 
                                                 paste0("input.baseline_intervention_", 1:100, collapse = ", "), 
                                                 "].every( (val) => { return val === '_';} ))"),
-            fluidRow(
-              column(1, 
-                     dropdownButton(
-                       div(
-                         prettySwitch("dynamic_timevis_baseline", value = FALSE, label = "Dynamic Plot")
-                       ),
-                       circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px"
-                     )
-              ),
-              column(11,
-                     conditionalPanel("! input.dynamic_timevis_baseline",
-                                      plotOutput("timevis_baseline", height = "400px") %>% withSpinner()), 
-                     conditionalPanel("input.dynamic_timevis_baseline",
-                                      highchartOutput("timevis_baseline_hc") %>% withSpinner())
-              )
-            )
+                             fluidRow(
+                               column(1, 
+                                      dropdownButton(
+                                        div(
+                                          prettySwitch("dynamic_timevis_baseline", value = FALSE, label = "Dynamic Plot")
+                                        ),
+                                        circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px"
+                                      )
+                               ),
+                               column(11,
+                                      conditionalPanel("! input.dynamic_timevis_baseline",
+                                                       plotOutput("timevis_baseline", height = "400px") %>% withSpinner()), 
+                                      conditionalPanel("input.dynamic_timevis_baseline",
+                                                       highchartOutput("timevis_baseline_hc") %>% withSpinner())
+                               )
+                             )
             ),
             br(), hr(),
             a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
             shinyjs::hidden(
               div(id = "results_baseline",
-                  prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
-                                     selected = "Observed", inline = TRUE), br(),
+                  div(class = "important_focus",
+                      prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
+                                         selected = "Observed", inline = TRUE), 
+                      p("Indicators and visualisations are based on the period of focus:"),
+                      tags$ul(tags$li("Observed: time range limited to provided observed data"), 
+                              tags$li("Predicted Reported: time range is the date range of simulation, visualisations y-axis with focus on reported"),
+                              tags$li("Predicted Reported: time range is the date range of simulation, visualisations y-axis with focus on reported + unreported"))
+                  ),
+                  br(),
                   fluidRow(
                     column(6, h4("Predicted Reported")),
                     column(6, h4("Predicted Reported + Unreported (Total)"))
@@ -167,7 +174,7 @@ ui <- function(request) {
                       6, 
                       htmlOutput("text_pct_total_baseline") %>% withSpinner(),
                       htmlOutput("text_death_total_baseline") %>% withSpinner()
-                      )
+                    )
                   ),
                   br(),
                   fluidRow(
@@ -236,7 +243,10 @@ ui <- function(request) {
                              ),
                              circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px")
                     ),
-                    column(11, plotOutput("plot_seroprev_baseline", height = "400px") %>% withSpinner())
+                    column(11, 
+                           downloadLink("download_seroprevalence_quant", span(icon("download"), "Download Seroprevalence Data")),
+                           plotOutput("plot_seroprev_baseline", height = "400px") %>% withSpinner()
+                    )
                   )
               )
             )
@@ -249,10 +259,10 @@ ui <- function(request) {
         fluidRow(
           column(2, br(),
                  div(class = "float_bottom_left",
-                 actionButton("reset_baseline", span(icon("eraser"), "Reset Baseline"), class="btn btn-success"), br(), br(),
-                 uiOutput("conditional_run_future"),
-                 br(),
-                 uiOutput("conditional_float_results")
+                     actionButton("reset_baseline", span(icon("eraser"), "Reset Baseline"), class="btn btn-success"), br(), br(),
+                     uiOutput("conditional_run_future"),
+                     br(),
+                     uiOutput("conditional_float_results")
                  )
           ),
           column(10,
@@ -262,22 +272,22 @@ ui <- function(request) {
                  conditionalPanel(condition = paste0("!([", 
                                                      paste0("input.future_intervention_", 1:100, collapse = ", "), 
                                                      "].every( (val) => { return val === '_';} ))"),
-                 fluidRow(
-                   column(1, 
-                          dropdownButton(
-                            div(
-                              prettySwitch("dynamic_timevis_future", value = FALSE, label = "Dynamic Plot")
-                            ),
-                            circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px"
-                          )
-                   ),
-                   column(11,
-                          conditionalPanel("! input.dynamic_timevis_future",
-                                           plotOutput("timevis_future", height = "400px") %>% withSpinner()), 
-                          conditionalPanel("input.dynamic_timevis_future",
-                                           highchartOutput("timevis_future_hc") %>% withSpinner())
-                   )
-                 )
+                                  fluidRow(
+                                    column(1, 
+                                           dropdownButton(
+                                             div(
+                                               prettySwitch("dynamic_timevis_future", value = FALSE, label = "Dynamic Plot")
+                                             ),
+                                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px"
+                                           )
+                                    ),
+                                    column(11,
+                                           conditionalPanel("! input.dynamic_timevis_future",
+                                                            plotOutput("timevis_future", height = "400px") %>% withSpinner()), 
+                                           conditionalPanel("input.dynamic_timevis_future",
+                                                            highchartOutput("timevis_future_hc") %>% withSpinner())
+                                    )
+                                  )
                  )
           )
         ),
@@ -289,8 +299,15 @@ ui <- function(request) {
             shinyjs::hidden(
               div(id = "results_interventions_1",
                   a(id = "anchor_summary", style="visibility: hidden", ""),
-                  prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
-                                     selected = "Predicted Reported + Unreported", inline = TRUE),
+                  div(class = "important_focus",
+                      prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
+                                         selected = "Predicted Reported + Unreported", inline = TRUE),
+                      p("Indicators and visualisations are based on the period of focus:"),
+                      tags$ul(tags$li("Observed: time range limited to provided observed data"), 
+                              tags$li("Predicted Reported: time range is the date range of simulation, visualisations y-axis with focus on reported"),
+                              tags$li("Predicted Reported: time range is the date range of simulation, visualisations y-axis with focus on reported + unreported"))
+                  ),
+                  br(),
                   fluidRow(
                     column(
                       6,
@@ -310,7 +327,7 @@ ui <- function(request) {
                           htmlOutput("text_pct_total_baseline_dup") %>% withSpinner(),
                           htmlOutput("text_death_total_baseline_dup") %>% withSpinner()
                         ),
-
+                        
                       )
                     ),
                     column(
@@ -547,18 +564,18 @@ server <- function(input, output, session) {
   output$conditional_float_results <- renderUI({
     if(simul_interventions$interventions_available){
       div(
-          p("Go to:"),
-          tags$ul(
-            tags$li(a("Building Interventions", href = '#anchor_interventions')),
-            tags$li(a("Summary Predictions", href = '#anchor_summary')),
-            tags$li(a("Cases", href = '#anchor_cases')),
-            tags$li(a("Deaths", href = '#anchor_deaths')),
-            tags$li(a("Hospital Occupancy", href = '#anchor_occupancy')),
-            tags$li(a("Rt", href = '#anchor_rt'))
-          ),
-          br(), 
-          uiOutput("report_generation"), br(),
-          downloadButton("download_data", "Download Data") %>% helper(type = "markdown", content = "help_legend_csv", colour = "red", size = "l")
+        p("Go to:"),
+        tags$ul(
+          tags$li(a("Building Interventions", href = '#anchor_interventions')),
+          tags$li(a("Summary Predictions", href = '#anchor_summary')),
+          tags$li(a("Cases", href = '#anchor_cases')),
+          tags$li(a("Deaths", href = '#anchor_deaths')),
+          tags$li(a("Hospital Occupancy", href = '#anchor_occupancy')),
+          tags$li(a("Rt", href = '#anchor_rt'))
+        ),
+        br(), 
+        uiOutput("report_generation"), br(),
+        downloadButton("download_data", "Download Data") %>% helper(type = "markdown", content = "help_legend_csv", colour = "red", size = "l")
       )
     }
   })
@@ -590,7 +607,7 @@ server <- function(input, output, session) {
     
     if(! is.character(version_template)) {
       showNotification("The uploaded file isn't in the right format.", 
-            type = "error", duration = 10)
+                       type = "error", duration = 10)
       return(NULL)  # exit
     }
     
@@ -687,9 +704,16 @@ server <- function(input, output, session) {
       }
       updatePickerInput(session, inputId = "country_contact", selected = param$Value_Country[param$Parameter == "country_contact"])
     }
-
+    
     if(msg_update_param != "The following 'Global Simulations Parameters' were updated: <br><br>") {
-      showNotification(HTML(msg_update_param), duration = NULL)
+      showModal(modalDialog(
+        HTML(msg_update_param),
+        title = NULL,
+        footer = modalButton("Okay"),
+        size = "m",
+        easyClose = TRUE,
+        fade = TRUE
+      ))
     }
     
     if(msg_update_param == "The following 'Global Simulations Parameters' were updated: <br><br>") {
@@ -703,12 +727,12 @@ server <- function(input, output, session) {
     
     if(all(interventions_excel$intervention %in% valid_interventions_v17)) message("Okay, all interventions are valid.")
     if(! all(interventions_excel$intervention %in% valid_interventions_v17)) stop("Stop, some interventions are not valid.")
-
+    
     
     
     # Update interventions in the UI: baseline interventions
     interventions_excel_baseline <- interventions_excel %>% 
-    filter(apply_to == "Baseline (Calibration)")
+      filter(apply_to == "Baseline (Calibration)")
     
     nb_interventions_baseline <- interventions_excel_baseline %>% nrow()
     if(nb_interventions_baseline > 0) {
@@ -724,7 +748,7 @@ server <- function(input, output, session) {
     
     # Update interventions in the UI: future interventions
     interventions_excel_future <- interventions_excel %>% 
-    filter(apply_to == "Hypothetical Scenario")
+      filter(apply_to == "Hypothetical Scenario")
     nb_interventions_future <- interventions_excel_future %>% nrow()
     if(nb_interventions_future > 0) {
       for (i in 1:nb_interventions_future) {
@@ -764,7 +788,7 @@ server <- function(input, output, session) {
     vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     
     check_parameters_list_for_na(parameters_list = parameters)
-
+    
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other, 
@@ -874,10 +898,10 @@ server <- function(input, output, session) {
     }
   )
   
-  # Downloadable csv ----
+  # Downloadable csv of results ----
   results_aggregated <- reactive({
     
-    ## Outputs of the model ----
+    # Outputs of the model ----
     dta <- tibble(
       date = simul_baseline$results$time, 
       
@@ -993,13 +1017,13 @@ server <- function(input, output, session) {
       hypothetical_reportable_death_max = simul_interventions$results$max$reportable_death,
     )
     
-    ## Cases Data ----
+    # Cases Data ----
     dta <- left_join(
       dta, 
       cases_rv$data %>% rename(input_cases = cases, input_deaths = deaths, input_cumulative_death = cumulative_death), 
       by = "date")
     
-    ## Interventions ----
+    # Interventions ----
     startdate <- input$date_range[1]
     stopdate <- input$date_range[2]
     times <- seq(0, as.numeric(stopdate - startdate))
@@ -1031,6 +1055,13 @@ server <- function(input, output, session) {
     filename = "COVID19_App_Data.csv",
     content = function(file) {
       write.csv(results_aggregated(), file, row.names = FALSE)
+    }
+  )
+  
+  output$download_seroprevalence_quant <- downloadHandler(
+    filename = "Baseline_Seroprevalence_Quantiles.csv",
+    content = function(file) {
+      write.csv(simul_baseline$results$seroprevalence_quantile, file, row.names = FALSE)
     }
   )
 }
