@@ -1,4 +1,4 @@
-**Updated on December 8, 2020.**
+**Updated on January 6, 2021.**
 
 Stage 1: Preliminary analyses and model calibration to explore optimal containment strategies
 
@@ -9,7 +9,6 @@ Stage 1: Preliminary analyses and model calibration to explore optimal containme
 * Fiji
 * Malaysia
 * Malawi
-* Mozambique
 * Myanmar
 * Nigeria
 * Poland
@@ -34,6 +33,7 @@ Stage 3: Have on at least one occasion presented CoMo Consortium model results t
 * Lao PDR
 * Mexico, Tabasco Province
 * Mexico, Queretaro State
+* Mozambique
 * Nepal
 * Thailand
 * Timor-Leste
@@ -45,5 +45,4 @@ Stage 4: The local MoH has made policy decisions based on CoMo Consortium model 
 * Afghanistan
 * Kyrgyzstan
 * Indonesia, North Sumatra Province
-* South Africa
 * Syria - NorthWest Syria
