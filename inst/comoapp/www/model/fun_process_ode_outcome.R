@@ -57,5 +57,34 @@ process_ode_outcome <- function(out, param_used, startdate, times, ihr, ifr, mor
   results$death_untreated_ventilator <- results$med$death_untreated_ventilator
   results$reportable_death <- results$med$reportable_death
   
+  # Compute seroprevalence ----
+  samp.sizes <- round(rnorm(length(results$time),
+                            param_used["sample_size"],
+                            param_used["sample_size"] / 5))
+  
+  ab <- data.frame(Time = rep(results$time, 100), Ab = 0)
+  
+  aux <- NULL
+  for (i in 1:100) {
+    num.inf.samp <- rbinom(length(results$time), size = samp.sizes, 
+                           prob = (results$med$ab_all_ages / results$med$N))
+    aux<-c(aux, num.inf.samp / samp.sizes)
+  }
+  
+  ab$Ab <- (param_used["se"]/100) * aux + (1 - (param_used["sp"]/100))*(1 - aux)
+  
+  quantile_ab <- ab %>%
+    group_by(Time) %>%
+    summarise(tibble(
+      q05 = quantile(Ab, probs = 0.05), 
+      q25 = quantile(Ab, probs = 0.25), 
+      q50 = median(Ab),
+      q75 = quantile(Ab, probs = 0.75), 
+      q95 = quantile(Ab, probs = 0.95))
+    )
+  
+  results$seroprevalence <- ab
+  results$seroprevalence_quantile <- quantile_ab
+  
   return(results)
 }

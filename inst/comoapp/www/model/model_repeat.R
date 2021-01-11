@@ -99,7 +99,7 @@ parameters <- reactiveValuesToList(input)[
     "reporth_g", "seroneg",
     "vaccine_eff_r", "pre",
     # addition in v17:
-    "init"
+    "init", "sample_size", "se", "sp"
   )] %>% 
   unlist()
 
