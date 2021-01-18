@@ -1,13 +1,14 @@
 
 **Choosing a "Number of model runs" greater than 1 will generate uncertainty as described below. If you decide to do so, we recommend to go for a minimum of 10 runs. Simulation running time can amount to 1 second per run and 30 seconds to aggregate results (irrespective of the number of runs).**
 
-<br>
-<br>
-<br>
+</br>
+</br>
+</br>
 
 Users of the CoMo Collaborative COVID-19 model need to comprehend and effectively communicate the multiple uncertainties involved in making quantitative projections about evolving outbreaks.  To assist in this "propagation of uncertainty", the model development team has created a way for users to specify a level of parametric (Gaussian) "white noise"" to **all of the model parameters listed below**.  If implemented by the user, this means that the chosen point value for each of these parameters will become the midpoint for a range defined by the standard deviation selected on the **Noise** slider bar.  With each modeling run, these parameters are then sampled from the resulting Gaussian distribution with mean given by the chosen parameter value.
 
 **Confidence** sets the degree of uncertainty the user would like to have reflected in the model prediction, expressed over all the model runs. Specifically, this defines the quantile of model predictions for each time point that comprise the chosen the credible intervals. Thus, if confidence is set at 5%, the upper limit for the model credible interval will be one that excludes the highest 5% values of the model predictions for each data point; since the same restriction applies to the lowest 5% of values, this choice corresponds to a 90% credible interval.  Similarly, if the user choses 25%, then only the middle 50% of values is shown in the model output.
+
 
 
 | Category                        	| Description                                                      	| Parameter             	|
@@ -32,7 +33,6 @@ Users of the CoMo Collaborative COVID-19 model need to comprehend and effectivel
 | Handwashing                     	| Efficacy: (0-25%)                                                	| hand_eff              	|
 | Working at Home                 	| Efficacy:                                                        	| work_eff              	|
 | Working at Home                 	| Home contacts inflation due to working from home:                	| w2h                   	|
-| School Closures                 	| Efficacy:                                                        	| school_eff            	|
 | School Closures                 	| Home contacts inflation due to school closure:                   	| s2h                   	|
 | Shielding the Elderly           	| Efficacy:                                                        	| cocoon_eff            	|
 | Wearing Mask                     	| Efficacy:                                                        	| mask_eff              	|

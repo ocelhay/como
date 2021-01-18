@@ -1,19 +1,15 @@
 | Intervention                          | Unit Intervention |
 |---------------------------------------|-------------------|
+| Dexamethasone                         | %                 |
+| Handwashing                           | %                 |
+| International Travel Ban              | %                 |
+| Mask Wearing                          | %                 |
+| Mass Testing                          | thousands tests   |
+| School Closures                       | %                 |
 | Self-isolation if Symptomatic         | %                 |
 | (*Self-isolation) Screening           | contacts          |
 | (*Self-isolation) Household Isolation | %                 |
-| Social Distancing                     | %                 |
-| Handwashing                           | %                 |
-| Working at Home                       | %                 |
-| School Closures                       | %                 |
 | Shielding the Elderly                 | %                 |
-| International Travel Ban              | %                 |
+| Social Distancing                     | %                 |
 | Vaccination                           | %                 |
-| (*Vaccination) Age Vaccine Minimum    | y.o.              |
-| (*Vaccination) Age Vaccine Maximum    | y.o.              |
-| Mass Testing                          | thousands tests   |
-| (*Mass Testing) Age Testing Minimum   | y.o.              |
-| (*Mass Testing) Age Testing Maximum   | y.o.              |
-| Mask Wearing                          | %                 |
-| Dexamethasone                         | %                 |
+| Working at Home                       | %                 |

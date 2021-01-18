@@ -1,24 +1,19 @@
 # CoMo COVID-19 App
-version_app <- "v16.2.6"
+version_app <- "v17.0.1"
 
-# To generate report with macOS standalone app (shinybox),
+# To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
 if (Sys.info()["sysname"] == "Darwin" & 
     !grepl("/usr/local/bin", Sys.getenv("PATH"), fixed = TRUE)) {
   Sys.setenv(PATH = paste("/usr/local/bin", Sys.getenv("PATH"), sep = ":"))
 }
 
-# Bug in 16.2.5
-# remove.packages("comoOdeCpp")
-# library(devtools)
-# devtools::install_github('bogaotory/comoOdeCpp@v16.2.2', subdir = 'comoOdeCpp')
-
+# Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "16.2.2" )  stop("
-Running the app requires to install the v16.2.2 of the R package comoOdeCpp.
-Run:   devtools::install_github('bogaotory/comoOdeCp/comoOdeCppp@v16.2.2')
+if(packageVersion("comoOdeCpp") != "16.6.0")  stop("
+Running the app requires to install the v16.6.0 of the R package comoOdeCpp.
+Run:  remotes::install_github('bogaotory/comoOdeCpp@v16.6.0', subdir = 'comoOdeCpp')
 in the R console to install it.")
-
 
 library(bsplus)
 library(deSolve)
@@ -46,12 +41,12 @@ source("./www/model/model_once.R")
 # Define UI ----
 ui <- function(request) {
   fluidPage(
+    title = "CoMo Consortium | COVID-19 App",
     theme = shinytheme("flatly"),
     includeCSS("./www/styles.css"),
     pushbar_deps(),
     useShinyjs(),
     chooseSliderSkin('HTML5'),
-    title = "CoMo Consortium | COVID-19 App",
     
     source("./www/ui/pushbar_parameters_reporting.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
@@ -64,19 +59,18 @@ ui <- function(request) {
       title = div(a(img(src = "CoMo-logo-medium-white_resized.png", id = "logo-top"))),
       id = "tabs", windowTitle = "CoMo Consortium | COVID-19 App", collapsible = TRUE, inverse = FALSE,
       tabPanel("Welcome", value = "tab_welcome",
-               h4(paste0("App ", version_app)),
+               span(class = "app-version", version_app),
                # for debugging purposes, TODO: remove in prod
                # htmlOutput("diagnosis_platform"),
                fluidRow(
-                 column(6,
+                 column(8,
                         span(img(src = "./como_logo.png", id = "logo"),
-                             "The Covid-19 International Modelling Consortium (CoMo Consortium) comprises several working groups. Each working group plays a specific role in formulating a mathematical modelling response to help guide policymaking responses to the Covid-19 pandemic. These responses can be tailored to the specific Covid-19 context at a national or sub-national level."),
-                        br(), br(), br(),
-                        h5("CoMo Consortium member countries’ stages of engagement with policymakers — August 21, 2020") %>%
+                             includeMarkdown("./www/markdown/welcome.md")),
+                        strong("CoMo Consortium member countries’ stages of engagement with policymakers") %>%
                           helper(content = "stages_countries", colour = "red"),
                         tags$img(src = "./como_policy_makers.png", id = "map")
                  ),
-                 column(6,
+                 column(4,
                         bs_accordion(id = "about") %>%
                           bs_set_opts(panel_type = "default", use_heading_link = TRUE) %>%
                           bs_append(title = "Important Disclaimer", content = includeMarkdown("./www/markdown/disclaimer.md")) %>%
@@ -93,30 +87,28 @@ ui <- function(request) {
           column(
             width = 2,
             div(class = "float_bottom_left",
-                hr(),
                 sliderInput("p", label = "Prob. of infection given contact:", min = 0.01, max = 0.08, step = 0.001,
-                            value = 0.049, ticks = FALSE, width = "75%"),
+                            value = 0.049, ticks = FALSE),
                 sliderInput("report", label = span("% of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
-                            value = 2.5, post = "%", ticks = FALSE, width = "75%"),
+                            value = 2.5, post = "%", ticks = FALSE),
                 sliderInput("reportc", label = span("% of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
-                            value = 5, post = "%", ticks = FALSE, width = "75%"),
+                            value = 10, post = "%", ticks = FALSE),
                 uiOutput("conditional_run_baseline"), br(),
-                uiOutput("conditional_validate_baseline"),
-                hr()
+                uiOutput("conditional_validate_baseline")
             )
           ),
           column(
             width = 10,
             div(class = "box_outputs", h4("Global Simulations Parameters")),
             fluidRow(
-              column(5, 
+              column(4, 
                      h4("Set Parameters with Template"),
                      fileInput("own_data", buttonLabel = "Upload template", label = NULL, accept = ".xlsx", multiple = FALSE),
                      includeMarkdown("./www/markdown/help_upload_template.md")
               ),
-              column(6, offset = 1,
+              column(7, offset = 1,
                      h4("Set Parameters On The Spot"),
-                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-10", end = "2021-06-30", startview = "year"),
+                     dateRangeInput("date_range", label = "Date range of simulation:", start = "2020-02-01", end = "2021-06-30", startview = "year"),
                      fluidRow(column(6, 
                                      actionButton("open_country_param", label = span(icon('cog'), " Country"), class = "btn-primary", width = "80%"),
                                      htmlOutput("feedback_choices"),
@@ -131,30 +123,58 @@ ui <- function(request) {
               )
             ),
             use_bs_accordion_sidebar(),
-            br(),
-            fluidRow(
-              column(6,
-                     div(class = "box_outputs", h4("Interventions for Baseline")),
-                     sliderInput("nb_interventions_baseline", label = "Number of interventions:", min = 0, max = 50, value = 0, step = 1, ticks = FALSE),
-                     htmlOutput("text_feedback_interventions_baseline"),
-                     source("./www/ui/interventions_baseline.R", local = TRUE)$value
-              ),
-              column(6,
-                     div(class = "box_outputs", h4("Timeline of Interventions")),
-                     plotOutput("timevis_baseline", height = 700)
-              )
+            div(class = "box_outputs", h4("Interventions for Baseline")),
+            
+            source("./www/ui/interventions_baseline.R", local = TRUE)$value,
+            htmlOutput("text_feedback_interventions_baseline"),
+            conditionalPanel(condition = paste0("!([", 
+                                                paste0("input.baseline_intervention_", 1:100, collapse = ", "), 
+                                                "].every( (val) => { return val === '_';} ))"),
+                             fluidRow(
+                               column(1, 
+                                      dropdownButton(
+                                        div(
+                                          prettySwitch("dynamic_timevis_baseline", value = FALSE, label = "Dynamic Plot")
+                                        ),
+                                        circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px"
+                                      )
+                               ),
+                               column(11,
+                                      conditionalPanel("! input.dynamic_timevis_baseline",
+                                                       plotOutput("timevis_baseline", height = "400px") %>% withSpinner()), 
+                                      conditionalPanel("input.dynamic_timevis_baseline",
+                                                       highchartOutput("timevis_baseline_hc") %>% withSpinner())
+                               )
+                             )
             ),
             br(), hr(),
             a(id = "anchor_results_baseline", style = "visibility: hidden", ""),
             shinyjs::hidden(
               div(id = "results_baseline",
-                  prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
-                                     selected = "Observed", inline = TRUE), br(),
-                  
+                  div(class = "important_focus",
+                      prettyRadioButtons("focus_axis", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"), 
+                                         selected = "Observed", inline = TRUE), 
+                      p("Indicators and visualisations are based on the period of focus:"),
+                      tags$ul(tags$li("Observed: time range limited to provided observed data"), 
+                              tags$li("Predicted Reported: time range is the date range of simulation, visualisations y-axis with focus on reported"),
+                              tags$li("Predicted Reported: time range is the date range of simulation, visualisations y-axis with focus on reported + unreported"))
+                  ),
+                  br(),
                   fluidRow(
-                    column(4, htmlOutput("text_pct_pop_baseline") %>% withSpinner()),
-                    column(4, htmlOutput("text_attributable_death_baseline") %>% withSpinner()),
-                    column(4, htmlOutput("text_reported_death_baseline") %>% withSpinner())
+                    column(6, h4("Predicted Reported")),
+                    column(6, h4("Predicted Reported + Unreported (Total)"))
+                  ),
+                  fluidRow(
+                    column(
+                      6, 
+                      htmlOutput("text_pct_reported_baseline") %>% withSpinner(),
+                      # htmlOutput("text_death_reported_baseline") %>% withSpinner()
+                    ),
+                    column(
+                      6, 
+                      htmlOutput("text_pct_total_baseline") %>% withSpinner(),
+                      htmlOutput("text_death_total_baseline") %>% withSpinner()
+                    )
                   ),
                   br(),
                   fluidRow(
@@ -202,7 +222,7 @@ ui <- function(request) {
                                                   selected = "No Focus", inline = TRUE)
                              ),
                              circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px")
-                           ),
+                    ),
                     column(11,
                            conditionalPanel("! input.dynamic_requirements_baseline",
                                             plotOutput("plot_requirements_baseline", height = "350px") %>% withSpinner()), 
@@ -211,8 +231,22 @@ ui <- function(request) {
                     )
                   ),
                   fluidRow(
-                    column(6, plotOutput("plot_total_deaths_age", height = "400px") %>% withSpinner()),
-                    column(6, plotOutput("plot_Rt_baseline", height = "400px") %>% withSpinner())
+                    column(7, plotOutput("plot_total_deaths_age", height = "400px") %>% withSpinner()),
+                    column(5, plotOutput("plot_Rt_baseline", height = "400px") %>% withSpinner())
+                  ),
+                  fluidRow(
+                    column(1, 
+                           dropdownButton(
+                             div(
+                               sliderInput("se", "Test Sensitivity:", 0, 100, value = 75, post = "%", ticks = FALSE),
+                               sliderInput("sp", "Test Specificty:", 0, 100, value = 97, post = "%", ticks = FALSE)
+                             ),
+                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px")
+                    ),
+                    column(11, 
+                           downloadLink("download_seroprevalence_quant", span(icon("download"), "Download Seroprevalence Data")),
+                           plotOutput("plot_seroprev_baseline", height = "400px") %>% withSpinner()
+                    )
                   )
               )
             )
@@ -224,47 +258,97 @@ ui <- function(request) {
         a(id = "anchor_interventions", style = "visibility: hidden", ""),
         fluidRow(
           column(2, br(),
-                 actionButton("reset_baseline", span(icon("eraser"), "Reset the Baseline"), class="btn btn-success"), br(), br(),
-                 uiOutput("conditional_run_future")
+                 div(class = "float_bottom_left",
+                     actionButton("reset_baseline", span(icon("eraser"), "Reset Baseline"), class="btn btn-success"), br(), br(),
+                     uiOutput("conditional_run_future"),
+                     br(),
+                     uiOutput("conditional_float_results")
+                 )
           ),
-          column(5,
+          column(10,
                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario")),
-                 sliderInput("nb_interventions_future", label = "Number of interventions:", min = 0, max = 50,  value = 0, step = 1, ticks = FALSE),
+                 source("./www/ui/interventions_future.R", local = TRUE)$value,
                  htmlOutput("text_feedback_interventions_future"),
-                 source("./www/ui/interventions_future.R", local = TRUE)$value
-          ),
-          column(5,
-                 div(class = "box_outputs", h4("Timeline of Interventions")),
-                 plotOutput("timevis_future", height = 700)
+                 conditionalPanel(condition = paste0("!([", 
+                                                     paste0("input.future_intervention_", 1:100, collapse = ", "), 
+                                                     "].every( (val) => { return val === '_';} ))"),
+                                  fluidRow(
+                                    column(1, 
+                                           dropdownButton(
+                                             div(
+                                               prettySwitch("dynamic_timevis_future", value = FALSE, label = "Dynamic Plot")
+                                             ),
+                                             circle = FALSE, status = "primary", icon = icon("gear"), size = "sm", width = "300px"
+                                           )
+                                    ),
+                                    column(11,
+                                           conditionalPanel("! input.dynamic_timevis_future",
+                                                            plotOutput("timevis_future", height = "400px") %>% withSpinner()), 
+                                           conditionalPanel("input.dynamic_timevis_future",
+                                                            highchartOutput("timevis_future_hc") %>% withSpinner())
+                                    )
+                                  )
+                 )
           )
         ),
         br(), br(), 
         fluidRow(
-          column(
-            2, 
-            uiOutput("conditional_float_results"),
-            a(id = "anchor_summary", style="visibility: hidden", "")
-          ),
+          column(2, ),
           column(
             10,
             shinyjs::hidden(
               div(id = "results_interventions_1",
-                  prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
-                                     selected = "Predicted Reported + Unreported", inline = TRUE),
+                  a(id = "anchor_summary", style="visibility: hidden", ""),
+                  div(class = "important_focus",
+                      prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
+                                         selected = "Predicted Reported + Unreported", inline = TRUE),
+                      p("Indicators and visualisations are based on the period of focus:"),
+                      tags$ul(tags$li("Observed: time range limited to provided observed data"), 
+                              tags$li("Predicted Reported: time range is the date range of simulation, visualisations y-axis with focus on reported"),
+                              tags$li("Predicted Reported: time range is the date range of simulation, visualisations y-axis with focus on reported + unreported"))
+                  ),
+                  br(),
                   fluidRow(
                     column(
                       6,
                       div(class = "box_outputs", h4("Baseline")),
-                      htmlOutput("text_pct_pop_baseline_dup") %>% withSpinner(), br(),
-                      htmlOutput("text_attributable_death_baseline_dup") %>% withSpinner(), br(),
-                      htmlOutput("text_reported_death_baseline_dup") %>% withSpinner()
+                      fluidRow(
+                        column(6, h4("Predicted Reported")),
+                        column(6, h4("Predicted Reported + Unreported (Total)")),
+                      ),
+                      fluidRow(
+                        column(
+                          6, 
+                          htmlOutput("text_pct_reported_baseline_dup") %>% withSpinner(),
+                          # htmlOutput("text_death_reported_baseline_dup") %>% withSpinner()
+                        ),
+                        column(
+                          6, 
+                          htmlOutput("text_pct_total_baseline_dup") %>% withSpinner(),
+                          htmlOutput("text_death_total_baseline_dup") %>% withSpinner()
+                        ),
+                        
+                      )
                     ),
                     column(
                       6,
                       div(class = "box_outputs", h4("Hypothetical Scenario")),
-                      htmlOutput("text_pct_pop_interventions") %>% withSpinner(), br(),
-                      htmlOutput("text_attributable_death_interventions") %>% withSpinner(), br(), 
-                      htmlOutput("text_reported_death_interventions") %>% withSpinner()
+                      fluidRow(
+                        column(6, h4("Predicted Reported")),
+                        column(6, h4("Predicted Reported + Unreported (Total)"))
+                      ),
+                      fluidRow(
+                        column(
+                          6, 
+                          htmlOutput("text_pct_reported_future") %>% withSpinner(),
+                          # htmlOutput("text_death_reported_future") %>% withSpinner()
+                        ),
+                        column(
+                          6, 
+                          htmlOutput("text_pct_total_future") %>% withSpinner(),
+                          htmlOutput("text_death_total_future") %>% withSpinner()
+                        )
+                      )
                     )
                   )
               )
@@ -301,13 +385,13 @@ ui <- function(request) {
                 fluidRow(
                   column(5, offset = 2,
                          highchartOutput("highchart_deaths_dual_baseline", height = "350px") %>% withSpinner(), br(),
-                         plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br(),
+                         # plotOutput("plot_deaths_age_baseline") %>% withSpinner(), br(),
                          plotOutput("plot_total_deaths_age_baseline") %>% withSpinner(), br(),
                          plotOutput("plot_mortality_lag_baseline") %>% withSpinner(), br()
                   ),
                   column(5,
                          highchartOutput("highchart_deaths_dual_interventions", height = "350px") %>% withSpinner(), br(),
-                         plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br(),
+                         # plotOutput("plot_deaths_age_interventions") %>% withSpinner(), br(),
                          plotOutput("plot_total_deaths_age_interventions") %>% withSpinner(), br(),
                          plotOutput("plot_mortality_lag_interventions") %>% withSpinner(), br()
                   )
@@ -348,7 +432,7 @@ ui <- function(request) {
 # Define server ----
 server <- function(input, output, session) {
   
-  # for debugging purposes, TODO: remove in prod
+  # look for PANDOC for debugging purposes - can be removed in prod
   # output$diagnosis_platform <- renderText({
   #   paste0("pandoc_available: ", pandoc_available(), "</br>",
   #          "Sys.getenv('PATH'): ", Sys.getenv("PATH"), "</br>",
@@ -361,7 +445,7 @@ server <- function(input, output, session) {
   # Hide tabs on app launch ----
   hideTab(inputId = "tabs", target = "tab_modelpredictions")
   
-  # Pushbar for parameters ----
+  # Pushbars for parameters/generation of uncertainty ----
   setup_pushbar(overlay = TRUE, blur = TRUE)
   observeEvent(input$open_reporting_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_reporting"))  
   observeEvent(input$close_reporting_param, pushbar_close())
@@ -373,8 +457,6 @@ server <- function(input, output, session) {
   observeEvent(input$close_virus_param, pushbar_close())
   observeEvent(input$open_hospital_param, ignoreInit = TRUE, pushbar_open(id = "pushbar_parameters_hospitalisation"))  
   observeEvent(input$close_hospital_param, pushbar_close())
-  
-  # Pushbar for uncertainty ----
   observeEvent(input$open_generate_uncertainty, ignoreInit = TRUE, pushbar_open(id = "pushbar_generate_uncertainty"))  
   observeEvent(input$close_generate_uncertainty, pushbar_close())
   
@@ -386,10 +468,11 @@ server <- function(input, output, session) {
   simul_baseline <- reactiveValues(results = NULL, baseline_available = FALSE)
   simul_interventions <- reactiveValues(results = NULL, interventions_available = FALSE)
   
-  
   # Management of interventions ----
   interventions <- reactiveValues(baseline_mat = tibble(NULL), 
+                                  baseline_age_groups = list(),
                                   future_mat = tibble(NULL),
+                                  future_age_groups = list(),
                                   valid_baseline_interventions = TRUE, 
                                   message_baseline_interventions = NULL,
                                   valid_future_interventions = TRUE, 
@@ -397,47 +480,57 @@ server <- function(input, output, session) {
   
   
   observe({
-    # Create baseline interventions tibble ----
+    # Create interventions tibble with input from UI ----
     interventions$baseline_mat <- tibble(
-      index = 1:nb_interventions_max,
       intervention = unlist(reactiveValuesToList(input)[paste0("baseline_intervention_", 1:nb_interventions_max)]),
-      # same as: intervention = c(input$baseline_intervention_1, input$baseline_intervention_2, ... , input$baseline_intervention_50)
       date_start = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)],
-      # same as: intervention = c(input$baseline_daterange_1[1],  input$baseline_daterange_2[1], ... , )
       date_end = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(2, 2*nb_interventions_max, by = 2)],
-      value = unlist(reactiveValuesToList(input)[paste0("baseline_coverage_", 1:nb_interventions_max)])) %>%
-            mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
-                              intervention == "Mass Testing" ~ " thousands tests", 
-                              TRUE ~ "%")) %>%
-      filter(index <= input$nb_interventions_baseline, intervention != "_")
-    
-    tibble(
-      index = 1:50,
-      date_start = do.call("c", reactiveValuesToList(input)[paste0("baseline_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)]
-    )
-    
-    # Create hypothetical scenario interventions tibble ----
-    interventions$future_mat <- tibble(
-      index = 1:nb_interventions_max,
-      intervention = unlist(reactiveValuesToList(input)[paste0("future_intervention_", 1:nb_interventions_max)]),
-      date_start = do.call("c", reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)],
-      date_end = do.call("c", reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)])[seq(2, 2*nb_interventions_max, by = 2)],
-      value = unlist(reactiveValuesToList(input)[paste0("future_coverage_", 1:nb_interventions_max)])) %>%
+      value = unlist(reactiveValuesToList(input)[paste0("baseline_coverage_", 1:nb_interventions_max)]),
+      age_group = unlist(map(reactiveValuesToList(input)[paste0("baseline_age_group_", 1:nb_interventions_max)], 
+                             ~ paste(str_sub(.x, 1, 2), collapse = ","))),
+      Target = 1:nb_interventions_max) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
                               TRUE ~ "%")) %>%
-      filter(index <= input$nb_interventions_future, intervention != "_")
+      filter(intervention != "_")
     
-    # Validation of interventions, Baseline (Calibration)
+    
+    # Fill list of age groups
+    vec <- interventions$baseline_mat$age_group
+    if(length(vec) > 0) {
+      for (i in 1:length(vec)) {
+        interventions$baseline_age_groups[[i]] <- parse_age_group(vec[i])
+      }
+    }
+    
+    interventions$future_mat <- tibble(
+      intervention = unlist(reactiveValuesToList(input)[paste0("future_intervention_", 1:nb_interventions_max)]),
+      date_start = do.call("c", reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)])[seq(1, (2*nb_interventions_max - 1), by = 2)],
+      date_end = do.call("c", reactiveValuesToList(input)[paste0("future_daterange_", 1:nb_interventions_max)])[seq(2, 2*nb_interventions_max, by = 2)],
+      value = unlist(reactiveValuesToList(input)[paste0("future_coverage_", 1:nb_interventions_max)]),
+      age_group = unlist(map(reactiveValuesToList(input)[paste0("future_age_group_", 1:nb_interventions_max)], 
+                             ~ paste(str_sub(.x, 1, 2), collapse = ","))),
+      Target = 1:nb_interventions_max) %>%
+      mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
+                              intervention == "Mass Testing" ~ " thousands tests", 
+                              TRUE ~ "%")) %>%
+      filter(intervention != "_")
+    
+    # Fill list of age groups
+    vec <- interventions$future_mat$age_group
+    if(length(vec) > 0) {
+      for (i in 1:length(vec)) {
+        interventions$future_age_groups[[i]] <- parse_age_group(vec[i])
+      }
+    }
+    
+    # Validation of interventions ----
     validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, 
                                                         simul_start_date = input$date_range[1], 
                                                         simul_end_date= input$date_range[2])
     interventions$valid_baseline_interventions <- validation_baseline$validation_interventions
     interventions$message_baseline_interventions <- validation_baseline$message_interventions
     
-    
-    
-    # Validation of interventions, Hypothetical Scenario
     validation_future <- fun_validation_interventions(dta = interventions$future_mat, 
                                                       simul_start_date = input$date_range[1], 
                                                       simul_end_date= input$date_range[2])
@@ -456,36 +549,33 @@ server <- function(input, output, session) {
   output$conditional_validate_baseline <- renderUI({
     if(simul_baseline$baseline_available){
       div(
-        actionButton("open_generate_uncertainty", span(icon("random"), " Generate Uncertainty"), class = "btn btn-success"),br(), br(),
-        actionButton("validate_baseline", span(icon("thumbs-up"), " Validate the Baseline"), class = "btn btn-success")
+        actionButton("open_generate_uncertainty", "Generate Uncertainty", class = "btn btn-success"),br(), br(),
+        actionButton("validate_baseline", span(icon("thumbs-up"), " Validate Baseline"), class = "btn btn-success")
       )
     }
   })
   
   output$conditional_run_future <- renderUI({
     if(interventions$valid_future_interventions) {
-      actionButton("run_interventions", "Run Hypothetical Scenario", class = "btn btn-success")
+      actionButton("run_interventions", "Run Scenario", class = "btn btn-success")
     }
   })
   
   output$conditional_float_results <- renderUI({
     if(simul_interventions$interventions_available){
-      div(class = "float_bottom_left",
-          hr(),
-          p("Go to:"),
-          tags$ul(
-            tags$li(a("Building Interventions", href = '#anchor_interventions')),
-            tags$li(a("Summary Predictions", href = '#anchor_summary')),
-            tags$li(a("Cases", href = '#anchor_cases')),
-            tags$li(a("Deaths", href = '#anchor_deaths')),
-            tags$li(a("Hospital Occupancy", href = '#anchor_occupancy')),
-            tags$li(a("Rt", href = '#anchor_rt'))
-          ),
-          br(), 
-          uiOutput("report_generation"), br(),
-          downloadButton("download_data", "Download Data") %>% helper(type = "markdown", content = "help_legend_csv", colour = "red", size = "l"), 
-          tags$small("Simulation results in .csv format."),
-          hr(),
+      div(
+        p("Go to:"),
+        tags$ul(
+          tags$li(a("Building Interventions", href = '#anchor_interventions')),
+          tags$li(a("Summary Predictions", href = '#anchor_summary')),
+          tags$li(a("Cases", href = '#anchor_cases')),
+          tags$li(a("Deaths", href = '#anchor_deaths')),
+          tags$li(a("Hospital Occupancy", href = '#anchor_occupancy')),
+          tags$li(a("Rt", href = '#anchor_rt'))
+        ),
+        br(), 
+        uiOutput("report_generation"), br(),
+        downloadButton("download_data", "Download Data") %>% helper(type = "markdown", content = "help_legend_csv", colour = "red", size = "l")
       )
     }
   })
@@ -511,9 +601,26 @@ server <- function(input, output, session) {
   observeEvent(input$own_data, {
     file_path <- input$own_data$datapath
     
-    # Cases
-    dta <- read_excel(file_path, sheet = "Cases")
-    names(dta) <- c("date", "cases", "deaths")
+    # Validation of template format
+    version <- read_excel(file_path, sheet = 1)
+    version_template <- names(version)[1]
+    
+    if(! is.character(version_template)) {
+      showNotification("The uploaded file isn't in the right format.", 
+                       type = "error", duration = 10)
+      return(NULL)  # exit
+    }
+    
+    if(version_template != "Template v17") {
+      showNotification(HTML("The format of the file is not recognised. </br> Upload a 'v17 template' to change defaults parameters."), 
+                       type = "error", duration = 10)
+      return(NULL)  # exit
+    }
+    
+    
+    # Epidemiology Sheet
+    dta <- read_excel(file_path, sheet = "Epidemiology")
+    names(dta) <- c("date", "cases", "deaths", "seroprevalence")
     
     cases_rv$data <- dta %>%
       mutate(date = as.Date(date), cumulative_death = cumsum(deaths)) %>%
@@ -523,7 +630,7 @@ server <- function(input, output, session) {
     updatePickerInput(session, inputId = "country_demographic", choices = c("-- Own Value ---", countries_demographic), selected = "-- Own Value ---")
     
     
-    # Severity/Mortality
+    # Severity/Mortality Sheet
     dta <- read_excel(file_path, sheet = "Severity-Mortality") 
     names(dta) <- c("age_category",	"ifr",	"ihr")
     
@@ -531,7 +638,7 @@ server <- function(input, output, session) {
       mutate(ihr = ihr/100) %>%  # starting unit should be % - scaling to a value between 0 and 1
       mutate(ifr = ifr/max(ifr))  # starting unit should be % - scaling to a value between 0 and 1
     
-    # Population
+    # Population Sheet
     dta <- read_excel(file_path, sheet = "Population")
     names(dta) <- c("age_category",	"pop",	"birth",	"death")
     
@@ -541,7 +648,7 @@ server <- function(input, output, session) {
     updatePickerInput(session, inputId = "country_demographic", selected = "-- Own Value ---")
     
     
-    # Parameters
+    # Parameters Sheets
     param <- bind_rows(read_excel(file_path, sheet = "Parameters"),
                        read_excel(file_path, sheet = "Country Area Param"),
                        read_excel(file_path, sheet = "Virus Param"),
@@ -550,53 +657,84 @@ server <- function(input, output, session) {
       mutate(Value_Date = as.Date(Value_Date)) %>%
       drop_na(Parameter)
     
+    msg_update_param <- "The following 'Global Simulations Parameters' were updated: <br><br>"
+    
     # Update all sliders
     if(!is_empty(param$Parameter[param$Type == 'slider'])) {
       for (input_excel in param$Parameter[param$Type == 'slider']){
+        if(param$Value[param$Parameter == input_excel] != input[[input_excel]]) {
+          msg_update_param <- glue("{msg_update_param} <strong>{input_excel}</strong>: from {input[[input_excel]]} to {param$Value[param$Parameter == input_excel]} ; ")
+        }
         updateSliderInput(session = session, inputId = input_excel, value = param$Value[param$Parameter == input_excel])
       }}
     
     # Update all numeric values
     if(!is_empty(param$Parameter[param$Type == 'numeric'])) {
       for (input_excel in param$Parameter[param$Type == 'numeric']){
+        if(param$Value[param$Parameter == input_excel] != input[[input_excel]]) {
+          msg_update_param <- glue("{msg_update_param} <strong>{input_excel}</strong>: from {input[[input_excel]]} to {param$Value[param$Parameter == input_excel]} ; ")
+        }
         updateNumericInput(session = session, inputId = input_excel, value = param$Value[param$Parameter == input_excel])
       }}
     
     # Update month text slider
     if(!is_empty(param$Parameter[param$Parameter == 'phi'])) {
+      if(param$Value[param$Parameter == 'phi'] != which(month.name == input[['phi']])) {
+        msg_update_param <- glue("{msg_update_param} <strong>phi</strong>: from {which(month.name == input[['phi']])} to {param$Value[param$Parameter == 'phi']} ; ")
+      }
       updateSliderTextInput(session = session, inputId = "phi", selected = month.name[param$Value[param$Parameter == "phi"]])
     }
     
     # Update date range of simulation
     if(!is_empty(param$Parameter[param$Type == 'date_range_simul'])) {
+      if(param$Value_Date[param$Parameter == 'date_range_simul_start'] != input[['date_range']][1]) {
+        msg_update_param <- glue("{msg_update_param} <strong>date_range_simul_start</strong>: from {input[['date_range']][1]} to {param$Value_Date[param$Parameter == 'date_range_simul_start']} ; ")
+      }
+      if(param$Value_Date[param$Parameter == 'date_range_simul_end'] != input[['date_range']][2]) {
+        msg_update_param <- glue("{msg_update_param} <strong>date_range_simul_end</strong>: from {input[['date_range']][2]} to {param$Value_Date[param$Parameter == 'date_range_simul_end']} ; ")
+      }
       updateDateRangeInput(session, inputId = "date_range", start = param$Value_Date[param$Parameter == "date_range_simul_start"], 
                            end = param$Value_Date[param$Parameter == "date_range_simul_end"])
     }
     
     # Update social contact
     if(!is_empty(param$Parameter[param$Type == 'picker'])) {
+      if(param$Value_Country[param$Parameter == 'country_contact'] != input[['country_contact']]) {
+        msg_update_param <- glue("{msg_update_param} <strong>country_contact</strong>: from {input[['country_contact']]} to {param$Value_Country[param$Parameter == 'country_contact']} ; ")
+      }
       updatePickerInput(session, inputId = "country_contact", selected = param$Value_Country[param$Parameter == "country_contact"])
     }
     
-    # Update interventions
+    if(msg_update_param != "The following 'Global Simulations Parameters' were updated: <br><br>") {
+      showModal(modalDialog(
+        HTML(msg_update_param),
+        title = NULL,
+        footer = modalButton("Okay"),
+        size = "m",
+        easyClose = TRUE,
+        fade = TRUE
+      ))
+    }
+    
+    if(msg_update_param == "The following 'Global Simulations Parameters' were updated: <br><br>") {
+      showNotification(HTML("No 'Global Simulations Parameter' was updated."), duration = NULL)
+    }
+    
+    # Update interventions in the UI: read "Interventions" sheet and validate
     interventions_excel <- read_excel(file_path, sheet = "Interventions") %>%
-      mutate(`Date Start` = as.Date(`Date Start`),
-             `Date End` = as.Date(`Date End`))
+      filter(!is.na(Intervention))
+    names(interventions_excel) <- c("intervention", "date_start", "date_end", "value", "unit", "age_group", "apply_to")
     
-    names(interventions_excel) <- c("intervention", "date_start", "date_end", "value", "unit", "apply_to")
+    if(all(interventions_excel$intervention %in% valid_interventions_v17)) message("Okay, all interventions are valid.")
+    if(! all(interventions_excel$intervention %in% valid_interventions_v17)) stop("Stop, some interventions are not valid.")
     
+    
+    
+    # Update interventions in the UI: baseline interventions
     interventions_excel_baseline <- interventions_excel %>% 
       filter(apply_to == "Baseline (Calibration)")
     
-    interventions_excel_future <- interventions_excel %>% 
-      filter(apply_to == "Hypothetical Scenario")
-    
     nb_interventions_baseline <- interventions_excel_baseline %>% nrow()
-    nb_interventions_future <- interventions_excel_future %>% nrow()
-    
-    updateSliderInput(session, inputId = "nb_interventions_baseline", value = nb_interventions_baseline)
-    updateSliderInput(session, inputId = "nb_interventions_future", value = nb_interventions_future)
-    
     if(nb_interventions_baseline > 0) {
       for (i in 1:nb_interventions_baseline) {
         updateSelectInput(session, paste0("baseline_intervention_", i), selected = interventions_excel_baseline[[i, "intervention"]])
@@ -604,9 +742,14 @@ server <- function(input, output, session) {
                              start = interventions_excel_baseline[[i, "date_start"]], 
                              end = interventions_excel_baseline[[i, "date_end"]])
         updateSliderInput(session, paste0("baseline_coverage_", i), value = interventions_excel_baseline[[i, "value"]])
+        updatePickerInput(session, paste0("baseline_age_group_", i), selected = vec_age_categories[as.logical(parse_age_group(interventions_excel_baseline$age_group[i]))])
       }
     }
     
+    # Update interventions in the UI: future interventions
+    interventions_excel_future <- interventions_excel %>% 
+      filter(apply_to == "Hypothetical Scenario")
+    nb_interventions_future <- interventions_excel_future %>% nrow()
     if(nb_interventions_future > 0) {
       for (i in 1:nb_interventions_future) {
         updateSelectInput(session, paste0("future_intervention_", i), selected = interventions_excel_future[[i, "intervention"]])
@@ -614,6 +757,7 @@ server <- function(input, output, session) {
                              start = interventions_excel_future[[i, "date_start"]], 
                              end = interventions_excel_future[[i, "date_end"]])
         updateSliderInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "value"]])
+        updatePickerInput(session, paste0("future_age_group_", i), selected = vec_age_categories[as.logical(parse_age_group(interventions_excel_future$age_group[i]))])
       }
     }
   })
@@ -641,23 +785,26 @@ server <- function(input, output, session) {
     source("./www/model/model_repeat.R", local = TRUE)
     parameters["iterations"] <- 1
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
-                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
-                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     
     check_parameters_list_for_na(parameters_list = parameters)
     
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
-                          contact_work = contact_work, contact_other = contact_other)
+                          contact_work = contact_work, contact_other = contact_other, 
+                          age_group_vectors = interventions$baseline_age_groups)
+    
+    showNotification("Processing results", duration = NULL, id = "msg_processing")
     simul_baseline$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
                                                   ifr, mort, popstruc, intv_vector = vectors)
+    removeNotification(id = "msg_processing")
+    
     simul_baseline$baseline_available <- TRUE
     
-    showNotification("Displaying results", duration = 3, type = "message")
+    showNotification("Displaying results", duration = 7)
     shinyjs::show(id = "results_baseline", anim = FALSE)
     # need a small pause 
-    Sys.sleep(1)
+    Sys.sleep(0.2)
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
   
@@ -669,22 +816,24 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model/model_repeat.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
-                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
-                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     
     check_parameters_list_for_na(parameters_list = parameters)
     
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
-                          contact_work = contact_work, contact_other = contact_other)
+                          contact_work = contact_work, contact_other = contact_other, 
+                          age_group_vectors = interventions$baseline_age_groups)
+    
+    showNotification("Processing results", duration = NULL, id = "msg_processing")
     simul_baseline$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
                                                   ifr, mort, popstruc, intv_vector = vectors)
     simul_baseline$baseline_available <- TRUE
     
-    showNotification("Displaying results", duration = 3, type = "message")
+    removeNotification(id = "msg_processing")
+    showNotification("Displaying results", duration = 7)
     # need a small pause 
-    Sys.sleep(1)
+    Sys.sleep(0.2)
     runjs('document.getElementById("anchor_results_baseline").scrollIntoView();')
   })
   
@@ -700,24 +849,26 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model/model_repeat.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, 
-                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
-                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
     
     check_parameters_list_for_na(parameters_list = parameters)
     
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
-                          contact_work = contact_work, contact_other = contact_other)
+                          contact_work = contact_work, contact_other = contact_other,
+                          age_group_vectors = interventions$future_age_groups)
+    
+    showNotification("Processing results", duration = NULL, id = "msg_processing")
     simul_interventions$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
                                                        ifr, mort, popstruc, intv_vector = vectors)
     simul_interventions$interventions_available <- TRUE
     
-    showNotification("Displaying results", duration = 3, type = "message")
+    removeNotification(id = "msg_processing")
+    showNotification("Displaying results", duration = 7)
     shinyjs::show(id = "results_interventions_1", anim = FALSE)
     shinyjs::show(id = "results_interventions_2", anim = FALSE)
     # need a small pause 
-    Sys.sleep(1)
+    Sys.sleep(0.2)
     runjs('document.getElementById("anchor_summary").scrollIntoView();')
   })
   
@@ -734,7 +885,7 @@ server <- function(input, output, session) {
   output$report <- downloadHandler(
     filename = "CoMo_Model_Report.docx",
     content = function(file) {
-      showNotification(HTML("Generating report (~ 15 secs.)"), duration = NULL, type = "message", id = "report_generation", session = session)
+      showNotification(HTML("Generating report."), duration = NULL, type = "message", id = "report_generation", session = session)
       
       tempReport <- file.path(tempdir(), "report.Rmd")
       tempLogo <- file.path(tempdir(), "como_logo.png")
@@ -747,10 +898,10 @@ server <- function(input, output, session) {
     }
   )
   
-  # Downloadable csv ----
+  # Downloadable csv of results ----
   results_aggregated <- reactive({
     
-    ## Outputs of the model ----
+    # Outputs of the model ----
     dta <- tibble(
       date = simul_baseline$results$time, 
       
@@ -866,36 +1017,31 @@ server <- function(input, output, session) {
       hypothetical_reportable_death_max = simul_interventions$results$max$reportable_death,
     )
     
-    ## Cases Data ----
+    # Cases Data ----
     dta <- left_join(
       dta, 
       cases_rv$data %>% rename(input_cases = cases, input_deaths = deaths, input_cumulative_death = cumulative_death), 
       by = "date")
     
-    ## Interventions ----
+    # Interventions ----
     startdate <- input$date_range[1]
     stopdate <- input$date_range[2]
     times <- seq(0, as.numeric(stopdate - startdate))
-    inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (Calibration)"),
-                     interventions$future_mat %>% mutate(`Apply to` = "Hypothetical Scenario")) %>%
-      rename(Intervention = intervention, `Date Start` = date_start, `Date End` = date_end, `Value` = value)
+    inp <- bind_rows(interventions$baseline_mat %>% mutate(apply_to = "Baseline (Calibration)"),
+                     interventions$future_mat %>% mutate(apply_to = "Hypothetical Scenario"))
     
-    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, 
-                       age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
-                       age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     vectors0_cbind <- do.call(cbind, vectors0)
     vectors0_reduced <- vectors0_cbind[seq(from=0,to=nrow(vectors0_cbind),by=20),]
     vectors0_reduced <- as.data.frame(rbind(rep(0,ncol(vectors0_reduced)),vectors0_reduced))
-    vectors0_reduced <- vectors0_reduced[,1:10] #subsetting only the coverages
+    vectors0_reduced <- vectors0_reduced[,1:12] #subsetting only the coverages - total of 12 different interventions
     names(vectors0_reduced) <- paste0("interventions_baseline_",names(vectors0_reduced))
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, 
-                      age_testing_min = input$age_testing_min, age_testing_max = input$age_testing_max, 
-                      age_vaccine_min = input$age_vaccine_min, age_vaccine_max  = input$age_vaccine_max)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
     vectors_cbind <- do.call(cbind, vectors)
     vectors_reduced <- vectors_cbind[seq(from=0,to=nrow(vectors_cbind),by=20),]
     vectors_reduced <- as.data.frame(rbind(rep(0,ncol(vectors_reduced)),vectors_reduced))
-    vectors_reduced <- vectors_reduced[,1:10] #subsetting only the coverages
+    vectors_reduced <- vectors_reduced[,1:12] #subsetting only the coverages - total of 12 different interventions
     names(vectors_reduced) <- paste0("interventions_hypothetical_",names(vectors_reduced))
     
     intv_vectors <- as_tibble(cbind(date=simul_baseline$results$time, vectors0_reduced, vectors_reduced))
@@ -909,6 +1055,13 @@ server <- function(input, output, session) {
     filename = "COVID19_App_Data.csv",
     content = function(file) {
       write.csv(results_aggregated(), file, row.names = FALSE)
+    }
+  )
+  
+  output$download_seroprevalence_quant <- downloadHandler(
+    filename = "Baseline_Seroprevalence_Quantiles.csv",
+    content = function(file) {
+      write.csv(simul_baseline$results$seroprevalence_quantile, file, row.names = FALSE)
     }
   )
 }
