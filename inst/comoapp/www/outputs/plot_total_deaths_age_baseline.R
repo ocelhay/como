@@ -1,7 +1,8 @@
 output$plot_total_deaths_age <- renderPlot({
   req(simul_baseline$baseline_available)
   
-  # end date is the date of the last data point if the focus is "Observed", otherwise it is the last day of the simulation otherwise
+  # end_date is the date of the last data point if the focus is "Observed",
+  # otherwise it is the last day of the simulation
   end_date <- input$date_range[2]
   if(input$focus_axis == "Observed")  end_date <- cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))]
   
