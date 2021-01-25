@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v17.0.1"
+version_app <- "v17.0.2"
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -788,12 +788,10 @@ server <- function(input, output, session) {
     vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
     
     check_parameters_list_for_na(parameters_list = parameters)
-    
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other, 
                           age_group_vectors = interventions$baseline_age_groups)
-    
     showNotification("Processing results", duration = NULL, id = "msg_processing")
     simul_baseline$results <- process_ode_outcome(out = results, param_used = parameters, startdate, times, ihr, 
                                                   ifr, mort, popstruc, intv_vector = vectors)
