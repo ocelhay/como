@@ -33,12 +33,12 @@ shinybox(
   app_name = "CoMo",
   author = "CoMo Condortium",
   description = "Model from the Covid-19 International Modelling Consortium",
-  semantic_version = "v17.0.5", # important to respect the format v.x.y.z
+  semantic_version = "v17.0.2", # important to respect the format v.x.y.z
   mran_date = "2020-12-01",
   cran_like_url = NULL,
   mac_url = NULL,
   git_host = "github",
-  git_repo = "ocelhay/como@dev",
+  git_repo = "ocelhay/como@master",
   function_name = "run_app_standalone",
   local_package_path = NULL,
   package_install_opts = list(type = "binary"),
