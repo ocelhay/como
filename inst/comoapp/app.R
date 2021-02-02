@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v17.0.2"
+version_app <- "v17.0.3"
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -46,7 +46,7 @@ ui <- function(request) {
     includeCSS("./www/styles.css"),
     pushbar_deps(),
     useShinyjs(),
-    chooseSliderSkin('HTML5'),
+    # chooseSliderSkin('HTML5'),
     
     source("./www/ui/pushbar_parameters_reporting.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
@@ -920,7 +920,10 @@ server <- function(input, output, session) {
       baseline_death_untreated_hospital_min = simul_baseline$results$min$death_untreated_hospital,
       baseline_death_untreated_icu_min = simul_baseline$results$min$death_untreated_icu,
       baseline_death_untreated_ventilator_min = simul_baseline$results$min$death_untreated_ventilator,
-      baseline_reportable_death_min = simul_baseline$results$min$reportable_death,
+      baseline_death_cum_mortality_min = simul_baseline$results$min$cum_mortality,
+      baseline_death_deaths_from_covid_min = simul_baseline$results$min$deaths_from_covid,
+      baseline_death_deaths_with_covid_min = simul_baseline$results$min$deaths_with_covid,
+      
       
       baseline_predicted_reported_med = simul_baseline$results$med$daily_incidence,
       baseline_predicted_reported_and_unreported_med = simul_baseline$results$med$daily_total_cases,
@@ -938,7 +941,10 @@ server <- function(input, output, session) {
       baseline_death_untreated_hospital_med = simul_baseline$results$med$death_untreated_hospital,
       baseline_death_untreated_icu_med = simul_baseline$results$med$death_untreated_icu,
       baseline_death_untreated_ventilator_med = simul_baseline$results$med$death_untreated_ventilator,
-      baseline_reportable_death_med = simul_baseline$results$med$reportable_death,
+      baseline_death_cum_mortality_med = simul_baseline$results$med$cum_mortality,
+      baseline_death_deaths_from_covid_med = simul_baseline$results$med$deaths_from_covid,
+      baseline_death_deaths_with_covid_med = simul_baseline$results$med$deaths_with_covid,
+      
       
       baseline_predicted_reported_max = simul_baseline$results$max$daily_incidence,
       baseline_predicted_reported_and_unreported_max = simul_baseline$results$max$daily_total_cases,
@@ -956,7 +962,9 @@ server <- function(input, output, session) {
       baseline_death_untreated_hospital_max = simul_baseline$results$max$death_untreated_hospital,
       baseline_death_untreated_icu_max = simul_baseline$results$max$death_untreated_icu,
       baseline_death_untreated_ventilator_max = simul_baseline$results$max$death_untreated_ventilator,
-      baseline_reportable_death_max = simul_baseline$results$max$reportable_death,
+      baseline_death_cum_mortality_max = simul_baseline$results$max$cum_mortality,
+      baseline_death_deaths_from_covid_max = simul_baseline$results$max$deaths_from_covid,
+      baseline_death_deaths_with_covid_max = simul_baseline$results$max$deaths_with_covid,
       
       
       # Hypothetical scenario
@@ -976,7 +984,9 @@ server <- function(input, output, session) {
       hypothetical_death_untreated_hospital_min = simul_interventions$results$min$death_untreated_hospital,
       hypothetical_death_untreated_icu_min = simul_interventions$results$min$death_untreated_icu,
       hypothetical_death_untreated_ventilator_min = simul_interventions$results$min$death_untreated_ventilator,
-      hypothetical_reportable_death_min = simul_interventions$results$min$reportable_death,
+      hypothetical_death_cum_mortality_min = simul_interventions$results$min$cum_mortality,
+      hypothetical_death_deaths_from_covid_min = simul_interventions$results$min$deaths_from_covid,
+      hypothetical_death_deaths_with_covid_min = simul_interventions$results$min$deaths_with_covid,
       
       hypothetical_predicted_reported_med = simul_interventions$results$med$daily_incidence,
       hypothetical_predicted_reported_and_unreported_med = simul_interventions$results$med$daily_total_cases,
@@ -994,7 +1004,9 @@ server <- function(input, output, session) {
       hypothetical_death_untreated_hospital_med = simul_interventions$results$med$death_untreated_hospital,
       hypothetical_death_untreated_icu_med = simul_interventions$results$med$death_untreated_icu,
       hypothetical_death_untreated_ventilator_med = simul_interventions$results$med$death_untreated_ventilator,
-      hypothetical_reportable_death_med = simul_interventions$results$med$reportable_death,
+      hypothetical_death_cum_mortality_med = simul_interventions$results$med$cum_mortality,
+      hypothetical_death_deaths_from_covid_med = simul_interventions$results$med$deaths_from_covid,
+      hypothetical_death_deaths_with_covid_med = simul_interventions$results$med$deaths_with_covid,
       
       hypothetical_predicted_reported_max = simul_interventions$results$max$daily_incidence,
       hypothetical_predicted_reported_and_unreported_max = simul_interventions$results$max$daily_total_cases,
@@ -1012,7 +1024,9 @@ server <- function(input, output, session) {
       hypothetical_death_untreated_hospital_max = simul_interventions$results$max$death_untreated_hospital,
       hypothetical_death_untreated_icu_max = simul_interventions$results$max$death_untreated_icu,
       hypothetical_death_untreated_ventilator_max = simul_interventions$results$max$death_untreated_ventilator,
-      hypothetical_reportable_death_max = simul_interventions$results$max$reportable_death,
+      hypothetical_death_cum_mortality_max = simul_interventions$results$max$cum_mortality,
+      hypothetical_death_deaths_from_covid_max = simul_interventions$results$max$deaths_from_covid,
+      hypothetical_death_deaths_with_covid_max = simul_interventions$results$max$deaths_with_covid,
     )
     
     # Cases Data ----

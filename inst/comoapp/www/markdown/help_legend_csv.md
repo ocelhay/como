@@ -23,7 +23,9 @@ Each variable ends with `_min`, `_med` or `_max`. If there is only one model run
 | *_death_untreated_hospital          | Cumulative COVID-19 deaths in patients who should have been in the hospital on inpatient beds up to time t                                                           |
 | *_death_untreated_icu               | Cumulative COVID-19 deaths in patients who require ICU bed, but placed on normal beds up to time t                                                                   |
 | *_death_untreated_ventilator        | Cumulative COVID-19 deaths in patients who require ventilators, but only get ICU beds up to time t                                                                   |
-| *_cum_mortality                     | Cumulative COVID-19 deaths + natural deaths from hospitalized, ICU, ventilator (and their overflown) compartments up to time t                                       |
+| *_death_cum_mortality               | Cumulative COVID-19 deaths + natural deaths from hospitalized, ICU, ventilator (and their overflown) compartments up to time t                                       |
+| *_death_deaths_from_covid           | All deaths due to covid19 disease - reported + unreported                                                                                                            |
+| *_death_deaths_with_covid           | All deaths of infected with sars-cov-2 virus - reported + unreported                                                                                                 |
 | input_cases                         | Observed daily incidence (based on user input or from European Centre for Disease Prevention and Control)                                                            |
 | input_deaths                        | Observed daily deaths (based on user input or from European Centre for Disease Prevention and Control)                                                               |
 | input_cumulative_death              | Observed cumulative deaths (based on user input or from European Centre for Disease Prevention and Control)                                                          |
