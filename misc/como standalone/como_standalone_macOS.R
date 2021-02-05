@@ -28,7 +28,7 @@ shinybox(
   app_name = "CoMo",
   author = "CoMo Consortium",
   description = "Model from the Covid-19 International Modelling Consortium",
-  semantic_version = "v17.0.2", # important de garder le format vx.y.z - to add as a validation?
+  semantic_version = "v17.0.3", # important de garder le format vx.y.z - to add as a validation?
   mran_date = "2020-12-01",
   cran_like_url = NULL,
   mac_url = "https://mac.r-project.org/high-sierra/R-4.0-branch/x86_64/R-4.0-branch.tar.gz",
