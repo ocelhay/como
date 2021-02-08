@@ -1,7 +1,7 @@
 Package: como
 Type: Package
 Title: A Web Application of the CoMo COVID-19 Model
-Version: 16.2.4
+Version: 17.0.3
 Authors@R: c(person(given = "Olivier", family = "Celhay", 
                 email = "olivier.celhay@gmail.com", 
                 role = c("aut", "cre"), comment = c(ORCID = "https://orcid.org/0000-0002-2971-9110")),
@@ -24,7 +24,6 @@ Description: The Covid-19 International Modelling Consortium (CoMo Consortium)
     that allows to investigate the potential impact of several non-pharmaceutical interventions.
 License: CC BY-NC 4.0
 URL: https://github.com/ocelhay/como
-BugReports: https://github.com/ocelhay/como/issues
 Encoding: UTF-8
 Language: en-gb
 LazyData: true
@@ -33,6 +32,7 @@ Depends:
 Imports:
     bsplus, 
     deSolve,
+    glue,
     gridExtra, 
     highcharter, 
     knitr, 
@@ -51,7 +51,7 @@ Imports:
     shinyWidgets, 
     tidyverse
 Remotes: 
-    url::https://github.com/bogaotory/comoOdeCpp/releases/download/v16.2.0/comoOdeCpp_16.2.0.tar.gz
+    url::https://github.com/bogaotory/comoOdeCpp/releases/download/v16.6.0/comoOdeCpp_16.6.0.tar.gz
 Suggests:
     oxcovid19
 RoxygenNote: 7.1.1

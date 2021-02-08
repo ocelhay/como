@@ -1,8 +1,9 @@
 ## Manually prepare data files (.Rda) to be used in the App
 
 # Prolegomenon ----
-# setwd("/Users/olivier/Documents/CoMo/como/data_preparation/raw_data/")
+# setwd("/Users/olivier/Documents/Projets/CoMo/como/data_preparation/raw_data")
 library(oxcovid19)
+library(RCurl)
 library(readxl)
 library(tidyverse)
 
@@ -15,7 +16,7 @@ ecdc <- get_table(con = con, tbl_name = "epidemiology") %>%
   collect()
 
 cases <- ecdc %>%
-  transmute(country, date, cumulative_cases = confirmed, cumulative_death = dead) %>%
+  transmute(country, date, cumulative_cases = confirmed, cumulative_death = dead, seroprevalence = NA) %>%
   group_by(country) %>%
   arrange(date) %>%
   mutate(cases = cumulative_cases - lag(cumulative_cases),
@@ -30,7 +31,7 @@ tests <- read.csv(text = table_tests) %>%
   filter(tests > 0)
 
 
-save(cases, tests, file = "/Users/olivier/Documents/CoMo/como/inst/comoapp/www/data/cases.Rda")
+save(cases, tests, file = "/Users/olivier/Documents/Projets/CoMo/como/inst/comoapp/www/data/cases.Rda")
 
 
 # Mortality/Severity
