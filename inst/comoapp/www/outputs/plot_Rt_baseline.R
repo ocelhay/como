@@ -21,6 +21,7 @@ output$plot_Rt_baseline <- renderPlot({
     geom_line(aes(y = Rt_med), color = "#00441b", lwd = 1.2) + 
     geom_line(aes(y = One), color = "red", lwd = 1.2) + 
     geom_label(label = "Rt = 1", x = simul_baseline$results$time[1], y = 1, color = "red", fill = "pink") + 
+    scale_x_date(date_labels =  "%b %Y") +
     ggtitle("Baseline Rt") + xlab("") + ylab("Rt") +
     theme_light(base_size = 14)
 })
