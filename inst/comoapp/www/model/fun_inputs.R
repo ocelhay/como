@@ -10,17 +10,17 @@ inputs <- function(inp, run, times, startdate, stopdate) {
   inp <- inp %>% arrange(`Date Start`)
   # print(inp)
   tv<-which(inp$`Apply to`==run)
-
+  
   si<-intersect(which(inp$Intervention=="Self-isolation if Symptomatic"),tv)
-  scr<-intersect(which(inp$Intervention=="Screening (when S.I.)"),tv)
+  scr<-intersect(which(inp$Intervention=="(*Self-isolation) Screening"),tv)
   sd<-intersect(which(inp$Intervention=="Social Distancing"),tv)
   hw<-intersect(which(inp$Intervention=="Handwashing"),tv)
-  msk<-intersect(which(inp$Intervention=="Masking"),tv)
+  msk<-intersect(which(inp$Intervention=="Mask Wearing"),tv)
   wah<-intersect(which(inp$Intervention=="Working at Home"),tv)
   sc<-intersect(which(inp$Intervention=="School Closures"),tv)
   # scc<-intersect(which(inp$Intervention=="School Group Code"),tv)
   cte<-intersect(which(inp$Intervention=="Shielding the Elderly"),tv)
-  q<-intersect(which(inp$Intervention=="Household Isolation (when S.I.)"),tv)
+  q<-intersect(which(inp$Intervention=="(*Self-isolation) Household Isolation"),tv)
   tb<-intersect(which(inp$Intervention=="International Travel Ban"),tv)
   vc<-intersect(which(inp$Intervention=="Vaccination"),tv)
   mt<-intersect(which(inp$Intervention=="Mass Testing"),tv)
@@ -65,8 +65,8 @@ inputs <- function(inp, run, times, startdate, stopdate) {
         isolation<-c(isolation,rep(1,(f[i*2]-f[i*2-1])*20))
       }
       if(i==length(si) && f[i*2]<tail(times,1)){
-       si_vector<-c(si_vector,rep(0,(tail(times,1)-f[i*2])*20))
-       isolation<-c(isolation,rep(0,(tail(times,1)-f[i*2])*20))
+        si_vector<-c(si_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        isolation<-c(isolation,rep(0,(tail(times,1)-f[i*2])*20))
       }
     }
   }else{
@@ -546,7 +546,7 @@ inputs <- function(inp, run, times, startdate, stopdate) {
     vaccine<-rep(0,tail(times,1)*20)
     vaccineage<-rep(0,tail(times,1)*20)
   }
- 
+  
   return(list(si_vector=si_vector,sd_vector=sd_vector,scr_vector=scr_vector,hw_vector=hw_vector,msk_vector=msk_vector,
               wah_vector=wah_vector,sc_vector=sc_vector,tb_vector=tb_vector,mt_vector=mt_vector*1000,
               cte_vector=cte_vector,q_vector=q_vector,vc_vector=vc_vector,isolation=isolation,
