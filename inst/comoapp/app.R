@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v16.2.6"
+version_app <- "v16.2.6.1"
 
 # To generate report with macOS standalone app (shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -16,7 +16,7 @@ if (Sys.info()["sysname"] == "Darwin" &
 library(comoOdeCpp)
 if(packageVersion("comoOdeCpp") != "16.2.2" )  stop("
 Running the app requires to install the v16.2.2 of the R package comoOdeCpp.
-Run:   devtools::install_github('bogaotory/comoOdeCp/comoOdeCppp@v16.2.2')
+Run:   devtools::install_github('bogaotory/comoOdeCpp/comoOdeCpp@v16.2.2')
 in the R console to install it.")
 
 
@@ -50,7 +50,7 @@ ui <- function(request) {
     includeCSS("./www/styles.css"),
     pushbar_deps(),
     useShinyjs(),
-    chooseSliderSkin('HTML5'),
+    # chooseSliderSkin('HTML5'),
     title = "CoMo Consortium | COVID-19 App",
     
     source("./www/ui/pushbar_parameters_reporting.R", local = TRUE)[1],
