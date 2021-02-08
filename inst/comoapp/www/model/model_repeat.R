@@ -98,7 +98,9 @@ parameters <- reactiveValuesToList(input)[
     "report_cv", "report_vr", "report_cvr", "report_r", "report_cr", "reporth_ICU",
     "report_death_HC", "pdeath_vent_hc", "pdeath_icu_hc", "pdeath_icu_hco",
     "reporth_g", "seroneg",
-    "vaccine_eff_r", "age_vaccine_max", "pre"
+    "vaccine_eff_r", "age_vaccine_max", "pre",
+    # addition in v16.3:
+    "init"
     )] %>% 
   unlist()
 
@@ -211,7 +213,7 @@ inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (C
 # initial conditions for the main solution vector ----
 initI <- rep(0, A)  # Infected and symptomatic
 initE <- rep(0, A)  # Incubating
-initE[aci] <- 1     # Place random index case in E compartment
+initE[aci] <- sum(popstruc[,2]) / parameters["init"]    # Place random index case in E compartment
 initR <- (input$pre / 100) * popstruc[,2]  # Immune
 initX <- rep(0, A)  # Isolated 
 initV <- rep(0, A)  # Vaccinated 
