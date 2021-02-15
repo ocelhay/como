@@ -7,6 +7,10 @@ inputs <- function(inp, run, times, startdate, stopdate) {
   # cap intervention start and end dates with simulation end date
   inp$`Date Start` = pmin(stopdate, inp$`Date Start`)
   inp$`Date End` = pmin(stopdate, inp$`Date End`)
+  
+  inp$`Date Start` = pmax(startdate, as.Date(inp$`Date Start`))
+  inp$`Date End` = pmax(startdate, as.Date(inp$`Date End`))
+  
   inp <- inp %>% arrange(`Date Start`)
   # print(inp)
   tv<-which(inp$`Apply to`==run)
