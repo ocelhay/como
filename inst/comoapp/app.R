@@ -782,7 +782,7 @@ server <- function(input, output, session) {
   
   # Process on "run_baseline" ----
   observeEvent(input$run_baseline, {
-    # Reset simul_interventions (expired baseline)
+    # Previous results are no longer valid
     simul_interventions$results <- NULL
     
     # Create/filter objects for model that are dependent on user inputs
@@ -790,6 +790,11 @@ server <- function(input, output, session) {
     parameters["iterations"] <- 1
     
     vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
+    
+    # Temporary fix the issue where the app crashes if the vaccination efficacy is 100 
+    # by replacing 100 by 99.
+    # It should better to fix this in the model.
+    vectors$vc_vector[which(vectors$vc_vector == 100)] <- 99
     
     check_parameters_list_for_na(parameters_list = parameters)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
@@ -819,6 +824,11 @@ server <- function(input, output, session) {
     source("./www/model/model_repeat.R", local = TRUE)
     
     vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
+    
+    # Temporary fix the issue where the app crashes if the vaccination efficacy is 100 
+    # by replacing 100 by 99.
+    # It should better to fix this in the model.
+    vectors$vc_vector[which(vectors$vc_vector == 100)] <- 99
     
     check_parameters_list_for_na(parameters_list = parameters)
     
@@ -852,6 +862,11 @@ server <- function(input, output, session) {
     source("./www/model/model_repeat.R", local = TRUE)
     
     vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
+    
+    # Temporary fix the issue where the app crashes if the vaccination efficacy is 100 
+    # by replacing 100 by 99.
+    # It should better to fix this in the model.
+    vectors$vc_vector[which(vectors$vc_vector == 100)] <- 99
     
     check_parameters_list_for_na(parameters_list = parameters)
     
