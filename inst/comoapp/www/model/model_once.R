@@ -10,12 +10,12 @@ entities_tests <- c("_", sort(unique(tests$entity)))
 countries_contact <- names(contact_home)
 countries_demographic <- sort(unique(population$country))
 
-valid_interventions_v17 <- c("Dexamethasone", "Handwashing", "International Travel Ban",
+valid_interventions_v18 <- c("Dexamethasone", "Handwashing", "International Travel Ban",
                              "Mask Wearing", "Mass Testing", "School Closures", "Self-isolation if Symptomatic",
                              "(*Self-isolation) Household Isolation", "(*Self-isolation) Screening", "Shielding the Elderly",
-                             "Social Distancing", "Vaccination", "Working at Home")
+                             "Social Distancing", "Vaccination", "Working at Home", "Partial School Closures")
 
-all_interventions <- c("_", valid_interventions_v17)
+all_interventions <- c("_", valid_interventions_v18)
 
 vec_age_categories <- c("1 = 0-5 y.o.", "2 = 5-10 y.o.", "3 = 10-15 y.o.", 
                         "4 = 15-20 y.o.", "5 = 20-25 y.o.", "6 = 25-30 y.o.",

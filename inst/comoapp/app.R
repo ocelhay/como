@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v17.1.1"
+version_app <- "v18.0.0"
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -615,8 +615,8 @@ server <- function(input, output, session) {
       return(NULL)  # exit
     }
     
-    if(version_template != "Template v17") {
-      showNotification(HTML("The format of the file is not recognised. </br> Upload a 'v17 template' to change defaults parameters."), 
+    if(version_template != "Template v18") {
+      showNotification(HTML("The format of the file is not recognised. </br> Upload a 'v18 template' to change defaults parameters."), 
                        type = "error", duration = 10)
       return(NULL)  # exit
     }
@@ -729,8 +729,8 @@ server <- function(input, output, session) {
       filter(!is.na(Intervention))
     names(interventions_excel) <- c("intervention", "date_start", "date_end", "value", "unit", "age_group", "apply_to")
     
-    if(all(interventions_excel$intervention %in% valid_interventions_v17)) message("Okay, all interventions are valid.")
-    if(! all(interventions_excel$intervention %in% valid_interventions_v17)) stop("Stop, some interventions are not valid.")
+    if(all(interventions_excel$intervention %in% valid_interventions_v18)) message("Okay, all interventions are valid.")
+    if(! all(interventions_excel$intervention %in% valid_interventions_v18)) stop("Stop, some interventions are not valid.")
     
     
     
