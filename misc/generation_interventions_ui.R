@@ -1,5 +1,5 @@
 js_1 <- "].every( (val) => { return val === '_';} ))"
-js_2 <- "['Mass Testing', 'Vaccination', 'School Closures']"
+js_2 <- "['Mass Testing', 'Vaccination', 'School Closures', 'Partial School Closures']"
 
 # Generate interventions_baseline.R ----
 sink("/Users/olivier/Desktop/interventions_baseline.R")

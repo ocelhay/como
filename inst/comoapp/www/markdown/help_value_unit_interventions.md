@@ -6,6 +6,7 @@
 | Mask Wearing                          | %                 |
 | Mass Testing                          | thousands tests   |
 | School Closures                       | %                 |
+| Partial School Closures               | %                 |
 | Self-isolation if Symptomatic         | %                 |
 | (*Self-isolation) Screening           | contacts          |
 | (*Self-isolation) Household Isolation | %                 |

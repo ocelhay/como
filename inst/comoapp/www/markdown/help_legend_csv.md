@@ -41,3 +41,4 @@ Each variable ends with `_min`, `_med` or `_max`. If there is only one model run
 | *_cte_vector                        | Coverage over time (shielding the elderly)                                                                                                                           |
 | *_q_vector                          | Coverage over time (household isolation)                                                                                                                             |
 | *_vc_vector                         | Coverage over time (vaccination)                                                                                                                                     |
+| *_scp_vector                        | Coverage over time (partial school closure)                                                                                                                          |
