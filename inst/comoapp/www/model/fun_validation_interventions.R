@@ -56,15 +56,6 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date) 
                                              check_date_range(reference = "Self-isolation if Symptomatic", dependant = "(*Self-isolation) Screening"))
   validation$message_interventions <- paste0(validation$message_interventions, 
                                              check_date_range(reference = "Self-isolation if Symptomatic", dependant = "(*Self-isolation) Household Isolation"))
-  validation$message_interventions <- paste0(validation$message_interventions, 
-                                             check_date_range(reference = "Vaccination", dependant = "(*Vaccination) Age Vaccine Minimum"))
-  validation$message_interventions <- paste0(validation$message_interventions, 
-                                             check_date_range(reference = "Vaccination", dependant = "(*Vaccination) Age Vaccine Maximum"))
-  validation$message_interventions <- paste0(validation$message_interventions, 
-                                             check_date_range(reference = "Mass Testing", dependant = "(*Mass Testing) Age Testing Minimum"))
-  validation$message_interventions <- paste0(validation$message_interventions, 
-                                             check_date_range(reference = "Mass Testing", dependant = "(*Mass Testing) Age Testing Maximum"))
-  
-  
+
   return(validation)
 }
