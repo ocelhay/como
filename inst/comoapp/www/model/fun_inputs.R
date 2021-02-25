@@ -22,13 +22,14 @@ inputs <- function(inp, run, times, startdate, stopdate) {
   msk<-intersect(which(inp$Intervention=="Mask Wearing"),tv)
   wah<-intersect(which(inp$Intervention=="Working at Home"),tv)
   sc<-intersect(which(inp$Intervention=="School Closures"),tv)
+  scp<-intersect(which(inp$Intervention=="Partial School Closures"),tv)
   # scc<-intersect(which(inp$Intervention=="School Group Code"),tv)
   cte<-intersect(which(inp$Intervention=="Shielding the Elderly"),tv)
   q<-intersect(which(inp$Intervention=="(*Self-isolation) Household Isolation"),tv)
   tb<-intersect(which(inp$Intervention=="International Travel Ban"),tv)
   vc<-intersect(which(inp$Intervention=="Vaccination"),tv)
+  vcp<-intersect(which(inp$Intervention=="Partial Vaccination"),tv)
   mt<-intersect(which(inp$Intervention=="Mass Testing"),tv)
-  vc<-intersect(which(inp$Intervention=="Vaccination"),tv)
   dx<-intersect(which(inp$Intervention=="Dexamethasone"),tv)
   
   v<-(format(as.POSIXct(inp$`Date Start`,format='%Y/%m/%d %H:%M:%S'),format="%d/%m/%y"))
@@ -340,6 +341,44 @@ inputs <- function(inp, run, times, startdate, stopdate) {
     schoolclose<-rep(0,tail(times,1)*20)
   }
   schoolclose[is.na(schoolclose)]<-1
+  ## partial school closure
+  f<-c()
+  scp_vector<-c()
+  schoolclosepartial<-c()
+  if (length(scp)>=1){
+    for (i in 1:length(scp)){
+      f<-c(f,as.numeric(inp$`Date Start`[sc[i]]-startdate),as.numeric(inp$`Date End`[scp[i]]-startdate))
+      if(i==1){
+        if (inp$`Date Start`[scp[i]]>startdate){
+          scp_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[scp[i]],(f[i+1]-f[i])*20))
+          schoolclosepartial<-c(rep(0,f[i]*20),rep(inp$Target[scp[i]],(f[i+1]-f[i])*20))
+        }
+        else{
+          scp_vector<-c(rep(inp$`Value`[scp[i]],(f[i+1])*20))
+          schoolclosepartial<-c(rep(inp$Target[scp[i]],(f[i+1])*20))
+        }
+      }
+      else{
+        if (f[(i-1)*2+1]-f[(i-1)*2]==1){
+          scp_vector<-c(scp_vector,rep(inp$`Value`[scp[i]],20))
+          schoolclosepartial<-c(schoolclosepartial,rep(inp$Target[scp[i]],20))
+        }else{
+          scp_vector<-c(scp_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+          schoolclosepartial<-c(schoolclosepartial,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        }
+        scp_vector<-c(scp_vector,rep(inp$`Value`[scp[i]],(f[i*2]-f[i*2-1])*20))
+        schoolclosepartial<-c(schoolclosepartial,rep(inp$Target[scp[i]],(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(scp)&& f[i*2]<tail(times,1)){
+        scp_vector<-c(scp_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        schoolclosepartial<-c(schoolclosepartial,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    scp_vector<-rep(0,tail(times,1)*20)
+    schoolclosepartial<-rep(0,tail(times,1)*20)
+  }
+  schoolclosepartial[is.na(schoolclosepartial)]<-1
   ## cocooning the elderly
   f<-c()
   cte_vector<-c()
@@ -551,10 +590,57 @@ inputs <- function(inp, run, times, startdate, stopdate) {
     vaccineage<-rep(0,tail(times,1)*20)
   }
   
+  ## vaccine partial
+  f<-c()
+  vcp_vector<-c()
+  vaccinep<-c()
+  vaccineagepartial<-c()
+  if (length(vcp)>=1){
+    for (i in 1:length(vcp)){
+      f<-c(f,as.numeric(inp$`Date Start`[vcp[i]]-startdate),as.numeric(inp$`Date End`[vcp[i]]-startdate))
+      if(i==1){
+        if (inp$`Date Start`[vcp[i]]>startdate){
+          vcp_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[vcp[i]],(f[i+1]-f[i])*20))
+          vaccinep<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+          vaccineagepartial<-c(rep(0,f[i]*20),rep(inp$`Target`[vcp[i]],(f[i+1]-f[i])*20))
+        }
+        else{
+          vcp_vector<-c(rep(inp$`Value`[vcp[i]],(f[i+1])*20))
+          vaccinep<-c(rep(1,(f[i+1])*20))
+          vaccineagepartial<-c(rep(inp$`Target`[vcp[i]],(f[i+1])*20))
+        }
+      }
+      else{
+        if (f[(i-1)*2+1]-f[(i-1)*2]==1){
+          vcp_vector<-c(vcp_vector,rep(inp$`Value`[vcp[i]],20))
+          vaccinep<-c(vaccinep,rep(1,20))
+          vaccineagepartial<-c(vaccineagepartial,rep(inp$`Target`[vcp[i]],20))
+        }else{
+          vcp_vector<-c(vcp_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+          vaccinep<-c(vaccinep,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+          vaccineagepartial<-c(vaccineagepartial,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        }
+        vcp_vector<-c(vcp_vector,rep(inp$`Value`[vcp[i]],(f[i*2]-f[i*2-1])*20))
+        vaccinep<-c(vaccinep,rep(1,(f[i*2]-f[i*2-1])*20))
+        vaccineagepartial<-c(vaccineagepartial,rep(inp$`Target`[vcp[i]],(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(vcp)&& f[i*2]<tail(times,1)){
+        vcp_vector<-c(vcp_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        vaccinep<-c(vaccinep,rep(0,(tail(times,1)-f[i*2])*20))
+        vaccineagepartial<-c(vaccineagepartial,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    vcp_vector<-rep(0,tail(times,1)*20)
+    vaccinep<-rep(0,tail(times,1)*20)
+    vaccineagepartial<-rep(0,tail(times,1)*20)
+  }
+  
   return(list(si_vector=si_vector,sd_vector=sd_vector,scr_vector=scr_vector,hw_vector=hw_vector,msk_vector=msk_vector,
-              wah_vector=wah_vector,sc_vector=sc_vector,tb_vector=tb_vector,mt_vector=mt_vector*1000,
-              cte_vector=cte_vector,q_vector=q_vector,vc_vector=vc_vector,isolation=isolation,
-              screen=screen,cocoon=cocoon,schoolclose=schoolclose,workhome=workhome,handwash=handwash,masking=masking,
-              quarantine=quarantine,vaccine=vaccine,travelban=travelban,distancing=distancing,masstesting=masstesting,
-              testage=testage,vaccineage=vaccineage,dex=dex))
+              wah_vector=wah_vector,sc_vector=sc_vector,scp_vector=scp_vector,tb_vector=tb_vector,mt_vector=mt_vector*1000,
+              cte_vector=cte_vector,q_vector=q_vector,vc_vector=vc_vector,vcp_vector=vcp_vector,isolation=isolation,
+              screen=screen,cocoon=cocoon,schoolclose=schoolclose,schoolclosepartial=schoolclosepartial,
+              workhome=workhome,handwash=handwash,masking=masking,
+              quarantine=quarantine,vaccine=vaccine,vaccinep=vaccinep,travelban=travelban,distancing=distancing,
+              masstesting=masstesting,testage=testage,vaccineage=vaccineage,vaccineagepartial=vaccineagepartial,dex=dex))
 }
