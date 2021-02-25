@@ -5,7 +5,7 @@ if(FALSE){
 rm(list = ls())
 remove.packages("shinybox")
 detach("package:shinybox", unload = TRUE)
-remotes::install_github("ocelhay/shinybox", auth_token = "")
+remotes::install_github("ocelhay/shinybox")
 }
 
 library(shinybox)
@@ -34,11 +34,11 @@ shinybox(
   author = "CoMo Condortium",
   description = "Model from the Covid-19 International Modelling Consortium",
   semantic_version = "v18.0.0", # important to respect the format v.x.y.z
-  mran_date = "2020-12-01",
+  mran_date = "2021-02-15",
   cran_like_url = NULL,
   mac_url = NULL,
   git_host = "github",
-  git_repo = "ocelhay/como@master",
+  git_repo = "ocelhay/como@v18",
   function_name = "run_app_standalone",
   local_package_path = NULL,
   package_install_opts = list(type = "binary"),
@@ -46,7 +46,6 @@ shinybox(
   rtools_path_win = "C:\\rtools40\\usr\\bin",
   nodejs_path = "C:/Program Files/nodejs/",
   nodejs_version = "v14.7.0",
-  permission = TRUE,
   run_build = TRUE)
 
 
