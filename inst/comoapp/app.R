@@ -10,12 +10,12 @@ if (Sys.info()["sysname"] == "Darwin" &
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "16.6.0")  stop("
-Running the app requires to install the v16.6.0 of the R package comoOdeCpp.
+if(packageVersion("comoOdeCpp") != "16.8.0")  stop("
+Running the app requires to install the v16.8.0 of the R package comoOdeCpp.
 Run:  
 
   remove.packages('comoOdeCpp')
-  remotes::install_github('bogaotory/comoOdeCpp@v16.6.0', subdir = 'comoOdeCpp')
+  remotes::install_github('bogaotory/comoOdeCpp', ref = 'v16.8.0', subdir = 'comoOdeCpp')
 
 in the R console to install it.")
 
