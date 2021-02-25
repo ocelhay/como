@@ -657,6 +657,7 @@ server <- function(input, output, session) {
                        read_excel(file_path, sheet = "Country Area Param"),
                        read_excel(file_path, sheet = "Virus Param"),
                        read_excel(file_path, sheet = "Hospitalisation Param"),
+                       read_excel(file_path, sheet = "Vaccination Param"),
                        read_excel(file_path, sheet = "Interventions Param")) %>%
       mutate(Value_Date = as.Date(Value_Date)) %>%
       drop_na(Parameter)
