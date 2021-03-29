@@ -1,6 +1,6 @@
 <!-- badges: start -->
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-[![](https://img.shields.io/badge/devel%20version-18.0.1.svg)](https://github.com/ocelhay/como)
+[![](https://img.shields.io/badge/devel%20version-18.1.0.svg)](https://github.com/ocelhay/como)
 [![Build Status](https://travis-ci.org/ocelhay/como.svg?branch=master)](https://travis-ci.org/ocelhay/como)
 [![DOI](https://zenodo.org/badge/251726959.svg)](https://zenodo.org/badge/latestdoi/251726959)
 <!-- badges: end -->
