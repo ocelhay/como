@@ -192,10 +192,10 @@ parameters["prob_v_vr"]<-parameters["prob_v_vr"]/100
 parameters["pclin_v"]<-parameters["pclin_v"]/100
 parameters["pclin_vr"]<-parameters["pclin_vr"]/100
 parameters["pclin_r"]<-parameters["pclin_r"]/100
-parameters["sigmaEV"]<-parameters["sigmaEV"]/100
-parameters["sigmaER"]<-parameters["sigmaER"]/100
-parameters["sigmaEVR"]<-parameters["sigmaEVR"]/100
-parameters["sigmaR"]<-parameters["sigmaR"]/100
+parameters["sigmaEV"]<-1-parameters["sigmaEV"]/100
+parameters["sigmaER"]<-1-parameters["sigmaER"]/100
+parameters["sigmaEVR"]<-1-parameters["sigmaEVR"]/100
+parameters["sigmaR"]<-1-parameters["sigmaR"]/100
 parameters["vac_dur"]<-1/parameters["vac_dur"]/100
 parameters["vac_dur_r"]<-1/parameters["vac_dur_r"]/100
 parameters["report_natdeathI"]<-parameters["report_natdeathI"]/100
