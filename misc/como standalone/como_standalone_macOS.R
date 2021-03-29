@@ -23,7 +23,7 @@ shinybox(
   app_name = "CoMo",
   author = "CoMo Consortium",
   description = "Model from the Covid-19 International Modelling Consortium",
-  semantic_version = "v17.1.2",
+  semantic_version = "v17.2.0",
   cran_like_url = "https://cran.microsoft.com/snapshot/2021-01-10",
   mac_file = "/Users/olivier/Documents/Projets/Standalone R Shiny/R/macOS/2020-10-13/R-4.0-branch.tar.gz",
   mac_r_url = NULL,
