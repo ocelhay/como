@@ -35,7 +35,6 @@ shinybox(
   local_package_path = NULL,
   package_install_opts = list(type = "binary"),
   build_path = build_path,
-  rtools_path_win = NULL,
   rtools_path_win = "C:\\rtools40\\usr\\bin",
   nodejs_path = "C:/Program Files/nodejs/",
   run_build = TRUE)
