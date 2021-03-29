@@ -7,6 +7,12 @@
 # make sure that Rtools in the PATH
 # https://stackoverflow.com/questions/47539125/how-to-add-rtools-bin-to-the-system-path-in-r
 
+# Make sure to use the correct version of shinybox
+rm(list = ls())
+cat("\014")
+remove.packages("shinybox")
+detach("package:shinybox", unload = TRUE)
+remotes::install_github("ocelhay/shinybox")
 library(shinybox)
 
 # Build a directory on the Desktop

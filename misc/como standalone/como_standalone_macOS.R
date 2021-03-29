@@ -4,7 +4,14 @@
 # remotes::install_github("ocelhay/como", ref = "master")
 # como::run_app_standalone()
 
+# Make sure to use the correct version of shinybox
+rm(list = ls())
+cat("\014")
+remove.packages("shinybox")
+detach("package:shinybox", unload = TRUE)
+remotes::install_github("ocelhay/shinybox")
 library(shinybox)
+
 
 # Build a directory on the Desktop
 time <- format(Sys.time(), "%Y-%m-%d_%H%M%S")
