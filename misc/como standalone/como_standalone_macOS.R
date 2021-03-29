@@ -4,10 +4,9 @@
 # remotes::install_github("ocelhay/como", ref = "master")
 # como::run_app_standalone()
 
-
 library(shinybox)
 
-# Build a directory on Dektop
+# Build a directory on the Desktop
 time <- format(Sys.time(), "%Y-%m-%d_%H%M%S")
 (build_path <- paste0("/Users/olivier/Documents/Projets/CoMo/Standalone_", time))
 dir.create(build_path)
@@ -20,7 +19,7 @@ shinybox(
   semantic_version = "v17.1.2",
   cran_like_url = "https://cran.microsoft.com/snapshot/2021-01-10",
   mac_file = "/Users/olivier/Documents/Projets/Standalone R Shiny/R/macOS/2020-10-13/R-4.0-branch.tar.gz",
-  mac_url = NULL,
+  mac_r_url = NULL,
   git_host = "github",
   git_repo = "ocelhay/como@master",
   function_name = "run_app_standalone", 
