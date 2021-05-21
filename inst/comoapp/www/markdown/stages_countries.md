@@ -1,4 +1,4 @@
-**Updated on January 6, 2021.**
+**Updated on April 6, 2021.**
 
 Stage 1: Preliminary analyses and model calibration to explore optimal containment strategies
 
@@ -12,6 +12,7 @@ Stage 1: Preliminary analyses and model calibration to explore optimal containme
 * Myanmar
 * Nigeria
 * Poland
+* Senegal
 * Sierra Leone
 * Syria - North East Syria
 * Taiwan
