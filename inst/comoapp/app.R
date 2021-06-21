@@ -91,8 +91,7 @@ ui <- function(request) {
           column(
             width = 2,
             div(class = "float_bottom_left",
-                sliderInput("p", label = "Prob. of infection given contact:", min = 0.01, max = 0.08, step = 0.001,
-                            value = 0.049, ticks = FALSE),
+                numericInput("p", label = "Prob. of infection given contact:", min = 0.01, max = 0.08, value = 0.049),
                 sliderInput("report", label = span("% of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
                             value = 2.5, post = "%", ticks = FALSE),
                 sliderInput("reportc", label = span("% of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
@@ -666,7 +665,7 @@ server <- function(input, output, session) {
     
     # Update all sliders
     if(!is_empty(param$Parameter[param$Type == 'slider'])) {
-      for (input_excel in param$Parameter[param$Type == 'slider']){
+      for (input_excel in setdiff(param$Parameter[param$Type == 'slider'], c("p", "ihr_scaling"))){
         if(param$Value[param$Parameter == input_excel] != input[[input_excel]]) {
           msg_update_param <- glue("{msg_update_param} <strong>{input_excel}</strong>: from {input[[input_excel]]} to {param$Value[param$Parameter == input_excel]} ; ")
         }
@@ -675,7 +674,7 @@ server <- function(input, output, session) {
     
     # Update all numeric values
     if(!is_empty(param$Parameter[param$Type == 'numeric'])) {
-      for (input_excel in param$Parameter[param$Type == 'numeric']){
+      for (input_excel in c(param$Parameter[param$Type == 'numeric'], "p", "ihr_scaling")){
         if(param$Value[param$Parameter == input_excel] != input[[input_excel]]) {
           msg_update_param <- glue("{msg_update_param} <strong>{input_excel}</strong>: from {input[[input_excel]]} to {param$Value[param$Parameter == input_excel]} ; ")
         }
