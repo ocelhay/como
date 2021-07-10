@@ -51,7 +51,7 @@ Imports:
     shinyWidgets, 
     tidyverse
 Remotes: 
-    url::https://github.com/bogaotory/comoOdeCpp/releases/tag/v16.8.0.tar.gz
+    url::https://github.com/bogaotory/comoOdeCpp/releases/download/v19.1.0/comoOdeCpp_19.1.0.tar.gz
 Suggests:
     oxcovid19
 RoxygenNote: 7.1.1

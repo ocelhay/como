@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v18.2.0"
+version_app <- "v19.1.0"
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -10,12 +10,12 @@ if (Sys.info()["sysname"] == "Darwin" &
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "16.8.0")  stop("
-Running the app requires to install the v16.8.0 of the R package comoOdeCpp.
+if(packageVersion("comoOdeCpp") != "19.1.0")  stop("
+Running the app requires to install the v19.1.0 of the R package comoOdeCpp.
 Run:  
 
   remove.packages('comoOdeCpp')
-  remotes::install_github('bogaotory/comoOdeCpp', ref = 'v16.8.0', subdir = 'comoOdeCpp')
+  remotes::install_github('bogaotory/comoOdeCpp', ref = 'v19.1.0', subdir = 'comoOdeCpp')
 
 in the R console to install it.")
 
@@ -614,8 +614,8 @@ server <- function(input, output, session) {
       return(NULL)  # exit
     }
     
-    if(version_template != "Template v18") {
-      showNotification(HTML("The format of the file is not recognised. </br> Upload a 'v18 template' to change defaults parameters."), 
+    if(version_template != "Template v19") {
+      showNotification(HTML("The format of the file is not recognised. </br> Upload a 'v19 template' to change defaults parameters."), 
                        type = "error", duration = 10)
       return(NULL)  # exit
     }

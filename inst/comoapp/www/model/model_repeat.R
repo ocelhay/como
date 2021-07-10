@@ -211,6 +211,7 @@ parameters["seroneg"]<-(1/parameters["seroneg"])
 
 
 # initial conditions for the main solution vector ----
+initSR <- 0*popstruc[,2]  # lost immunity
 initI<-0*popstruc[,2]  # Infected and symptomatic
 initE<-0*popstruc[,2]  # Incubating
 # initE[aci]<-1          # place random index case in E compartment
@@ -218,7 +219,8 @@ initE[aci]<-parameters["init"]     # place random index case in E compartment
 initR<-parameters["pre"]*popstruc[,2]  # Immune
 initX<-0*popstruc[,2]  # Isolated 
 initV<-0*popstruc[,2]  # Vaccinated 
-initQS<-0*popstruc[,2] # quarantined S 
+initQS<-0*popstruc[,2] # quarantined S
+initQSR <- 0*popstruc[,2] # quarantined SR 
 initQE<-0*popstruc[,2] # quarantined E  
 initQI<-0*popstruc[,2] # quarantined I  
 initQR<-0*popstruc[,2] # quarantined R  
@@ -248,8 +250,8 @@ initHCICU<-0*popstruc[,2] # icu not seeking
 initHCV<-0*popstruc[,2]   # ventilator not seeking
 initAb<-0*popstruc[,2]   # ventilator not seeking
 
-initS<-popstruc[,2]-initE-initI-initCL-initR-initX-initZ-initV-initH-initHC-initICU-initICUC-initICUCV-initVent-initVentC-
-  initQS-initQE-initQI-initQR-initQC-initEV-initER-initEVR-initVR-initQV-initQEV-initQEVR-initQER-initQVR-
+initS<-popstruc[,2]-initSR-initE-initI-initCL-initR-initX-initZ-initV-initH-initHC-initICU-initICUC-initICUCV-initVent-initVentC-
+  initQS-initQSR-initQE-initQI-initQR-initQC-initEV-initER-initEVR-initVR-initQV-initQEV-initQEVR-initQER-initQVR-
   initHCICU-initHCV # Susceptible (non-immune)
 
 
@@ -260,6 +262,6 @@ inp <- bind_rows(interventions$baseline_mat %>% mutate(`Apply to` = "Baseline (C
   rename(apply_to = `Apply to`)
 
 
-Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, 
+Y<-c(initS,initSR,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQSR, initQE, initQI, initQR, initCL, initQC, initICU, 
      initICUC, initICUCV, initVent, initVentC, initCMC,initZ, initEV, initER, initEVR, initVR, 
      initQV,initQEV,initQEVR,initQER,initQVR,initHCICU,initHCV,initAb) # initial conditions for the main solution vector
