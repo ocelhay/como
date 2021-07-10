@@ -5,8 +5,8 @@ inputs <- function(inp, run, times, startdate, stopdate) {
                          `Apply to` = apply_to)
 
   # cap intervention start and end dates with simulation end date
-  inp$`Date Start` = pmin(stopdate, inp$`Date Start`)
-  inp$`Date End` = pmin(stopdate, inp$`Date End`)
+  inp$`Date Start` = pmin(stopdate, as.Date(inp$`Date Start`))
+  inp$`Date End` = pmin(stopdate, as.Date(inp$`Date End`))
   
   inp$`Date Start` = pmax(startdate, as.Date(inp$`Date Start`))
   inp$`Date End` = pmax(startdate, as.Date(inp$`Date End`))
@@ -31,6 +31,9 @@ inputs <- function(inp, run, times, startdate, stopdate) {
   vcp<-intersect(which(inp$Intervention=="Partial Vaccination"),tv)
   mt<-intersect(which(inp$Intervention=="Mass Testing"),tv)
   dx<-intersect(which(inp$Intervention=="Dexamethasone"),tv)
+  pmod<-intersect(which(inp$Intervention=="Transmissibility"),tv)
+  dmod<-intersect(which(inp$Intervention=="Lethality"),tv)
+  cmod<-intersect(which(inp$Intervention=="Breakthrough infection probability"),tv)
   
   v<-(format(as.POSIXct(inp$`Date Start`,format='%Y/%m/%d %H:%M:%S'),format="%d/%m/%y"))
   v2<-as.Date(v,format="%d/%m/%y")
@@ -39,7 +42,118 @@ inputs <- function(inp, run, times, startdate, stopdate) {
   v<-(format(as.POSIXct(inp$`Date End`,format='%Y/%m/%d %H:%M:%S'),format="%d/%m/%y"))
   v2<-as.Date(v,format="%d/%m/%y")
   inp$`Date End`<-v2
-  
+
+  ## transmissibility
+  f<-c()
+  pmod_vector<-c()
+  p_mod<-c()
+  if (length(pmod)>=1){
+    for (i in 1:length(pmod)){
+      f<-c(f,as.numeric(inp$`Date Start`[pmod[i]]-startdate),as.numeric(inp$`Date End`[pmod[i]]-startdate))
+      if(i==1){
+        if (inp$`Date Start`[pmod[i]]>startdate){
+          pmod_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[pmod[i]],(f[i+1]-f[i])*20))
+          p_mod<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          pmod_vector<-c(rep(inp$`Value`[pmod[i]],(f[i+1])*20))
+          p_mod<-c(rep(1,(f[i+1])*20))
+        }
+      }
+      else{
+        if (f[(i-1)*2+1]-f[(i-1)*2]==1){
+          pmod_vector<-c(pmod_vector,rep(inp$`Value`[pmod[i]],20))
+          p_mod<-c(p_mod,rep(1,20))
+        }else{
+          pmod_vector<-c(pmod_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+          p_mod<-c(p_mod,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        }
+        pmod_vector<-c(pmod_vector,rep(inp$`Value`[pmod[i]],(f[i*2]-f[i*2-1])*20))
+        p_mod<-c(p_mod,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(pmod) && f[i*2]<tail(times,1)){
+        pmod_vector<-c(pmod_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        p_mod<-c(p_mod,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    pmod_vector<-rep(0,tail(times,1)*20)
+    p_mod<-rep(0,tail(times,1)*20)
+  }
+  ## lethality
+  f<-c()
+  dmod_vector<-c()
+  d_mod<-c()
+  if (length(dmod)>=1){
+    for (i in 1:length(dmod)){
+      f<-c(f,as.numeric(inp$`Date Start`[dmod[i]]-startdate),as.numeric(inp$`Date End`[dmod[i]]-startdate))
+      if(i==1){
+        if (inp$`Date Start`[dmod[i]]>startdate){
+          dmod_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[dmod[i]],(f[i+1]-f[i])*20))
+          d_mod<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          dmod_vector<-c(rep(inp$`Value`[dmod[i]],(f[i+1])*20))
+          d_mod<-c(rep(1,(f[i+1])*20))
+        }
+      }
+      else{
+        if (f[(i-1)*2+1]-f[(i-1)*2]==1){
+          dmod_vector<-c(dmod_vector,rep(inp$`Value`[dmod[i]],20))
+          d_mod<-c(d_mod,rep(1,20))
+        }else{
+          dmod_vector<-c(dmod_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+          d_mod<-c(d_mod,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        }
+        dmod_vector<-c(dmod_vector,rep(inp$`Value`[dmod[i]],(f[i*2]-f[i*2-1])*20))
+        d_mod<-c(d_mod,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(dmod) && f[i*2]<tail(times,1)){
+        dmod_vector<-c(dmod_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        d_mod<-c(d_mod,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    dmod_vector<-rep(0,tail(times,1)*20)
+    d_mod<-rep(0,tail(times,1)*20)
+  }
+  ## cross immunity
+  f<-c()
+  cmod_vector<-c()
+  c_mod<-c()
+  if (length(cmod)>=1){
+    for (i in 1:length(cmod)){
+      f<-c(f,as.numeric(inp$`Date Start`[cmod[i]]-startdate),as.numeric(inp$`Date End`[cmod[i]]-startdate))
+      if(i==1){
+        if (inp$`Date Start`[cmod[i]]>startdate){
+          cmod_vector<-c(rep(0,f[i]*20),rep(inp$`Value`[cmod[i]],(f[i+1]-f[i])*20))
+          c_mod<-c(rep(0,f[i]*20),rep(1,(f[i+1]-f[i])*20))
+        }
+        else{
+          cmod_vector<-c(rep(inp$`Value`[cmod[i]],(f[i+1])*20))
+          c_mod<-c(rep(1,(f[i+1])*20))
+        }
+      }
+      else{
+        if (f[(i-1)*2+1]-f[(i-1)*2]==1){
+          cmod_vector<-c(cmod_vector,rep(inp$`Value`[cmod[i]],20))
+          c_mod<-c(c_mod,rep(1,20))
+        }else{
+          cmod_vector<-c(cmod_vector,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+          c_mod<-c(c_mod,rep(0,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        }
+        cmod_vector<-c(cmod_vector,rep(inp$`Value`[cmod[i]],(f[i*2]-f[i*2-1])*20))
+        c_mod<-c(c_mod,rep(1,(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(cmod) && f[i*2]<tail(times,1)){
+        cmod_vector<-c(cmod_vector,rep(0,(tail(times,1)-f[i*2])*20))
+        c_mod<-c(c_mod,rep(0,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    cmod_vector<-rep(0,tail(times,1)*20)
+    c_mod<-rep(0,tail(times,1)*20)
+  }
   ##  self isolation
   f<-c()
   si_vector<-c()
@@ -642,5 +756,6 @@ inputs <- function(inp, run, times, startdate, stopdate) {
               screen=screen,cocoon=cocoon,schoolclose=schoolclose,schoolclosepartial=schoolclosepartial,
               workhome=workhome,handwash=handwash,masking=masking,
               quarantine=quarantine,vaccine=vaccine,vaccinep=vaccinep,travelban=travelban,distancing=distancing,
+              pmod=p_mod,pmod_vector=pmod_vector,dmod=d_mod,dmod_vector=dmod_vector,cmod=c_mod,cmod_vector=cmod_vector,
               masstesting=masstesting,testage=testage,vaccineage=vaccineage,vaccineagepartial=vaccineagepartial,dex=dex))
 }
