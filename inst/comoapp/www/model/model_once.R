@@ -10,14 +10,13 @@ entities_tests <- c("_", sort(unique(tests$entity)))
 countries_contact <- names(contact_home)
 countries_demographic <- sort(unique(population$country))
 
-valid_interventions_v18 <- c("Dexamethasone", "Handwashing", "International Travel Ban",
+valid_interventions <- c("Dexamethasone", "Handwashing", "International Travel Ban",
                              "Mask Wearing", "Mass Testing", "School Closures", "Self-isolation if Symptomatic",
                              "(*Self-isolation) Household Isolation", "(*Self-isolation) Screening", "Shielding the Elderly",
                              "Social Distancing", "Vaccination", "Working at Home", "Partial School Closures",
-                             "Transmissibility", "Lethality", "Breakthrough infection probability"
-                             )
+                             "Transmissibility", "Lethality", "Breakthrough infection probability")
 
-all_interventions <- c("_", valid_interventions_v18)
+all_interventions <- c("_", valid_interventions)
 
 vec_age_categories <- c("1 = 0-5 y.o.", "2 = 5-10 y.o.", "3 = 10-15 y.o.", 
                         "4 = 15-20 y.o.", "5 = 20-25 y.o.", "6 = 25-30 y.o.",
@@ -27,7 +26,8 @@ vec_age_categories <- c("1 = 0-5 y.o.", "2 = 5-10 y.o.", "3 = 10-15 y.o.",
                         "16 = 75-80 y.o.", "17 = 80-85 y.o.", "18 = 85-90 y.o.",
                         "19 = 90-95 y.o.", "20 = 95-100 y.o.", "21 = 100+ y.o.")
 
-real_interventions <- setdiff(all_interventions, c("_", "(*Self-isolation) Household Isolation", "(*Self-isolation) Screening"))
+real_interventions <- setdiff(all_interventions, c("_", "(*Self-isolation) Household Isolation", "(*Self-isolation) Screening",
+                                                   "Transmissibility", "Lethality", "Breakthrough infection probability"))
 
 # Default values for interventions.
 nb_interventions_max <- 100

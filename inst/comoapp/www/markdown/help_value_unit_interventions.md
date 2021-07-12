@@ -14,3 +14,6 @@
 | Social Distancing                     | %                 |
 | Vaccination                           | %                 |
 | Working at Home                       | %                 |
+| Transmissibility                      | Relative risk     |
+| Lethality                             | Relative risk     |
+| Breakthrough infection probability    | %                 |
