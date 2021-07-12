@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v19.1.0"
+version_app <- "v19.1.0"  # also in DESCRIPTION and README.md
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -91,7 +91,7 @@ ui <- function(request) {
           column(
             width = 2,
             div(class = "float_bottom_left",
-                numericInput("p", label = "Prob. of infection given contact:", min = 0.01, max = 0.08, value = 0.049),
+                numericInput("p", label = "Prob. of infection given contact:", min = 0, max = 0.2, value = 0.049),
                 sliderInput("report", label = span("% of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
                             value = 2.5, post = "%", ticks = FALSE),
                 sliderInput("reportc", label = span("% of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
@@ -729,9 +729,9 @@ server <- function(input, output, session) {
       filter(!is.na(Intervention))
     names(interventions_excel) <- c("intervention", "date_start", "date_end", "value", "unit", "age_group", "apply_to")
     
-    if(all(interventions_excel$intervention %in% valid_interventions_v18)) message("Okay, all interventions are valid.")
-    if(! all(interventions_excel$intervention %in% valid_interventions_v18)) stop("Stop, some interventions are not valid.")
-    
+    ifelse(all(interventions_excel$intervention %in% valid_interventions),
+           message("Okay, all interventions are valid."),
+           stop("Stop, some interventions are not valid."))
     
     
     # Update interventions in the UI: baseline interventions
