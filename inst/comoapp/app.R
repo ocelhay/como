@@ -494,6 +494,7 @@ server <- function(input, output, session) {
       Target = 1:nb_interventions_max) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
+                              intervention %in% c("Transmissibility", "Lethality", "Breakthrough infection probability") ~ " RR",
                               TRUE ~ "%")) %>%
       filter(intervention != "_")
     
@@ -516,6 +517,7 @@ server <- function(input, output, session) {
       Target = 1:nb_interventions_max) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
+                              intervention %in% c("Transmissibility", "Lethality", "Breakthrough infection probability") ~ " RR",
                               TRUE ~ "%")) %>%
       filter(intervention != "_")
     
@@ -530,13 +532,15 @@ server <- function(input, output, session) {
     # Validation of interventions ----
     validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, 
                                                         simul_start_date = input$date_range[1], 
-                                                        simul_end_date= input$date_range[2])
+                                                        simul_end_date= input$date_range[2],
+                                                        input = reactiveValuesToList(input))
     interventions$valid_baseline_interventions <- validation_baseline$validation_interventions
     interventions$message_baseline_interventions <- validation_baseline$message_interventions
     
     validation_future <- fun_validation_interventions(dta = interventions$future_mat, 
                                                       simul_start_date = input$date_range[1], 
-                                                      simul_end_date= input$date_range[2])
+                                                      simul_end_date= input$date_range[2],
+                                                      input = reactiveValuesToList(input))
     interventions$valid_future_interventions <- validation_future$validation_interventions
     interventions$message_future_interventions <- validation_future$message_interventions
   })
