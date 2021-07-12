@@ -1,11 +1,12 @@
 js_1 <- "].every( (val) => { return val === '_';} ))"
 js_2 <- "['Mass Testing', 'Vaccination', 'School Closures', 'Partial School Closures']"
+js_3 <- "['Transmissibility', 'Lethality', 'Breakthrough infection probability']"
 
 # Generate interventions_baseline.R ----
 sink("/Users/olivier/Desktop/interventions_baseline.R")
 
 cat(
-'div(
+  'div(
   br(),
   fluidRow(
     column(1, h5("#")),
@@ -26,6 +27,10 @@ print(
                      column(3, selectInput("baseline_intervention_{i}", NULL, all_interventions, selected = new_intervention_value)),
                      column(3, dateRangeInput("baseline_daterange_{i}", NULL, start = new_daterange_value[1], end = new_daterange_value[2], format = "yyyy-mm-dd", startview = "year")),
                      column(2, sliderInput("baseline_coverage_{i}", NULL, min = 0, max = 100, value = new_coverage_value, ticks = FALSE)),
+                     column(2, conditionalPanel("{js_3}.includes(input.baseline_intervention_{i})",
+                                             sliderInput("baseline_coverage_{i}", NULL, min = 0, max = 3, value = new_coverage_value, ticks = FALSE)),
+                               conditionalPanel("!({js_3}.includes(input.baseline_intervention_{i}))",
+                                             sliderInput("baseline_coverage_{i}", NULL, min = 0, max = 100, value = new_coverage_value, ticks = FALSE))),
                      column(3, conditionalPanel("{js_2}.includes(input.baseline_intervention_{i})", 
                                                 pickerInput("baseline_age_group_{i}", NULL, choices = vec_age_categories, selected = vec_age_categories, options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"), multiple = TRUE)))
                    )
@@ -43,7 +48,10 @@ for (i in 2:100) {
                      column(1, "#{i}"),
                      column(3, selectInput("baseline_intervention_{i}", NULL, all_interventions, selected = new_intervention_value)),
                      column(3, dateRangeInput("baseline_daterange_{i}", NULL, start = new_daterange_value[1], end = new_daterange_value[2], format = "yyyy-mm-dd", startview = "year")),
-                     column(2, sliderInput("baseline_coverage_{i}", NULL, min = 0, max = 100, value = new_coverage_value, ticks = FALSE)),
+                     column(2, conditionalPanel("{js_3}.includes(input.baseline_intervention_{i})",
+                                             sliderInput("baseline_coverage_{i}", NULL, min = 0, max = 3, value = new_coverage_value, ticks = FALSE)),
+                               conditionalPanel("!({js_3}.includes(input.baseline_intervention_{i}))",
+                                             sliderInput("baseline_coverage_{i}", NULL, min = 0, max = 100, value = new_coverage_value, ticks = FALSE))),
                      column(3, conditionalPanel("{js_2}.includes(input.baseline_intervention_{i})", 
                                                 pickerInput("baseline_age_group_{i}", NULL, choices = vec_age_categories, selected = vec_age_categories, options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"), multiple = TRUE)))
                    )
@@ -79,7 +87,10 @@ print(
                      column(1, "#{i}"),
                      column(3, selectInput("future_intervention_{i}", NULL, all_interventions, selected = new_intervention_value)),
                      column(3, dateRangeInput("future_daterange_{i}", NULL, start = new_daterange_value[1], end = new_daterange_value[2], format = "yyyy-mm-dd", startview = "year")),
-                     column(2, sliderInput("future_coverage_{i}", NULL, min = 0, max = 100, value = new_coverage_value, ticks = FALSE)),
+                     column(2, conditionalPanel("{js_3}.includes(input.future_intervention_{i})",
+                                             sliderInput("future_coverage_{i}", NULL, min = 0, max = 3, value = new_coverage_value, ticks = FALSE)),
+                               conditionalPanel("!({js_3}.includes(input.future_intervention_{i}))",
+                                             sliderInput("future_coverage_{i}", NULL, min = 0, max = 100, value = new_coverage_value, ticks = FALSE))),
                      column(3, conditionalPanel("{js_2}.includes(input.future_intervention_{i})", 
                                                 pickerInput("future_age_group_{i}", NULL, choices = vec_age_categories, selected = vec_age_categories, options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"), multiple = TRUE)))
                    )
@@ -97,7 +108,10 @@ for (i in 2:100) {
                      column(1, "#{i}"),
                      column(3, selectInput("future_intervention_{i}", NULL, all_interventions, selected = new_intervention_value)),
                      column(3, dateRangeInput("future_daterange_{i}", NULL, start = new_daterange_value[1], end = new_daterange_value[2], format = "yyyy-mm-dd", startview = "year")),
-                     column(2, sliderInput("future_coverage_{i}", NULL, min = 0, max = 100, value = new_coverage_value, ticks = FALSE)),
+                     column(2, conditionalPanel("{js_3}.includes(input.future_intervention_{i})",
+                                             sliderInput("future_coverage_{i}", NULL, min = 0, max = 3, value = new_coverage_value, ticks = FALSE)),
+                               conditionalPanel("!({js_3}.includes(input.future_intervention_{i}))",
+                                             sliderInput("future_coverage_{i}", NULL, min = 0, max = 100, value = new_coverage_value, ticks = FALSE))),
                      column(3, conditionalPanel("{js_2}.includes(input.future_intervention_{i})", 
                                                 pickerInput("future_age_group_{i}", NULL, choices = vec_age_categories, selected = vec_age_categories, options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"), multiple = TRUE)))
                    )
