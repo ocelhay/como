@@ -60,6 +60,20 @@
   z-index: 1000;
 }
 
+
+.brutal {
+  font-size: 1.1em;
+  font-weight: bold;
+  background-color: #FFFF00;
+  color: #EC6568;
+  border-radius: 5px;
+  position:fixed;
+  bottom: calc(1%);;
+  right: calc(2%);;
+  padding: 5px;
+  z-index: 1000;
+}
+
 .buttons_interventions {
   text-align: right;
 }

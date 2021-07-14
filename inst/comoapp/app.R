@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v18.2.0"
+version_app <- "v19.1.1"  # also in DESCRIPTION and README.md
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -10,12 +10,12 @@ if (Sys.info()["sysname"] == "Darwin" &
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "16.8.0")  stop("
-Running the app requires to install the v16.8.0 of the R package comoOdeCpp.
+if(packageVersion("comoOdeCpp") != "19.1.1")  stop("
+Running the app requires to install the v19.1.1 of the R package comoOdeCpp.
 Run:  
 
   remove.packages('comoOdeCpp')
-  remotes::install_github('bogaotory/comoOdeCpp', ref = 'v16.8.0', subdir = 'comoOdeCpp')
+  remotes::install_github('bogaotory/comoOdeCpp', ref = 'v19.1.1', subdir = 'comoOdeCpp')
 
 in the R console to install it.")
 
@@ -50,7 +50,6 @@ ui <- function(request) {
     includeCSS("./www/styles.css"),
     pushbar_deps(),
     useShinyjs(),
-    # chooseSliderSkin('HTML5'),
     
     source("./www/ui/pushbar_parameters_reporting.R", local = TRUE)[1],
     source("./www/ui/pushbar_parameters_interventions.R", local = TRUE)[1],
@@ -91,7 +90,7 @@ ui <- function(request) {
           column(
             width = 2,
             div(class = "float_bottom_left",
-                numericInput("p", label = "Prob. of infection given contact:", min = 0.01, max = 0.08, value = 0.049),
+                numericInput("p", label = "Prob. of infection given contact:", min = 0, max = 0.2, value = 0.049),
                 sliderInput("report", label = span("% of all", em(" asymptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
                             value = 2.5, post = "%", ticks = FALSE),
                 sliderInput("reportc", label = span("% of all", em(" symptomatic infections "), "reported:"), min = 0, max = 100, step = 0.1,
@@ -126,6 +125,10 @@ ui <- function(request) {
               )
             ),
             use_bs_accordion_sidebar(),
+            div(class = "box_outputs", h4("Relative Risks for Baseline")),
+            source("./www/ui/rr_baseline.R", local = TRUE)$value,
+            plotOutput("plot_rr_parameters_baseline"),
+            
             div(class = "box_outputs", h4("Interventions for Baseline")),
             
             source("./www/ui/interventions_baseline.R", local = TRUE)$value,
@@ -269,6 +272,10 @@ ui <- function(request) {
                  )
           ),
           column(10,
+                 div(class = "box_outputs", h4("Relative Risks for Hypothetical Scenario")),
+                 source("./www/ui/rr_future.R", local = TRUE)$value,
+                 plotOutput("plot_rr_parameters_future"),
+                 
                  div(class = "box_outputs", h4("Interventions for Hypothetical Scenario")),
                  source("./www/ui/interventions_future.R", local = TRUE)$value,
                  htmlOutput("text_feedback_interventions_future"),
@@ -494,6 +501,7 @@ server <- function(input, output, session) {
       Target = 1:nb_interventions_max) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
+                              intervention %in% c("Transmissibility", "Lethality", "Breakthrough infection probability") ~ " RR",
                               TRUE ~ "%")) %>%
       filter(intervention != "_")
     
@@ -516,6 +524,7 @@ server <- function(input, output, session) {
       Target = 1:nb_interventions_max) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
+                              intervention %in% c("Transmissibility", "Lethality", "Breakthrough infection probability") ~ " RR",
                               TRUE ~ "%")) %>%
       filter(intervention != "_")
     
@@ -530,13 +539,15 @@ server <- function(input, output, session) {
     # Validation of interventions ----
     validation_baseline <- fun_validation_interventions(dta = interventions$baseline_mat, 
                                                         simul_start_date = input$date_range[1], 
-                                                        simul_end_date= input$date_range[2])
+                                                        simul_end_date= input$date_range[2],
+                                                        input = reactiveValuesToList(input))
     interventions$valid_baseline_interventions <- validation_baseline$validation_interventions
     interventions$message_baseline_interventions <- validation_baseline$message_interventions
     
     validation_future <- fun_validation_interventions(dta = interventions$future_mat, 
                                                       simul_start_date = input$date_range[1], 
-                                                      simul_end_date= input$date_range[2])
+                                                      simul_end_date= input$date_range[2],
+                                                      input = reactiveValuesToList(input))
     interventions$valid_future_interventions <- validation_future$validation_interventions
     interventions$message_future_interventions <- validation_future$message_interventions
   })
@@ -614,8 +625,8 @@ server <- function(input, output, session) {
       return(NULL)  # exit
     }
     
-    if(version_template != "Template v18") {
-      showNotification(HTML("The format of the file is not recognised. </br> Upload a 'v18 template' to change defaults parameters."), 
+    if(version_template != "Template v19") {
+      showNotification(HTML("The format of the file is not recognised. </br> Upload a 'v19 template' to change defaults parameters."), 
                        type = "error", duration = 10)
       return(NULL)  # exit
     }
@@ -650,7 +661,7 @@ server <- function(input, output, session) {
     
     updatePickerInput(session, inputId = "country_demographic", selected = "-- Own Value ---")
     
-    
+
     # Parameters Sheets
     param <- bind_rows(read_excel(file_path, sheet = "Parameters"),
                        read_excel(file_path, sheet = "Country Area Param"),
@@ -725,18 +736,24 @@ server <- function(input, output, session) {
     }
     
     # Update interventions in the UI: read "Interventions" sheet and validate
-    interventions_excel <- read_excel(file_path, sheet = "Interventions") %>%
-      filter(!is.na(Intervention))
-    names(interventions_excel) <- c("intervention", "date_start", "date_end", "value", "unit", "age_group", "apply_to")
+    interventions_excel <- bind_rows(
+      read_excel(file_path, sheet = "Interventions") %>%
+        filter(!is.na(Intervention)) %>%
+        rename(intervention = 1, date_start = 2, date_end = 3, value = 4, unit = 5, age_group = 6, apply_to = 7),
+      read_excel(file_path, sheet = "VOC") %>%
+        filter(!is.na(Intervention)) %>%
+        rename(intervention = 1, date_start = 2, date_end = 3, value = 4, unit = 5, age_group = 6, apply_to = 7)
+    )
     
-    if(all(interventions_excel$intervention %in% valid_interventions_v18)) message("Okay, all interventions are valid.")
-    if(! all(interventions_excel$intervention %in% valid_interventions_v18)) stop("Stop, some interventions are not valid.")
-    
-    
+    # ifelse(all(interventions_excel$intervention %in% valid_interventions),
+    #        message("Okay, all interventions are valid."),
+    #        stop("Stop, some interventions are not valid.")
+    # )
     
     # Update interventions in the UI: baseline interventions
     interventions_excel_baseline <- interventions_excel %>% 
       filter(apply_to == "Baseline (Calibration)")
+    
     
     nb_interventions_baseline <- interventions_excel_baseline %>% nrow()
     if(nb_interventions_baseline > 0) {
