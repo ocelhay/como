@@ -14,14 +14,14 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date, 
   if(any(test$overlapping)) {
     validation$validation_interventions <- FALSE
     validation$message_interventions <- paste0(validation$message_interventions,
-                                               "<span class = 'redbold'>NEEDS RESOLUTION: some interventions of the same nature are overlapping.</span>",
+                                               "NEEDS RESOLUTION: some interventions of the same nature are overlapping.",
                                                br())
   }
   
   # Test interventions date range versus simulation date range
   if(any(dta$date_start < simul_start_date | dta$date_end > simul_end_date)) {
     validation$message_interventions <- paste0(validation$message_interventions,
-                                               "<span class = 'warn'>Take note that some intervention(s) date range are outside the date range of simulation.</span>",
+                                               "Take note that some intervention(s) date range are outside the date range of simulation.",
                                                br())
   }
   
@@ -30,7 +30,7 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date, 
     max_value <- input$p * dta %>% filter(intervention == "Transmissibility") %>% pull(value) %>% max()
     if(max_value > 0.2) {
       validation$message_interventions <- paste0(validation$message_interventions,
-                                                 "<span class = 'redbold'>NEEDS RESOLUTION: After applying RR, the 'Prob. of infection given contact' is above the max authorised value of 0.2.</span>",
+                                                 "NEEDS RESOLUTION: After applying RR, the 'Prob. of infection given contact' is above the max authorised value of 0.2.",
                                                  br())
     }
   }
@@ -51,7 +51,7 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date, 
                        input$pdeath_icu_hco) * dta %>% filter(intervention == "Lethality") %>% pull(value) %>% max())
     if(max_value > 100) {
       validation$message_interventions <- paste0(validation$message_interventions,
-                                                 "<span class = 'redbold'>NEEDS RESOLUTION: After applying RR, one or several 'Probability of dying' parameter is above the max authorised value of 100.</span>",
+                                                 "NEEDS RESOLUTION: After applying RR, one or several 'Probability of dying' parameter is above the max authorised value of 100.",
                                                  br())
     }
   }
@@ -60,7 +60,7 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date, 
     max_value <- (input$sigmaR * dta %>% filter(intervention == "Breakthrough infection probability") %>% pull(value) %>% max())
     if(max_value > 100) {
       validation$message_interventions <- paste0(validation$message_interventions,
-                                                 "<span class = 'redbold'>NEEDS RESOLUTION: After applying RR, the 'Probability of infection of people that have recovered from a previous infection' is above the max authorised value of 100.</span>",
+                                                 "NEEDS RESOLUTION: After applying RR, the 'Probability of infection of people that have recovered from a previous infection' is above the max authorised value of 100.",
                                                  br())
     }
   }
@@ -89,7 +89,7 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date, 
     }
     
     
-    if(!all(dates_dep %in% dates_ref)) return(glue("<span class = 'warn'>Take note that <em>{dependant}</em> has no effect unless <em>{reference}</em> is selected.</span><br>"))
+    if(!all(dates_dep %in% dates_ref)) return(glue("Take note that <em>{dependant}</em> has no effect unless <em>{reference}</em> is selected.<br>"))
   }
   
   validation$message_interventions <- paste0(validation$message_interventions, 
@@ -97,5 +97,7 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date, 
   validation$message_interventions <- paste0(validation$message_interventions, 
                                              check_date_range(reference = "Self-isolation if Symptomatic", dependant = "(*Self-isolation) Household Isolation"))
   
+  
+  validation$message_interventions <- paste0("<div class = 'brutal'>", validation$message_interventions, "</div>")
   return(validation)
 }
