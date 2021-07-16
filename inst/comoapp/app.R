@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v19.1.1"  # also in DESCRIPTION and README.md
+version_app <- "v19.1.2"  # also in DESCRIPTION and README.md
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -10,12 +10,12 @@ if (Sys.info()["sysname"] == "Darwin" &
 
 # Load comoOdeCpp and ensure this is the correct version of comoOdeCpp.
 library(comoOdeCpp)
-if(packageVersion("comoOdeCpp") != "19.1.1")  stop("
-Running the app requires to install the v19.1.1 of the R package comoOdeCpp.
+if(packageVersion("comoOdeCpp") != "19.1.2")  stop("
+Running the app requires to install the v19.1.2 of the R package comoOdeCpp.
 Run:  
 
   remove.packages('comoOdeCpp')
-  remotes::install_github('bogaotory/comoOdeCpp', ref = 'v19.1.1', subdir = 'comoOdeCpp')
+  remotes::install_github('bogaotory/comoOdeCpp', ref = 'v19.1.2', subdir = 'comoOdeCpp')
 
 in the R console to install it.")
 
@@ -101,6 +101,8 @@ ui <- function(request) {
           ),
           column(
             width = 10,
+            # Comment the next line in production
+            actionButton("debug", "Launch debug"),
             div(class = "box_outputs", h4("Global Simulations Parameters")),
             fluidRow(
               column(4, 
@@ -125,7 +127,7 @@ ui <- function(request) {
               )
             ),
             use_bs_accordion_sidebar(),
-            div(class = "box_outputs", h4("Relative Risks for Baseline")),
+            div(class = "box_outputs", h4("VOC for Baseline")),
             source("./www/ui/rr_baseline.R", local = TRUE)$value,
             plotOutput("plot_rr_parameters_baseline"),
             
@@ -272,7 +274,7 @@ ui <- function(request) {
                  )
           ),
           column(10,
-                 div(class = "box_outputs", h4("Relative Risks for Hypothetical Scenario")),
+                 div(class = "box_outputs", h4("VOC for Hypothetical Scenario")),
                  source("./www/ui/rr_future.R", local = TRUE)$value,
                  plotOutput("plot_rr_parameters_future"),
                  
@@ -303,66 +305,65 @@ ui <- function(request) {
         ),
         br(), br(), 
         fluidRow(
-          column(2, ),
-          column(
-            10,
-            shinyjs::hidden(
-              div(id = "results_interventions_1",
-                  a(id = "anchor_summary", style="visibility: hidden", ""),
-                  div(class = "important_focus",
-                      prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
-                                         selected = "Predicted Reported + Unreported", inline = TRUE),
-                      p("Indicators and visualisations are based on the period of focus:"),
-                      tags$ul(tags$li("Observed: time range limited to provided observed data"), 
-                              tags$li("Predicted Reported: time range is the date range of simulation, visualisations y-axis with focus on reported"),
-                              tags$li("Predicted Reported: time range is the date range of simulation, visualisations y-axis with focus on reported + unreported"))
-                  ),
-                  br(),
-                  fluidRow(
-                    column(
-                      6,
-                      div(class = "box_outputs", h4("Baseline")),
-                      fluidRow(
-                        column(6, h4("Predicted Reported")),
-                        column(6, h4("Predicted Reported + Unreported (Total)")),
-                      ),
-                      fluidRow(
-                        column(
-                          6, 
-                          htmlOutput("text_pct_reported_baseline_dup") %>% withSpinner(),
-                          # htmlOutput("text_death_reported_baseline_dup") %>% withSpinner()
-                        ),
-                        column(
-                          6, 
-                          htmlOutput("text_pct_total_baseline_dup") %>% withSpinner(),
-                          htmlOutput("text_death_total_baseline_dup") %>% withSpinner()
-                        ),
-                        
-                      )
-                    ),
-                    column(
-                      6,
-                      div(class = "box_outputs", h4("Hypothetical Scenario")),
-                      fluidRow(
-                        column(6, h4("Predicted Reported")),
-                        column(6, h4("Predicted Reported + Unreported (Total)"))
-                      ),
-                      fluidRow(
-                        column(
-                          6, 
-                          htmlOutput("text_pct_reported_future") %>% withSpinner(),
-                          # htmlOutput("text_death_reported_future") %>% withSpinner()
-                        ),
-                        column(
-                          6, 
-                          htmlOutput("text_pct_total_future") %>% withSpinner(),
-                          htmlOutput("text_death_total_future") %>% withSpinner()
-                        )
-                      )
-                    )
-                  )
-              )
-            )
+          column(2, ""),
+          column(10,
+                 shinyjs::hidden(
+                   div(id = "results_interventions_1",
+                       a(id = "anchor_summary", style="visibility: hidden", ""),
+                       div(class = "important_focus",
+                           prettyRadioButtons("focus_axis_dup", label = "Focus on:", choices = c("Observed", "Predicted Reported", "Predicted Reported + Unreported"),
+                                              selected = "Predicted Reported + Unreported", inline = TRUE),
+                           p("Indicators and visualisations are based on the period of focus:"),
+                           tags$ul(tags$li("Observed: time range limited to provided observed data"), 
+                                   tags$li("Predicted Reported: time range is the date range of simulation, visualisations y-axis with focus on reported"),
+                                   tags$li("Predicted Reported: time range is the date range of simulation, visualisations y-axis with focus on reported + unreported"))
+                       ),
+                       br(),
+                       fluidRow(
+                         column(
+                           6,
+                           div(class = "box_outputs", h4("Baseline")),
+                           fluidRow(
+                             column(6, h4("Predicted Reported")),
+                             column(6, h4("Predicted Reported + Unreported (Total)")),
+                           ),
+                           fluidRow(
+                             column(
+                               6, 
+                               htmlOutput("text_pct_reported_baseline_dup") %>% withSpinner(),
+                               # htmlOutput("text_death_reported_baseline_dup") %>% withSpinner()
+                             ),
+                             column(
+                               6, 
+                               htmlOutput("text_pct_total_baseline_dup") %>% withSpinner(),
+                               htmlOutput("text_death_total_baseline_dup") %>% withSpinner()
+                             ),
+                             
+                           )
+                         ),
+                         column(
+                           6,
+                           div(class = "box_outputs", h4("Hypothetical Scenario")),
+                           fluidRow(
+                             column(6, h4("Predicted Reported")),
+                             column(6, h4("Predicted Reported + Unreported (Total)"))
+                           ),
+                           fluidRow(
+                             column(
+                               6, 
+                               htmlOutput("text_pct_reported_future") %>% withSpinner(),
+                               # htmlOutput("text_death_reported_future") %>% withSpinner()
+                             ),
+                             column(
+                               6, 
+                               htmlOutput("text_pct_total_future") %>% withSpinner(),
+                               htmlOutput("text_death_total_future") %>% withSpinner()
+                             )
+                           )
+                         )
+                       )
+                   )
+                 )
           ),
           shinyjs::hidden(
             div(id = "results_interventions_2",
@@ -449,6 +450,8 @@ server <- function(input, output, session) {
   #          "find_pandoc(dir = '/usr/local/bin/')", find_pandoc(dir = "/usr/local/bin/")$version)
   # })
   
+  observeEvent(input$debug, browser())
+  
   # triggers the modal dialogs when the user clicks an icon
   observe_helpers(help_dir = "./www/markdown")
   
@@ -501,7 +504,7 @@ server <- function(input, output, session) {
       Target = 1:nb_interventions_max) %>%
       mutate(unit = case_when(intervention == "(*Self-isolation) Screening" ~ " contacts",
                               intervention == "Mass Testing" ~ " thousands tests", 
-                              intervention %in% c("Transmissibility", "Lethality", "Breakthrough infection probability") ~ " RR",
+                              intervention %in% c("Transmissibility", "Lethality") ~ " RR",
                               TRUE ~ "%")) %>%
       filter(intervention != "_")
     
@@ -661,7 +664,7 @@ server <- function(input, output, session) {
     
     updatePickerInput(session, inputId = "country_demographic", selected = "-- Own Value ---")
     
-
+    
     # Parameters Sheets
     param <- bind_rows(read_excel(file_path, sheet = "Parameters"),
                        read_excel(file_path, sheet = "Country Area Param"),
@@ -743,7 +746,8 @@ server <- function(input, output, session) {
       read_excel(file_path, sheet = "VOC") %>%
         filter(!is.na(Intervention)) %>%
         rename(intervention = 1, date_start = 2, date_end = 3, value = 4, unit = 5, age_group = 6, apply_to = 7)
-    )
+    ) %>% 
+      filter(intervention %in% c(valid_interventions, real_rr_interventions))
     
     # ifelse(all(interventions_excel$intervention %in% valid_interventions),
     #        message("Okay, all interventions are valid."),
@@ -752,7 +756,7 @@ server <- function(input, output, session) {
     
     # Update interventions in the UI: baseline interventions
     interventions_excel_baseline <- interventions_excel %>% 
-      filter(apply_to == "Baseline (Calibration)")
+      filter(apply_to == "Baseline (Calibration)", intervention %in% valid_interventions)
     
     
     nb_interventions_baseline <- interventions_excel_baseline %>% nrow()
@@ -769,7 +773,8 @@ server <- function(input, output, session) {
     
     # Update interventions in the UI: future interventions
     interventions_excel_future <- interventions_excel %>% 
-      filter(apply_to == "Hypothetical Scenario")
+      filter(apply_to == "Hypothetical Scenario", intervention %in% valid_interventions)
+    
     nb_interventions_future <- interventions_excel_future %>% nrow()
     if(nb_interventions_future > 0) {
       for (i in 1:nb_interventions_future) {
@@ -778,7 +783,37 @@ server <- function(input, output, session) {
                              start = interventions_excel_future[[i, "date_start"]], 
                              end = interventions_excel_future[[i, "date_end"]])
         updateSliderInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "value"]])
-        updatePickerInput(session, paste0("future_age_group_", i), selected = vec_age_categories[as.logical(parse_age_group(interventions_excel_future$age_group[i]))])
+      }
+    }
+    
+    
+    # Update RR in the UI: baseline RR
+    rr_excel_baseline <- interventions_excel %>%
+      filter(apply_to == "Baseline (Calibration)", intervention %in% real_rr_interventions)
+    
+    nb_rr_baseline <- rr_excel_baseline %>% nrow()
+    if(nb_rr_baseline > 0) {
+      for (i in 1:nb_rr_baseline) {
+        updateSelectInput(session, paste0("baseline_intervention_", i + 100), selected = rr_excel_baseline[[i, "intervention"]])
+        updateDateRangeInput(session, paste0("baseline_daterange_", i + 100),
+                             start = rr_excel_baseline[[i, "date_start"]],
+                             end = rr_excel_baseline[[i, "date_end"]])
+        updateSliderInput(session, paste0("baseline_coverage_", i + 100), value = rr_excel_baseline[[i, "value"]])
+      }
+    }
+    
+    # Update RR in the UI: future interventions
+    rr_excel_future <- interventions_excel %>%
+      filter(apply_to == "Hypothetical Scenario", intervention %in% real_rr_interventions)
+    
+    nb_rr_future <- rr_excel_future %>% nrow()
+    if(nb_rr_future > 0) {
+      for (i in 1:nb_rr_future) {
+        updateSelectInput(session, paste0("future_intervention_", i + 100), selected = rr_excel_future[[i, "intervention"]])
+        updateDateRangeInput(session, paste0("future_daterange_", i + 100),
+                             start = rr_excel_future[[i, "date_start"]],
+                             end = rr_excel_future[[i, "date_end"]])
+        updateSliderInput(session, paste0("future_coverage_", i + 100), value = rr_excel_future[[i, "value"]])
       }
     }
   })

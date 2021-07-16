@@ -1,7 +1,7 @@
 output$plot_rr_parameters_baseline <- renderPlot({
-  req(interventions$valid_baseline_interventions)
+  # req(interventions$valid_baseline_interventions)
   req(interventions$baseline_mat %>% filter(intervention %in% real_rr_interventions) %>% nrow() > 0)
-  
+
   param <- tibble(date = seq(input$date_range[1], input$date_range[2], by = 1),
                   p = input$p,
                   sigmaR = input$sigmaR,
@@ -73,8 +73,8 @@ output$plot_rr_parameters_baseline <- renderPlot({
       distinct(date, .keep_all = TRUE)
     
     param <- left_join(param, bip_tib, by = "date") %>%
-      replace_na(list(Breakthrough = 1)) %>%
-      mutate(sigmaR = Breakthrough * sigmaR)
+      replace_na(list(Breakthrough = 100)) %>%
+      mutate(sigmaR = Breakthrough / 100 * sigmaR)
   }
   
   param <- param %>% 

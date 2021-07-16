@@ -16,4 +16,4 @@
 | Working at Home                       | %                 |
 | Transmissibility                      | Relative risk     |
 | Lethality                             | Relative risk     |
-| Breakthrough infection probability    | Relative risk     |
+| Breakthrough infection probability    | %                 |

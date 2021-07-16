@@ -1,5 +1,5 @@
 ---
-title: "Covid-19 International Modelling Consortium model simulation report"
+title: "Covid-19 International Modelling Consortium model simulation report (prototype v19)"
 output: word_document
 editor_options: 
   chunk_output_type: console

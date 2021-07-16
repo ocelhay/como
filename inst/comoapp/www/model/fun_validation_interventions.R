@@ -29,6 +29,7 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date, 
   if(dta %>% filter(intervention == "Transmissibility") %>% nrow() != 0) {
     max_value <- input$p * dta %>% filter(intervention == "Transmissibility") %>% pull(value) %>% max()
     if(max_value > 0.2) {
+      validation$validation_interventions <- FALSE
       validation$message_interventions <- paste0(validation$message_interventions,
                                                  "NEEDS RESOLUTION: After applying RR, the 'Prob. of infection given contact' is above the max authorised value of 0.2.",
                                                  br())
@@ -50,6 +51,7 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date, 
                        input$pdeath_icu_hc,
                        input$pdeath_icu_hco) * dta %>% filter(intervention == "Lethality") %>% pull(value) %>% max())
     if(max_value > 100) {
+      validation$validation_interventions <- FALSE
       validation$message_interventions <- paste0(validation$message_interventions,
                                                  "NEEDS RESOLUTION: After applying RR, one or several 'Probability of dying' parameter is above the max authorised value of 100.",
                                                  br())
@@ -57,8 +59,9 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date, 
   }
   
   if(dta %>% filter(intervention == "Breakthrough infection probability") %>% nrow() != 0) {
-    max_value <- (input$sigmaR * dta %>% filter(intervention == "Breakthrough infection probability") %>% pull(value) %>% max())
+    max_value <- (input$sigmaR * (1/100) * dta %>% filter(intervention == "Breakthrough infection probability") %>% pull(value) %>% max())
     if(max_value > 100) {
+      validation$validation_interventions <- FALSE
       validation$message_interventions <- paste0(validation$message_interventions,
                                                  "NEEDS RESOLUTION: After applying RR, the 'Probability of infection of people that have recovered from a previous infection' is above the max authorised value of 100.",
                                                  br())
