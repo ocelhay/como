@@ -750,6 +750,15 @@ inputs <- function(inp, run, times, startdate, stopdate) {
     vaccineagepartial<-rep(0,tail(times,1)*20)
   }
   
+  dmMax <- with(as.list(parameters), {
+    1 / max(pdeath_h,pdeath_ho,pdeath_hc,pdeath_hco,pdeath_icu,pdeath_icuo,pdeath_icuc,
+            pdeath_icuco,pdeath_vent,pdeath_ventc,pdeath_vent_hc,pdeath_icu_hc,
+            pdeath_icu_hco)
+  })
+  dmod_vector <- pmin(dmMax, dmod_vector)
+  
+  cmod_vector <- pmin(1 / parameters["sigmaR"], cmod_vector)
+  
   return(list(si_vector=si_vector,sd_vector=sd_vector,scr_vector=scr_vector,hw_vector=hw_vector,msk_vector=msk_vector,
               wah_vector=wah_vector,sc_vector=sc_vector,scp_vector=scp_vector,tb_vector=tb_vector,mt_vector=mt_vector*1000,
               cte_vector=cte_vector,q_vector=q_vector,vc_vector=vc_vector,vcp_vector=vcp_vector,isolation=isolation,
