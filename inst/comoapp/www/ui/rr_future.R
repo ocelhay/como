@@ -2,7 +2,7 @@ div(
   br(),
   fluidRow(
     column(1, h5("#")),
-    column(3, h5("Nature of RR:")),
+    column(3, h5("Nature of VOC:")),
     column(3, h5("Date Range:")),
     column(2, h5("Value:") %>% helper(type = "markdown", content = "help_value_unit_interventions", colour = "red")),
     column(3, "")

@@ -102,7 +102,7 @@ ui <- function(request) {
           column(
             width = 10,
             # Comment the next line in production
-            actionButton("debug", "Launch debug"),
+            # actionButton("debug", "Launch debug"),
             div(class = "box_outputs", h4("Global Simulations Parameters")),
             fluidRow(
               column(4, 
