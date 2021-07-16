@@ -145,7 +145,7 @@ parameters["vaccine_eff_r"]<-parameters["vaccine_eff_r"]/100
 age_vaccine_min<-(parameters["age_vaccine_min"])
 age_vaccine_max<-(parameters["age_vaccine_max"])
 # parameters["vaccine_cov"]<-parameters["vaccine_cov"]/100
-# parameters["vac_campaign"]<-parameters["vac_campaign"]*7
+parameters["vac_campaign"]<-parameters["vac_campaign"]*7
 parameters["screen_test_sens"]<-parameters["screen_test_sens"]/100
 parameters["quarantine_days"]<-parameters["quarantine_days"]
 parameters["quarantine_effort"]<-1/parameters["quarantine_effort"]
