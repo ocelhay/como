@@ -757,7 +757,7 @@ inputs <- function(inp, run, times, startdate, stopdate) {
   })
   dmod_vector <- pmin(dmMax, dmod_vector)
   
-  cmod_vector <- pmin(1 / parameters["sigmaR"], cmod_vector)
+  cmod_vector <- pmin(100, cmod_vector)
   
   return(list(si_vector=si_vector,sd_vector=sd_vector,scr_vector=scr_vector,hw_vector=hw_vector,msk_vector=msk_vector,
               wah_vector=wah_vector,sc_vector=sc_vector,scp_vector=scp_vector,tb_vector=tb_vector,mt_vector=mt_vector*1000,
