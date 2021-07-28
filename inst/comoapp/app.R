@@ -739,15 +739,25 @@ server <- function(input, output, session) {
     }
     
     # Update interventions in the UI: read "Interventions" sheet and validate
+    
+    voc <- read_excel(file_path, sheet = "VOC")
+    if (nrow(voc) == 0) {
+      interventions_excel <- read_excel(file_path, sheet = "Interventions") %>%
+          filter(!is.na(Intervention)) %>%
+          rename(intervention = 1, date_start = 2, date_end = 3, value = 4, unit = 5, age_group = 6, apply_to = 7) %>% 
+      filter(intervention %in% c(valid_interventions, real_rr_interventions)) }
+    
+    
+    if (nrow(voc) > 0) {
     interventions_excel <- bind_rows(
       read_excel(file_path, sheet = "Interventions") %>%
         filter(!is.na(Intervention)) %>%
         rename(intervention = 1, date_start = 2, date_end = 3, value = 4, unit = 5, age_group = 6, apply_to = 7),
-      read_excel(file_path, sheet = "VOC") %>%
+       voc %>%
         filter(!is.na(Intervention)) %>%
         rename(intervention = 1, date_start = 2, date_end = 3, value = 4, unit = 5, age_group = 6, apply_to = 7)
     ) %>% 
-      filter(intervention %in% c(valid_interventions, real_rr_interventions))
+      filter(intervention %in% c(valid_interventions, real_rr_interventions)) }
     
     # ifelse(all(interventions_excel$intervention %in% valid_interventions),
     #        message("Okay, all interventions are valid."),
