@@ -14,7 +14,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
   day_infections <- empty_mat
   Rt_aux <- empty_mat
   infections <- empty_mat
-
+  
   # Define spline function ----
   # the parameters give and beds_available have no noise added to them
   f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0)
@@ -64,11 +64,11 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     critV<-c()
     
     for (ii in 1:length(times)){
-        critH[ii]<-min(1-fH((sum(mat_ode[ii,(Hindex+1)]))+sum(mat_ode[ii,(ICUCindex+1)])+sum(mat_ode[ii,(ICUCVindex+1)])),1)
-        crit[ii]<-min(1-fICU((sum(mat_ode[ii,(ICUindex+1)]))+(sum(mat_ode[ii,(Ventindex+1)]))+(sum(mat_ode[ii,(VentCindex+1)]))),1)
-        critV[ii]<-min(1-fVent((sum(mat_ode[ii,(Ventindex+1)]))),1)
-      }
-
+      critH[ii]<-min(1-fH((sum(mat_ode[ii,(Hindex+1)]))+sum(mat_ode[ii,(ICUCindex+1)])+sum(mat_ode[ii,(ICUCVindex+1)])),1)
+      crit[ii]<-min(1-fICU((sum(mat_ode[ii,(ICUindex+1)]))+(sum(mat_ode[ii,(Ventindex+1)]))+(sum(mat_ode[ii,(VentCindex+1)]))),1)
+      critV[ii]<-min(1-fVent((sum(mat_ode[ii,(Ventindex+1)]))),1)
+    }
+    
     # daily incidence
     incidence<-parameters_dup["report"]*parameters_dup["gamma"]*(1-parameters_dup["pclin"])*mat_ode[,(Eindex+1)]%*%(1-ihr[,2])+
       parameters_dup["reportc"]*parameters_dup["gamma"]*parameters_dup["pclin"]*mat_ode[,(Eindex+1)]%*%(1-ihr[,2])+
@@ -80,7 +80,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
       parameters_dup["report_cvr"]*parameters_dup["gamma"]*parameters_dup["pclin_vr"]*mat_ode[,(EVRindex+1)]%*%(1-parameters_dup["sigmaEVR"]*ihr[,2])+
       parameters_dup["report_r"]*parameters_dup["gamma"]*(1-parameters_dup["pclin_r"])*mat_ode[,(ERindex+1)]%*%(1-parameters_dup["sigmaER"]*ihr[,2])+
       parameters_dup["report_cr"]*parameters_dup["gamma"]*parameters_dup["pclin_r"]*mat_ode[,(ERindex+1)]%*%(1-parameters_dup["sigmaER"]*ihr[,2])
-      
+    
     incidenceh<- parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*parameters_dup["reporth"]+
       parameters_dup["gamma"]*mat_ode[,(Eindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*(1-parameters_dup["reporth"])*parameters_dup["reporth_g"]+
       parameters_dup["gamma"]*mat_ode[,(QEindex+1)]%*%ihr[,2]*(1-critH)*(1-parameters_dup["prob_icu"])*parameters_dup["reporth"]+
@@ -115,10 +115,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     cum_cases[,i] <- colSums(incidence) + colSums(incidenceh)         # cumulative incidence cases
     day_infections[,i]<- round(rowSums(parameters_dup["gamma"]*mat_ode[,(Eindex+1)]+
                                          parameters_dup["gamma"]*mat_ode[,(QEindex+1)]+
-                                         parameters_dup["gamma"]*mat_ode[,(EVindex+1)]+
-                                         parameters_dup["gamma"]*mat_ode[,(EVRindex+1)]+
-                                         parameters_dup["gamma"]*mat_ode[,(ERindex+1)])
-                               )
+                                         parameters_dup["gamma"]*mat_ode[,(EVindex+1)]))
     
     # overtime proportion of the  population that is infected
     # different from covidage_v16.5.R
@@ -145,19 +142,19 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     results$mean_cases <- cases
     results$min_cases <- cases
     results$max_cases <- cases
-
+    
     results$mean_cum_cases <- cum_cases
     results$min_cum_cases <- cum_cases
     results$max_cum_cases <- cum_cases
-
+    
     results$mean_daily_infection <- day_infections
     results$min_daily_infection <- day_infections
     results$max_daily_infection <- day_infections
-
+    
     results$mean_Rt <- Rt_aux
     results$min_Rt <- Rt_aux
     results$max_Rt <- Rt_aux
-
+    
     results$mean <- aux[, , 1]
     results$min <- aux[, , 1]
     results$max <- aux[, , 1]
@@ -172,11 +169,11 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     results$mean_cases <- apply(cases, 1, quantile, probs = 0.5)
     results$min_cases <- apply(cases, 1, quantile, probs = parameters["confidence"]/100)
     results$max_cases <- apply(cases, 1, quantile, probs = (1 - parameters["confidence"]/100))
-
+    
     results$mean_daily_infection <- apply(day_infections, 1, quantile, probs = 0.5)
     results$min_daily_infection <- apply(day_infections, 1, quantile, probs = parameters["confidence"]/100)
     results$max_daily_infection <- apply(day_infections, 1, quantile, probs = (1 - parameters["confidence"]/100))
-
+    
     results$mean_Rt <- apply(Rt_aux, 1, quantile, probs = 0.5, na.rm = TRUE)
     results$min_Rt <- apply(Rt_aux, 1, quantile, probs = parameters["confidence"]/100, na.rm = TRUE)
     results$max_Rt <- apply(Rt_aux, 1, quantile, probs = (1 - parameters["confidence"]/100), na.rm = TRUE)
@@ -185,7 +182,7 @@ multi_runs <- function(Y, times, parameters, input, A, ihr, ifr, mort, popstruc,
     results$mean <- apply(aux, 1:2, quantile, probs = 0.5)
     results$min <- apply(aux, 1:2, quantile, probs = parameters["confidence"]/100)
     results$max <- apply(aux, 1:2, quantile, probs = (1 - parameters["confidence"]/100))
-
+    
     removeNotification(id = "aggregation_results")
   }
   return(results)
