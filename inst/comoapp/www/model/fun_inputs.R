@@ -1,4 +1,4 @@
-inputs <- function(inp, run, times, startdate, stopdate) {
+inputs <- function(inp, run, times, startdate, stopdate, parameters) {
   inp  <- inp %>% rename(Intervention = intervention, 
                          `Date Start` = date_start, 
                          `Date End` = date_end, Value = value,
@@ -750,13 +750,21 @@ inputs <- function(inp, run, times, startdate, stopdate) {
     vaccineagepartial<-rep(0,tail(times,1)*20)
   }
   
-  dmMax <- with(as.list(parameters), {
-    1 / max(pdeath_h,pdeath_ho,pdeath_hc,pdeath_hco,pdeath_icu,pdeath_icuo,pdeath_icuc,
-            pdeath_icuco,pdeath_vent,pdeath_ventc,pdeath_vent_hc,pdeath_icu_hc,
-            pdeath_icu_hco)
-  })
-  dmod_vector <- pmin(dmMax, dmod_vector)
+  dmMax <-  1 / max(parameters["pdeath_h"], 
+                    parameters["pdeath_ho"],
+                    parameters["pdeath_hc"],
+                    parameters["pdeath_hco"],
+                    parameters["pdeath_icu"],
+                    parameters["pdeath_icuo"],
+                    parameters["pdeath_icuc"],
+                    parameters["pdeath_icuco"],
+                    parameters["pdeath_vent"],
+                    parameters["pdeath_ventc"],
+                    parameters["pdeath_vent_hc"],
+                    parameters["pdeath_icu_hc"],
+                    parameters["pdeath_icu_hco"])
   
+  dmod_vector <- pmin(dmMax, dmod_vector)
   cmod_vector <- pmin(100, cmod_vector)
   
   return(list(si_vector=si_vector,sd_vector=sd_vector,scr_vector=scr_vector,hw_vector=hw_vector,msk_vector=msk_vector,

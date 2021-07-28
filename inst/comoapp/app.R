@@ -836,12 +836,11 @@ server <- function(input, output, session) {
   observeEvent(input$run_baseline, {
     # Previous results are no longer valid
     simul_interventions$results <- NULL
-    
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model/model_repeat.R", local = TRUE)
     parameters["iterations"] <- 1
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, parameters)
     
     # Temporary fix the issue where the app crashes if the vaccination efficacy is 100 
     # by replacing 100 by 99.
@@ -875,7 +874,7 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model/model_repeat.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
+    vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, parameters)
     
     # Temporary fix the issue where the app crashes if the vaccination efficacy is 100 
     # by replacing 100 by 99.
@@ -913,7 +912,7 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model/model_repeat.R", local = TRUE)
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, parameters)
     
     # Temporary fix the issue where the app crashes if the vaccination efficacy is 100 
     # by replacing 100 by 99.
@@ -1113,14 +1112,14 @@ server <- function(input, output, session) {
     inp <- bind_rows(interventions$baseline_mat %>% mutate(apply_to = "Baseline (Calibration)"),
                      interventions$future_mat %>% mutate(apply_to = "Hypothetical Scenario"))
     
-    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate)
+    vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, parameters)
     vectors0_cbind <- do.call(cbind, vectors0)
     vectors0_reduced <- vectors0_cbind[seq(from=0,to=nrow(vectors0_cbind),by=20),]
     vectors0_reduced <- as.data.frame(rbind(rep(0,ncol(vectors0_reduced)),vectors0_reduced))
     vectors0_reduced <- vectors0_reduced[,1:12] #subsetting only the coverages - total of 12 different interventions
     names(vectors0_reduced) <- paste0("interventions_baseline_",names(vectors0_reduced))
     
-    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate)
+    vectors <- inputs(inp, 'Hypothetical Scenario', times, startdate, stopdate, parameters)
     vectors_cbind <- do.call(cbind, vectors)
     vectors_reduced <- vectors_cbind[seq(from=0,to=nrow(vectors_cbind),by=20),]
     vectors_reduced <- as.data.frame(rbind(rep(0,ncol(vectors_reduced)),vectors_reduced))
