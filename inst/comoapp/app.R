@@ -858,7 +858,6 @@ server <- function(input, output, session) {
     # by replacing 100 by 99.
     # It should better to fix this in the model.
     vectors$vc_vector[which(vectors$vc_vector == 100)] <- 99
-    browser()
     check_parameters_list_for_na(parameters_list = parameters)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
