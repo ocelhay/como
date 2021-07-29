@@ -810,7 +810,7 @@ server <- function(input, output, session) {
         updateDateRangeInput(session, paste0("baseline_daterange_", i + 100),
                              start = rr_excel_baseline[[i, "date_start"]],
                              end = rr_excel_baseline[[i, "date_end"]])
-        updateSliderInput(session, paste0("baseline_coverage_", i + 100), value = rr_excel_baseline[[i, "value"]])
+        updateNumericInput(session, paste0("baseline_coverage_", i + 100), value = rr_excel_baseline[[i, "value"]])
       }
     }
     
@@ -825,7 +825,7 @@ server <- function(input, output, session) {
         updateDateRangeInput(session, paste0("future_daterange_", i + 100),
                              start = rr_excel_future[[i, "date_start"]],
                              end = rr_excel_future[[i, "date_end"]])
-        updateSliderInput(session, paste0("future_coverage_", i + 100), value = rr_excel_future[[i, "value"]])
+        updateNumericInput(session, paste0("future_coverage_", i + 100), value = rr_excel_future[[i, "value"]])
       }
     }
   })
@@ -858,7 +858,7 @@ server <- function(input, output, session) {
     # by replacing 100 by 99.
     # It should better to fix this in the model.
     vectors$vc_vector[which(vectors$vc_vector == 100)] <- 99
-    
+    browser()
     check_parameters_list_for_na(parameters_list = parameters)
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 

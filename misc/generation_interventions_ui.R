@@ -1,6 +1,6 @@
 js_1 <- "].every( (val) => { return val === '_';} ))"
 js_2 <- "['Mass Testing', 'Vaccination', 'School Closures', 'Partial School Closures']"
-js_3 <- "['Breakthrough infection probability']"
+js_3 <- "['Breakthrough infection probability', '_']"
 
 # Generate interventions_baseline.R ----
 sink("/Users/olivier/Desktop/interventions_baseline.R")
@@ -134,7 +134,7 @@ print(
                      column(1, paste0("#", {i}-100)),
                      column(3, selectInput("baseline_intervention_{i}", NULL, rr_interventions, selected = "_")),
                      column(3, dateRangeInput("baseline_daterange_{i}", NULL, start = new_daterange_value[1], end = new_daterange_value[2], format = "yyyy-mm-dd", startview = "year")),
-                     column(2, sliderInput("baseline_coverage_{i}", NULL, min = 0, max = 100, value = 100, ticks = FALSE)),
+                     column(2, numericInput("baseline_coverage_{i}", NULL, min = 0, max = 100, value = 100)),
                      column(3, conditionalPanel("!({js_3}.includes(input.baseline_intervention_{i}))", "Choose a value ≤ 3"))
                    )
   ),'
@@ -156,7 +156,7 @@ for (i in 102:200) {
                      column(1, paste0("#", {i}-100)),
                      column(3, selectInput("baseline_intervention_{i}", NULL, rr_interventions, selected = "_")),
                      column(3, dateRangeInput("baseline_daterange_{i}", NULL, start = new_daterange_value[1], end = new_daterange_value[2], format = "yyyy-mm-dd", startview = "year")),
-                     column(2, sliderInput("baseline_coverage_{i}", NULL, min = 0, max = 100, value = 100, ticks = FALSE)),
+                     column(2, numericInput("baseline_coverage_{i}", NULL, min = 0, max = 100, value = 100)),
                      column(3, conditionalPanel("!({js_3}.includes(input.baseline_intervention_{i}))", "Choose a value ≤ 3"))
                    )
   ),'
@@ -191,7 +191,7 @@ print(
                      column(1, paste0("#", {i}-100)),
                      column(3, selectInput("future_intervention_{i}", NULL, rr_interventions, selected = "_")),
                      column(3, dateRangeInput("future_daterange_{i}", NULL, start = new_daterange_value[1], end = new_daterange_value[2], format = "yyyy-mm-dd", startview = "year")),
-                     column(2, sliderInput("future_coverage_{i}", NULL, min = 0, max = 100, value = 100, ticks = FALSE)),
+                     column(2, numericInput("future_coverage_{i}", NULL, min = 0, max = 100, value = 100)),
                      column(3, conditionalPanel("!({js_3}.includes(input.future_intervention_{i}))", "Choose a value ≤ 3"))
                    )
   ),'
@@ -208,7 +208,7 @@ for (i in 102:200) {
                      column(1, paste0("#", {i}-100)),
                      column(3, selectInput("future_intervention_{i}", NULL, rr_interventions, selected = "_")),
                      column(3, dateRangeInput("future_daterange_{i}", NULL, start = new_daterange_value[1], end = new_daterange_value[2], format = "yyyy-mm-dd", startview = "year")),
-                     column(2, sliderInput("future_coverage_{i}", NULL, min = 0, max = 100, value = 100, ticks = FALSE)),
+                     column(2, numericInput("future_coverage_{i}", NULL, min = 0, max = 100, value = 100)),
                      column(3, conditionalPanel("!({js_3}.includes(input.future_intervention_{i}))", "Choose a value ≤ 3"))
                    )
   ),'
