@@ -738,8 +738,15 @@ server <- function(input, output, session) {
       showNotification(HTML("No 'Global Simulations Parameter' was updated."), duration = NULL)
     }
     
-    # Update interventions in the UI: read "Interventions" sheet and validate
+    # Set all interventions to "_"
+    for (i in 1:200) {
+      updateSelectInput(session, paste0("baseline_intervention_", i), selected = "_")
+      updateSelectInput(session, paste0("future_intervention_", i), selected = "_")
+    }
     
+    
+    
+    # Update interventions in the UI: read "Interventions" sheet and validate
     voc <- read_excel(file_path, sheet = "VOC")
     if (nrow(voc) == 0) {
       interventions_excel <- read_excel(file_path, sheet = "Interventions") %>%
@@ -758,11 +765,6 @@ server <- function(input, output, session) {
         rename(intervention = 1, date_start = 2, date_end = 3, value = 4, unit = 5, age_group = 6, apply_to = 7)
     ) %>% 
       filter(intervention %in% c(valid_interventions, real_rr_interventions)) }
-    
-    # ifelse(all(interventions_excel$intervention %in% valid_interventions),
-    #        message("Okay, all interventions are valid."),
-    #        stop("Stop, some interventions are not valid.")
-    # )
     
     # Update interventions in the UI: baseline interventions
     interventions_excel_baseline <- interventions_excel %>% 
