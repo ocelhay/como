@@ -38,8 +38,6 @@ output$text_pct_total_baseline_dup <- renderText({
 output$text_death_total_baseline <- renderText({
   req(simul_baseline$baseline_available)
   
-  if(input$focus_axis == "Predicted Reported") browser()
-  
   end_date <- input$date_range[2] - 1
   if(input$focus_axis == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], input$date_range[2])
   
