@@ -450,7 +450,7 @@ server <- function(input, output, session) {
   #          "find_pandoc(dir = '/usr/local/bin/')", find_pandoc(dir = "/usr/local/bin/")$version)
   # })
   
-  observeEvent(input$debug, browser())
+  # observeEvent(input$debug, browser())
   
   # triggers the modal dialogs when the user clicks an icon
   observe_helpers(help_dir = "./www/markdown")
