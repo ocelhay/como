@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v19.1.3"  # also in DESCRIPTION and README.md
+version_app <- "v19.1.4"  # also in DESCRIPTION and README.md
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -63,7 +63,7 @@ ui <- function(request) {
       id = "tabs", windowTitle = "CoMo Consortium | COVID-19 App", collapsible = TRUE, inverse = FALSE,
       tabPanel("Welcome", value = "tab_welcome",
                span(class = "app-version", version_app),
-               # for debugging purposes, TODO: remove in prod
+               # TODO (production) : comment the next line
                # htmlOutput("diagnosis_platform"),
                fluidRow(
                  column(8,
@@ -101,7 +101,7 @@ ui <- function(request) {
           ),
           column(
             width = 10,
-            # Comment the next line in production
+            # TODO (production) : comment the next line
             # actionButton("debug", "Launch debug"),
             div(class = "box_outputs", h4("Global Simulations Parameters")),
             fluidRow(
@@ -450,6 +450,7 @@ server <- function(input, output, session) {
   #          "find_pandoc(dir = '/usr/local/bin/')", find_pandoc(dir = "/usr/local/bin/")$version)
   # })
   
+  # TODO (production) : comment the next line
   # observeEvent(input$debug, browser())
   
   # triggers the modal dialogs when the user clicks an icon
@@ -1122,6 +1123,9 @@ server <- function(input, output, session) {
     times <- seq(0, as.numeric(stopdate - startdate))
     inp <- bind_rows(interventions$baseline_mat %>% mutate(apply_to = "Baseline (Calibration)"),
                      interventions$future_mat %>% mutate(apply_to = "Hypothetical Scenario"))
+    
+    # Make parameters available
+    source("./www/model/model_repeat.R", local = TRUE)
     
     vectors0 <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, parameters)
     vectors0_cbind <- do.call(cbind, vectors0)
