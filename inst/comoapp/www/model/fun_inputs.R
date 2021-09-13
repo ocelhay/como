@@ -764,6 +764,7 @@ inputs <- function(inp, run, times, startdate, stopdate, parameters) {
                     parameters["pdeath_icu_hc"],
                     parameters["pdeath_icu_hco"])
   
+  browser()
   dmod_vector <- pmin(dmMax, dmod_vector)
   cmod_vector <- pmin(100, cmod_vector)
   

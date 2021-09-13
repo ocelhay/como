@@ -51,9 +51,9 @@ fun_validation_interventions <- function(dta, simul_start_date, simul_end_date, 
                        input$pdeath_icu_hc,
                        input$pdeath_icu_hco) * dta %>% filter(intervention == "Lethality") %>% pull(value) %>% max())
     if(max_value > 100) {
-      validation$validation_interventions <- FALSE
+      validation$validation_interventions <- TRUE
       validation$message_interventions <- paste0(validation$message_interventions,
-                                                 "NEEDS RESOLUTION: After applying RR, one or several 'Probability of dying' parameter is above the max authorised value of 100.",
+                                                 "WARNING: After applying RR, one or several 'Probability of dying' parameter is above the max authorised value of 100.",
                                                  br())
     }
   }

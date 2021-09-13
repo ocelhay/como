@@ -1,5 +1,5 @@
 # CoMo COVID-19 App
-version_app <- "v19.1.4"  # also in DESCRIPTION and README.md
+version_app <- "v19.1.5"  # also in DESCRIPTION and README.md
 
 # To generate report with macOS standalone app (created with shinybox),
 # ensure that the R session has access to pandoc installed in "/usr/local/bin".
@@ -15,6 +15,7 @@ Running the app requires to install the v19.1.2 of the R package comoOdeCpp.
 Run:  
 
   remove.packages('comoOdeCpp')
+  # quit and reopen R
   remotes::install_github('bogaotory/comoOdeCpp', ref = 'v19.1.2', subdir = 'comoOdeCpp')
 
 in the R console to install it.")
@@ -852,7 +853,6 @@ server <- function(input, output, session) {
     # Create/filter objects for model that are dependent on user inputs
     source("./www/model/model_repeat.R", local = TRUE)
     parameters["iterations"] <- 1
-    
     vectors <- inputs(inp, 'Baseline (Calibration)', times, startdate, stopdate, parameters)
     
     # Temporary fix the issue where the app crashes if the vaccination efficacy is 100 

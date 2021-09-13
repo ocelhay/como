@@ -70,7 +70,7 @@ process_ode_outcome <- function(out, param_used, startdate, times, ihr, ifr, mor
                            prob = (results$med$ab_all_ages / results$med$N))
     aux<-c(aux, num.inf.samp / samp.sizes)
   }
-  
+
   ab$Ab <- (param_used["se"]/100) * aux + (1 - (param_used["sp"]/100))*(1 - aux)
   
   quantile_ab <- ab %>%
