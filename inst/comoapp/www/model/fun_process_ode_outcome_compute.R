@@ -1,14 +1,12 @@
 # Results derived from out$min, out$max or out$mean ----
   process_ode_outcome_compute <- function(out_mat, param_used, startdate, times, ihr, ifr, mort, popstruc, intv_vector) {
-    
-    # snippet v16.5 lines 1615-1627 already in fun_multi_runs.R
-    
-    # Start snippet v16.5 lines 1629-1642 ----
-    # changes: replaced out$mean with out_mat
+  
+    # IMPORTANT difference with script: replaced out_mean & out$mean with out_mat
+    # IMPORTANT difference with script: replaced parameters with param_used
     # total population
-    pop1<-out_mat[,(Sindex+1)]+out_mat[,(Eindex+1)]+out_mat[,(Iindex+1)]+out_mat[,(CLindex+1)]+out_mat[,(Rindex+1)]+
+    pop1<-out_mat[,(Sindex+1)]+out_mat[,(SRindex+1)]+out_mat[,(Eindex+1)]+out_mat[,(Iindex+1)]+out_mat[,(CLindex+1)]+out_mat[,(Rindex+1)]+
       out_mat[,(Xindex+1)]+out_mat[,(Vindex+1)]+out_mat[,(Zindex+1)]+out_mat[,(EVindex+1)]+out_mat[,(ERindex+1)]+out_mat[,(EVRindex+1)]+
-      out_mat[,(QSindex+1)]+out_mat[,(QEindex+1)]+out_mat[,(QIindex+1)]+out_mat[,(QCindex+1)]+out_mat[,(QRindex+1)]+
+      out_mat[,(QSindex+1)]+out_mat[,(QSRindex+1)]+out_mat[,(QEindex+1)]+out_mat[,(QIindex+1)]+out_mat[,(QCindex+1)]+out_mat[,(QRindex+1)]+
       out_mat[,(QVindex+1)]+out_mat[,(QEVindex+1)]+out_mat[,(QERindex+1)]+out_mat[,(QVRindex+1)]+out_mat[,(QEVRindex+1)]+
       out_mat[,(Hindex+1)]+out_mat[,(HCindex+1)]+out_mat[,(ICUindex+1)]+out_mat[,(ICUCindex+1)]+out_mat[,(ICUCVindex+1)]+
       out_mat[,(Ventindex+1)]+out_mat[,(VentCindex+1)]+out_mat[,(HCICUindex+1)]+out_mat[,(HCVindex+1)]
@@ -75,6 +73,7 @@
     cinc_mort_131 <- cumsum(rowSums(param_used["nusc"]*(1-param_used["propo2"])*param_used["pdeath_icu_hc"]*dm*(out_mat[,(HCICUindex+1)]%*%ifr[,2])))
     cinc_mort_141 <- cumsum(rowSums(param_used["nu_ventc"]*param_used["pdeath_vent_hc"]*dm*(out_mat[,(HCVindex+1)]%*%ifr[,2])))
     
+    
     cinc_mort_H1 <- cinc_mort_1 + cinc_mort_2
     cinc_mort_HC1 <- cinc_mort_3 + cinc_mort_4 + cinc_mort_12 + cinc_mort_13 + cinc_mort_14
     cinc_mort_ICU1 <- cinc_mort_5 + cinc_mort_6
@@ -100,7 +99,9 @@
     
     base_mort_V1 <- cumsum(rowSums(out_mat[,(Vindex+1)]%*%mort))
     base_mort_S1 <- cumsum(rowSums(out_mat[,(Sindex+1)]%*%mort))
+    base_mort_SR1 <- cumsum(rowSums(out_mat[,(SRindex+1)]%*%mort))
     base_mort_QS1 <- cumsum(rowSums(out_mat[,(QSindex+1)]%*%mort))
+    base_mort_QSR1 <- cumsum(rowSums(out_mat[,(QSRindex+1)]%*%mort))
     base_mort_QR1 <- cumsum(rowSums(out_mat[,(QRindex+1)]%*%mort))
     base_mort_R1 <- cumsum(rowSums(out_mat[,(Rindex+1)]%*%mort))
     base_mort_QVR1 <- cumsum(rowSums(out_mat[,(QVRindex+1)]%*%mort))
@@ -144,11 +145,9 @@
                               base_mort_ER11 + base_mort_EV11+  base_mort_EVR11+   
                               base_mort_QE11 + base_mort_QI11 + base_mort_QC11 +  
                               base_mort_QEV11 + base_mort_QER11 + base_mort_QEVR11 + base_mort_Z1+
-                              base_mort_H1+base_mort_HC11+base_mort_ICU1+base_mort_ICUC1+base_mort_ICUCV1+
-                              base_mort_Vent1+base_mort_VentC1+base_mort_HCICU11+base_mort_HCV11)
-    # End snippet v16.5 lines 1669-1763 ----
+                              base_mort_H1+base_mort_HC11 + base_mort_ICU1 + base_mort_ICUC1 + base_mort_ICUCV1+
+                              base_mort_Vent1 + base_mort_VentC1 + base_mort_HCICU11 + base_mort_HCV11)
     
-    # Start snippet v16.5 lines 1764-1772 ----
     results <- list()
     results$time <- startdate + times  # dates
     results$N <- tpop1
@@ -156,10 +155,11 @@
     ## Ab
     results$ab_all_ages<-ab_all_ages
     results$ab<-ab_age
-    # End snippet v16.5 lines 1764-1772 ----
+    
+    # Rt/ FOI
+    # 6-lines section not included
+    
 
-    # Start snippet v16.5 lines 1782-1825 (Part 1) ----
-    # changes: replaced out$mean with out_mat; replaced out with our_mat; replaced parameters with param_used
     # Hospital requirements
     previcureq1<-rowSums(out_mat[,(Hindex+1)])+ rowSums(out_mat[,(ICUCindex+1)])+rowSums(out_mat[,(ICUCVindex+1)]) # surge beds occupancy
     previcureq21<-rowSums(out_mat[,(ICUindex+1)])+rowSums(out_mat[,(VentCindex+1)])   # icu beds occupancy
@@ -181,13 +181,15 @@
     ### MORTALITY
     results$cum_mortality <- round(rowSums(out_mat[,(CMindex+1)]))       # cumulative mortality
     
-    # End Snippet (Part 1) ----
+    # DIFFERENT FROM SCRIPT:
     
     results$deaths_from_covid <- round(cinc_mort_all)
     results$deaths_with_covid <- round(nat_deaths_inf)
     
-    # Start Snippet (Part 2) ----
-    results$death_natural_non_exposed <- round(base_mort_S1+base_mort_V1+base_mort_QS1)
+    # Start copy/paste script
+    # IMPORTANT difference with script: replaced out_mean & out$mean with out_mat
+    # IMPORTANT difference with script: replaced parameters with param_used
+    results$death_natural_non_exposed <- round(base_mort_S1+base_mort_V1+base_mort_QS1+base_mort_QSR1+base_mort_SR1)
     results$death_natural_exposed <- round(base_mort_E1 + base_mort_I1 + base_mort_CL1 + base_mort_X1 + 
                                              base_mort_R1+ base_mort_ER1 + base_mort_EV1+  base_mort_EVR1+   
                                              base_mort_QE1 + base_mort_QI1 + base_mort_QC1 + base_mort_QR1 + 
@@ -206,10 +208,9 @@
     results$total_deaths <- results$attributable_deaths + results$death_natural_non_exposed + results$death_natural_exposed
     results$total_deaths_end <- last(results$total_deaths)
     results$total_reported_deaths_end <- last(results$cum_mortality)
-    # End snippet v16.5 lines 1764-1825 (Part 2) ----
     
-    # Start snippet v16.5 lines 1826-1857 ----
-    # changes: replaced out$mean with out_mat; replaced parameters with param_used
+    
+    ## AGE DEPENDENT MORTALITY
     cinc_mort_H1 <- param_used["nus"]*param_used["propo2"]*param_used["pdeath_ho"]*dm*dexo2_hist*(out_mat[,(Hindex+1)])+
       param_used["nus"]*(1-param_used["propo2"])*param_used["pdeath_h"]*dm*(out_mat[,(Hindex+1)])
     cinc_mort_HC1 <- param_used["nusc"]*param_used["report_death_HC"]*param_used["propo2"]*param_used["pdeath_hco"]*dm*(out_mat[,(HCindex+1)])+
@@ -227,7 +228,6 @@
     
     totage1<-as.data.frame(cinc_mort_H1+cinc_mort_HC1+cinc_mort_ICU1+cinc_mort_ICUC1+
                              cinc_mort_Vent1+cinc_mort_VentC1+cinc_mort_ICUCV1+cinc_mort_HCICU1+cinc_mort_HCV1)
-    
     
     basemort_H1<-(out_mat[,(Hindex+1)])
     basemort_HC1<-param_used["report_death_HC"]*(out_mat[,(HCindex+1)])
@@ -257,7 +257,6 @@
                               basemort_I+basemort_QI+basemort_E+basemort_QE+basemort_EV+basemort_EVR+
                               basemort_ER+basemort_QEV+basemort_QEVR+basemort_QER+basemort_CL+basemort_QC+basemort_X)
     
-    
     tc<-c()
     for (i in 1:dim(cinc_mort_H1)[1]) {
       for (j in 1:dim(cinc_mort_H1)[2]) {
@@ -267,6 +266,7 @@
     }
     tc<-as.data.frame(tc)
     colnames(tc)<-c("Day","Age","value")
+    
     results$tc <- tc %>%
       mutate(Date = startdate + Day,
              age_cat = case_when(
@@ -278,6 +278,7 @@
                Age >=  15  ~ ">= 70 y.o.")) %>%
       mutate(age_cat = factor(age_cat, levels = rev(c("<= 30 y.o.", "30-40 y.o.",
                                                       "40-50 y.o.", "50-60 y.o.", "60-70 y.o.", ">= 70 y.o."))))
+    
     
     mortality_lag <- data.frame(Age = popstruc$agefloor)
     if(nrow(out_mat) >= 30)  mortality_lag <- bind_cols(mortality_lag,
@@ -294,18 +295,12 @@
                                                             mutate(day120 = ifelse(is.infinite(day120), 0, day120)))
     
     results$mortality_lag <- mortality_lag
-    # End snippet v16.5 lines 1863-1893 ----
+    # End copy/paste script
     
-    # Start bridge v16.5 ----
     results$total_covid_deaths <- results$deaths_from_covid + results$deaths_with_covid
     results$reportable_deaths <- results$attributable_deaths + results$death_natural_exposed
     results$total_reportable_deaths_end <- last(results$total_reportable_deaths)
     results$total_cm_deaths_end <- round(last(results$cum_mortality))
-    # End bridge v16.5 ----
-    
-    # to compare scripts and app
-    # browser()
-    # results_app <<- results
-    
+
     return(results)
   }
