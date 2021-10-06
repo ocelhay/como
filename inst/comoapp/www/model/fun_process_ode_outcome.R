@@ -64,7 +64,6 @@ process_ode_outcome <- function(out, param_used, startdate, times, ihr, ifr, mor
   
   ab <- data.frame(Time = rep(results$time, 100), Ab = 0)
   
-  browser()
   aux <- NULL
   for (i in 1:100) {
     num.inf.samp <- rbinom(length(results$time), size = samp.sizes, 
