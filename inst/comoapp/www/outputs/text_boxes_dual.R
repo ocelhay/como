@@ -1,9 +1,8 @@
 # Baseline
-
 output$text_pct_total_baseline <- renderText({
   req(simul_baseline$baseline_available)
   end_date <- input$date_range[2] - 1
-  if(input$focus_axis == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], input$date_range[2])
+  if(input$focus_axis == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], end_date)
   
   paste0(
     as.character(
@@ -21,7 +20,7 @@ output$text_pct_total_baseline_dup <- renderText({
   req(simul_baseline$baseline_available)
   
   end_date <- input$date_range[2] - 1
-  if(input$focus_axis_dup == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], input$date_range[2])
+  if(input$focus_axis_dup == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], end_date)
   
   paste0(
     as.character(
@@ -39,7 +38,7 @@ output$text_death_total_baseline <- renderText({
   req(simul_baseline$baseline_available)
   
   end_date <- input$date_range[2] - 1
-  if(input$focus_axis == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], input$date_range[2])
+  if(input$focus_axis == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], end_date)
   
   paste0(
     as.character(
@@ -57,7 +56,7 @@ output$text_death_total_baseline_dup <- renderText({
   req(simul_baseline$baseline_available)
   
   end_date <- input$date_range[2] - 1
-  if(input$focus_axis_dup == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], input$date_range[2])
+  if(input$focus_axis_dup == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], end_date)
   
   paste0(
     as.character(
@@ -74,7 +73,7 @@ output$text_death_total_baseline_dup <- renderText({
 output$text_pct_reported_baseline <- renderText({
   req(simul_baseline$baseline_available)
   end_date <- input$date_range[2] - 1
-  if(input$focus_axis == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], input$date_range[2])
+  if(input$focus_axis == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], end_date)
   
   paste0(
     as.character(
@@ -92,7 +91,7 @@ output$text_pct_reported_baseline_dup <- renderText({
   req(simul_baseline$baseline_available)
   
   end_date <- input$date_range[2] - 1
-  if(input$focus_axis_dup == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], input$date_range[2])
+  if(input$focus_axis_dup == "Observed") end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], end_date)
   
   paste0(
     as.character(
@@ -113,7 +112,7 @@ output$text_death_total_future <- renderText({
   req(simul_interventions$interventions_available)
 
   end_date <- input$date_range[2] - 1
-  if(input$focus_axis_dup == "Observed")  end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], input$date_range[2])
+  if(input$focus_axis_dup == "Observed")  end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], end_date)
 
   reduction <- (simul_interventions$results$med$total_covid_deaths[which(simul_interventions$results$med$time == end_date)] -
                   simul_baseline$results$med$total_covid_deaths[which(simul_baseline$results$med$time == end_date)])
@@ -135,7 +134,7 @@ output$text_pct_total_future <- renderText({
   req(simul_interventions$interventions_available)
 
   end_date <- input$date_range[2] - 1
-  if(input$focus_axis_dup == "Observed")  end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], input$date_range[2])
+  if(input$focus_axis_dup == "Observed")  end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], end_date)
 
   n <- simul_interventions$results$med$pct_total_pop_infected[which(simul_interventions$results$min$time == end_date)]
   reduction <- round((n - simul_baseline$results$med$pct_total_pop_infected[which(simul_baseline$results$min$time == end_date)]), 1)
@@ -156,7 +155,7 @@ output$text_pct_reported_future <- renderText({
   req(simul_interventions$interventions_available)
   
   end_date <- input$date_range[2] - 1
-  if(input$focus_axis_dup == "Observed")  end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], input$date_range[2])
+  if(input$focus_axis_dup == "Observed")  end_date <- min(cases_rv$data$date[last(which(!is.na(cases_rv$data$cases)))], end_date)
   
   n <- simul_interventions$results$med$pct_reported_pop_infected[which(simul_interventions$results$min$time == end_date)]
   reduction <- round((n - simul_baseline$results$med$pct_reported_pop_infected[which(simul_baseline$results$min$time == end_date)]), 1)
