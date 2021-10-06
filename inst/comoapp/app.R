@@ -443,16 +443,12 @@ ui <- function(request) {
 
 # Define server ----
 server <- function(input, output, session) {
-  
   # look for PANDOC for debugging purposes - can be removed in prod
   # output$diagnosis_platform <- renderText({
   #   paste0("pandoc_available: ", pandoc_available(), "</br>",
   #          "Sys.getenv('PATH'): ", Sys.getenv("PATH"), "</br>",
   #          "find_pandoc(dir = '/usr/local/bin/')", find_pandoc(dir = "/usr/local/bin/")$version)
   # })
-  
-  # TODO (production) : comment the next line
-  # observeEvent(input$debug, browser())
   
   # triggers the modal dialogs when the user clicks an icon
   observe_helpers(help_dir = "./www/markdown")
@@ -797,6 +793,7 @@ server <- function(input, output, session) {
                              start = interventions_excel_future[[i, "date_start"]], 
                              end = interventions_excel_future[[i, "date_end"]])
         updateSliderInput(session, paste0("future_coverage_", i), value = interventions_excel_future[[i, "value"]])
+        updatePickerInput(session, paste0("future_age_group_", i), selected = vec_age_categories[as.logical(parse_age_group(interventions_excel_future$age_group[i]))])
       }
     }
     
@@ -860,6 +857,7 @@ server <- function(input, output, session) {
     # It should better to fix this in the model.
     vectors$vc_vector[which(vectors$vc_vector == 100)] <- 99
     check_parameters_list_for_na(parameters_list = parameters)
+    
     results <- multi_runs(Y, times, parameters, input = vectors, A = A,  ihr, ifr, mort, popstruc, popbirth, ageing,
                           contact_home = contact_home, contact_school = contact_school, 
                           contact_work = contact_work, contact_other = contact_other, 
