@@ -1,7 +1,5 @@
 <!-- badges: start -->
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-[![](https://img.shields.io/badge/devel%20version-18.2.0.svg)](https://github.com/ocelhay/como)
-[![Build Status](https://travis-ci.org/ocelhay/como.svg?branch=master)](https://travis-ci.org/ocelhay/como)
 [![DOI](https://zenodo.org/badge/251726959.svg)](https://zenodo.org/badge/latestdoi/251726959)
 <!-- badges: end -->
 
@@ -16,7 +14,7 @@ The model is continually being updated and refined based on feedback from member
 - The latest stable release from the app can be accessed online at https://comomodel.net
 - Standalone versions of the app for Windows and macOS are available: [standalone stable releases](https://github.com/ocelhay/como/releases/latest).
 
-(Experimental.) The latest development version is available [as a standalone app](https://github.com/ocelhay/como/releases) or [an online app](https://livedataoxford.shinyapps.io/comoappdev/).
+(Experimental.) The latest development version is available [as a standalone app](https://github.com/ocelhay/como/releases) or [an online app](https://livedataoxford.shinyapps.io/comomodel/).
 
 (Advanced.) The app can also run as an R package:
 
